@@ -1,19 +1,19 @@
 name:                infovis-parallel
-version:             0.2.3.11
+version:             0.2.3.12
 synopsis:            Parallel-planes information visualization.
 description:         This information visualization shows multidimensional data as parallel planes with scatterplots connected by lines for corresponding data points.  It is a three-dimensional generalization of the two-dimensional parallel coordinate plots.
 
 license:             MIT
 license-file:        LICENSE
-author:              Brian W Bush <consult@brianwbush.info>
-maintainer:          Brian W Bush <consult@brianwbush.info>
-copyright:           (c) 2015 Brian W Bush
+author:              Brian W Bush <brian.bush@nrel.gov>
+maintainer:          Brian W Bush <brian.bush@nrel.gov>
+copyright:           (c) 2016 National Renewable Energy Laboratory
 category:            Graphics
 build-type:          Simple
 cabal-version:       >= 1.10
-homepage:            https://bitbucket.org/bwbush/infovis-parallel
+homepage:            https://github.com/NREL/infovis-parallel.git
 bug-reports:         https://bwbush.atlassian.net/projects/HIVPP/issues/
-package-url:         https://bitbucket.org/bwbush/infovis-parallel/downloads/infovis-parallel-0.2.3.11.tar.gz
+package-url:         https://github.com/NREL/infovis-parallel/releases/
 
 extra-source-files:  ReadMe.md
 data-dir: data
@@ -26,7 +26,7 @@ data-files: ENB2012.md
 
 source-repository head
   type: git
-  location: https://bwbush@bitbucket.org/bwbush/infovis-parallel.git
+  location: https://github.com/NREL/infovis-parallel.git
  
 library
   build-depends:    base                               >= 4.8.1 && < 5
