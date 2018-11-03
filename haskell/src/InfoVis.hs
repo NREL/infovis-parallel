@@ -73,7 +73,7 @@ withLogger action =
     liftIO
       . forkIO
       $ do
-        result <- tryIOError . action $ \severity message -> writeChan messages $ Right (severity, message)
+        result <- tryIOError . action $ ((writeChan messages . Right) .) . (,)
         writeChan messages $ Left result        
     let
       loop =
