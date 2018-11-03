@@ -1,4 +1,5 @@
-SHELL=bash
+#!/usr/bin/env nix-shell
+#!nix-shell -i "make -f" -p gnumake dotnet-sdk protobuf
 
 
 build: src/Infovis/Protobuf.cs
@@ -14,8 +15,8 @@ clean:
 restore:
 	dotnet restore
 
-infovis-unity.sln:
-	dotnet new sln -o ../infovis-unity
+csharp.sln:
+	dotnet new sln -o ../csharp
 
 src/Infovis/Infovis.csproj:
 	dotnet new console -lang 'C#' -o $(@D)
@@ -24,9 +25,9 @@ src/Infovis/Infovis.csproj:
 	dotnet add $@ package WebSocketSharp --version 1.0.3-rc1
 	dotnet sln add $@
 
-src/Infovis/Protobuf.cs: infovis.proto3
-	protoc --csharp_out $(@D) $<
-	mv src/Infovis/Infovis.cs $@
+src/Infovis/Protobuf.cs: ../protobuf/infovis.proto3
+	protoc --csharp_out . $<
+	mv Infovis.cs $@
 
 
 .PHONY: build clean restore run
