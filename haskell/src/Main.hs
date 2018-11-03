@@ -14,6 +14,7 @@
 
 
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE FlexibleContexts   #-}
 {-# LANGUAGE RecordWildCards    #-}
 
 
@@ -23,12 +24,15 @@ module Main (
 
 
 import Control.Concurrent
+import Control.Monad.Except (MonadError, MonadIO, liftIO, runExceptT, throwError)
 import Data.ByteString.Base64 (encode)
 import Data.Data (Data)
 import Data.Version (showVersion)
 import Network.WebSockets
 import Paths_infovis_parallel (version)
 import System.Console.CmdArgs (Typeable, (&=), Default(..), args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
+import System.Exit (die)
+import System.IO.Error (tryIOError)
 
 import qualified Data.ByteString as BS
 import qualified Data.Text as T
@@ -97,13 +101,19 @@ main :: IO ()
 main =
   do
     command <- cmdArgs infovis
-    dispatch command
+    result <- runExceptT $ dispatch command
+    case result :: Either String () of
+      Right () -> return ()
+      Left  e  -> die $ "Critical] " ++ e
 
 
-dispatch :: Infovis -> IO ()
+dispatch :: (MonadError String m, MonadIO m)
+         => Infovis
+         -> m ()
 
 dispatch SendBuffers{..} =
-  runClient host port path
+  guardIO
+    . runClient host port path
     $ \connection ->
     do
       sequence_
@@ -117,4 +127,11 @@ dispatch SendBuffers{..} =
           file <- buffers
         ]
       threadDelay 500000
-      sendClose connection $ T.pack "Done."
+      sendClose connection $ T.pack "Infovis done."
+
+
+guardIO :: (MonadIO m, MonadError String m) => IO a -> m a
+guardIO =
+  (either (throwError . show) return =<<)
+    . liftIO
+    . tryIOError
