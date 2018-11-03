@@ -27,7 +27,7 @@ module Main (
 ) where
 
 
-import Control.Concurrent
+import Control.Concurrent (threadDelay)
 import Control.Monad (when)
 import Control.Monad.Except (MonadError, MonadIO, liftIO, runExceptT, throwError)
 import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), logInfo, renderWithSeverity, runLoggingT)
@@ -35,15 +35,15 @@ import Data.ByteString.Base64 (encode)
 import Data.Data (Data)
 import Data.String (IsString(..))
 import Data.Version (showVersion)
-import Network.WebSockets
+import Network.WebSockets (runClient, sendBinaryData, sendTextData, sendClose)
 import Paths_infovis_parallel (version)
 import System.Console.CmdArgs (Typeable, (&=), Default(..), args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
 import System.Exit (die)
 import System.IO (hPrint, stderr)
 import System.IO.Error (tryIOError)
 
-import qualified Data.ByteString as BS
-import qualified Data.Text as T
+import qualified Data.ByteString as BS (readFile)
+import qualified Data.Text as T (pack)
 
 
 stringVersion :: String
