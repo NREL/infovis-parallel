@@ -18,6 +18,7 @@ namespace Infovis {
       byte[] bytes = evt.IsText ? Convert.FromBase64String(evt.Data) : evt.RawData;
       Request request = Request.Parser.ParseFrom(bytes);
       Infovis.State.Process(request);
+      Send("Buffer received");
     }
 
     protected override void OnError(ErrorEventArgs evt) {

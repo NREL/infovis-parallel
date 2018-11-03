@@ -21,17 +21,15 @@ module InfoVis.Parallel.Sender (
 ) where
 
 
-import Control.Concurrent (threadDelay)
+import Control.Exception (finally)
 import Control.Monad.Except (MonadError, MonadIO)
 import Control.Monad.Log (Severity(..), logInfo)
 import Data.ByteString.Base64 (encode)
 import InfoVis (SeverityLog, withLogger)
-import Network.WebSockets (runClient, sendBinaryData, sendTextData, sendClose)
+import Network.WebSockets (receiveData, runClient, sendBinaryData, sendTextData, sendClose)
 
 import qualified Data.ByteString as BS (readFile)
-import qualified Data.Text as T (pack)
-
-
+import qualified Data.Text as T (pack, unpack)
 
 
 sendBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -60,6 +58,13 @@ sendBuffers host port path sendText buffers =
             |
               file <- buffers
             ]
-          threadDelay 500000
-          sendClose connection $ T.pack "Infovis done."
+          let
+            loop :: IO ()
+            loop =
+              do
+                x <- receiveData connection
+                logger Debug $ T.unpack x
+                loop
+          loop
+            `finally` sendClose connection (T.pack "Infovis done.")
     logInfo $ "Closing WebSocket on <ws://" ++ host ++ ":" ++ show port ++ path ++ "> . . ."

@@ -111,7 +111,7 @@ main =
         $ dispatch command
     case result :: Either String () of
       Right () -> return ()
-      Left  e  -> die $ "Critical] " ++ e
+      Left  e  -> die $ "[Critical] " ++ e
 
 
 dispatch :: (MonadError String m, MonadIO m, SeverityLog m)

@@ -29,6 +29,7 @@ module InfoVis (
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.Chan (newChan, readChan, writeChan)
+import Control.Exception (SomeException, catch)
 import Control.Monad (when)
 import Control.Monad.Except (MonadError, MonadIO, liftIO, throwError)
 import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), logMessage, renderWithSeverity, runLoggingT)
@@ -55,13 +56,11 @@ withSeverityLog :: (MonadError String m, MonadIO m)
                 -> m a
 withSeverityLog severity =
   flip runLoggingT
-    (
-      \message ->
-        when (msgSeverity message <= severity)
-          $ if msgSeverity message > Critical
-              then liftIO . hPrint stderr $ renderWithSeverity fromString message
-              else throwError . fromString $ discardSeverity message
-    )
+    $ \message ->
+      when (msgSeverity message <= severity)
+        . liftIO
+        . hPrint stderr
+        $ renderWithSeverity fromString message
 
 
 withLogger :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -73,7 +72,9 @@ withLogger action =
     liftIO
       . forkIO
       $ do
-        result <- tryIOError . action $ ((writeChan messages . Right) .) . (,)
+        result <- catch
+                    (fmap Right . action $ ((writeChan messages . Right) .) . (,))
+                    (\e -> return $ Left (e :: SomeException))
         writeChan messages $ Left result        
     let
       loop =
