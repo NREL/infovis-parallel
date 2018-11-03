@@ -1,7 +1,8 @@
 name         : infovis-parallel
-version      : 0.3.2.8
+version      : 0.1.0.0
 synopsis     : Parallel-planes information visualization.
 description  : This information visualization shows multidimensional data as parallel planes with scatterplots connected by lines for corresponding data points.  It is a three-dimensional generalization of the two-dimensional parallel coordinate plots.
+
 
 license      : MIT
 license-file : LICENSE
@@ -15,183 +16,25 @@ homepage     : https://bitbucket.org/bwbush/infovis-parallel
 bug-reports  : https://bwbush.atlassian.net/projects/HIVPP/issues/
 package-url  : https://bitbucket.org/bwbush/infovis-parallel/downloads/infovis-parallel-$version.tar.gz
 
-extra-source-files: ReadMe.md
-data-dir          : data
-data-files        : ENB2012.md
-                    ENB2012.tsv
-                    ENB2012.yaml
-                    presentation.yaml
-                    launch-laptop.sh
-                    laptop/input.yaml
-                    laptop/joystick.yaml
-                    laptop/spacenav.yaml
-                    laptop/world.yaml
-                    laptop/advanced.yaml
-                    launch-zspace.sh
-                    zspace/input-kafka.yaml
-                    zspace/input-vrpn.yaml
-                    zspace/world.yaml
-                    zspace/advanced.yaml
-                    launch-diagnostics.sh
-                    diagnostics/input.yaml
-                    diagnostics/spacenav.yaml
-                    diagnostics/world.yaml
-                    launch-cave.sh
-                    cave/input-kafka.yaml
-                    cave/input-vrpn.yaml
-                    cave/world.yaml
-                    cave/advanced.yaml
-
 
 source-repository head
   type    : git
   location: https://bwbush@bitbucket.org/bwbush/infovis-parallel.git
-
-
-flag SwapGroup
-  description: Support calling glJoinSwapGroupNV.
-  default    : True
-
-flag UseKafka
-  description: Support the use of Kafka for input.
-  default    : True
-
-flag UseVRPN
-  description: Support the use of VRPN for input.
-  default    : True
-
-library
-
-  exposed-modules  : InfoVis.Parallel.IO
-                     InfoVis.Parallel.Presentation.Displaying
-                     InfoVis.Parallel.Presentation.Presenting
-                     InfoVis.Parallel.Presentation.Scaling
-                     InfoVis.Parallel.Process
-                     InfoVis.Parallel.Process.DataProvider
-                     InfoVis.Parallel.Process.Select
-                     InfoVis.Parallel.Process.Track
-                     InfoVis.Parallel.Process.Util
-                     InfoVis.Parallel.Rendering.Display
-                     InfoVis.Parallel.Rendering.Shapes
-                     InfoVis.Parallel.Rendering.Types
-                     InfoVis.Parallel.Types
-                     InfoVis.Parallel.Types.Configuration
-                     InfoVis.Parallel.Types.Dataset
-                     InfoVis.Parallel.Types.Input
-                     InfoVis.Parallel.Types.Message
-                     InfoVis.Parallel.Types.Presentation
-                     InfoVis.Parallel.Types.World
-  other-modules    : Control.Distributed.Process.Backend.SimpleWidenet
-                     Control.Distributed.Process.Util
-                     Data.Math.Util
-                     Graphics.OpenGL.Util
-                     Graphics.OpenGL.Util.Instances
-                     Graphics.OpenGL.Util.Projection
-                     Graphics.OpenGL.Util.Setup
-                     Graphics.OpenGL.Util.Types
-                     Linear.Util
-                     Linear.Util.Graphics
-                     Linear.Util.Instances
-  build-depends    : base                               >= 4.8 && < 5
-                   , aeson
-                   , array
-                   , binary                             >= 0.7.5
-                   , bitvec                             >= 0.1.0
-                   , bytestring                         >= 0.10.6
-                   , clock                              >= 0.7.2
-                   , containers                         >= 0.5.6
-                   , data-default                       >= 0.7.1
-                   , deepseq                            >= 1.4.1
-                   , distributed-process                >= 0.6.6
-                   , distributed-process-simplelocalnet >= 0.2.3
-                   , exceptions                         >= 0.8.3
-                   , GLUT                               >= 2.7
-                   , hashable                           >= 1.2.3
-                   , linear                             >= 1.20.5
-                   , network                            >= 2.6.2
-                   , network-transport                  >= 0.4.2
-                   , opengl-dlp-stereo                  >= 0.1.5.4
-                   , OpenGL                             >= 3.0.1
-                   , random                             >= 1.1
-                   , raft                               >= 0.3.11
-                   , split                              >= 0.2.2
-                   , stm                                >= 2.4.4
-                   , transformers                       >= 0.4.2
-                   , unordered-containers               >= 0.2.5
-                   , vector                             >= 0.11.0
-                   , yaml                               >= 0.8.22
-  hs-source-dirs   : src
-  exposed          : True
-  buildable        : True
-  ghc-options      : -Wall
-  default-language : Haskell2010
-
-  if flag(SwapGroup)
-    other-modules  : Graphics.OpenGL.Functions
-    build-depends  : OpenGLRaw >= 2.0
-                   , X11       >= 1.8
-    cpp-options    : "-DINFOVIS_SWAP_GROUP"
-    cc-options     : "-DUSE_DLSYM"
-
-  if flag(UseKafka)
-    exposed-modules: InfoVis.Parallel.Process.Track.Kafka
-                     InfoVis.Parallel.Types.Input.Kafka
-    build-depends  : kafka-device >= 0.2.1
-    cpp-options    : "-DINFOVIS_KAFKA"
-
-  if flag(UseVRPN)
-    exposed-modules: InfoVis.Parallel.Process.Track.VRPN
-                     InfoVis.Parallel.Types.Input.VRPN
-    build-depends  : vrpn >=  0.2.1
-    cpp-options    : "-DINFOVIS_VRPN"
+  tag     : multiclient
 
 
 executable infovis-parallel
-
   main-is          : Main.hs
+--other-modules    :       
   hs-source-dirs   : src
-  build-depends    : base
+  build-depends    : base >= 4.10 && < 4.11
                    , aeson
-                   , array
-                   , binary
-                   , bitvec
+                   , base64-bytestring
                    , bytestring
-                   , clock
-                   , cmdargs                            >= 0.10.14
-                   , containers
-                   , data-default
-                   , deepseq
-                   , distributed-process
-                   , distributed-process-simplelocalnet
-                   , exceptions
-                   , GLUT
-                   , hashable
-                   , linear
-                   , network
-                   , network-transport
-                   , opengl-dlp-stereo
-                   , OpenGL
-                   , raft
-                   , split
-                   , stm
-                   , transformers
-                   , unordered-containers
-                   , vector
+                   , protobuf
+                   , text
+                   , websockets
                    , yaml
+--other-extensions :    
   ghc-options      : -threaded -Wall
   default-language : Haskell2010
-
-  if flag(SwapGroup)
-    other-modules  : Graphics.OpenGL.Functions
-    build-depends  : OpenGLRaw
-                   , X11
-    cpp-options    : "-DINFOVIS_SWAP_GROUP"
-    cc-options     : "-DUSE_DLSYM"
-
-  if flag(UseKafka)
-    build-depends  : kafka-device
-    cpp-options    : "-DINFOVIS_KAFKA"
-
-  if flag(UseVRPN)
-    build-depends  : vrpn
-    cpp-options    : "-DINFOVIS_VRPN"
