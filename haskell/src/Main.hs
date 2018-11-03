@@ -13,7 +13,6 @@
 -----------------------------------------------------------------------------
 
 
-{-# LANGUAGE ConstraintKinds    #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE FlexibleContexts   #-}
 {-# LANGUAGE RecordWildCards    #-}
@@ -27,27 +26,14 @@ module Main (
 ) where
 
 
-import Control.Concurrent (threadDelay)
-import Control.Monad (when)
-import Control.Monad.Except (MonadError, MonadIO, liftIO, runExceptT, throwError)
-import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), logInfo, renderWithSeverity, runLoggingT)
-import Data.ByteString.Base64 (encode)
+import Control.Monad.Except (MonadError, MonadIO, runExceptT)
+import Control.Monad.Log (Severity(..))
 import Data.Data (Data)
-import Data.String (IsString(..))
-import Data.Version (showVersion)
-import Network.WebSockets (runClient, sendBinaryData, sendTextData, sendClose)
-import Paths_infovis_parallel (version)
+import InfoVis (SeverityLog, stringVersion, withSeverityLog)
 import System.Console.CmdArgs (Typeable, (&=), Default(..), args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
 import System.Exit (die)
-import System.IO (hPrint, stderr)
-import System.IO.Error (tryIOError)
 
-import qualified Data.ByteString as BS (readFile)
-import qualified Data.Text as T (pack)
-
-
-stringVersion :: String
-stringVersion = showVersion version ++ ", © 2018"
+import qualified InfoVis.Parallel.Sender as I (sendBuffers)
 
 
 deriving instance Data Severity
@@ -81,34 +67,35 @@ sendBuffers :: Infovis
 sendBuffers =
   SendBuffers
   {
-    logging       = Notice
-                 &= explicit
-                 &= name "logging"
-                 &= typ "Debug|Informational|Notice|Warning|Error|Critical"
-                 &= help "Level of detail for logging"
-  , host          = "127.0.0.1"
-                 &= explicit
-                 &= name "host"
-                 &= typ "ADDRESS"
-                 &= help "Address of the websocket server"
-  , port          = 8080
-                 &= explicit
-                 &= name "port"
-                 &= typ "PORT"
-                 &= help "Port number of the websocket server"
-  , path          = "/Infovis"
-                 &= explicit
-                 &= name "path"
-                 &= typ "PATH"
-                 &= help "Path for the websocket server"
-  , sendText      = False
-                 &= explicit
-                 &= name "send-text"
-                 &= help "Send data as text messages"
-  , buffers       = def
-                 &= typFile
-                 &= args
+    logging   = Informational
+             &= explicit
+             &= name "logging"
+             &= typ "LEVEL"
+             &= help "Minimum level of detail for logging: one of Debug, Informational, Notice, Warning, Error"
+  , host      = "127.0.0.1"
+             &= explicit
+             &= name "host"
+             &= typ "ADDRESS"
+             &= help "Address of the websocket server"
+  , port      = 8080
+             &= explicit
+             &= name "port"
+             &= typ "PORT"
+             &= help "Port number of the websocket server"
+  , path      = "/Infovis"
+             &= explicit
+             &= name "path"
+             &= typ "PATH"
+             &= help "Path for the websocket server"
+  , sendText  = False
+             &= explicit
+             &= name "send-text"
+             &= help "Send data as text messages"
+  , buffers   = def
+             &= typFile
+             &= args
   }
+    &= explicit
     &= name "send-buffers"
     &= help "Send protocol buffers serialized as binary files to client."
     &= details []
@@ -130,52 +117,4 @@ main =
 dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          => Infovis
          -> m ()
-
-dispatch SendBuffers{..} =
-  do
-    logInfo $ "Opening WebSocket on <ws://" ++ host ++ ":" ++ show port ++ path ++ "> . . ."
-    guardIO
-      . runClient host port path
-      $ \connection ->
-      do
-        sequence_
-          [
-            do
-              bytes <- BS.readFile file
-              if sendText
-                then sendBinaryData connection bytes
-                else sendTextData connection $ encode bytes
-          |
-            file <- buffers
-          ]
-        threadDelay 500000
-        sendClose connection $ T.pack "Infovis done."
-    logInfo $ "Closing WebSocket on <ws://" ++ host ++ ":" ++ show port ++ path ++ "> . . ."
-
-
-type SeverityLog = MonadLog (WithSeverity String)
-
-
-type SeverityLogT = LoggingT (WithSeverity String)
-
-
-withSeverityLog :: (MonadError String m, MonadIO m)
-                => Severity
-                -> SeverityLogT m a
-                -> m a
-withSeverityLog severity =
-  flip runLoggingT
-    (
-      \message ->
-        when (msgSeverity message <= severity)
-          $ if msgSeverity message > Critical
-              then liftIO . hPrint stderr $ renderWithSeverity fromString message
-              else throwError . fromString $ discardSeverity message
-    )
-
-
-guardIO :: (MonadIO m, MonadError String m) => IO a -> m a
-guardIO =
-  (either (throwError . show) return =<<)
-    . liftIO
-    . tryIOError
+dispatch SendBuffers{..} = I.sendBuffers host port path sendText buffers

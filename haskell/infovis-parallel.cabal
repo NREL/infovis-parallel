@@ -26,6 +26,8 @@ source-repository head
 executable infovis-parallel
   main-is          : Main.hs
   other-modules    : Paths_infovis_parallel
+                     InfoVis
+                     InfoVis.Parallel.Sender
   hs-source-dirs   : src
   build-depends    : base >= 4.10 && < 4.11
                    , aeson
