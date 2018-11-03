@@ -34,6 +34,7 @@ executable infovis-parallel
                    , base64-bytestring
                    , bytestring
                    , cmdargs
+                   , containers
                    , logging-effect
                    , mtl
                    , protobuf

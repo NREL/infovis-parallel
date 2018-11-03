@@ -23,9 +23,9 @@ module InfoVis.Parallel.Sender (
 
 import Control.Concurrent (threadDelay)
 import Control.Monad.Except (MonadError, MonadIO)
-import Control.Monad.Log (logInfo)
+import Control.Monad.Log (Severity(..), logInfo)
 import Data.ByteString.Base64 (encode)
-import InfoVis (SeverityLog, guardIO)
+import InfoVis (SeverityLog, withLogger)
 import Network.WebSockets (runClient, sendBinaryData, sendTextData, sendClose)
 
 import qualified Data.ByteString as BS (readFile)
@@ -44,20 +44,22 @@ sendBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
 sendBuffers host port path sendText buffers =
   do
     logInfo $ "Opening WebSocket on <ws://" ++ host ++ ":" ++ show port ++ path ++ "> . . ."
-    guardIO
-      . runClient host port path
-      $ \connection ->
-      do
-        sequence_
-          [
-            do
-              bytes <- BS.readFile file
-              if sendText
-                then sendBinaryData connection bytes
-                else sendTextData connection $ encode bytes
-          |
-            file <- buffers
-          ]
-        threadDelay 500000
-        sendClose connection $ T.pack "Infovis done."
+    withLogger $ \logger ->
+      runClient host port path
+        $ \connection ->
+        do
+          sequence_
+            [
+              do
+                logger Debug $ "Reading " ++ show file ++ " . . ."           
+                bytes <- BS.readFile file
+                logger Informational $ "Sending " ++ show file ++ " . . ."           
+                if sendText
+                  then sendBinaryData connection bytes
+                  else sendTextData connection $ encode bytes
+            |
+              file <- buffers
+            ]
+          threadDelay 500000
+          sendClose connection $ T.pack "Infovis done."
     logInfo $ "Closing WebSocket on <ws://" ++ host ++ ":" ++ show port ++ path ++ "> . . ."

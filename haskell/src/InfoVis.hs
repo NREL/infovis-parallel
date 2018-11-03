@@ -21,6 +21,7 @@ module InfoVis (
   SeverityLog
 , SeverityLogT
 , withSeverityLog
+, withLogger
 , guardIO
 , stringVersion
 ) where
@@ -28,7 +29,9 @@ module InfoVis (
 
 import Control.Monad (when)
 import Control.Monad.Except (MonadError, MonadIO, liftIO, throwError)
-import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), renderWithSeverity, runLoggingT)
+import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), logMessage, renderWithSeverity, runLoggingT)
+import Data.IORef (newIORef, modifyIORef, readIORef)
+import Data.Sequence (Seq(Empty), (|>))
 import Data.String (IsString(..))
 import Data.Version (showVersion)
 import Paths_infovis_parallel (version)
@@ -59,6 +62,17 @@ withSeverityLog severity =
               then liftIO . hPrint stderr $ renderWithSeverity fromString message
               else throwError . fromString $ discardSeverity message
     )
+
+
+withLogger :: (MonadError String m, MonadIO m, SeverityLog m)
+           => ((Severity -> String -> IO ()) -> IO a) -> m a
+withLogger action =
+  do
+    messages <- liftIO $ newIORef Empty
+    result <- guardIO . action $ ((modifyIORef messages . flip (|>)) .) . (,)
+    messages' <- liftIO $ readIORef messages
+    mapM_ (uncurry ((logMessage .) . WithSeverity)) messages'
+    return result
 
 
 guardIO :: (MonadIO m, MonadError String m) => IO a -> m a
