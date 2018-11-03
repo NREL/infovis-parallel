@@ -1,5 +1,5 @@
 name         : infovis-parallel
-version      : 0.1.0.0
+version      : 0.4.0.0
 synopsis     : Parallel-planes information visualization.
 description  : This information visualization shows multidimensional data as parallel planes with scatterplots connected by lines for corresponding data points.  It is a three-dimensional generalization of the two-dimensional parallel coordinate plots.
 
@@ -25,12 +25,13 @@ source-repository head
 
 executable infovis-parallel
   main-is          : Main.hs
---other-modules    :       
+  other-modules    : Paths_infovis_parallel
   hs-source-dirs   : src
   build-depends    : base >= 4.10 && < 4.11
                    , aeson
                    , base64-bytestring
                    , bytestring
+                   , cmdargs
                    , protobuf
                    , text
                    , websockets
