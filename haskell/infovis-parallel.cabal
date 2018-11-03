@@ -32,6 +32,7 @@ executable infovis-parallel
                    , base64-bytestring
                    , bytestring
                    , cmdargs
+                   , logging-effect
                    , mtl
                    , protobuf
                    , text

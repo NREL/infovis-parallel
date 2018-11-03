@@ -1,6 +1,6 @@
 {
   mkDerivation, stdenv
-, aeson, base, base64-bytestring, bytestring, mtl, protobuf, text, websockets, yaml
+, aeson, base, base64-bytestring, bytestring, logging-effect, mtl, protobuf, text, websockets, yaml
 , cmdargs
 }:
 
@@ -11,10 +11,10 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    aeson base base64-bytestring bytestring mtl protobuf text websockets yaml
+    aeson base base64-bytestring bytestring logging-effect mtl protobuf text websockets yaml
   ];
   executableHaskellDepends = [
-    aeson base base64-bytestring bytestring cmdargs protobuf text websockets yaml
+    cmdargs
   ];
   homepage = "https://bitbucket.org/bwbush/infovis-parallel";
   description = "Parallel-planes information visualization";
