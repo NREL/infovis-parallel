@@ -28,7 +28,8 @@ module InfoVis.Parallel.ProtoBuf (
 
 
 import Control.Lens.Getter ((^.))
-import Control.Lens.Lens (Lens', lens)
+import Control.Lens.Lens (Lens', (&), lens)
+import Control.Lens.Setter ((.~))
 import Control.Lens.Tuple (_1, _2, _3, _4, _5)
 import Control.Monad (guard)
 import Data.Aeson ((.=), (.:?))
@@ -38,13 +39,17 @@ import Data.Default (Default(..))
 import Data.Int (Int32, Int64)
 import Data.List.Split (splitPlaces)
 import Data.Maybe (fromMaybe)
+import Data.ProtocolBuffers (Decode, Encode, Message, Optional, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
+import Data.Serialize (runGetLazy, runPutLazy)
 import Data.Word (Word32)
-import Data.ProtocolBuffers (Decode, Encode, Message, Optional, Repeated, Value, getField, putField)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.NewTypes (Color, Displacement, Frame, Identifier, Position, PositionRotation)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
+import Network.WebSockets (DataMessage(..), WebSocketsData(..))
+
+import qualified Data.Text.Lazy as T (unpack)
 
 
 data Request =
@@ -93,10 +98,15 @@ instance ToJSON Request where
     where
       option s v = if null v then id else ((s .= v) :)
 
-
 instance Decode Request
 
 instance Encode Request
+
+instance WebSocketsData Request where
+  fromDataMessage (Text _ _) = def
+  fromDataMessage (Binary x) = fromLazyByteString x
+  fromLazyByteString = either error id . runGetLazy decodeMessage
+  toLazyByteString = runPutLazy . encodeMessage
 
 
 reset :: Lens' Request Bool
@@ -191,6 +201,12 @@ instance ToJSON Response where
 instance Decode Response
 
 instance Encode Response
+
+instance WebSocketsData Response where
+  fromDataMessage (Text _ x) = def & message .~ fmap T.unpack x
+  fromDataMessage (Binary x) = fromLazyByteString x
+  fromLazyByteString = either error id . runGetLazy decodeMessage
+  toLazyByteString = runPutLazy . encodeMessage
 
 
 message :: Lens' Response (Maybe String)

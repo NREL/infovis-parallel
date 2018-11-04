@@ -1,3 +1,5 @@
+using Google.Protobuf;
+using Infovis.Protobuf;
 using UnityEngine;
 using WebSocketSharp.Server;
 
@@ -11,7 +13,7 @@ namespace Infovis {
 
     private const string serviceAddress = "ws://0.0.0.0:8080";
 
-    private const string serviceName = "/Infovis";
+    private const string serviceName = "/InfoVis";
 
     private WebSocketServer server = null;
 
@@ -22,6 +24,10 @@ namespace Infovis {
     public bool enableTooltips = false;
 
     public bool useBoxes = true;
+
+    public double deltaReport = 5;
+
+    private double nextReport = 0;
 
     void Start() {
 
@@ -68,6 +74,38 @@ namespace Infovis {
       if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, controller)) {
       }
 
+      if (Time.time >= nextReport) {
+        GameObject tool = GameObject.Find("RightHandAnchor");
+        Response response = new Response {
+          Message = "Time = " + Time.time + "s",
+          Viewloc = new Location {
+            Posx = camera.transform.position.x,
+            Posy = camera.transform.position.y,
+            Posz = camera.transform.position.z,
+            Rotw = camera.transform.rotation.w,
+            Rotx = camera.transform.rotation.x,
+            Roty = camera.transform.rotation.y,
+            Rotz = camera.transform.rotation.z,
+          },
+          Toolloc = new Location {
+            Posx = tool.transform.position.x,
+            Posy = tool.transform.position.y,
+            Posz = tool.transform.position.z,
+            Rotw = tool.transform.rotation.w,
+            Rotx = tool.transform.rotation.x,
+            Roty = tool.transform.rotation.y,
+            Rotz = tool.transform.rotation.z,
+          }
+        };
+        Broadcast(response);
+        nextReport = Time.time + deltaReport;
+      }
+
+    }
+
+    public void Broadcast(Response response)
+    {
+      server.WebSocketServices.Broadcast(response.ToByteArray());
     }
 
     private Vector3 home = Vector3.zero;

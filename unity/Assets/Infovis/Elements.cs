@@ -1,8 +1,10 @@
+using Google.Protobuf;
 using Infovis.Protobuf;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+using Convert = System.Convert;
 using Debug = UnityEngine.Debug;
 using Float = System.Single;
 using OVRRayPointerEventData = ControllerSelection.OVRRayPointerEventData;
@@ -76,11 +78,21 @@ namespace Infovis {
 
     private static InfoScreen infoScreen = null;
 
+    private static Program program = null;
+
     public void OnPointerClickDelegate(OVRRayPointerEventData data) {
       if (infoScreen == null)
         infoScreen = GameObject.Find("Info").GetComponent<InfoScreen>();  
-      if (text != "")
+      if (program == null)
+        program = GameObject.Find("Program").GetComponent<Program>();  
+      if (text != "") {
         infoScreen.ShowMessage(text, 3f);
+        Response response = new Response {
+          Message = "Selected " + obj.name + ": " + text
+//        Select = {Convert.ToInt64(obj.name)}
+        };
+        program.Broadcast(response);
+      }
     }
 
     public void OnPointerEnterDelegate(OVRRayPointerEventData data) {

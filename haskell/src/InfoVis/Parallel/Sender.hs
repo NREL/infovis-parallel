@@ -13,7 +13,8 @@
 -----------------------------------------------------------------------------
 
 
-{-# LANGUAGE FlexibleContexts   #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 
 module InfoVis.Parallel.Sender (
@@ -26,10 +27,11 @@ import Control.Monad.Except (MonadError, MonadIO)
 import Control.Monad.Log (Severity(..), logInfo)
 import Data.ByteString.Base64 (encode)
 import InfoVis (SeverityLog, withLogger)
+import InfoVis.Parallel.ProtoBuf (Response)
 import Network.WebSockets (receiveData, runClient, sendBinaryData, sendTextData, sendClose)
 
 import qualified Data.ByteString as BS (readFile)
-import qualified Data.Text as T (pack, unpack)
+import qualified Data.Text as T (pack)
 
 
 sendBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -63,7 +65,7 @@ sendBuffers host port path sendText buffers =
             loop =
               do
                 x <- receiveData connection
-                logger Debug $ T.unpack x
+                logger Debug $ show (x :: Response)
                 loop
           loop
             `finally` sendClose connection (T.pack "Infovis done.")
