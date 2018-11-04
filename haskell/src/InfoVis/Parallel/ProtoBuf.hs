@@ -1,7 +1,9 @@
 {-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE StandaloneDeriving    #-}
 
 
 module InfoVis.Parallel.ProtoBuf (
@@ -28,7 +30,9 @@ import Control.Lens.Getter ((^.))
 import Control.Lens.Lens (Lens', lens)
 import Control.Lens.Tuple (_1, _2, _3, _4, _5)
 import Control.Monad (guard)
+import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Bits (Bits, (.|.), (.&.), shift)
+import Data.Default (Default(..))
 import Data.Int (Int32, Int64)
 import Data.List.Split (splitPlaces)
 import Data.Maybe (fromMaybe)
@@ -52,9 +56,20 @@ data Request =
   }
     deriving (Generic, Show)
 
-instance Decode Request
+instance Default Request where
+  def =
+    Request
+    {
+      reset'   = putField Nothing
+    , upsert'  = putField []
+    , delete'  = putField []
+    , viewloc' = putField Nothing
+    , toolloc' = putField Nothing
+    }
 
-instance Encode Request
+deriving instance Decode Request
+
+deriving instance Encode Request
 
 
 reset :: Lens' Request Bool
@@ -105,9 +120,22 @@ data Response =
   }
     deriving (Generic, Show)
 
-instance Decode Response
+instance Default Response where
+  def = 
+    Response
+    {
+      message'  = putField def
+    , hover'    = putField def
+    , unhover'  = putField def
+    , select'   = putField def
+    , deselect' = putField def
+    , viewloc'  = putField def
+    , toolloc'  = putField def
+    }
 
-instance Encode Response
+deriving instance Decode Response
+
+deriving instance Encode Response
 
 
 message :: Lens' Response (Maybe String)
@@ -176,9 +204,9 @@ data GeometryPB =
   }
     deriving (Generic, Show)
 
-instance Decode GeometryPB
+deriving instance Decode GeometryPB
 
-instance Encode GeometryPB
+deriving instance Encode GeometryPB
 
 
 data Geometry =
@@ -191,7 +219,7 @@ data Geometry =
   , color      :: Maybe Color
   , text       :: Maybe String
   }
-    deriving (Eq, Generic, Ord, Read, Show)
+    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
 shapeBit :: (Bits a, Num a) => a
@@ -268,7 +296,7 @@ data Shape =
   | Rectangles [(Position, Displacement, Displacement)]
   | Label (Position, Displacement, Displacement)
   | Axis (Position, Displacement)
-    deriving (Eq, Generic, Ord, Read, Show)
+    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
 toShape :: (Maybe Int32, [Int32], [Double], [Double], [Double]) -> Maybe Shape
@@ -355,9 +383,9 @@ data LocationPB =
   }
     deriving (Generic, Show)
 
-instance Decode LocationPB
+deriving instance Decode LocationPB
 
-instance Encode LocationPB
+deriving instance Encode LocationPB
 
 
 toPositionRotation :: LocationPB -> PositionRotation
