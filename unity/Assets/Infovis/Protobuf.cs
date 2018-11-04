@@ -25,23 +25,23 @@ namespace Infovis.Protobuf {
             "Cg5pbmZvdmlzLnByb3RvMxIHSW5mb3ZpcyKkAQoIR2VvbWV0cnkSDAoEZnJh",
             "bRgBIAEoBRIMCgRpZGVuGAIgASgDEgwKBHR5cGUYAyABKAUSDAoEbWFzaxgE",
             "IAEoBRIMCgRjbnRzGAUgAygFEgwKBHBvc3gYBiADKAESDAoEcG9zeRgHIAMo",
-            "ARIMCgRwb3N6GAggAygBEgwKBHNpemUYCiABKAESDAoEY29schgLIAEoBxIM",
-            "CgR0ZXh0GAwgASgJIl4KCExvY2F0aW9uEgwKBHBvc3gYASABKAESDAoEcG9z",
-            "eRgCIAEoARIMCgRwb3N6GAMgASgBEgwKBHJvdHgYBCABKAESDAoEcm90eRgF",
-            "IAEoARIMCgRyb3R6GAYgASgBIpMBCgdSZXF1ZXN0Eg0KBXJlc2V0GAEgASgI",
-            "EiEKBnVwc2VydBgCIAMoCzIRLkluZm92aXMuR2VvbWV0cnkSDgoGZGVsZXRl",
-            "GAMgAygDEiIKB3ZpZXdsb2MYBCABKAsyES5JbmZvdmlzLkxvY2F0aW9uEiIK",
-            "B3Rvb2xsb2MYBSABKAsyES5JbmZvdmlzLkxvY2F0aW9uIqUBCghSZXNwb25z",
-            "ZRIPCgdtZXNzYWdlGAEgASgJEg0KBWhvdmVyGAIgAygDEg8KB3VuaG92ZXIY",
-            "AyADKAMSDgoGc2VsZWN0GAQgAygDEhAKCGRlc2VsZWN0GAUgAygDEiIKB3Zp",
-            "ZXdsb2MYBiABKAsyES5JbmZvdmlzLkxvY2F0aW9uEiIKB3Rvb2xsb2MYByAB",
-            "KAsyES5JbmZvdmlzLkxvY2F0aW9uQhOqAhBJbmZvdmlzLlByb3RvYnVmYgZw",
-            "cm90bzM="));
+            "ARIMCgRwb3N6GAggAygBEgwKBHNpemUYCSABKAESDAoEY29schgKIAEoBxIM",
+            "CgR0ZXh0GAsgASgJImwKCExvY2F0aW9uEgwKBHBvc3gYASABKAESDAoEcG9z",
+            "eRgCIAEoARIMCgRwb3N6GAMgASgBEgwKBHJvdHcYBCABKAESDAoEcm90eBgF",
+            "IAEoARIMCgRyb3R5GAYgASgBEgwKBHJvdHoYByABKAEikwEKB1JlcXVlc3QS",
+            "DQoFcmVzZXQYASABKAgSIQoGdXBzZXJ0GAIgAygLMhEuSW5mb3Zpcy5HZW9t",
+            "ZXRyeRIOCgZkZWxldGUYAyADKAMSIgoHdmlld2xvYxgEIAEoCzIRLkluZm92",
+            "aXMuTG9jYXRpb24SIgoHdG9vbGxvYxgFIAEoCzIRLkluZm92aXMuTG9jYXRp",
+            "b24ipQEKCFJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSDQoFaG92ZXIYAiAD",
+            "KAMSDwoHdW5ob3ZlchgDIAMoAxIOCgZzZWxlY3QYBCADKAMSEAoIZGVzZWxl",
+            "Y3QYBSADKAMSIgoHdmlld2xvYxgGIAEoCzIRLkluZm92aXMuTG9jYXRpb24S",
+            "IgoHdG9vbGxvYxgHIAEoCzIRLkluZm92aXMuTG9jYXRpb25CE6oCEEluZm92",
+            "aXMuUHJvdG9idWZiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Geometry), global::Infovis.Protobuf.Geometry.Parser, new[]{ "Fram", "Iden", "Type", "Mask", "Cnts", "Posx", "Posy", "Posz", "Size", "Colr", "Text" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Location), global::Infovis.Protobuf.Location.Parser, new[]{ "Posx", "Posy", "Posz", "Rotx", "Roty", "Rotz" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Location), global::Infovis.Protobuf.Location.Parser, new[]{ "Posx", "Posy", "Posz", "Rotw", "Rotx", "Roty", "Rotz" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Reset", "Upsert", "Delete", "Viewloc", "Toolloc" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Response), global::Infovis.Protobuf.Response.Parser, new[]{ "Message", "Hover", "Unhover", "Select", "Deselect", "Viewloc", "Toolloc" }, null, null, null)
           }));
@@ -192,7 +192,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "size" field.</summary>
-    public const int SizeFieldNumber = 10;
+    public const int SizeFieldNumber = 9;
     private double size_;
     /// <summary>
     /// mask = 0010b = 2
@@ -206,7 +206,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "colr" field.</summary>
-    public const int ColrFieldNumber = 11;
+    public const int ColrFieldNumber = 10;
     private uint colr_;
     /// <summary>
     /// mask = 0100b = 4
@@ -220,7 +220,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "text" field.</summary>
-    public const int TextFieldNumber = 12;
+    public const int TextFieldNumber = 11;
     private string text_ = "";
     /// <summary>
     /// mask = 1000b = 8
@@ -305,15 +305,15 @@ namespace Infovis.Protobuf {
       posy_.WriteTo(output, _repeated_posy_codec);
       posz_.WriteTo(output, _repeated_posz_codec);
       if (Size != 0D) {
-        output.WriteRawTag(81);
+        output.WriteRawTag(73);
         output.WriteDouble(Size);
       }
       if (Colr != 0) {
-        output.WriteRawTag(93);
+        output.WriteRawTag(85);
         output.WriteFixed32(Colr);
       }
       if (Text.Length != 0) {
-        output.WriteRawTag(98);
+        output.WriteRawTag(90);
         output.WriteString(Text);
       }
     }
@@ -425,15 +425,15 @@ namespace Infovis.Protobuf {
             posz_.AddEntriesFrom(input, _repeated_posz_codec);
             break;
           }
-          case 81: {
+          case 73: {
             Size = input.ReadDouble();
             break;
           }
-          case 93: {
+          case 85: {
             Colr = input.ReadFixed32();
             break;
           }
-          case 98: {
+          case 90: {
             Text = input.ReadString();
             break;
           }
@@ -470,6 +470,7 @@ namespace Infovis.Protobuf {
       posx_ = other.posx_;
       posy_ = other.posy_;
       posz_ = other.posz_;
+      rotw_ = other.rotw_;
       rotx_ = other.rotx_;
       roty_ = other.roty_;
       rotz_ = other.rotz_;
@@ -513,8 +514,19 @@ namespace Infovis.Protobuf {
       }
     }
 
+    /// <summary>Field number for the "rotw" field.</summary>
+    public const int RotwFieldNumber = 4;
+    private double rotw_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public double Rotw {
+      get { return rotw_; }
+      set {
+        rotw_ = value;
+      }
+    }
+
     /// <summary>Field number for the "rotx" field.</summary>
-    public const int RotxFieldNumber = 4;
+    public const int RotxFieldNumber = 5;
     private double rotx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public double Rotx {
@@ -525,7 +537,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "roty" field.</summary>
-    public const int RotyFieldNumber = 5;
+    public const int RotyFieldNumber = 6;
     private double roty_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public double Roty {
@@ -536,7 +548,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "rotz" field.</summary>
-    public const int RotzFieldNumber = 6;
+    public const int RotzFieldNumber = 7;
     private double rotz_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public double Rotz {
@@ -562,6 +574,7 @@ namespace Infovis.Protobuf {
       if (Posx != other.Posx) return false;
       if (Posy != other.Posy) return false;
       if (Posz != other.Posz) return false;
+      if (Rotw != other.Rotw) return false;
       if (Rotx != other.Rotx) return false;
       if (Roty != other.Roty) return false;
       if (Rotz != other.Rotz) return false;
@@ -574,6 +587,7 @@ namespace Infovis.Protobuf {
       if (Posx != 0D) hash ^= Posx.GetHashCode();
       if (Posy != 0D) hash ^= Posy.GetHashCode();
       if (Posz != 0D) hash ^= Posz.GetHashCode();
+      if (Rotw != 0D) hash ^= Rotw.GetHashCode();
       if (Rotx != 0D) hash ^= Rotx.GetHashCode();
       if (Roty != 0D) hash ^= Roty.GetHashCode();
       if (Rotz != 0D) hash ^= Rotz.GetHashCode();
@@ -599,16 +613,20 @@ namespace Infovis.Protobuf {
         output.WriteRawTag(25);
         output.WriteDouble(Posz);
       }
-      if (Rotx != 0D) {
+      if (Rotw != 0D) {
         output.WriteRawTag(33);
+        output.WriteDouble(Rotw);
+      }
+      if (Rotx != 0D) {
+        output.WriteRawTag(41);
         output.WriteDouble(Rotx);
       }
       if (Roty != 0D) {
-        output.WriteRawTag(41);
+        output.WriteRawTag(49);
         output.WriteDouble(Roty);
       }
       if (Rotz != 0D) {
-        output.WriteRawTag(49);
+        output.WriteRawTag(57);
         output.WriteDouble(Rotz);
       }
     }
@@ -623,6 +641,9 @@ namespace Infovis.Protobuf {
         size += 1 + 8;
       }
       if (Posz != 0D) {
+        size += 1 + 8;
+      }
+      if (Rotw != 0D) {
         size += 1 + 8;
       }
       if (Rotx != 0D) {
@@ -650,6 +671,9 @@ namespace Infovis.Protobuf {
       }
       if (other.Posz != 0D) {
         Posz = other.Posz;
+      }
+      if (other.Rotw != 0D) {
+        Rotw = other.Rotw;
       }
       if (other.Rotx != 0D) {
         Rotx = other.Rotx;
@@ -683,14 +707,18 @@ namespace Infovis.Protobuf {
             break;
           }
           case 33: {
-            Rotx = input.ReadDouble();
+            Rotw = input.ReadDouble();
             break;
           }
           case 41: {
-            Roty = input.ReadDouble();
+            Rotx = input.ReadDouble();
             break;
           }
           case 49: {
+            Roty = input.ReadDouble();
+            break;
+          }
+          case 57: {
             Rotz = input.ReadDouble();
             break;
           }

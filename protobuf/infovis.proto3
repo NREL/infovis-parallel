@@ -16,9 +16,9 @@ message Geometry {
   repeated double posx =  6; // mask = 0001b = 1
   repeated double posy =  7; // mask = 0001b = 1
   repeated double posz =  8; // mask = 0001b = 1
-  double          size = 10; // mask = 0010b = 2
-  fixed32         colr = 11; // mask = 0100b = 4
-  string          text = 12; // mask = 1000b = 8
+  double          size =  9; // mask = 0010b = 2
+  fixed32         colr = 10; // mask = 0100b = 4
+  string          text = 11; // mask = 1000b = 8
 }
 
 
@@ -26,9 +26,10 @@ message Location {
   double posx = 1;
   double posy = 2;
   double posz = 3;
-  double rotx = 4;
-  double roty = 5;
-  double rotz = 6;
+  double rotw = 4;
+  double rotx = 5;
+  double roty = 6;
+  double rotz = 7;
 }
 
 

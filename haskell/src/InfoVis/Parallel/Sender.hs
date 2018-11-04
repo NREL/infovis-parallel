@@ -53,8 +53,8 @@ sendBuffers host port path sendText buffers =
                 bytes <- BS.readFile file
                 logger Informational $ "Sending " ++ show file ++ " . . ."           
                 if sendText
-                  then sendBinaryData connection bytes
-                  else sendTextData connection $ encode bytes
+                  then sendBinaryData connection          bytes
+                  else sendTextData   connection $ encode bytes
             |
               file <- buffers
             ]

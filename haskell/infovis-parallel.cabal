@@ -27,6 +27,8 @@ executable infovis-parallel
   main-is          : Main.hs
   other-modules    : Paths_infovis_parallel
                      InfoVis
+                     InfoVis.Parallel.ProtoBuf
+                     InfoVis.Parallel.NewTypes
                      InfoVis.Parallel.Sender
   hs-source-dirs   : src
   build-depends    : base >= 4.10 && < 4.11
@@ -35,9 +37,13 @@ executable infovis-parallel
                    , bytestring
                    , cmdargs
                    , containers
+                   , data-default
+                   , lens
+                   , linear
                    , logging-effect
                    , mtl
                    , protobuf
+                   , split
                    , text
                    , websockets
                    , yaml

@@ -14,7 +14,7 @@ examples: $(EXAMPLES)
 	protoc --csharp_out . $<
 	mv Infovis.cs $@
 
-%.pbb : %.pbt
+%.pbb : %.pbt infovis.proto3
 	protoc --encode=Infovis.Request infovis.proto3 < $< > $@
 
 
