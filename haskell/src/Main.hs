@@ -18,7 +18,8 @@
 {-# LANGUAGE RecordWildCards    #-}
 {-# LANGUAGE StandaloneDeriving #-}
 
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-missing-fields #-}
+{-# OPTIONS_GHC -fno-warn-orphans        #-}
 
 
 module Main (
@@ -30,16 +31,17 @@ import Control.Monad.Except (MonadError, MonadIO, runExceptT)
 import Control.Monad.Log (Severity(..))
 import Data.Data (Data)
 import InfoVis (SeverityLog, stringVersion, withSeverityLog)
-import System.Console.CmdArgs (Typeable, (&=), Default(..), args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
+import System.Console.CmdArgs (Typeable, (&=), args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
 import System.Exit (die)
 
+import qualified InfoVis.Parallel.Compiler as I (compileBuffers)
 import qualified InfoVis.Parallel.Sender as I (sendBuffers)
 
 
 deriving instance Data Severity
 
 
-data Infovis =
+data InfoVis =
     SendBuffers
     {
       logging  :: Severity
@@ -49,21 +51,28 @@ data Infovis =
     , sendText :: Bool
     , buffers  :: [FilePath]
     }
+  | Compile
+    {
+      logging  :: Severity
+    , buffers  :: [FilePath]
+    , output   :: FilePath
+    }
     deriving (Data, Show, Typeable)
 
 
-infovis :: Infovis
+infovis :: InfoVis
 infovis =
   modes
     [
       sendBuffers
+    , compile
     ]
-      &= summary ("Infovis-Parallel command-line, Version " ++ stringVersion ++ " by National Renewable Energy Laboratory")
+      &= summary ("InfoVis-Parallel command line, Version " ++ stringVersion ++ " by National Renewable Energy Laboratory")
       &= program "infovis-parallel"
-      &= help "This tool provides a command-line interface to Infovis-Parallel."
+      &= help "This tool provides a command-line interface to InfoVis-Parallel."
 
 
-sendBuffers :: Infovis
+sendBuffers :: InfoVis
 sendBuffers =
   SendBuffers
   {
@@ -82,22 +91,38 @@ sendBuffers =
              &= name "port"
              &= typ "PORT"
              &= help "Port number of the websocket server"
-  , path      = "/Infovis"
+  , path      = "/InfoVis"
              &= explicit
              &= name "path"
              &= typ "PATH"
              &= help "Path for the websocket server"
   , sendText  = False
              &= explicit
-             &= name "send-text"
+             &= name "text"
              &= help "Send data as text messages"
-  , buffers   = def
+  , buffers   = []
              &= typFile
              &= args
   }
     &= explicit
-    &= name "send-buffers"
+    &= name "send"
     &= help "Send protocol buffers serialized as binary files to client."
+    &= details []
+
+
+compile :: InfoVis
+compile =
+  Compile
+  {
+    output  = "/dev/stdout"
+           &= explicit
+           &= name "output"
+           &= typFile
+           &= help "Serialized protocol buffers"
+  }
+    &= explicit
+    &= name "compile"
+    &= help "Compile YAML files to serialized protocol buffers."
     &= details []
 
 
@@ -115,6 +140,7 @@ main =
 
 
 dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
-         => Infovis
+         => InfoVis
          -> m ()
 dispatch SendBuffers{..} = I.sendBuffers host port path sendText buffers
+dispatch Compile{..} = I.compileBuffers buffers output

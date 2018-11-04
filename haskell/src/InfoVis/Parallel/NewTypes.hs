@@ -1,6 +1,4 @@
-{-# LANGUAGE DeriveAnyClass             #-}
 {-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -33,26 +31,25 @@ type Identifier = Int64
 
 type Position = Point V3 Double
 
-deriving instance FromJSON Position
+instance FromJSON Position
 
-deriving instance ToJSON Position
+instance ToJSON Position
 
 
 type Displacement = V3 Double
 
-deriving instance FromJSON Displacement
+instance FromJSON Displacement
 
-deriving instance ToJSON Displacement
+instance ToJSON Displacement
 
 
 type Rotation = Quaternion Double
 
-deriving instance FromJSON Rotation
+instance FromJSON Rotation
 
-deriving instance ToJSON Rotation
+instance ToJSON Rotation
 
 
 type PositionRotation = (Position, Rotation)
-
 
 type Color = Word32

@@ -27,6 +27,7 @@ executable infovis-parallel
   main-is          : Main.hs
   other-modules    : Paths_infovis_parallel
                      InfoVis
+                     InfoVis.Parallel.Compiler
                      InfoVis.Parallel.ProtoBuf
                      InfoVis.Parallel.NewTypes
                      InfoVis.Parallel.Sender
@@ -35,6 +36,7 @@ executable infovis-parallel
                    , aeson
                    , base64-bytestring
                    , bytestring
+                   , cereal
                    , cmdargs
                    , containers
                    , data-default

@@ -2,8 +2,9 @@
 {-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
-{-# LANGUAGE StandaloneDeriving    #-}
 
 
 module InfoVis.Parallel.ProtoBuf (
@@ -30,7 +31,8 @@ import Control.Lens.Getter ((^.))
 import Control.Lens.Lens (Lens', lens)
 import Control.Lens.Tuple (_1, _2, _3, _4, _5)
 import Control.Monad (guard)
-import Data.Aeson.Types (FromJSON, ToJSON)
+import Data.Aeson ((.=), (.:?))
+import Data.Aeson.Types (FromJSON(..), ToJSON(..), object, withObject)
 import Data.Bits (Bits, (.|.), (.&.), shift)
 import Data.Default (Default(..))
 import Data.Int (Int32, Int64)
@@ -67,9 +69,34 @@ instance Default Request where
     , toolloc' = putField Nothing
     }
 
-deriving instance Decode Request
+instance FromJSON Request where
+  parseJSON =
+    withObject "Request"
+      $ \v ->
+      do
+        reset'   <- putField                                            <$> v .:? "reset"
+        upsert'  <- putField . fmap fromGeometry         . fromMaybe [] <$> v .:? "upsert"
+        delete'  <- putField .                             fromMaybe [] <$> v .:? "delete"
+        viewloc' <- putField . fmap fromPositionRotation                <$> v .:? "viewloc"
+        toolloc' <- putField . fmap fromPositionRotation                <$> v .:? "toolloc"
+        return Request{..}
 
-deriving instance Encode Request
+instance ToJSON Request where
+  toJSON Request{..} =
+    object
+     . maybe id ((:) . ("reset"   .=)) (                       getField reset'  )
+     . option           "upsert"       (toGeometry         <$> getField upsert' )
+     . option           "delete"       (                       getField delete' )
+     . maybe id ((:) . ("viewloc" .=)) (toPositionRotation <$> getField viewloc')
+     $ maybe id ((:) . ("toolloc" .=)) (toPositionRotation <$> getField toolloc')
+       []
+    where
+      option s v = if null v then id else ((s .= v) :)
+
+
+instance Decode Request
+
+instance Encode Request
 
 
 reset :: Lens' Request Bool
@@ -133,9 +160,37 @@ instance Default Response where
     , toolloc'  = putField def
     }
 
-deriving instance Decode Response
+instance FromJSON Response where
+  parseJSON =
+    withObject "Response"
+      $ \v ->
+      do
+        message'  <- putField                             <$> v .:? "message"
+        hover'    <- putField . fromMaybe []              <$> v .:? "hover"
+        unhover'  <- putField . fromMaybe []              <$> v .:? "unhover"
+        select'   <- putField . fromMaybe []              <$> v .:? "select"
+        deselect' <- putField . fromMaybe []              <$> v .:? "deselect"
+        viewloc'  <- putField . fmap fromPositionRotation <$> v .:? "viewloc"
+        toolloc'  <- putField . fmap fromPositionRotation <$> v .:? "toolloc"
+        return Response{..}
 
-deriving instance Encode Response
+instance ToJSON Response where
+  toJSON Response{..} =
+    object
+     . maybe id ((:) . ("message" .=)) (                       getField message' )
+     . option           "hover"        (                       getField hover'   )
+     . option           "unhover"      (                       getField unhover' )
+     . option           "select"       (                       getField select'  )
+     . option           "deselect"     (                       getField deselect')
+     . maybe id ((:) . ("viewloc" .=)) (toPositionRotation <$> getField viewloc' )
+     $ maybe id ((:) . ("toolloc" .=)) (toPositionRotation <$> getField toolloc' )
+       []
+    where
+      option s v = if null v then id else ((s .= v) :)
+
+instance Decode Response
+
+instance Encode Response
 
 
 message :: Lens' Response (Maybe String)
@@ -204,9 +259,9 @@ data GeometryPB =
   }
     deriving (Generic, Show)
 
-deriving instance Decode GeometryPB
+instance Decode GeometryPB
 
-deriving instance Encode GeometryPB
+instance Encode GeometryPB
 
 
 data Geometry =
@@ -383,9 +438,9 @@ data LocationPB =
   }
     deriving (Generic, Show)
 
-deriving instance Decode LocationPB
+instance Decode LocationPB
 
-deriving instance Encode LocationPB
+instance Encode LocationPB
 
 
 toPositionRotation :: LocationPB -> PositionRotation
