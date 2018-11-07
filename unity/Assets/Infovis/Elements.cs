@@ -102,13 +102,13 @@ namespace Infovis {
       selected = !selected;
       Response response =
         selected
-          ?  new Response {
-               Message = "Selected " + obj.name + ": " + text,
-               Select = {Convert.ToInt64(obj.name)}
-             }
-          :  new Response {
-               Deselect = {Convert.ToInt64(obj.name)}
-             };
+          ? new Response {
+              Message = "Selected " + obj.name + ": " + text,
+              Select = {Convert.ToInt64(obj.name)}
+            }
+          : new Response {
+              Deselect = {Convert.ToInt64(obj.name)}
+            };
       Broadcast(response);
     }
 
@@ -117,9 +117,8 @@ namespace Infovis {
         return;
       inside = true;
       if (text != "")
-        Display(text, Float.PositiveInfinity);
+        Display(text, 1f); //Float.PositiveInfinity);
       Response response = new Response {
-        Message = "Hover " + obj.name + ": " + text,
         Hover = {Convert.ToInt64(obj.name)}
       };
       Broadcast(response);
@@ -129,8 +128,8 @@ namespace Infovis {
       if (!inside)
         return;
       inside = false;
-      if (text != "")
-        Display("", -1f);
+//    if (text != "")
+//      Display("", -1f);
       Response response = new Response {
         Unhover = {Convert.ToInt64(obj.name)}
       };
