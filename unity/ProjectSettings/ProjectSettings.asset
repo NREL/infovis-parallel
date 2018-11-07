@@ -49,7 +49,7 @@ PlayerSettings:
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 0
   m_MTRendering: 1
-  m_MobileMTRendering: 0
+  m_MobileMTRendering: 1
   m_StackTraceTypes: 010000000100000001000000010000000100000001000000
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
@@ -77,8 +77,8 @@ PlayerSettings:
   resizableWindow: 0
   useMacAppStoreValidation: 0
   macAppStoreCategory: public.app-category.games
-  gpuSkinning: 0
-  graphicsJobs: 0
+  gpuSkinning: 1
+  graphicsJobs: 1
   xboxPIXTextureCapture: 0
   xboxEnableAvatar: 0
   xboxEnableKinect: 0
@@ -138,7 +138,11 @@ PlayerSettings:
   useHDRDisplay: 0
   applicationIdentifier:
     Android: gov.nrel.infovis
+    SamsungTV: com.oculus.UnitySample
     Standalone: com.oculus.UnitySample
+    Tizen: com.oculus.UnitySample
+    WebGL: com.oculus.UnitySample
+    iOS: com.oculus.UnitySample
   buildNumber: {}
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 19
@@ -158,7 +162,7 @@ PlayerSettings:
     serializedVersion: 2
     m_Bits: 238
   iPhoneSdkVersion: 988
-  iOSTargetOSVersionString: 
+  iOSTargetOSVersionString: 7.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
   tvOSTargetOSVersionString: 
@@ -237,6 +241,18 @@ PlayerSettings:
     m_Enabled: 1
     m_Devices:
     - Oculus
+  - m_BuildTarget: SamsungTV
+    m_Enabled: 1
+    m_Devices: []
+  - m_BuildTarget: WebGL
+    m_Enabled: 1
+    m_Devices: []
+  - m_BuildTarget: Tizen
+    m_Enabled: 1
+    m_Devices: []
+  - m_BuildTarget: iOS
+    m_Enabled: 1
+    m_Devices: []
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   webPlayerTemplate: APPLICATION:Default
