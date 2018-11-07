@@ -3,6 +3,7 @@ using Infovis.Protobuf;
 using UnityEngine;
 using WebSocketSharp.Server;
 
+using Convert = System.Convert;
 using Debug = UnityEngine.Debug;
 using Text = UnityEngine.UI.Text;
 

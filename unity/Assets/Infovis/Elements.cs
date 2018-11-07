@@ -28,6 +28,10 @@ namespace Infovis {
 
     public string text = "";
 
+    public bool selected = false;
+
+    public bool inside = false;
+
     protected static GameObject MakeGeometric() {
       GameObject obj = new GameObject();
       obj.AddComponent<MeshRenderer>();
@@ -58,7 +62,9 @@ namespace Infovis {
         entry.callback.AddListener(data => { OnPointerClickDelegate((OVRRayPointerEventData) data); });
         trigger.triggers.Add(entry);
 
-      } else if (enableTooltips) {
+      }
+
+      if (enableTooltips) {
 
         EventTrigger trigger = child.AddComponent<EventTrigger>();
 
@@ -78,34 +84,57 @@ namespace Infovis {
 
     private static InfoScreen infoScreen = null;
 
-    private static Program program = null;
-
-    public void OnPointerClickDelegate(OVRRayPointerEventData data) {
+    private void Display(string message, float duration) {
       if (infoScreen == null)
         infoScreen = GameObject.Find("Info").GetComponent<InfoScreen>();  
+      infoScreen.ShowMessage(message, duration);
+    }
+
+    private static Program program = null;
+
+    private void Broadcast(Response response) {
       if (program == null)
         program = GameObject.Find("Program").GetComponent<Program>();  
-      if (text != "") {
-        infoScreen.ShowMessage(text, 3f);
-        Response response = new Response {
-          Message = "Selected " + obj.name + ": " + text
-//        Select = {Convert.ToInt64(obj.name)}
-        };
-        program.Broadcast(response);
-      }
+      program.Broadcast(response);
+    }
+
+    public void OnPointerClickDelegate(OVRRayPointerEventData data) {
+      selected = !selected;
+      Response response =
+        selected
+          ?  new Response {
+               Message = "Selected " + obj.name + ": " + text,
+               Select = {Convert.ToInt64(obj.name)}
+             }
+          :  new Response {
+               Deselect = {Convert.ToInt64(obj.name)}
+             };
+      Broadcast(response);
     }
 
     public void OnPointerEnterDelegate(OVRRayPointerEventData data) {
-      if (infoScreen == null)
-        infoScreen = GameObject.Find("Info").GetComponent<InfoScreen>();  
+      if (inside)
+        return;
+      inside = true;
       if (text != "")
-        infoScreen.ShowMessage(text, 1f /*Float.PositiveInfinity*/);
+        Display(text, Float.PositiveInfinity);
+      Response response = new Response {
+        Message = "Hover " + obj.name + ": " + text,
+        Hover = {Convert.ToInt64(obj.name)}
+      };
+      Broadcast(response);
     }
 
     public void OnPointerExitDelegate(OVRRayPointerEventData data) {
-      if (infoScreen == null)
-        infoScreen = GameObject.Find("Info").GetComponent<InfoScreen>();  
-      infoScreen.ShowMessage("", -1f);
+      if (!inside)
+        return;
+      inside = false;
+      if (text != "")
+        Display("", -1f);
+      Response response = new Response {
+        Unhover = {Convert.ToInt64(obj.name)}
+      };
+      Broadcast(response);
     }
 
     protected void PreUpdate(Geometry geometry) {

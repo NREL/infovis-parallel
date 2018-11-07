@@ -711,8 +711,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   infoScreen: {fileID: 281850816}
   enableSelection: 1
-  enableTooltips: 0
+  enableTooltips: 1
   useBoxes: 1
+  deltaReport: 5
 --- !u!4 &707254339
 Transform:
   m_ObjectHideFlags: 0
