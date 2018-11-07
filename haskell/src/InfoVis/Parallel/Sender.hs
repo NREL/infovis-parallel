@@ -23,11 +23,12 @@ module InfoVis.Parallel.Sender (
 
 
 import Control.Exception (finally)
+import Control.Lens.Getter ((^.))
 import Control.Monad.Except (MonadError, MonadIO)
 import Control.Monad.Log (Severity(..), logInfo)
 import Data.ByteString.Base64 (encode)
 import InfoVis (SeverityLog, withLogger)
-import InfoVis.Parallel.ProtoBuf (Response)
+import InfoVis.Parallel.ProtoBuf (Response, deselect, hover, message, select, toolGet, unhover, viewGet)
 import Network.WebSockets (receiveData, runClient, sendBinaryData, sendTextData, sendClose)
 
 import qualified Data.ByteString as BS (readFile)
@@ -61,11 +62,19 @@ sendBuffers host port path sendText buffers =
               file <- buffers
             ]
           let
+            justShow s = maybe (return ()) (logger Debug . (s ++) . show)
+            fullShow s x = if null x then return () else logger Debug $ s ++ show x
             loop :: IO ()
             loop =
               do
-                x <- receiveData connection
-                logger Debug $ show (x :: Response)
+                x <- receiveData connection :: IO Response
+                justShow "Message: "  $ x ^. message
+                fullShow "Hover: "    $ x ^. hover
+                fullShow "Unhover: "  $ x ^. unhover
+                fullShow "Select: "   $ x ^. select
+                fullShow "Deselect: " $ x ^. deselect
+                justShow "View: "     $ x ^. viewGet
+                justShow "Tool: "     $ x ^. toolGet
                 loop
           loop
             `finally` sendClose connection (T.pack "Infovis done.")
