@@ -32,18 +32,19 @@ namespace Infovis.Protobuf {
             "DQoFcmVzZXQYASABKAgSIQoGdXBzZXJ0GAIgAygLMhEuSW5mb3Zpcy5HZW9t",
             "ZXRyeRIOCgZkZWxldGUYAyADKAMSIgoHdmlld2xvYxgEIAEoCzIRLkluZm92",
             "aXMuTG9jYXRpb24SIgoHdG9vbGxvYxgFIAEoCzIRLkluZm92aXMuTG9jYXRp",
-            "b24ipQEKCFJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSDQoFaG92ZXIYAiAD",
+            "b24i6wEKCFJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSDQoFaG92ZXIYAiAD",
             "KAMSDwoHdW5ob3ZlchgDIAMoAxIOCgZzZWxlY3QYBCADKAMSEAoIZGVzZWxl",
             "Y3QYBSADKAMSIgoHdmlld2xvYxgGIAEoCzIRLkluZm92aXMuTG9jYXRpb24S",
-            "IgoHdG9vbGxvYxgHIAEoCzIRLkluZm92aXMuTG9jYXRpb25CE6oCEEluZm92",
-            "aXMuUHJvdG9idWZiBnByb3RvMw=="));
+            "IgoHdG9vbGxvYxgHIAEoCzIRLkluZm92aXMuTG9jYXRpb24SEQoJZGVwcmVz",
+            "c2VkGAggASgFEg8KB3ByZXNzZWQYCSABKAUSEAoIcmVsZWFzZWQYCiABKAUS",
+            "DgoGYW5hbG9nGAsgAygBQhOqAhBJbmZvdmlzLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Geometry), global::Infovis.Protobuf.Geometry.Parser, new[]{ "Fram", "Iden", "Type", "Mask", "Cnts", "Posx", "Posy", "Posz", "Size", "Colr", "Text" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Location), global::Infovis.Protobuf.Location.Parser, new[]{ "Posx", "Posy", "Posz", "Rotw", "Rotx", "Roty", "Rotz" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Reset", "Upsert", "Delete", "Viewloc", "Toolloc" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Response), global::Infovis.Protobuf.Response.Parser, new[]{ "Message", "Hover", "Unhover", "Select", "Deselect", "Viewloc", "Toolloc" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Response), global::Infovis.Protobuf.Response.Parser, new[]{ "Message", "Hover", "Unhover", "Select", "Deselect", "Viewloc", "Toolloc", "Depressed", "Pressed", "Released", "Analog" }, null, null, null)
           }));
     }
     #endregion
@@ -985,6 +986,10 @@ namespace Infovis.Protobuf {
       deselect_ = other.deselect_.Clone();
       Viewloc = other.viewloc_ != null ? other.Viewloc.Clone() : null;
       Toolloc = other.toolloc_ != null ? other.Toolloc.Clone() : null;
+      depressed_ = other.depressed_;
+      pressed_ = other.pressed_;
+      released_ = other.released_;
+      analog_ = other.analog_.Clone();
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1065,6 +1070,49 @@ namespace Infovis.Protobuf {
       }
     }
 
+    /// <summary>Field number for the "depressed" field.</summary>
+    public const int DepressedFieldNumber = 8;
+    private int depressed_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int Depressed {
+      get { return depressed_; }
+      set {
+        depressed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pressed" field.</summary>
+    public const int PressedFieldNumber = 9;
+    private int pressed_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int Pressed {
+      get { return pressed_; }
+      set {
+        pressed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "released" field.</summary>
+    public const int ReleasedFieldNumber = 10;
+    private int released_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int Released {
+      get { return released_; }
+      set {
+        released_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "analog" field.</summary>
+    public const int AnalogFieldNumber = 11;
+    private static readonly pb::FieldCodec<double> _repeated_analog_codec
+        = pb::FieldCodec.ForDouble(90);
+    private readonly pbc::RepeatedField<double> analog_ = new pbc::RepeatedField<double>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pbc::RepeatedField<double> Analog {
+      get { return analog_; }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as Response);
@@ -1085,6 +1133,10 @@ namespace Infovis.Protobuf {
       if(!deselect_.Equals(other.deselect_)) return false;
       if (!object.Equals(Viewloc, other.Viewloc)) return false;
       if (!object.Equals(Toolloc, other.Toolloc)) return false;
+      if (Depressed != other.Depressed) return false;
+      if (Pressed != other.Pressed) return false;
+      if (Released != other.Released) return false;
+      if(!analog_.Equals(other.analog_)) return false;
       return true;
     }
 
@@ -1098,6 +1150,10 @@ namespace Infovis.Protobuf {
       hash ^= deselect_.GetHashCode();
       if (viewloc_ != null) hash ^= Viewloc.GetHashCode();
       if (toolloc_ != null) hash ^= Toolloc.GetHashCode();
+      if (Depressed != 0) hash ^= Depressed.GetHashCode();
+      if (Pressed != 0) hash ^= Pressed.GetHashCode();
+      if (Released != 0) hash ^= Released.GetHashCode();
+      hash ^= analog_.GetHashCode();
       return hash;
     }
 
@@ -1124,6 +1180,19 @@ namespace Infovis.Protobuf {
         output.WriteRawTag(58);
         output.WriteMessage(Toolloc);
       }
+      if (Depressed != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(Depressed);
+      }
+      if (Pressed != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(Pressed);
+      }
+      if (Released != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(Released);
+      }
+      analog_.WriteTo(output, _repeated_analog_codec);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1142,6 +1211,16 @@ namespace Infovis.Protobuf {
       if (toolloc_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Toolloc);
       }
+      if (Depressed != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Depressed);
+      }
+      if (Pressed != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Pressed);
+      }
+      if (Released != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Released);
+      }
+      size += analog_.CalculateSize(_repeated_analog_codec);
       return size;
     }
 
@@ -1169,6 +1248,16 @@ namespace Infovis.Protobuf {
         }
         Toolloc.MergeFrom(other.Toolloc);
       }
+      if (other.Depressed != 0) {
+        Depressed = other.Depressed;
+      }
+      if (other.Pressed != 0) {
+        Pressed = other.Pressed;
+      }
+      if (other.Released != 0) {
+        Released = other.Released;
+      }
+      analog_.Add(other.analog_);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1215,6 +1304,23 @@ namespace Infovis.Protobuf {
               toolloc_ = new global::Infovis.Protobuf.Location();
             }
             input.ReadMessage(toolloc_);
+            break;
+          }
+          case 64: {
+            Depressed = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            Pressed = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            Released = input.ReadInt32();
+            break;
+          }
+          case 90:
+          case 89: {
+            analog_.AddEntriesFrom(input, _repeated_analog_codec);
             break;
           }
         }

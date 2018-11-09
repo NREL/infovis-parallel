@@ -1,4 +1,5 @@
 using Google.Protobuf;
+using Google.Protobuf.Collections;
 using Infovis.Protobuf;
 using UnityEngine;
 using WebSocketSharp.Server;
@@ -52,9 +53,8 @@ namespace Infovis {
       State.Refresh();
 
       GameObject camera = GameObject.Find("OVRCameraRig");
-      OVRInput.Controller controller = OVRInput.GetActiveController();
 
-      if (OVRInput.GetDown(OVRInput.Button.Two, controller)) {
+      if (OVRInput.GetDown(OVRInput.Button.Two)) {
 
         camera.transform.position = home;
 
@@ -62,23 +62,43 @@ namespace Infovis {
 
       } else {
 
-        Vector2 joystick = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad, controller);
+        Vector2 joystick = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
   
-        if (OVRInput.GetDown(OVRInput.Button.One, controller))
+        if (OVRInput.GetDown(OVRInput.Button.One))
           upwards = - upwards;
-        float shift = OVRInput.Get(OVRInput.Button.One, controller) ? upwards : 0;
+        float shift = OVRInput.Get(OVRInput.Button.One) ? upwards : 0;
   
         camera.transform.position = camera.transform.position + 0.008f * (new Vector3(joystick[0], shift, joystick[1]));
 
       }
 
-      if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, controller)) {
+      int depressed = 0;
+      int pressed = 0;
+      int released = 0;
+      for (int i = 0; i < 32; ++i) {
+        int mask = 1 << i;
+        OVRInput.Button button = (OVRInput.Button) mask;
+        if (OVRInput.Get(button))
+          depressed |= mask;
+        if (OVRInput.GetDown(button))
+          pressed |= mask;
+        if (OVRInput.GetUp(button))
+          released |= mask;
       }
 
-      if (Time.time >= nextReport) {
+      double[] analog = new double[12];
+      for (int i = 0; i < 4; ++i) {
+        int mask = 1 << i;
+        analog[i]  = OVRInput.Get((OVRInput.Axis1D) mask);
+        Vector2 xy = OVRInput.Get((OVRInput.Axis2D) mask);
+        analog[2 * i + 4] = xy.x;
+        analog[2 * i + 5] = xy.y;
+      }
+
+      if (pressed != 0 || released != 0 || Time.time >= nextReport) {
         GameObject tool = GameObject.Find("RightHandAnchor");
         Response response = new Response {
-          Message = "Time = " + Time.time + "s",
+          Message = "Time: " + Time.time + "s",
           Viewloc = new Location {
             Posx = camera.transform.position.x,
             Posy = camera.transform.position.y,
@@ -96,8 +116,12 @@ namespace Infovis {
             Rotx = tool.transform.rotation.x,
             Roty = tool.transform.rotation.y,
             Rotz = tool.transform.rotation.z,
-          }
+          },
+          Depressed = depressed,
+          Pressed   = pressed  ,
+          Released  = released ,
         };
+        response.Analog.Add(analog);
         Broadcast(response);
         nextReport = Time.time + deltaReport;
       }

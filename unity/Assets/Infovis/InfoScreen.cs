@@ -25,12 +25,6 @@ namespace Infovis {
         turnedOn = false;
       }
 
-//    OVRInput.Controller controller = OVRInput.Controller.Gamepad;
-//
-//    if (OVRInput.GetDown(OVRInput.Button.Four, controller)) {
-//      ShowMessage("BUTTON FOUR", 2);
-//    }
-
     }
 
     private bool turnedOn = true;

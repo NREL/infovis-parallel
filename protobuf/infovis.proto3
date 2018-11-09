@@ -43,11 +43,15 @@ message Request {
 
 
 message Response {
-  string         message   = 1;
-  repeated int64 hover     = 2;
-  repeated int64 unhover   = 3;
-  repeated int64 select    = 4;
-  repeated int64 deselect  = 5;
-  Location       viewloc   = 6;
-  Location       toolloc   = 7;
+  string          message   =  1;
+  repeated int64  hover     =  2;
+  repeated int64  unhover   =  3;
+  repeated int64  select    =  4;
+  repeated int64  deselect  =  5;
+  Location        viewloc   =  6;
+  Location        toolloc   =  7;
+  int32           depressed =  8;
+  int32           pressed   =  9;
+  int32           released  = 10;
+  repeated double analog    = 11;
 }
