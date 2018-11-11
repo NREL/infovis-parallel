@@ -8,9 +8,9 @@ option csharp_namespace = "Infovis.Protobuf";
 
 
 message Geometry {
-  int32           fram =  1; // not supported
+  int32           fram =  1; // 0 = all
   int64           iden =  2;
-  int32           type =  3; // 1 = points, 2 = polylines, 3 = rectangles, 4 = label, 5 = axis
+  int32           type =  3; // 0 = all, 1 = points, 2 = polylines, 3 = rectangles, 4 = label, 5 = axis
   int32           mask =  4;
   repeated int32  cnts =  5;
   repeated double posx =  6; // mask = 0001b = 1
@@ -34,24 +34,26 @@ message Location {
 
 
 message Request {
-  bool              reset   = 1;
-  repeated Geometry upsert  = 2;
-  repeated int64    delete  = 3;
-  Location          viewloc = 4;
-  Location          toolloc = 5;
+  int32             show    = 1; // 0 = no change
+  bool              reset   = 2;
+  repeated Geometry upsert  = 3;
+  repeated int64    delete  = 4;
+  Location          viewloc = 5;
+  Location          toolloc = 6;
 }
 
 
 message Response {
-  string          message   =  1;
-  repeated int64  hover     =  2;
-  repeated int64  unhover   =  3;
-  repeated int64  select    =  4;
-  repeated int64  deselect  =  5;
-  Location        viewloc   =  6;
-  Location        toolloc   =  7;
-  int32           depressed =  8;
-  int32           pressed   =  9;
-  int32           released  = 10;
-  repeated double analog    = 11;
+  int32           shown     =  1;
+  string          message   =  2;
+  repeated int64  hover     =  3;
+  repeated int64  unhover   =  4;
+  repeated int64  select    =  5;
+  repeated int64  deselect  =  6;
+  Location        viewloc   =  7;
+  Location        toolloc   =  8;
+  fixed32         depressed =  9;
+  fixed32         pressed   = 10;
+  fixed32         released  = 11;
+  repeated double analog    = 12;
 }

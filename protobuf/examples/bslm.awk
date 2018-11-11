@@ -43,11 +43,12 @@ BEGIN {
 END {
   for (i in x) {
     print "upsert {"
+    print "  fram: 3"
     print "  iden: " (1000000 + i)
     print "  type: 1"
     print "  mask: 15"
     print "  cnts: 1"
-    print "  posx: " ((x[i] - xmin) / (xmax - xmin) + 1.25)
+    print "  posx: " ((x[i] - xmin) / (xmax - xmin))
     print "  posy: " ((y[i] - ymin) / (ymax - ymin))
     print "  posz: " ((z[i] - zmin) / (zmax - zmin))
     print "  size: 0.020"

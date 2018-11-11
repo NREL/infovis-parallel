@@ -1,6 +1,8 @@
+show: 1
 reset: true
 
 upsert {
+  fram: 1
   iden: 101
   type: 5
   mask: 15
@@ -17,6 +19,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 102
   type: 5
   mask: 15
@@ -33,6 +36,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 103
   type: 5
   mask: 15
@@ -49,6 +53,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 111
   type: 4
   mask: 15
@@ -68,6 +73,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 112
   type: 4
   mask: 15
@@ -87,6 +93,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 113
   type: 4
   mask: 15

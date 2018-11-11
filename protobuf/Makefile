@@ -9,6 +9,9 @@ all: examples ../unity/Assets/Infovis/Protobuf.cs
 
 examples: $(EXAMPLES)
 
+examples/bslm-%.pbt: examples/bslm.tsv.part-% examples/bslm.awk
+	gawk -f examples/bslm.awk $< > $@
+
 
 %.cs: infovis.proto3
 	protoc --csharp_out . $<

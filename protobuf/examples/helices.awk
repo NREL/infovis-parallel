@@ -4,6 +4,7 @@
 BEGIN {
 
   print "upsert {"
+  print "  fram: 1"
   print "  iden: 301"
   print "  type: 2"
   print "  mask: 15"
@@ -27,6 +28,7 @@ BEGIN {
   print "}"
 
   print "upsert {"
+  print "  fram: 1"
   print "  iden: 302"
   print "  type: 2"
   print "  mask: 15"

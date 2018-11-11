@@ -1,4 +1,5 @@
 upsert {
+  fram: 1
   iden: 201
   type: 1
   mask: 15
@@ -12,6 +13,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 202
   type: 1
   mask: 15
@@ -25,6 +27,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 203
   type: 1
   mask: 15
@@ -38,6 +41,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 204
   type: 1
   mask: 15
@@ -51,6 +55,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 205
   type: 1
   mask: 15
@@ -64,6 +69,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 206
   type: 1
   mask: 15
@@ -77,6 +83,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 207
   type: 1
   mask: 15
@@ -90,6 +97,7 @@ upsert {
 }
 
 upsert {
+  fram: 1
   iden: 208
   type: 1
   mask: 15
