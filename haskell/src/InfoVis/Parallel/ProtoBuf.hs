@@ -9,12 +9,14 @@
 
 module InfoVis.Parallel.ProtoBuf (
   Request
+, frameShow
 , reset
 , upsert
 , delete
 , viewSet
 , toolSet
 , Response
+, frameShown
 , message
 , hover
 , unhover
@@ -40,14 +42,13 @@ import Data.Aeson ((.=), (.:?))
 import Data.Aeson.Types (FromJSON(..), ToJSON(..), object, withObject)
 import Data.Bits (Bits, (.|.), (.&.), shift)
 import Data.Default (Default(..))
-import Data.Word (Word32)
 import Data.Int (Int32)
 import Data.List.Split (splitPlaces)
 import Data.Maybe (fromMaybe)
 import Data.ProtocolBuffers (Decode, Encode, Message, Optional, Packed, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
 import Data.Serialize (runGetLazy, runPutLazy)
 import GHC.Generics (Generic)
-import InfoVis.Parallel.NewTypes (Color, Displacement, Frame, Identifier, Position, PositionRotation)
+import InfoVis.Parallel.NewTypes (Buttons, Color, Displacement, Frame, Identifier, Position, PositionRotation)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
@@ -59,11 +60,12 @@ import qualified Data.Text.Lazy as T (unpack)
 data Request =
   Request
   {
-    reset'   :: Optional 1 (Value   Bool      )
-  , upsert'  :: Repeated 2 (Message GeometryPB)
-  , delete'  :: Packed   3 (Value   Identifier)
-  , viewloc' :: Optional 4 (Message LocationPB)
-  , toolloc' :: Optional 5 (Message LocationPB)
+    show'    :: Optional 1 (Value   Frame     )
+  , reset'   :: Optional 2 (Value   Bool      )
+  , upsert'  :: Repeated 3 (Message GeometryPB)
+  , delete'  :: Packed   4 (Value   Identifier)
+  , viewloc' :: Optional 5 (Message LocationPB)
+  , toolloc' :: Optional 6 (Message LocationPB)
   }
     deriving (Generic, Show)
 
@@ -71,7 +73,8 @@ instance Default Request where
   def =
     Request
     {
-      reset'   = putField def
+      show'    = putField def
+    , reset'   = putField def
     , upsert'  = putField def
     , delete'  = putField def
     , viewloc' = putField def
@@ -83,6 +86,7 @@ instance FromJSON Request where
     withObject "Request"
       $ \v ->
       do
+        show'    <- putField                                             <$> v .:? "frame"
         reset'   <- putField                                             <$> v .:? "reset"
         upsert'  <- putField . fmap fromGeometry         . fromMaybe def <$> v .:? "upsert"
         delete'  <- putField .                             fromMaybe def <$> v .:? "delete"
@@ -93,6 +97,7 @@ instance FromJSON Request where
 instance ToJSON Request where
   toJSON Request{..} =
     object
+     . maybe id ((:) . ("frame"   .=)) (                       getField show'   )
      . maybe id ((:) . ("reset"   .=)) (                       getField reset'  )
      . option           "upsert"       (toGeometry         <$> getField upsert' )
      . option           "delete"       (                       getField delete' )
@@ -111,6 +116,13 @@ instance WebSocketsData Request where
   fromDataMessage (Binary x) = fromLazyByteString x
   fromLazyByteString = either error id . runGetLazy decodeMessage
   toLazyByteString = runPutLazy . encodeMessage
+
+
+frameShow :: Lens' Request Frame
+frameShow =
+  lens
+    (fromMaybe def . getField . show')
+    (\s x -> s {show' = putField $ Just x})
 
 
 reset :: Lens' Request Bool
@@ -137,31 +149,32 @@ delete =
 viewSet :: Lens' Request (Maybe PositionRotation)
 viewSet =
   lens
-    (fmap toPositionRotation . getField . (viewloc' :: Request -> Optional 4 (Message LocationPB)))
+    (fmap toPositionRotation . getField . (viewloc' :: Request -> Optional 5 (Message LocationPB)))
     (\s x -> (s :: Request) {viewloc' = putField $ fromPositionRotation <$> x})
 
 
 toolSet :: Lens' Request (Maybe PositionRotation)
 toolSet =
   lens
-    (fmap toPositionRotation . getField . (toolloc' :: Request -> Optional 5 (Message LocationPB)))
+    (fmap toPositionRotation . getField . (toolloc' :: Request -> Optional 6 (Message LocationPB)))
     (\s x -> (s :: Request) {toolloc' = putField $ fromPositionRotation <$> x})
 
 
 data Response =
   Response
   {
-    message'   :: Optional  1 (Value   String    )
-  , hover'     :: Packed    2 (Value   Identifier)
-  , unhover'   :: Packed    3 (Value   Identifier)
-  , select'    :: Packed    4 (Value   Identifier)
-  , deselect'  :: Packed    5 (Value   Identifier)
-  , viewloc'   :: Optional  6 (Message LocationPB)
-  , toolloc'   :: Optional  7 (Message LocationPB)
-  , depressed' :: Optional  8 (Value   Int32     )
-  , pressed'   :: Optional  9 (Value   Int32     )
-  , released'  :: Optional 10 (Value   Int32     )
-  , analog'    :: Packed   11 (Value   Double    )
+    shown'     :: Optional  1 (Value   Frame     )
+  , message'   :: Optional  2 (Value   String    )
+  , hover'     :: Packed    3 (Value   Identifier)
+  , unhover'   :: Packed    4 (Value   Identifier)
+  , select'    :: Packed    5 (Value   Identifier)
+  , deselect'  :: Packed    6 (Value   Identifier)
+  , viewloc'   :: Optional  7 (Message LocationPB)
+  , toolloc'   :: Optional  8 (Message LocationPB)
+  , depressed' :: Optional  9 (Value   Buttons   )
+  , pressed'   :: Optional 10 (Value   Buttons   )
+  , released'  :: Optional 11 (Value   Buttons   )
+  , analog'    :: Packed   12 (Value   Double    )
   }
     deriving (Generic, Show)
 
@@ -169,7 +182,8 @@ instance Default Response where
   def = 
     Response
     {
-      message'   = putField def
+      shown'     = putField def
+    , message'   = putField def
     , hover'     = putField def
     , unhover'   = putField def
     , select'    = putField def
@@ -187,6 +201,7 @@ instance FromJSON Response where
     withObject "Response"
       $ \v ->
       do
+        shown'     <- putField                             <$> v .:? "frame"
         message'   <- putField                             <$> v .:? "message"
         hover'     <- putField . fromMaybe def             <$> v .:? "hover"
         unhover'   <- putField . fromMaybe def             <$> v .:? "unhover"
@@ -203,6 +218,7 @@ instance FromJSON Response where
 instance ToJSON Response where
   toJSON Response{..} =
     object
+     . maybe id ((:) . ("frame"     .=)) (                       getField shown'    )
      . maybe id ((:) . ("message"   .=)) (                       getField message'  )
      . option           "hover"          (                       getField hover'    )
      . option           "unhover"        (                       getField unhover'  )
@@ -227,6 +243,13 @@ instance WebSocketsData Response where
   fromDataMessage (Binary x) = fromLazyByteString x
   fromLazyByteString = either error id . runGetLazy decodeMessage
   toLazyByteString = runPutLazy . encodeMessage
+
+
+frameShown :: Lens' Response Frame
+frameShown =
+  lens
+    (fromMaybe def . getField . shown')
+    (\s x -> s {shown' = putField $ Just x})
 
 
 message :: Lens' Response (Maybe String)
@@ -267,32 +290,32 @@ deselect =
 viewGet :: Lens' Response (Maybe PositionRotation)
 viewGet =
   lens
-    (fmap toPositionRotation . getField . (viewloc' :: Response -> Optional 6 (Message LocationPB)))
+    (fmap toPositionRotation . getField . (viewloc' :: Response -> Optional 7 (Message LocationPB)))
     (\s x -> (s :: Response) {viewloc' = putField $ fromPositionRotation <$> x})
 
 
 toolGet :: Lens' Response (Maybe PositionRotation)
 toolGet =
   lens
-    (fmap toPositionRotation . getField . (toolloc' :: Response -> Optional 7 (Message LocationPB)))
+    (fmap toPositionRotation . getField . (toolloc' :: Response -> Optional 8 (Message LocationPB)))
     (\s x -> (s :: Response) {toolloc' = putField $ fromPositionRotation <$> x})
 
 
-depressed :: Lens' Response Word32
+depressed :: Lens' Response Buttons
 depressed =
   lens
     (maybe def fromIntegral . getField . depressed')
     (\s x -> s {depressed' = putField . Just $ fromIntegral x})
 
 
-pressed :: Lens' Response Word32
+pressed :: Lens' Response Buttons
 pressed =
   lens
     (maybe def fromIntegral . getField . pressed')
     (\s x -> s {pressed' = putField . Just $ fromIntegral x})
 
 
-released :: Lens' Response Word32
+released :: Lens' Response Buttons
 released =
   lens
     (maybe def fromIntegral . getField . released')
@@ -360,9 +383,9 @@ textBit = 1 `shift` 3
 toGeometry :: GeometryPB -> Geometry
 toGeometry GeometryPB{..} =
   let
-    frame      = fromMaybe 0 $ getField fram'
-    identifier = fromMaybe 0 $ getField iden'
-    mask       = fromMaybe 0 $ getField mask'
+    frame      = fromMaybe def $ getField fram'
+    identifier = fromMaybe def $ getField iden'
+    mask       = fromMaybe def $ getField mask'
     shape =
       do
         guard
@@ -375,9 +398,9 @@ toGeometry GeometryPB{..} =
           , getField posy'
           , getField posz'
           )
-    size       = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe 0  $ getField size')
-    color      = guard (colorBit .&. mask /= 0) >> return (fromMaybe 0  $ getField colr')
-    text       = guard (textBit  .&. mask /= 0) >> return (fromMaybe "" $ getField text')
+    size       = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def $ getField size')
+    color      = guard (colorBit .&. mask /= 0) >> return (fromMaybe def $ getField colr')
+    text       = guard (textBit  .&. mask /= 0) >> return (fromMaybe def $ getField text')
   in
     Geometry{..}
 
@@ -512,15 +535,15 @@ toPositionRotation LocationPB{..} =
   (
     P
       $ V3
-        (fromMaybe 0 $ getField posx')
-        (fromMaybe 0 $ getField posy')
-        (fromMaybe 0 $ getField posz')
+        (fromMaybe def $ getField posx')
+        (fromMaybe def $ getField posy')
+        (fromMaybe def $ getField posz')
   , Quaternion
-      (fromMaybe 0 $ getField rotw')
+      (fromMaybe def $ getField rotw')
       $ V3
-        (fromMaybe 0 $ getField rotx')
-        (fromMaybe 0 $ getField roty')
-        (fromMaybe 0 $ getField rotz')
+        (fromMaybe def $ getField rotx')
+        (fromMaybe def $ getField roty')
+        (fromMaybe def $ getField rotz')
   )
 
 

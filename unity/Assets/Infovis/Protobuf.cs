@@ -28,23 +28,24 @@ namespace Infovis.Protobuf {
             "ARIMCgRwb3N6GAggAygBEgwKBHNpemUYCSABKAESDAoEY29schgKIAEoBxIM",
             "CgR0ZXh0GAsgASgJImwKCExvY2F0aW9uEgwKBHBvc3gYASABKAESDAoEcG9z",
             "eRgCIAEoARIMCgRwb3N6GAMgASgBEgwKBHJvdHcYBCABKAESDAoEcm90eBgF",
-            "IAEoARIMCgRyb3R5GAYgASgBEgwKBHJvdHoYByABKAEikwEKB1JlcXVlc3QS",
-            "DQoFcmVzZXQYASABKAgSIQoGdXBzZXJ0GAIgAygLMhEuSW5mb3Zpcy5HZW9t",
-            "ZXRyeRIOCgZkZWxldGUYAyADKAMSIgoHdmlld2xvYxgEIAEoCzIRLkluZm92",
-            "aXMuTG9jYXRpb24SIgoHdG9vbGxvYxgFIAEoCzIRLkluZm92aXMuTG9jYXRp",
-            "b24i6wEKCFJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSDQoFaG92ZXIYAiAD",
-            "KAMSDwoHdW5ob3ZlchgDIAMoAxIOCgZzZWxlY3QYBCADKAMSEAoIZGVzZWxl",
-            "Y3QYBSADKAMSIgoHdmlld2xvYxgGIAEoCzIRLkluZm92aXMuTG9jYXRpb24S",
-            "IgoHdG9vbGxvYxgHIAEoCzIRLkluZm92aXMuTG9jYXRpb24SEQoJZGVwcmVz",
-            "c2VkGAggASgFEg8KB3ByZXNzZWQYCSABKAUSEAoIcmVsZWFzZWQYCiABKAUS",
-            "DgoGYW5hbG9nGAsgAygBQhOqAhBJbmZvdmlzLlByb3RvYnVmYgZwcm90bzM="));
+            "IAEoARIMCgRyb3R5GAYgASgBEgwKBHJvdHoYByABKAEioQEKB1JlcXVlc3QS",
+            "DAoEc2hvdxgBIAEoBRINCgVyZXNldBgCIAEoCBIhCgZ1cHNlcnQYAyADKAsy",
+            "ES5JbmZvdmlzLkdlb21ldHJ5Eg4KBmRlbGV0ZRgEIAMoAxIiCgd2aWV3bG9j",
+            "GAUgASgLMhEuSW5mb3Zpcy5Mb2NhdGlvbhIiCgd0b29sbG9jGAYgASgLMhEu",
+            "SW5mb3Zpcy5Mb2NhdGlvbiL6AQoIUmVzcG9uc2USDQoFc2hvd24YASABKAUS",
+            "DwoHbWVzc2FnZRgCIAEoCRINCgVob3ZlchgDIAMoAxIPCgd1bmhvdmVyGAQg",
+            "AygDEg4KBnNlbGVjdBgFIAMoAxIQCghkZXNlbGVjdBgGIAMoAxIiCgd2aWV3",
+            "bG9jGAcgASgLMhEuSW5mb3Zpcy5Mb2NhdGlvbhIiCgd0b29sbG9jGAggASgL",
+            "MhEuSW5mb3Zpcy5Mb2NhdGlvbhIRCglkZXByZXNzZWQYCSABKAcSDwoHcHJl",
+            "c3NlZBgKIAEoBxIQCghyZWxlYXNlZBgLIAEoBxIOCgZhbmFsb2cYDCADKAFC",
+            "E6oCEEluZm92aXMuUHJvdG9idWZiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Geometry), global::Infovis.Protobuf.Geometry.Parser, new[]{ "Fram", "Iden", "Type", "Mask", "Cnts", "Posx", "Posy", "Posz", "Size", "Colr", "Text" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Location), global::Infovis.Protobuf.Location.Parser, new[]{ "Posx", "Posy", "Posz", "Rotw", "Rotx", "Roty", "Rotz" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Reset", "Upsert", "Delete", "Viewloc", "Toolloc" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Response), global::Infovis.Protobuf.Response.Parser, new[]{ "Message", "Hover", "Unhover", "Select", "Deselect", "Viewloc", "Toolloc", "Depressed", "Pressed", "Released", "Analog" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Show", "Reset", "Upsert", "Delete", "Viewloc", "Toolloc" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Response), global::Infovis.Protobuf.Response.Parser, new[]{ "Shown", "Message", "Hover", "Unhover", "Select", "Deselect", "Viewloc", "Toolloc", "Depressed", "Pressed", "Released", "Analog" }, null, null, null)
           }));
     }
     #endregion
@@ -97,7 +98,7 @@ namespace Infovis.Protobuf {
     public const int FramFieldNumber = 1;
     private int fram_;
     /// <summary>
-    /// not supported
+    /// 0 = all
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int Fram {
@@ -122,7 +123,7 @@ namespace Infovis.Protobuf {
     public const int TypeFieldNumber = 3;
     private int type_;
     /// <summary>
-    /// 1 = points, 2 = polylines, 3 = rectangles, 4 = label, 5 = axis
+    /// 0 = all, 1 = points, 2 = polylines, 3 = rectangles, 4 = label, 5 = axis
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int Type {
@@ -753,6 +754,7 @@ namespace Infovis.Protobuf {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Request(Request other) : this() {
+      show_ = other.show_;
       reset_ = other.reset_;
       upsert_ = other.upsert_.Clone();
       delete_ = other.delete_.Clone();
@@ -765,8 +767,22 @@ namespace Infovis.Protobuf {
       return new Request(this);
     }
 
+    /// <summary>Field number for the "show" field.</summary>
+    public const int ShowFieldNumber = 1;
+    private int show_;
+    /// <summary>
+    /// 0 = no change
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int Show {
+      get { return show_; }
+      set {
+        show_ = value;
+      }
+    }
+
     /// <summary>Field number for the "reset" field.</summary>
-    public const int ResetFieldNumber = 1;
+    public const int ResetFieldNumber = 2;
     private bool reset_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public bool Reset {
@@ -777,9 +793,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "upsert" field.</summary>
-    public const int UpsertFieldNumber = 2;
+    public const int UpsertFieldNumber = 3;
     private static readonly pb::FieldCodec<global::Infovis.Protobuf.Geometry> _repeated_upsert_codec
-        = pb::FieldCodec.ForMessage(18, global::Infovis.Protobuf.Geometry.Parser);
+        = pb::FieldCodec.ForMessage(26, global::Infovis.Protobuf.Geometry.Parser);
     private readonly pbc::RepeatedField<global::Infovis.Protobuf.Geometry> upsert_ = new pbc::RepeatedField<global::Infovis.Protobuf.Geometry>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<global::Infovis.Protobuf.Geometry> Upsert {
@@ -787,9 +803,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "delete" field.</summary>
-    public const int DeleteFieldNumber = 3;
+    public const int DeleteFieldNumber = 4;
     private static readonly pb::FieldCodec<long> _repeated_delete_codec
-        = pb::FieldCodec.ForInt64(26);
+        = pb::FieldCodec.ForInt64(34);
     private readonly pbc::RepeatedField<long> delete_ = new pbc::RepeatedField<long>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<long> Delete {
@@ -797,7 +813,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "viewloc" field.</summary>
-    public const int ViewlocFieldNumber = 4;
+    public const int ViewlocFieldNumber = 5;
     private global::Infovis.Protobuf.Location viewloc_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Infovis.Protobuf.Location Viewloc {
@@ -808,7 +824,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "toolloc" field.</summary>
-    public const int ToollocFieldNumber = 5;
+    public const int ToollocFieldNumber = 6;
     private global::Infovis.Protobuf.Location toolloc_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Infovis.Protobuf.Location Toolloc {
@@ -831,6 +847,7 @@ namespace Infovis.Protobuf {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Show != other.Show) return false;
       if (Reset != other.Reset) return false;
       if(!upsert_.Equals(other.upsert_)) return false;
       if(!delete_.Equals(other.delete_)) return false;
@@ -842,6 +859,7 @@ namespace Infovis.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Show != 0) hash ^= Show.GetHashCode();
       if (Reset != false) hash ^= Reset.GetHashCode();
       hash ^= upsert_.GetHashCode();
       hash ^= delete_.GetHashCode();
@@ -857,18 +875,22 @@ namespace Infovis.Protobuf {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Reset != false) {
+      if (Show != 0) {
         output.WriteRawTag(8);
+        output.WriteInt32(Show);
+      }
+      if (Reset != false) {
+        output.WriteRawTag(16);
         output.WriteBool(Reset);
       }
       upsert_.WriteTo(output, _repeated_upsert_codec);
       delete_.WriteTo(output, _repeated_delete_codec);
       if (viewloc_ != null) {
-        output.WriteRawTag(34);
+        output.WriteRawTag(42);
         output.WriteMessage(Viewloc);
       }
       if (toolloc_ != null) {
-        output.WriteRawTag(42);
+        output.WriteRawTag(50);
         output.WriteMessage(Toolloc);
       }
     }
@@ -876,6 +898,9 @@ namespace Infovis.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Show != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Show);
+      }
       if (Reset != false) {
         size += 1 + 1;
       }
@@ -894,6 +919,9 @@ namespace Infovis.Protobuf {
     public void MergeFrom(Request other) {
       if (other == null) {
         return;
+      }
+      if (other.Show != 0) {
+        Show = other.Show;
       }
       if (other.Reset != false) {
         Reset = other.Reset;
@@ -923,26 +951,30 @@ namespace Infovis.Protobuf {
             input.SkipLastField();
             break;
           case 8: {
+            Show = input.ReadInt32();
+            break;
+          }
+          case 16: {
             Reset = input.ReadBool();
             break;
           }
-          case 18: {
+          case 26: {
             upsert_.AddEntriesFrom(input, _repeated_upsert_codec);
             break;
           }
-          case 26:
-          case 24: {
+          case 34:
+          case 32: {
             delete_.AddEntriesFrom(input, _repeated_delete_codec);
             break;
           }
-          case 34: {
+          case 42: {
             if (viewloc_ == null) {
               viewloc_ = new global::Infovis.Protobuf.Location();
             }
             input.ReadMessage(viewloc_);
             break;
           }
-          case 42: {
+          case 50: {
             if (toolloc_ == null) {
               toolloc_ = new global::Infovis.Protobuf.Location();
             }
@@ -979,6 +1011,7 @@ namespace Infovis.Protobuf {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Response(Response other) : this() {
+      shown_ = other.shown_;
       message_ = other.message_;
       hover_ = other.hover_.Clone();
       unhover_ = other.unhover_.Clone();
@@ -997,8 +1030,19 @@ namespace Infovis.Protobuf {
       return new Response(this);
     }
 
+    /// <summary>Field number for the "shown" field.</summary>
+    public const int ShownFieldNumber = 1;
+    private int shown_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int Shown {
+      get { return shown_; }
+      set {
+        shown_ = value;
+      }
+    }
+
     /// <summary>Field number for the "message" field.</summary>
-    public const int MessageFieldNumber = 1;
+    public const int MessageFieldNumber = 2;
     private string message_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string Message {
@@ -1009,9 +1053,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "hover" field.</summary>
-    public const int HoverFieldNumber = 2;
+    public const int HoverFieldNumber = 3;
     private static readonly pb::FieldCodec<long> _repeated_hover_codec
-        = pb::FieldCodec.ForInt64(18);
+        = pb::FieldCodec.ForInt64(26);
     private readonly pbc::RepeatedField<long> hover_ = new pbc::RepeatedField<long>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<long> Hover {
@@ -1019,9 +1063,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "unhover" field.</summary>
-    public const int UnhoverFieldNumber = 3;
+    public const int UnhoverFieldNumber = 4;
     private static readonly pb::FieldCodec<long> _repeated_unhover_codec
-        = pb::FieldCodec.ForInt64(26);
+        = pb::FieldCodec.ForInt64(34);
     private readonly pbc::RepeatedField<long> unhover_ = new pbc::RepeatedField<long>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<long> Unhover {
@@ -1029,9 +1073,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "select" field.</summary>
-    public const int SelectFieldNumber = 4;
+    public const int SelectFieldNumber = 5;
     private static readonly pb::FieldCodec<long> _repeated_select_codec
-        = pb::FieldCodec.ForInt64(34);
+        = pb::FieldCodec.ForInt64(42);
     private readonly pbc::RepeatedField<long> select_ = new pbc::RepeatedField<long>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<long> Select {
@@ -1039,9 +1083,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "deselect" field.</summary>
-    public const int DeselectFieldNumber = 5;
+    public const int DeselectFieldNumber = 6;
     private static readonly pb::FieldCodec<long> _repeated_deselect_codec
-        = pb::FieldCodec.ForInt64(42);
+        = pb::FieldCodec.ForInt64(50);
     private readonly pbc::RepeatedField<long> deselect_ = new pbc::RepeatedField<long>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<long> Deselect {
@@ -1049,7 +1093,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "viewloc" field.</summary>
-    public const int ViewlocFieldNumber = 6;
+    public const int ViewlocFieldNumber = 7;
     private global::Infovis.Protobuf.Location viewloc_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Infovis.Protobuf.Location Viewloc {
@@ -1060,7 +1104,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "toolloc" field.</summary>
-    public const int ToollocFieldNumber = 7;
+    public const int ToollocFieldNumber = 8;
     private global::Infovis.Protobuf.Location toolloc_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Infovis.Protobuf.Location Toolloc {
@@ -1071,10 +1115,10 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "depressed" field.</summary>
-    public const int DepressedFieldNumber = 8;
-    private int depressed_;
+    public const int DepressedFieldNumber = 9;
+    private uint depressed_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int Depressed {
+    public uint Depressed {
       get { return depressed_; }
       set {
         depressed_ = value;
@@ -1082,10 +1126,10 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "pressed" field.</summary>
-    public const int PressedFieldNumber = 9;
-    private int pressed_;
+    public const int PressedFieldNumber = 10;
+    private uint pressed_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int Pressed {
+    public uint Pressed {
       get { return pressed_; }
       set {
         pressed_ = value;
@@ -1093,10 +1137,10 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "released" field.</summary>
-    public const int ReleasedFieldNumber = 10;
-    private int released_;
+    public const int ReleasedFieldNumber = 11;
+    private uint released_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int Released {
+    public uint Released {
       get { return released_; }
       set {
         released_ = value;
@@ -1104,9 +1148,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "analog" field.</summary>
-    public const int AnalogFieldNumber = 11;
+    public const int AnalogFieldNumber = 12;
     private static readonly pb::FieldCodec<double> _repeated_analog_codec
-        = pb::FieldCodec.ForDouble(90);
+        = pb::FieldCodec.ForDouble(98);
     private readonly pbc::RepeatedField<double> analog_ = new pbc::RepeatedField<double>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<double> Analog {
@@ -1126,6 +1170,7 @@ namespace Infovis.Protobuf {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Shown != other.Shown) return false;
       if (Message != other.Message) return false;
       if(!hover_.Equals(other.hover_)) return false;
       if(!unhover_.Equals(other.unhover_)) return false;
@@ -1143,6 +1188,7 @@ namespace Infovis.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Shown != 0) hash ^= Shown.GetHashCode();
       if (Message.Length != 0) hash ^= Message.GetHashCode();
       hash ^= hover_.GetHashCode();
       hash ^= unhover_.GetHashCode();
@@ -1164,8 +1210,12 @@ namespace Infovis.Protobuf {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
+      if (Shown != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Shown);
+      }
       if (Message.Length != 0) {
-        output.WriteRawTag(10);
+        output.WriteRawTag(18);
         output.WriteString(Message);
       }
       hover_.WriteTo(output, _repeated_hover_codec);
@@ -1173,24 +1223,24 @@ namespace Infovis.Protobuf {
       select_.WriteTo(output, _repeated_select_codec);
       deselect_.WriteTo(output, _repeated_deselect_codec);
       if (viewloc_ != null) {
-        output.WriteRawTag(50);
+        output.WriteRawTag(58);
         output.WriteMessage(Viewloc);
       }
       if (toolloc_ != null) {
-        output.WriteRawTag(58);
+        output.WriteRawTag(66);
         output.WriteMessage(Toolloc);
       }
       if (Depressed != 0) {
-        output.WriteRawTag(64);
-        output.WriteInt32(Depressed);
+        output.WriteRawTag(77);
+        output.WriteFixed32(Depressed);
       }
       if (Pressed != 0) {
-        output.WriteRawTag(72);
-        output.WriteInt32(Pressed);
+        output.WriteRawTag(85);
+        output.WriteFixed32(Pressed);
       }
       if (Released != 0) {
-        output.WriteRawTag(80);
-        output.WriteInt32(Released);
+        output.WriteRawTag(93);
+        output.WriteFixed32(Released);
       }
       analog_.WriteTo(output, _repeated_analog_codec);
     }
@@ -1198,6 +1248,9 @@ namespace Infovis.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Shown != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Shown);
+      }
       if (Message.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
       }
@@ -1212,13 +1265,13 @@ namespace Infovis.Protobuf {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Toolloc);
       }
       if (Depressed != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Depressed);
+        size += 1 + 4;
       }
       if (Pressed != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Pressed);
+        size += 1 + 4;
       }
       if (Released != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Released);
+        size += 1 + 4;
       }
       size += analog_.CalculateSize(_repeated_analog_codec);
       return size;
@@ -1228,6 +1281,9 @@ namespace Infovis.Protobuf {
     public void MergeFrom(Response other) {
       if (other == null) {
         return;
+      }
+      if (other.Shown != 0) {
+        Shown = other.Shown;
       }
       if (other.Message.Length != 0) {
         Message = other.Message;
@@ -1268,58 +1324,62 @@ namespace Infovis.Protobuf {
           default:
             input.SkipLastField();
             break;
-          case 10: {
-            Message = input.ReadString();
+          case 8: {
+            Shown = input.ReadInt32();
             break;
           }
-          case 18:
-          case 16: {
-            hover_.AddEntriesFrom(input, _repeated_hover_codec);
+          case 18: {
+            Message = input.ReadString();
             break;
           }
           case 26:
           case 24: {
-            unhover_.AddEntriesFrom(input, _repeated_unhover_codec);
+            hover_.AddEntriesFrom(input, _repeated_hover_codec);
             break;
           }
           case 34:
           case 32: {
-            select_.AddEntriesFrom(input, _repeated_select_codec);
+            unhover_.AddEntriesFrom(input, _repeated_unhover_codec);
             break;
           }
           case 42:
           case 40: {
+            select_.AddEntriesFrom(input, _repeated_select_codec);
+            break;
+          }
+          case 50:
+          case 48: {
             deselect_.AddEntriesFrom(input, _repeated_deselect_codec);
             break;
           }
-          case 50: {
+          case 58: {
             if (viewloc_ == null) {
               viewloc_ = new global::Infovis.Protobuf.Location();
             }
             input.ReadMessage(viewloc_);
             break;
           }
-          case 58: {
+          case 66: {
             if (toolloc_ == null) {
               toolloc_ = new global::Infovis.Protobuf.Location();
             }
             input.ReadMessage(toolloc_);
             break;
           }
-          case 64: {
-            Depressed = input.ReadInt32();
+          case 77: {
+            Depressed = input.ReadFixed32();
             break;
           }
-          case 72: {
-            Pressed = input.ReadInt32();
+          case 85: {
+            Pressed = input.ReadFixed32();
             break;
           }
-          case 80: {
-            Released = input.ReadInt32();
+          case 93: {
+            Released = input.ReadFixed32();
             break;
           }
-          case 90:
-          case 89: {
+          case 98:
+          case 97: {
             analog_.AddEntriesFrom(input, _repeated_analog_codec);
             break;
           }

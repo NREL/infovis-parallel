@@ -31,6 +31,8 @@ namespace Infovis {
 
     private double nextReport = 0;
 
+    private int frame = 0;
+
     void Start() {
 
       server = new WebSocketServer(serviceAddress);
@@ -72,11 +74,11 @@ namespace Infovis {
 
       }
 
-      int depressed = 0;
-      int pressed = 0;
-      int released = 0;
+      uint depressed = 0;
+      uint pressed = 0;
+      uint released = 0;
       for (int i = 0; i < 32; ++i) {
-        int mask = 1 << i;
+        uint mask = 1U << i;
         OVRInput.Button button = (OVRInput.Button) mask;
         if (OVRInput.Get(button))
           depressed |= mask;
@@ -88,7 +90,7 @@ namespace Infovis {
 
       double[] analog = new double[12];
       for (int i = 0; i < 4; ++i) {
-        int mask = 1 << i;
+        uint mask = 1U << i;
         analog[i]  = OVRInput.Get((OVRInput.Axis1D) mask);
         Vector2 xy = OVRInput.Get((OVRInput.Axis2D) mask);
         analog[2 * i + 4] = xy.x;
@@ -98,6 +100,7 @@ namespace Infovis {
       if (pressed != 0 || released != 0 || Time.time >= nextReport) {
         GameObject tool = GameObject.Find("RightHandAnchor");
         Response response = new Response {
+          Shown = frame,
           Message = "Time: " + Time.time + "s",
           Viewloc = new Location {
             Posx = camera.transform.position.x,

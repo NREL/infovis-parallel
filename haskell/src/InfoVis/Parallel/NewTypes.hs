@@ -12,6 +12,7 @@ module InfoVis.Parallel.NewTypes (
 , Rotation
 , PositionRotation
 , Color
+, Buttons
 ) where
 
 
@@ -52,4 +53,8 @@ instance ToJSON Rotation
 
 type PositionRotation = (Position, Rotation)
 
+
 type Color = Word32
+
+
+type Buttons = Word32
