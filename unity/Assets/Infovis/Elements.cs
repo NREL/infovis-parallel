@@ -1,4 +1,3 @@
-using Google.Protobuf;
 using Infovis.Protobuf;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +6,6 @@ using UnityEngine.EventSystems;
 using Convert = System.Convert;
 using Debug = UnityEngine.Debug;
 using Float = System.Single;
-using OVRRayPointerEventData = ControllerSelection.OVRRayPointerEventData;
 
 
 namespace Infovis {
@@ -58,7 +56,7 @@ namespace Infovis {
 
         EventTrigger.Entry entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerClick;
-        entry.callback.AddListener(data => { OnPointerClickDelegate((OVRRayPointerEventData) data); });
+        entry.callback.AddListener(data => { OnPointerClickDelegate((PointerEventData) data); });
         trigger.triggers.Add(entry);
 
       }
@@ -69,27 +67,25 @@ namespace Infovis {
 
         EventTrigger.Entry entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerEnter;
-        entry.callback.AddListener(data => { OnPointerEnterDelegate((OVRRayPointerEventData) data); });
+        entry.callback.AddListener(data => { OnPointerEnterDelegate((PointerEventData) data); });
         trigger.triggers.Add(entry);
     
         entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerExit;
-        entry.callback.AddListener(data => { OnPointerExitDelegate((OVRRayPointerEventData) data); });
+        entry.callback.AddListener(data => { OnPointerExitDelegate((PointerEventData) data); });
         trigger.triggers.Add(entry);
 
       }
 
     }
 
-    private static InfoScreen infoScreen = null;
+    private Program program = null;
 
     private void Display(string message, float duration) {
-      if (infoScreen == null)
-        infoScreen = GameObject.Find("Info").GetComponent<InfoScreen>();  
-      infoScreen.ShowMessage(message, duration);
+      if (program == null)
+        program = GameObject.Find("Program").GetComponent<Program>();  
+      program.Display(message, duration);
     }
-
-    private static Program program = null;
 
     private void Broadcast(Response response) {
       if (program == null)
@@ -97,7 +93,7 @@ namespace Infovis {
       program.Broadcast(response);
     }
 
-    public void OnPointerClickDelegate(OVRRayPointerEventData data) {
+    public void OnPointerClickDelegate(PointerEventData data) {
       selected = !selected;
       Response response =
         selected
@@ -111,7 +107,7 @@ namespace Infovis {
       Broadcast(response);
     }
 
-    public void OnPointerEnterDelegate(OVRRayPointerEventData data) {
+    public void OnPointerEnterDelegate(PointerEventData data) {
       if (inside)
         return;
       inside = true;
@@ -123,7 +119,7 @@ namespace Infovis {
       Broadcast(response);
     }
 
-    public void OnPointerExitDelegate(OVRRayPointerEventData data) {
+    public void OnPointerExitDelegate(PointerEventData data) {
       if (!inside)
         return;
       inside = false;

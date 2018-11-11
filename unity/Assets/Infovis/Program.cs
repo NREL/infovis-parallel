@@ -1,23 +1,24 @@
 using Google.Protobuf;
-using Google.Protobuf.Collections;
 using Infovis.Protobuf;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using WebSocketSharp.Server;
 
-using Convert = System.Convert;
 using Debug = UnityEngine.Debug;
-using Text = UnityEngine.UI.Text;
 
 
 namespace Infovis {
 
   public class Program : MonoBehaviour {
 
-    private const string serviceAddress = "ws://0.0.0.0:8080";
+    public string serviceHost = "0.0.0.0";
 
-    private const string serviceName = "/InfoVis";
+    public string servicePort = "8080";
 
-    private WebSocketServer server = null;
+    public string serviceName = "/InfoVis";
+
+    public GameObject root;
 
     public InfoScreen infoScreen;
 
@@ -27,22 +28,17 @@ namespace Infovis {
 
     public bool useBoxes = true;
 
-    public double deltaReport = 5;
-
-    private double nextReport = 0;
+    private WebSocketServer server = null;
 
     private int frame = 0;
 
     void Start() {
 
-      server = new WebSocketServer(serviceAddress);
-      server.AddWebSocketService<GeometrySocket>(serviceName, () => new GeometrySocket() {IgnoreExtensions = true});
-      Debug.Log("Starting service on " + serviceAddress + serviceName);
+      server = new WebSocketServer(BindingAddress());
+      server.AddWebSocketService<GeometrySocket>(serviceName, () => new GeometrySocket(this) {IgnoreExtensions = true});
+      Debug.Log("Starting service on" + BindingAddress() + serviceName);
 
       server.Start();
-
-      GameObject camera = GameObject.Find("OVRCameraRig");
-      home = camera.transform.position;
 
       Element.enableSelection = enableSelection;
       Element.enableTooltips = enableTooltips;
@@ -52,93 +48,137 @@ namespace Infovis {
 
     void Update() {
 
-      State.Refresh();
+      while (pending.Count > 0)
+        lock (pending)
+          Handle(pending.Dequeue());
 
-      GameObject camera = GameObject.Find("OVRCameraRig");
+    }
 
-      if (OVRInput.GetDown(OVRInput.Button.Two)) {
+    public void Display(string message, float duration) {
+      infoScreen.ShowMessage(message, duration);
+    }
 
-        camera.transform.position = home;
-
-        infoScreen.ShowMessage("Infovis Parallel\nws://" + Network.player.ipAddress + ":8080", 5f);
-
-      } else {
-
-        Vector2 joystick = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
-  
-        if (OVRInput.GetDown(OVRInput.Button.One))
-          upwards = - upwards;
-        float shift = OVRInput.Get(OVRInput.Button.One) ? upwards : 0;
-  
-        camera.transform.position = camera.transform.position + 0.008f * (new Vector3(joystick[0], shift, joystick[1]));
-
-      }
-
-      uint depressed = 0;
-      uint pressed = 0;
-      uint released = 0;
-      for (int i = 0; i < 32; ++i) {
-        uint mask = 1U << i;
-        OVRInput.Button button = (OVRInput.Button) mask;
-        if (OVRInput.Get(button))
-          depressed |= mask;
-        if (OVRInput.GetDown(button))
-          pressed |= mask;
-        if (OVRInput.GetUp(button))
-          released |= mask;
-      }
-
-      double[] analog = new double[12];
-      for (int i = 0; i < 4; ++i) {
-        uint mask = 1U << i;
-        analog[i]  = OVRInput.Get((OVRInput.Axis1D) mask);
-        Vector2 xy = OVRInput.Get((OVRInput.Axis2D) mask);
-        analog[2 * i + 4] = xy.x;
-        analog[2 * i + 5] = xy.y;
-      }
-
-      if (pressed != 0 || released != 0 || Time.time >= nextReport) {
-        GameObject tool = GameObject.Find("RightHandAnchor");
-        Response response = new Response {
-          Shown = frame,
-          Message = "Time: " + Time.time + "s",
-          Viewloc = new Location {
-            Posx = camera.transform.position.x,
-            Posy = camera.transform.position.y,
-            Posz = camera.transform.position.z,
-            Rotw = camera.transform.rotation.w,
-            Rotx = camera.transform.rotation.x,
-            Roty = camera.transform.rotation.y,
-            Rotz = camera.transform.rotation.z,
-          },
-          Toolloc = new Location {
-            Posx = tool.transform.position.x,
-            Posy = tool.transform.position.y,
-            Posz = tool.transform.position.z,
-            Rotw = tool.transform.rotation.w,
-            Rotx = tool.transform.rotation.x,
-            Roty = tool.transform.rotation.y,
-            Rotz = tool.transform.rotation.z,
-          },
-          Depressed = depressed,
-          Pressed   = pressed  ,
-          Released  = released ,
-        };
-        response.Analog.Add(analog);
-        Broadcast(response);
-        nextReport = Time.time + deltaReport;
-      }
-
+    public void ShowService() {
+      Display("Infovis Parallel\n" + BoundAddress() + serviceName, 5f);
     }
 
     public void Broadcast(Response response)
     {
+      response.Shown = frame;
       server.WebSocketServices.Broadcast(response.ToByteArray());
     }
 
-    private Vector3 home = Vector3.zero;
+    private string BindingAddress() {
+      return "ws://" + serviceHost + ":" + servicePort;
+    }
 
-    private float upwards = 0.5f;
+    private string BoundAddress() {
+      return "ws://" + Network.player.ipAddress + ":" + servicePort;
+    }
+
+    private Queue<Request> pending = new Queue<Request>();
+
+    public void Process(Request request) {
+      lock (pending)
+        pending.Enqueue(request);
+    }
+
+    public void Refresh() {
+    }
+
+    private string NameFrame(int frame) {
+      return "frame:" + frame;
+    }
+
+    private GameObject GetFrame(GameObject root, int frame) {
+
+      if (frame == 0)
+        return null;
+
+      string name = NameFrame(frame);
+
+      for (int i = 0; i < root.transform.childCount; ++i) {
+        GameObject candidate = root.transform.GetChild(i).gameObject;
+        if (candidate.name == name)
+          return candidate;
+       }
+
+       GameObject frameObject = new GameObject();
+       frameObject.SetActive(false);
+       frameObject.name = name;
+       frameObject.transform.parent = root.transform;
+
+      return frameObject;
+    }
+        
+    private void Handle(Request request) {
+
+      if (request.Reset) {
+
+        types.Clear();
+
+        for (int i = 0; i < root.transform.childCount; ++i)
+          GameObject.Destroy(root.transform.GetChild(i).gameObject);
+//        GameObject.DestroyImmediate(obj);
+        
+        new WaitForSeconds(0.001f);
+
+      }
+
+      foreach (Geometry geometry in request.Upsert) {
+
+        int frame = geometry.Fram;
+        long identifier = geometry.Iden;
+        short type = (short) geometry.Type;
+
+        GameObject frameObject = GetFrame(root, frame);
+        
+        if (type != 0 && !types.ContainsKey(type))
+          types[type] = new Dictionary<int, Dictionary<long, Element>>();
+
+        foreach (Dictionary<int, Dictionary<long, Element>> frames in types.Where(entry => type == 0 || entry.Key == type).Select(entry => entry.Value)) {
+
+          if (type != 0 && frame != 0 && !frames.ContainsKey(frame))
+            frames[frame] = new Dictionary<long, Element>();
+        
+          foreach (Dictionary<long, Element> elements in frames.Where(entry => frame == 0 || entry.Key == frame).Select(entry => entry.Value)) {
+
+            Element element = null;
+            if (elements.TryGetValue(identifier, out element))
+              elements[identifier] = Factory.UpdateElement(element, geometry);
+            else if (frameObject != null)
+              elements[identifier] = Factory.CreateElement(frameObject, geometry);
+
+          }
+
+        }
+
+      }
+
+      foreach (Dictionary<int, Dictionary<long, Element>> frames in types.Select(entry => entry.Value))
+        foreach (Dictionary<long, Element> elements in frames.Select(entry => entry.Value))
+          foreach (long identifier in request.Delete) {
+            Element element = null;
+            if (elements.TryGetValue(identifier, out element)) {
+              elements.Remove(identifier);
+              Factory.RemoveElement(element);
+            }
+          }
+
+      if (request.Show != 0) {
+        frame = request.Show;
+        string name = NameFrame(request.Show);
+        for (int i = 0; i < root.transform.childCount; ++i) {
+          GameObject frameObject = root.transform.GetChild(i).gameObject;
+          bool newActive = frameObject.name == name;
+          if (frameObject.activeSelf != newActive)
+            frameObject.SetActive(newActive);
+        }
+      }
+
+    }
+
+    private Dictionary<short, Dictionary<int, Dictionary<long, Element>>> types = new Dictionary<short, Dictionary<int, Dictionary<long, Element>>>();
 
   }
 

@@ -10,6 +10,12 @@ namespace Infovis {
 
   public class GeometrySocket : WebSocketBehavior {
 
+    private Program program;
+
+    public GeometrySocket(Program p) : base() {
+      program = p;
+    }
+
     protected override void OnOpen() {
       Debug.Log("GeometrySocket: opened.");
     }
@@ -17,7 +23,7 @@ namespace Infovis {
     protected override void OnMessage(MessageEventArgs evt) {
       byte[] bytes = evt.IsText ? Convert.FromBase64String(evt.Data) : evt.RawData;
       Request request = Request.Parser.ParseFrom(bytes);
-      Infovis.State.Process(request);
+      program.Process(request);
       Send("Buffer received");
     }
 
