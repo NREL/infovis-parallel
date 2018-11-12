@@ -371,6 +371,7 @@ namespace Infovis {
       MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
       if (textMaterial == null)
         textMaterial = Resources.Load<Material>("font-material");
+      Debug.Log(textMaterial);
       meshRenderer.material = textMaterial;
       TextMesh textComponent = obj.AddComponent<TextMesh>();
       if (textFont == null)

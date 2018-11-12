@@ -33,6 +33,8 @@ namespace Infovis {
 
         camera.transform.position = home;
 
+        program.ShowService();
+
       } else {
 
         Vector2 joystick = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);

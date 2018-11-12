@@ -118,8 +118,8 @@ namespace Infovis {
         types.Clear();
 
         for (int i = 0; i < root.transform.childCount; ++i)
-          GameObject.Destroy(root.transform.GetChild(i).gameObject);
-//        GameObject.DestroyImmediate(obj);
+//        GameObject.Destroy(root.transform.GetChild(i).gameObject);
+          GameObject.DestroyImmediate(root.transform.GetChild(i).gameObject);
         
         new WaitForSeconds(0.001f);
 
