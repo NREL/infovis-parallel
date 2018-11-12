@@ -12,12 +12,6 @@ namespace Infovis {
 
     public GameObject selectionVisualizer;
 
-    void Start() {
-
-      ShowMessage("Infovis Parallel\nws://" + Network.player.ipAddress + ":8080", 5f);
-
-    }
-
     void Update() {
 
       if (turnedOn && Time.time > turnOff) {

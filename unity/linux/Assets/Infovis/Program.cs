@@ -46,6 +46,8 @@ namespace Infovis {
       Element.enableTooltips = enableTooltips;
       Element.useBoxes = useBoxes;
 
+      ShowService();
+
     }
 
     void Update() {
