@@ -234,8 +234,9 @@ MonoBehaviour:
   serviceName: /InfoVis
   root: {fileID: 707254337}
   infoScreen: {fileID: 1944541865}
-  enableSelection: 1
-  enableTooltips: 1
+  camera: {fileID: 2039570721}
+  enableSelection: 0
+  enableTooltips: 0
   useBoxes: 1
 --- !u!4 &707254339
 Transform:

@@ -22,6 +22,8 @@ namespace Infovis {
 
     public InfoScreen infoScreen;
 
+    public GameObject camera = null;
+
     public bool enableSelection = true;
 
     public bool enableTooltips = false;
@@ -174,6 +176,11 @@ namespace Infovis {
           if (frameObject.activeSelf != newActive)
             frameObject.SetActive(newActive);
         }
+      }
+
+      if (camera != null && request.Viewloc != null) {
+        camera.transform.position = new Vector3((float) request.Viewloc.Posx, (float) request.Viewloc.Posy, (float) request.Viewloc.Posz);
+        camera.transform.rotation = new Quaternion((float) request.Viewloc.Rotx, (float) request.Viewloc.Roty, (float) request.Viewloc.Rotz, (float) request.Viewloc.Rotw);
       }
 
     }
