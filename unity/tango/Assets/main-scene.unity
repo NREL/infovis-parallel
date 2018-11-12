@@ -410,7 +410,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 484544, guid: b65144e12d543401285d34c736b7ec92, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -1.75
+      value: -2.25
       objectReference: {fileID: 0}
     - target: {fileID: 484544, guid: b65144e12d543401285d34c736b7ec92, type: 2}
       propertyPath: m_LocalRotation.x
@@ -438,7 +438,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 2034540, guid: b65144e12d543401285d34c736b7ec92, type: 2}
       propertyPath: far clip plane
-      value: 8
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b65144e12d543401285d34c736b7ec92, type: 2}
@@ -569,6 +569,14 @@ Prefab:
     - target: {fileID: 400000, guid: ff519ec4bed0442dc9bf3a21a9777c4d, type: 2}
       propertyPath: m_RootOrder
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400006, guid: ff519ec4bed0442dc9bf3a21a9777c4d, type: 2}
+      propertyPath: m_enableVideoOverlay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400006, guid: ff519ec4bed0442dc9bf3a21a9777c4d, type: 2}
+      propertyPath: m_videoOverlayUseByteBufferMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ff519ec4bed0442dc9bf3a21a9777c4d, type: 2}

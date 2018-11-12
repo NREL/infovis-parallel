@@ -6,6 +6,10 @@ oculus:
 	adb devices
 	adb install -r infovis-oculus.apk
 
+tango:
+	adb devices
+	adb install -r infovis-tango.apk
+
 linux:
 	tar cf infovis-linux.tar infovis-linux{.x86_64,_Data}
 	xz -9f infovis-linux.tar 
