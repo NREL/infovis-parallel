@@ -24,6 +24,8 @@ namespace Infovis {
 
     public GameObject camera = null;
 
+    public GameObject tool = null;
+
     public bool enableSelection = true;
 
     public bool enableTooltips = false;
@@ -178,6 +180,11 @@ namespace Infovis {
           if (frameObject.activeSelf != newActive)
             frameObject.SetActive(newActive);
         }
+      }
+
+      if (tool != null && request.Toolloc != null) {
+        tool.transform.position = new Vector3((float) request.Toolloc.Posx, (float) request.Toolloc.Posy, (float) request.Toolloc.Posz);
+        tool.transform.rotation = new Quaternion((float) request.Toolloc.Rotx, (float) request.Toolloc.Roty, (float) request.Toolloc.Rotz, (float) request.Toolloc.Rotw);
       }
 
       if (camera != null && request.Viewloc != null) {

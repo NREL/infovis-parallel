@@ -430,7 +430,7 @@ namespace Infovis {
       : base(root, GameObject.CreatePrimitive(PrimitiveType.Cylinder), identifier) {
     }
 
-    private static Object cone = null;
+    private static Object arrowhead = null;
 
     public override void Update(Geometry geometry) {
 
@@ -459,9 +459,9 @@ namespace Infovis {
         obj.transform.localScale = new Vector3(1, displacement.magnitude / 2, 1);
 
         if (obj.transform.childCount == 0) {
-          if (cone == null)
-            cone = Resources.Load("cone");
-          GameObject glyph = (GameObject) Object.Instantiate(cone, obj.transform, false); // FIXME: Avoid casting.
+          if (arrowhead == null)
+            arrowhead = Resources.Load("arrowhead");
+          GameObject glyph = (GameObject) Object.Instantiate(arrowhead, obj.transform, false); // FIXME: Avoid casting.
           foreach (MeshRenderer renderer in obj.GetComponentsInChildren<MeshRenderer>())
             renderer.material.color = color;
         }
