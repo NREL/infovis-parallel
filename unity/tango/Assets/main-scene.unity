@@ -391,6 +391,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 956274426}
+  - component: {fileID: 956274424}
   m_Layer: 0
   m_Name: IO
   m_TagString: Untagged
@@ -398,6 +399,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &956274424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 956274423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf6746ef58fee476f8adb979700cd294, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  program: {fileID: 707254338}
+  camera: {fileID: 1236696224}
+  deltaReport: 5
 --- !u!4 &956274426
 Transform:
   m_ObjectHideFlags: 0
@@ -416,6 +431,10 @@ Transform:
 Camera:
   m_PrefabParentObject: {fileID: 2034540, guid: b65144e12d543401285d34c736b7ec92,
     type: 2}
+  m_PrefabInternal: {fileID: 1777608165}
+--- !u!1 &1236696224 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 103230, guid: b65144e12d543401285d34c736b7ec92, type: 2}
   m_PrefabInternal: {fileID: 1777608165}
 --- !u!1 &1308252783
 GameObject:
