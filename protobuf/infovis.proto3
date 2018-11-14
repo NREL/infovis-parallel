@@ -35,11 +35,12 @@ message Location {
 
 message Request {
   int32             show    = 1; // 0 = no change
-  bool              reset   = 2;
-  repeated Geometry upsert  = 3;
-  repeated int64    delete  = 4;
-  Location          viewloc = 5;
-  Location          toolloc = 6;
+  string            message = 2;
+  bool              reset   = 3;
+  repeated Geometry upsert  = 4;
+  repeated int64    delete  = 5;
+  Location          viewloc = 6;
+  Location          toolloc = 7;
 }
 
 

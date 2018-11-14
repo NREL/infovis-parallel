@@ -119,6 +119,9 @@ namespace Infovis {
         
     private void Handle(Request request) {
 
+      if (request.Message != "")
+        Display(request.Message, 3f);
+
       if (request.Reset) {
 
         types.Clear();

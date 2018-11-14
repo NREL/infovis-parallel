@@ -10,6 +10,7 @@
 module InfoVis.Parallel.ProtoBuf (
   Request
 , frameShow
+, display
 , reset
 , upsert
 , delete
@@ -61,11 +62,12 @@ data Request =
   Request
   {
     show'    :: Optional 1 (Value   Frame     )
-  , reset'   :: Optional 2 (Value   Bool      )
-  , upsert'  :: Repeated 3 (Message GeometryPB)
-  , delete'  :: Packed   4 (Value   Identifier)
-  , viewloc' :: Optional 5 (Message LocationPB)
-  , toolloc' :: Optional 6 (Message LocationPB)
+  , display' :: Optional 2 (Value   String    )
+  , reset'   :: Optional 3 (Value   Bool      )
+  , upsert'  :: Repeated 4 (Message GeometryPB)
+  , delete'  :: Packed   5 (Value   Identifier)
+  , viewloc' :: Optional 6 (Message LocationPB)
+  , toolloc' :: Optional 7 (Message LocationPB)
   }
     deriving (Generic, Show)
 
@@ -74,6 +76,7 @@ instance Default Request where
     Request
     {
       show'    = putField def
+    , display' = putField def
     , reset'   = putField def
     , upsert'  = putField def
     , delete'  = putField def
@@ -87,6 +90,7 @@ instance FromJSON Request where
       $ \v ->
       do
         show'    <- putField                                             <$> v .:? "frame"
+        display' <- putField                                             <$> v .:? "message"
         reset'   <- putField                                             <$> v .:? "reset"
         upsert'  <- putField . fmap fromGeometry         . fromMaybe def <$> v .:? "upsert"
         delete'  <- putField .                             fromMaybe def <$> v .:? "delete"
@@ -98,6 +102,7 @@ instance ToJSON Request where
   toJSON Request{..} =
     object
      . maybe id ((:) . ("frame"   .=)) (                       getField show'   )
+     . maybe id ((:) . ("message" .=)) (                       getField display')
      . maybe id ((:) . ("reset"   .=)) (                       getField reset'  )
      . option           "upsert"       (toGeometry         <$> getField upsert' )
      . option           "delete"       (                       getField delete' )
@@ -125,6 +130,13 @@ frameShow =
     (\s x -> s {show' = putField $ Just x})
 
 
+display :: Lens' Request (Maybe String)
+display =
+  lens
+    (getField . display')
+    (\s x -> s {display' = putField x})
+
+
 reset :: Lens' Request Bool
 reset =
   lens
@@ -149,14 +161,14 @@ delete =
 viewSet :: Lens' Request (Maybe PositionRotation)
 viewSet =
   lens
-    (fmap toPositionRotation . getField . (viewloc' :: Request -> Optional 5 (Message LocationPB)))
+    (fmap toPositionRotation . getField . (viewloc' :: Request -> Optional 6 (Message LocationPB)))
     (\s x -> (s :: Request) {viewloc' = putField $ fromPositionRotation <$> x})
 
 
 toolSet :: Lens' Request (Maybe PositionRotation)
 toolSet =
   lens
-    (fmap toPositionRotation . getField . (toolloc' :: Request -> Optional 6 (Message LocationPB)))
+    (fmap toPositionRotation . getField . (toolloc' :: Request -> Optional 7 (Message LocationPB)))
     (\s x -> (s :: Request) {toolloc' = putField $ fromPositionRotation <$> x})
 
 
@@ -398,9 +410,9 @@ toGeometry GeometryPB{..} =
           , getField posy'
           , getField posz'
           )
-    size       = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def $ getField size')
-    color      = guard (colorBit .&. mask /= 0) >> return (fromMaybe def $ getField colr')
-    text       = guard (textBit  .&. mask /= 0) >> return (fromMaybe def $ getField text')
+    size  = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def $ getField size')
+    color = guard (colorBit .&. mask /= 0) >> return (fromMaybe def $ getField colr')
+    text  = guard (textBit  .&. mask /= 0) >> return (fromMaybe def $ getField text')
   in
     Geometry{..}
 

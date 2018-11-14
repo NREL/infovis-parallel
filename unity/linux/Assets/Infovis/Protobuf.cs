@@ -28,23 +28,23 @@ namespace Infovis.Protobuf {
             "ARIMCgRwb3N6GAggAygBEgwKBHNpemUYCSABKAESDAoEY29schgKIAEoBxIM",
             "CgR0ZXh0GAsgASgJImwKCExvY2F0aW9uEgwKBHBvc3gYASABKAESDAoEcG9z",
             "eRgCIAEoARIMCgRwb3N6GAMgASgBEgwKBHJvdHcYBCABKAESDAoEcm90eBgF",
-            "IAEoARIMCgRyb3R5GAYgASgBEgwKBHJvdHoYByABKAEioQEKB1JlcXVlc3QS",
-            "DAoEc2hvdxgBIAEoBRINCgVyZXNldBgCIAEoCBIhCgZ1cHNlcnQYAyADKAsy",
-            "ES5JbmZvdmlzLkdlb21ldHJ5Eg4KBmRlbGV0ZRgEIAMoAxIiCgd2aWV3bG9j",
-            "GAUgASgLMhEuSW5mb3Zpcy5Mb2NhdGlvbhIiCgd0b29sbG9jGAYgASgLMhEu",
-            "SW5mb3Zpcy5Mb2NhdGlvbiL6AQoIUmVzcG9uc2USDQoFc2hvd24YASABKAUS",
-            "DwoHbWVzc2FnZRgCIAEoCRINCgVob3ZlchgDIAMoAxIPCgd1bmhvdmVyGAQg",
-            "AygDEg4KBnNlbGVjdBgFIAMoAxIQCghkZXNlbGVjdBgGIAMoAxIiCgd2aWV3",
-            "bG9jGAcgASgLMhEuSW5mb3Zpcy5Mb2NhdGlvbhIiCgd0b29sbG9jGAggASgL",
-            "MhEuSW5mb3Zpcy5Mb2NhdGlvbhIRCglkZXByZXNzZWQYCSABKAcSDwoHcHJl",
-            "c3NlZBgKIAEoBxIQCghyZWxlYXNlZBgLIAEoBxIOCgZhbmFsb2cYDCADKAFC",
-            "E6oCEEluZm92aXMuUHJvdG9idWZiBnByb3RvMw=="));
+            "IAEoARIMCgRyb3R5GAYgASgBEgwKBHJvdHoYByABKAEisgEKB1JlcXVlc3QS",
+            "DAoEc2hvdxgBIAEoBRIPCgdtZXNzYWdlGAIgASgJEg0KBXJlc2V0GAMgASgI",
+            "EiEKBnVwc2VydBgEIAMoCzIRLkluZm92aXMuR2VvbWV0cnkSDgoGZGVsZXRl",
+            "GAUgAygDEiIKB3ZpZXdsb2MYBiABKAsyES5JbmZvdmlzLkxvY2F0aW9uEiIK",
+            "B3Rvb2xsb2MYByABKAsyES5JbmZvdmlzLkxvY2F0aW9uIvoBCghSZXNwb25z",
+            "ZRINCgVzaG93bhgBIAEoBRIPCgdtZXNzYWdlGAIgASgJEg0KBWhvdmVyGAMg",
+            "AygDEg8KB3VuaG92ZXIYBCADKAMSDgoGc2VsZWN0GAUgAygDEhAKCGRlc2Vs",
+            "ZWN0GAYgAygDEiIKB3ZpZXdsb2MYByABKAsyES5JbmZvdmlzLkxvY2F0aW9u",
+            "EiIKB3Rvb2xsb2MYCCABKAsyES5JbmZvdmlzLkxvY2F0aW9uEhEKCWRlcHJl",
+            "c3NlZBgJIAEoBxIPCgdwcmVzc2VkGAogASgHEhAKCHJlbGVhc2VkGAsgASgH",
+            "Eg4KBmFuYWxvZxgMIAMoAUITqgIQSW5mb3Zpcy5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Geometry), global::Infovis.Protobuf.Geometry.Parser, new[]{ "Fram", "Iden", "Type", "Mask", "Cnts", "Posx", "Posy", "Posz", "Size", "Colr", "Text" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Location), global::Infovis.Protobuf.Location.Parser, new[]{ "Posx", "Posy", "Posz", "Rotw", "Rotx", "Roty", "Rotz" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Show", "Reset", "Upsert", "Delete", "Viewloc", "Toolloc" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Show", "Message", "Reset", "Upsert", "Delete", "Viewloc", "Toolloc" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Response), global::Infovis.Protobuf.Response.Parser, new[]{ "Shown", "Message", "Hover", "Unhover", "Select", "Deselect", "Viewloc", "Toolloc", "Depressed", "Pressed", "Released", "Analog" }, null, null, null)
           }));
     }
@@ -755,6 +755,7 @@ namespace Infovis.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Request(Request other) : this() {
       show_ = other.show_;
+      message_ = other.message_;
       reset_ = other.reset_;
       upsert_ = other.upsert_.Clone();
       delete_ = other.delete_.Clone();
@@ -781,8 +782,19 @@ namespace Infovis.Protobuf {
       }
     }
 
+    /// <summary>Field number for the "message" field.</summary>
+    public const int MessageFieldNumber = 2;
+    private string message_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Message {
+      get { return message_; }
+      set {
+        message_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     /// <summary>Field number for the "reset" field.</summary>
-    public const int ResetFieldNumber = 2;
+    public const int ResetFieldNumber = 3;
     private bool reset_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public bool Reset {
@@ -793,9 +805,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "upsert" field.</summary>
-    public const int UpsertFieldNumber = 3;
+    public const int UpsertFieldNumber = 4;
     private static readonly pb::FieldCodec<global::Infovis.Protobuf.Geometry> _repeated_upsert_codec
-        = pb::FieldCodec.ForMessage(26, global::Infovis.Protobuf.Geometry.Parser);
+        = pb::FieldCodec.ForMessage(34, global::Infovis.Protobuf.Geometry.Parser);
     private readonly pbc::RepeatedField<global::Infovis.Protobuf.Geometry> upsert_ = new pbc::RepeatedField<global::Infovis.Protobuf.Geometry>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<global::Infovis.Protobuf.Geometry> Upsert {
@@ -803,9 +815,9 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "delete" field.</summary>
-    public const int DeleteFieldNumber = 4;
+    public const int DeleteFieldNumber = 5;
     private static readonly pb::FieldCodec<long> _repeated_delete_codec
-        = pb::FieldCodec.ForInt64(34);
+        = pb::FieldCodec.ForInt64(42);
     private readonly pbc::RepeatedField<long> delete_ = new pbc::RepeatedField<long>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<long> Delete {
@@ -813,7 +825,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "viewloc" field.</summary>
-    public const int ViewlocFieldNumber = 5;
+    public const int ViewlocFieldNumber = 6;
     private global::Infovis.Protobuf.Location viewloc_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Infovis.Protobuf.Location Viewloc {
@@ -824,7 +836,7 @@ namespace Infovis.Protobuf {
     }
 
     /// <summary>Field number for the "toolloc" field.</summary>
-    public const int ToollocFieldNumber = 6;
+    public const int ToollocFieldNumber = 7;
     private global::Infovis.Protobuf.Location toolloc_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Infovis.Protobuf.Location Toolloc {
@@ -848,6 +860,7 @@ namespace Infovis.Protobuf {
         return true;
       }
       if (Show != other.Show) return false;
+      if (Message != other.Message) return false;
       if (Reset != other.Reset) return false;
       if(!upsert_.Equals(other.upsert_)) return false;
       if(!delete_.Equals(other.delete_)) return false;
@@ -860,6 +873,7 @@ namespace Infovis.Protobuf {
     public override int GetHashCode() {
       int hash = 1;
       if (Show != 0) hash ^= Show.GetHashCode();
+      if (Message.Length != 0) hash ^= Message.GetHashCode();
       if (Reset != false) hash ^= Reset.GetHashCode();
       hash ^= upsert_.GetHashCode();
       hash ^= delete_.GetHashCode();
@@ -879,18 +893,22 @@ namespace Infovis.Protobuf {
         output.WriteRawTag(8);
         output.WriteInt32(Show);
       }
+      if (Message.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Message);
+      }
       if (Reset != false) {
-        output.WriteRawTag(16);
+        output.WriteRawTag(24);
         output.WriteBool(Reset);
       }
       upsert_.WriteTo(output, _repeated_upsert_codec);
       delete_.WriteTo(output, _repeated_delete_codec);
       if (viewloc_ != null) {
-        output.WriteRawTag(42);
+        output.WriteRawTag(50);
         output.WriteMessage(Viewloc);
       }
       if (toolloc_ != null) {
-        output.WriteRawTag(50);
+        output.WriteRawTag(58);
         output.WriteMessage(Toolloc);
       }
     }
@@ -900,6 +918,9 @@ namespace Infovis.Protobuf {
       int size = 0;
       if (Show != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Show);
+      }
+      if (Message.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
       }
       if (Reset != false) {
         size += 1 + 1;
@@ -922,6 +943,9 @@ namespace Infovis.Protobuf {
       }
       if (other.Show != 0) {
         Show = other.Show;
+      }
+      if (other.Message.Length != 0) {
+        Message = other.Message;
       }
       if (other.Reset != false) {
         Reset = other.Reset;
@@ -954,27 +978,31 @@ namespace Infovis.Protobuf {
             Show = input.ReadInt32();
             break;
           }
-          case 16: {
+          case 18: {
+            Message = input.ReadString();
+            break;
+          }
+          case 24: {
             Reset = input.ReadBool();
             break;
           }
-          case 26: {
+          case 34: {
             upsert_.AddEntriesFrom(input, _repeated_upsert_codec);
             break;
           }
-          case 34:
-          case 32: {
+          case 42:
+          case 40: {
             delete_.AddEntriesFrom(input, _repeated_delete_codec);
             break;
           }
-          case 42: {
+          case 50: {
             if (viewloc_ == null) {
               viewloc_ = new global::Infovis.Protobuf.Location();
             }
             input.ReadMessage(viewloc_);
             break;
           }
-          case 50: {
+          case 58: {
             if (toolloc_ == null) {
               toolloc_ = new global::Infovis.Protobuf.Location();
             }

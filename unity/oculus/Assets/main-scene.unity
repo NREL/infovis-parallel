@@ -412,6 +412,22 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: da658651c702042c68f764d548a688ff, type: 2}
+    - target: {fileID: 400002, guid: 0e13fc4f1f39944018c406aa65096153, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 0e13fc4f1f39944018c406aa65096153, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 0e13fc4f1f39944018c406aa65096153, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 0e13fc4f1f39944018c406aa65096153, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -90
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0e13fc4f1f39944018c406aa65096153, type: 3}
   m_IsPrefabParent: 0
@@ -1012,7 +1028,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   program: {fileID: 707254338}
   camera: {fileID: 1155557445}
-  deltaReport: 5
+  deltaReport: 0.05
 --- !u!4 &956274426
 Transform:
   m_ObjectHideFlags: 0
