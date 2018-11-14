@@ -194,6 +194,15 @@ namespace Infovis {
 
     }
 
+    public Element Find(long identifier) {
+      Element element;
+      foreach (KeyValuePair<short, Dictionary<int, Dictionary<long, Element>>> frames in types)
+        foreach (KeyValuePair<int, Dictionary<long, Element>> elements in frames.Value)
+          if (elements.Value.TryGetValue(identifier, out element))
+            return element;
+      return null;
+    }
+
     private Dictionary<short, Dictionary<int, Dictionary<long, Element>>> types = new Dictionary<short, Dictionary<int, Dictionary<long, Element>>>();
 
   }

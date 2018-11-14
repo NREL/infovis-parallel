@@ -2,6 +2,8 @@ using Google.Protobuf.Collections;
 using Infovis.Protobuf;
 using UnityEngine;
 
+using Convert = System.Convert;
+
 
 namespace Infovis {
 
@@ -17,8 +19,45 @@ namespace Infovis {
 
     void Update() {
 
-      if (Time.time >= nextReport) {
-        GameObject tool = GameObject.Find("RightHandAnchor");
+      if (Input.GetKey(KeyCode.Escape)) {
+
+        AndroidHelper.AndroidQuit();
+
+      } else if (Input.GetMouseButtonDown(0)) {
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); 
+        Quaternion rotation = Quaternion.LookRotation(ray.direction);
+
+        Response response = new Response {
+          Message = "Time: " + Time.time + "s",
+          Toolloc = new Location {
+            Posx = ray.origin.x,
+            Posy = ray.origin.y,
+            Posz = ray.origin.z,
+            Rotw = rotation.w,
+            Rotx = rotation.x,
+            Roty = rotation.y,
+            Rotz = rotation.z,
+          },
+        };
+
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+          for (GameObject obj = hit.collider.gameObject; gameObject != null; obj = obj.transform.parent.gameObject)
+            if (obj.tag == "infovis") {
+              long identifier = Convert.ToInt64(obj.name);
+              response.Select.Add(identifier);
+              response.Deselect.Add(identifier);
+              Element element = program.Find(identifier);
+              if (element != null && element.text != "")
+                program.Display(element.text, 1f);
+              break;
+            }
+
+        program.Broadcast(response);
+
+      } else if (Time.time >= nextReport) {
+
         Response response = new Response {
           Message = "Time: " + Time.time + "s",
           Viewloc = new Location {
@@ -33,6 +72,7 @@ namespace Infovis {
         };
         program.Broadcast(response);
         nextReport = Time.time + deltaReport;
+
       }
 
     }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - UICamera
   - Ground
+  - infovis
   layers:
   - Default
   - TransparentFX

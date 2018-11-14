@@ -39,6 +39,7 @@ namespace Infovis {
     public Element(GameObject root, GameObject o, string identifier) {
       obj = o;
       obj.name = identifier;
+      obj.tag = "infovis";
       obj.transform.parent = root.transform;
       AddTrigger(obj);
     }
