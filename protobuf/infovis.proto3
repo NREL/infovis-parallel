@@ -13,12 +13,13 @@ message Geometry {
   int32           type =  3; // 0 = all, 1 = points, 2 = polylines, 3 = rectangles, 4 = label, 5 = axis
   int32           mask =  4;
   repeated int32  cnts =  5;
-  repeated double posx =  6; // mask = 0001b = 1
-  repeated double posy =  7; // mask = 0001b = 1
-  repeated double posz =  8; // mask = 0001b = 1
-  double          size =  9; // mask = 0010b = 2
-  fixed32         colr = 10; // mask = 0100b = 4
-  string          text = 11; // mask = 1000b = 8
+  repeated double posx =  6; // mask = 00001b = 1
+  repeated double posy =  7; // mask = 00001b = 1
+  repeated double posz =  8; // mask = 00001b = 1
+  double          size =  9; // mask = 00010b = 2
+  fixed32         colr = 10; // mask = 00100b = 4
+  string          text = 11; // mask = 01000b = 8
+  int32           glyp = 12; // mask = 10000b = 16; 0 = cubes/boxes for points/polylines, 1 = spheres/cylinders
 }
 
 

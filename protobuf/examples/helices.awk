@@ -31,7 +31,7 @@ BEGIN {
   print "  fram: 1"
   print "  iden: 302"
   print "  type: 2"
-  print "  mask: 15"
+  print "  mask: 31"
   print "  cnts: 101"
   print "  cnts: 101"
   for (i = 0; i <= 100; ++i)
@@ -49,6 +49,7 @@ BEGIN {
   print "  size: 0.05"
   print "  colr: 1088475391"
   print "  text: \"another two helices\""
+  print "  glyp: 1"
   print "}"
 
 

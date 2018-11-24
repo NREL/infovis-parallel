@@ -16,8 +16,6 @@ namespace Infovis {
 
     public static bool enableTooltips = false;
 
-    public static bool useBoxes = true;
-
     public GameObject obj = null;
 
     public float size = 0;
@@ -25,6 +23,8 @@ namespace Infovis {
     public Color color = Color.white;
 
     public string text = "";
+
+    public bool useBoxes = true;
 
     public bool selected = false;
 
@@ -134,6 +134,9 @@ namespace Infovis {
 
     protected void PreUpdate(Geometry geometry) {
 
+      if (DirtyGlyph(geometry))
+        useBoxes = geometry.Glyp == 0;
+
       if (DirtySize(geometry)) {
         Debug.Assert(geometry.Size >= 0, "Size must be non-negative: " + obj.name);
         size = (float) geometry.Size;
@@ -190,6 +193,10 @@ namespace Infovis {
 
     protected static bool DirtyText(Geometry geometry) {
       return (geometry.Mask & 1 << 3) != 0;
+    }
+
+    protected static bool DirtyGlyph(Geometry geometry) {
+      return (geometry.Mask & 1 << 4) != 0;
     }
 
   }

@@ -619,7 +619,7 @@ upsert {
   fram: 2
   iden: 302
   type: 2
-  mask: 15
+  mask: 31
   cnts: 101
   cnts: 101
   posx: 0
@@ -1231,4 +1231,5 @@ upsert {
   size: 0.05
   colr: 1088475391
   text: "another two helices"
+  glyp: 1
 }
