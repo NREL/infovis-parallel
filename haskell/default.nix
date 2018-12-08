@@ -1,6 +1,6 @@
 {
   mkDerivation, stdenv
-, aeson, base, base64-bytestring, bytestring, cereal, containers, data-default, lens, linear, logging-effect, mtl, protobuf, split, text, websockets, yaml
+, aeson, array, base, base64-bytestring, binary, bytestring, cereal, containers, data-default, deepseq, GLUT, hashable, lens, linear, logging-effect, mtl, OpenGL, OpenGLRaw, opengl-dlp-stereo, protobuf, split, text, websockets, yaml
 , cmdargs
 }:
 
@@ -11,7 +11,7 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    aeson base base64-bytestring bytestring cereal containers data-default lens linear logging-effect mtl protobuf split text websockets yaml
+    aeson array base base64-bytestring binary bytestring cereal containers data-default deepseq GLUT hashable lens linear logging-effect mtl OpenGL OpenGLRaw opengl-dlp-stereo protobuf split text websockets yaml
   ];
   executableHaskellDepends = [
     cmdargs

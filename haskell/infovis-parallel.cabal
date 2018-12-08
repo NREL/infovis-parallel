@@ -52,3 +52,36 @@ executable infovis-parallel
 --other-extensions :    
   ghc-options      : -threaded -Wall
   default-language : Haskell2010
+
+
+executable infovis-test
+  main-is          : Test.hs
+  hs-source-dirs   : src
+  build-depends    : base >= 4.10 && < 4.11
+                   , aeson
+                   , array
+                   , base64-bytestring
+                   , binary
+                   , bytestring
+                   , cereal
+                   , cmdargs
+                   , containers
+                   , data-default
+                   , deepseq
+                   , GLUT
+                   , hashable
+                   , lens
+                   , linear
+                   , logging-effect
+                   , mtl
+                   , OpenGL
+                   , OpenGLRaw
+                   , opengl-dlp-stereo
+                   , protobuf
+                   , split
+                   , text
+                   , websockets
+                   , yaml
+--other-extensions :    
+  ghc-options      : -threaded -Wall
+  default-language : Haskell2010
