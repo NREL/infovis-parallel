@@ -3,6 +3,9 @@ module InfoVis.Parallel.Rendering.NewShapes (
 , cube
 , tube
 , icosahedron
+, rectangle
+, square
+, arrow
 , cone
 ) where
 
@@ -144,6 +147,37 @@ icosahedron d =
       , p07, p02, p11
       ]
     )
+
+
+rectangle :: Floating a
+          => a
+          -> a
+          -> (PrimitiveMode, [Vertex3 a])
+rectangle h w =
+  let
+    h2 = h / 2
+    w2 = w / 2
+    p1 = Vertex3 0   h2    w2
+    p2 = Vertex3 0   h2  (-w2)
+    p3 = Vertex3 0 (-h2)   w2
+    p4 = Vertex3 0 (-h2) (-w2)
+  in
+    (
+      Quads
+    , [
+        p1, p2, p4, p3
+      , p1, p3, p4, p2
+      ]
+    )
+
+
+square :: Floating a
+       => a
+       -> (PrimitiveMode, [Vertex3 a])
+square w = rectangle w w
+
+
+arrow = undefined
 
 
 cone :: Floating a
