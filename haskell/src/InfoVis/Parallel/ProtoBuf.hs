@@ -29,7 +29,7 @@ module InfoVis.Parallel.ProtoBuf (
 , pressed
 , released
 , analog
-, Geometry(..)
+, DeltaGeometry(..)
 , Shape(..)
 ) where
 
@@ -49,7 +49,7 @@ import Data.Maybe (fromMaybe)
 import Data.ProtocolBuffers (Decode, Encode, Message, Optional, Packed, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
 import Data.Serialize (runGetLazy, runPutLazy)
 import GHC.Generics (Generic)
-import InfoVis.Parallel.NewTypes (Buttons, Color, Displacement, Frame, Identifier, Position, PositionRotation)
+import InfoVis.Parallel.NewTypes (Buttons, Color, Frame, Identifier, PositionRotation, Shape(..))
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
@@ -144,7 +144,7 @@ reset =
     (\s x -> s {reset' = putField $ Just x})
 
 
-upsert :: Lens' Request [Geometry]
+upsert :: Lens' Request [DeltaGeometry]
 upsert =
   lens
     (fmap toGeometry . getField . upsert')
@@ -363,15 +363,15 @@ instance Decode GeometryPB
 instance Encode GeometryPB
 
 
-data Geometry =
-  Geometry
+data DeltaGeometry =
+  DeltaGeometry
   {
     frame      :: Frame
   , identifier :: Identifier
-  , shape      :: Maybe Shape
-  , size       :: Maybe Double
-  , color      :: Maybe Color
-  , text       :: Maybe String
+  , deltaShape :: Maybe Shape
+  , deltaSize  :: Maybe Double
+  , deltaColor :: Maybe Color
+  , deltaText  :: Maybe String
   }
     deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
@@ -392,13 +392,13 @@ textBit :: (Bits a, Num a) => a
 textBit = 1 `shift` 3
 
 
-toGeometry :: GeometryPB -> Geometry
+toGeometry :: GeometryPB -> DeltaGeometry
 toGeometry GeometryPB{..} =
   let
     frame      = fromMaybe def $ getField fram'
     identifier = fromMaybe def $ getField iden'
     mask       = fromMaybe def $ getField mask'
-    shape =
+    deltaShape =
       do
         guard
           $ shapeBit .&. mask /= 0
@@ -410,23 +410,23 @@ toGeometry GeometryPB{..} =
           , getField posy'
           , getField posz'
           )
-    size  = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def $ getField size')
-    color = guard (colorBit .&. mask /= 0) >> return (fromMaybe def $ getField colr')
-    text  = guard (textBit  .&. mask /= 0) >> return (fromMaybe def $ getField text')
+    deltaSize  = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def $ getField size')
+    deltaColor = guard (colorBit .&. mask /= 0) >> return (fromMaybe def $ getField colr')
+    deltaText  = guard (textBit  .&. mask /= 0) >> return (fromMaybe def $ getField text')
   in
-    Geometry{..}
+    DeltaGeometry{..}
 
 
-fromGeometry :: Geometry -> GeometryPB
-fromGeometry Geometry{..} =
+fromGeometry :: DeltaGeometry -> GeometryPB
+fromGeometry DeltaGeometry{..} =
   let
     mask =
-        maybe (shapeBit .|.) (const id) shape
-      . maybe (sizeBit  .|.) (const id) size
-      . maybe (colorBit .|.) (const id) color
-      . maybe (textBit  .|.) (const id) text
+        maybe (shapeBit .|.) (const id) deltaShape
+      . maybe (sizeBit  .|.) (const id) deltaSize
+      . maybe (colorBit .|.) (const id) deltaColor
+      . maybe (textBit  .|.) (const id) deltaText
       $ 0
-    shape' = fromShape <$> shape
+    shape' = fromShape <$> deltaShape
   in
     GeometryPB
     {
@@ -438,19 +438,10 @@ fromGeometry Geometry{..} =
     , posx' = putField $ maybe [] (^. _3) shape'
     , posy' = putField $ maybe [] (^. _4) shape'
     , posz' = putField $ maybe [] (^. _5) shape'
-    , size' = putField size
-    , colr' = putField color
-    , text' = putField text
+    , size' = putField deltaSize
+    , colr' = putField deltaColor
+    , text' = putField deltaText
     }
-
-
-data Shape =
-    Points [[Position]]
-  | Polylines [[Position]]
-  | Rectangles [(Position, Displacement, Displacement)]
-  | Label (Position, Displacement, Displacement)
-  | Axis (Position, Displacement)
-    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
 toShape :: (Maybe Int32, [Int32], [Double], [Double], [Double]) -> Maybe Shape

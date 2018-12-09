@@ -5,14 +5,17 @@ module InfoVis.Parallel.Rendering.Buffers (
   ShapeBuffer
 , makeShapeBuffer
 , deleteShapeBuffer
+, setInstances
 , updateInstances
 , drawInstances
 , buildBuffer
+, ShapeSection(..)
 ) where
 
 
 import Data.Array.Storable (newListArray, withStorableArray)
 import Data.Maybe (catMaybes)
+import Data.Monoid ((<>))
 import Foreign.Storable (Storable, sizeOf)
 import Graphics.GL.Types (GLfloat, GLuint)
 import Graphics.Rendering.OpenGL.GL (($=!), deleteObjectName, deleteObjectNames, genObjectName)
@@ -60,6 +63,17 @@ deleteShapeBuffer :: ShapeBuffer
 deleteShapeBuffer ShapeBuffer{..} = deleteObjectNames $ catMaybes [Just mesh, positions, rotations, scales, colors]
 
 
+setInstances :: ShapeSection
+             -> ShapeBuffer
+             -> IO ShapeBuffer
+setInstances ShapeSection{..} =
+  updateInstances
+    (Just positionSection)
+    (Just rotationSection)
+    (Just scaleSection   )
+    (Just colorSection   )
+
+
 updateInstances :: Maybe [Vertex3 GLfloat]
                 -> Maybe [Vector4 GLfloat]
                 -> Maybe [Vector3 GLfloat]
@@ -88,11 +102,11 @@ updateInstances positions' rotations' scales' colors' shapeBuffer@ShapeBuffer{..
       }
 
 
-drawInstances :: ShapeBuffer
+drawInstances :: M44 GLfloat
               -> M44 GLfloat
-              -> M44 GLfloat
+              -> ShapeBuffer
               -> IO ()
-drawInstances ShapeBuffer{..} projection modelView =
+drawInstances projection modelView ShapeBuffer{..} =
   do
 
     selectShapeProgram $ Just shapeProgram
@@ -127,3 +141,18 @@ buildBuffer primitives =
         bufferData ArrayBuffer $=! (toEnum size, ptr, DynamicDraw)
     bindBuffer ArrayBuffer $=! Nothing
     return bufferObject
+
+
+data ShapeSection =
+  ShapeSection
+  {
+    positionSection :: [Vertex3 GLfloat]
+  , rotationSection :: [Vector4 GLfloat]
+  , scaleSection    :: [Vector3 GLfloat]
+  , colorSection    :: [GLuint]
+  }
+    deriving (Eq, Ord, Read, Show)
+
+instance Monoid ShapeSection where
+  mempty = ShapeSection mempty mempty mempty mempty
+  ShapeSection p r s c `mappend` ShapeSection p' r' s' c' = ShapeSection (p <> p') (r <> r') (s <> s') (c <> c')

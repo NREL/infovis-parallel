@@ -1,5 +1,6 @@
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE TypeSynonymInstances       #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE FlexibleInstances     #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -13,12 +14,15 @@ module InfoVis.Parallel.NewTypes (
 , PositionRotation
 , Color
 , Buttons
+, Geometry(..)
+, Shape(..)
 ) where
 
 
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Int (Int32, Int64)
 import Data.Word (Word32)
+import GHC.Generics (Generic)
 import Linear.Affine(Point)
 import Linear.Quaternion (Quaternion)
 import Linear.V3 (V3)
@@ -58,3 +62,23 @@ type Color = Word32
 
 
 type Buttons = Word32
+
+
+data Geometry =
+  Geometry
+  {
+    shape :: Shape
+  , size  :: Double
+  , color :: Color
+  , text  :: String
+  }
+    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+
+data Shape =
+    Points [[Position]]
+  | Polylines [[Position]]
+  | Rectangles [(Position, Displacement, Displacement)]
+  | Label (Position, Displacement, Displacement)
+  | Axis (Position, Displacement)
+    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)

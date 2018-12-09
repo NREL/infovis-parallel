@@ -57,6 +57,7 @@ executable infovis-parallel
 executable infovis-test
   main-is          : Test.hs
   other-modules    : InfoVis.Parallel.Rendering.Buffers
+                     InfoVis.Parallel.Rendering.Frames
                      InfoVis.Parallel.Rendering.NewShapes
                      InfoVis.Parallel.Rendering.Program
   hs-source-dirs   : src
@@ -84,6 +85,7 @@ executable infovis-test
                    , split
                    , text
                    , websockets
+                   , vector
                    , yaml
 --other-extensions :    
   ghc-options      : -threaded -Wall
