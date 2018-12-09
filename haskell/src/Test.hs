@@ -1,50 +1,36 @@
-{-|
-Module      :  Main
-Copyright   :  (c) 2015 Brian W Bush
-License     :  MIT
-Maintainer  :  Brian W Bush <consult@brianwbush.info>
-Stability   :  Stable
-Portability :  Portable
-
-Example application illustrating frame-sequential DLP.
--}
-
-
 module Main (
--- * Entry Point
   main
 ) where
 
 
 import Control.Monad (when)
+import Data.Array.Storable (newListArray, withStorableArray)
 import Data.Default (def)
 import Data.IORef (IORef, newIORef)
-import Graphics.Rendering.DLP (DlpEncoding(..), DlpEye(..))
-import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), DlpDisplayCallback, dlpDisplayCallback)
-import Graphics.Rendering.OpenGL.GL (Color3(..), ComparisonFunction(Less), PrimitiveMode(..), Vector3(..), Vertex3(..), Vector4(..), GLdouble, GLfloat, GLuint, ($=!), ($~!), color, get, loadIdentity, preservingMatrix, renderPrimitive, rotate, translate, vertex)
-import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
-
-
-import Data.Array.Storable (newListArray, withStorableArray)
-import Foreign.Ptr (nullPtr, plusPtr)
-import Foreign.Storable (Storable, poke, sizeOf)
-import Graphics.Rendering.OpenGL.GL (($=), deleteObjectName, genObjectName)
-import Graphics.Rendering.OpenGL.GL (GLfloat)
-import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferAccess(..), BufferObject, BufferTarget(..), BufferUsage(DynamicDraw), TransferDirection(WriteToBuffer), bindBuffer, bufferData, bufferSubData, withMappedBuffer)
+import Foreign.Ptr (nullPtr)
+import Foreign.Storable (sizeOf)
+import Graphics.GL.ARB.InstancedArrays (glVertexAttribDivisorARB)
+import Graphics.GL.Types (GLfloat, GLuint)
+import Graphics.Rendering.DLP (DlpEncoding(..))
+import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), dlpDisplayCallback)
+import Graphics.Rendering.OpenGL.GL (($=!), ($~!), genObjectName, get)
+import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferTarget(..), BufferUsage(DynamicDraw), bindBuffer, bufferData)
+import Graphics.Rendering.OpenGL.GL.CoordTrans(GLmatrix, MatrixOrder(RowMajor), newMatrix)
 import Graphics.Rendering.OpenGL.GL.DebugOutput (debugMessageCallback, debugOutput)
+import Graphics.Rendering.OpenGL.GL.PerFragment(ComparisonFunction(Less))
 import Graphics.Rendering.OpenGL.GL.Shaders.Attribs (attribLocation)
 import Graphics.Rendering.OpenGL.GL.Shaders.ProgramObjects (attachShader, createProgram, currentProgram, linkProgram, programSeparable)
-import Graphics.Rendering.OpenGL.GL.Shaders.ShaderObjects (ShaderType(FragmentShader, VertexShader), compileShader, createShader, shaderSourceBS)
+import Graphics.Rendering.OpenGL.GL.Shaders.ShaderObjects (ShaderType(VertexShader), compileShader, createShader, shaderSourceBS)
 import Graphics.Rendering.OpenGL.GL.Shaders.Uniform(uniform, uniformLocation)
-import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..), ClientArrayType(..), DataType(Float, UnsignedInt), NumArrayIndices, VertexArrayDescriptor(..), arrayPointer, clientState, drawArraysInstanced, vertexAttribArray, vertexAttribPointer)
+import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..))
+import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..), DataType(Float, UnsignedInt), VertexArrayDescriptor(..), drawArraysInstanced, vertexAttribArray, vertexAttribPointer)
 import Graphics.Rendering.OpenGL.GL.VertexSpec (AttribLocation(..), IntegerHandling(KeepIntegral, ToFloat))
-import Graphics.Rendering.OpenGL.GL.CoordTrans(GLmatrix, MatrixOrder(RowMajor), newMatrix)
+import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
+import InfoVis.Parallel.Rendering.NewShapes
 import Linear.Matrix((!*!))
 import Linear.Projection (lookAt, perspective)
 import Linear.V3 (V3(..))
 import Linear.V4 (V4(..))
-
-import Graphics.GL.ARB.InstancedArrays (glVertexAttribDivisorARB)
 
 import qualified Data.ByteString.Char8 as BS (ByteString, pack)
 
@@ -78,20 +64,8 @@ vertexShaderSource =
     \}"
 
 
-cubeQuads :: [Vector3 GLfloat]
-cubeQuads =
-  [
-    Vector3   0.5    0.5    0.5 , Vector3   0.5    0.5  (-0.5), Vector3   0.5  (-0.5) (-0.5), Vector3   0.5  (-0.5)   0.5
-  , Vector3   0.5    0.5    0.5 , Vector3   0.5    0.5  (-0.5), Vector3 (-0.5)   0.5  (-0.5), Vector3 (-0.5)   0.5    0.5
-  , Vector3   0.5    0.5    0.5 , Vector3   0.5  (-0.5)   0.5 , Vector3 (-0.5) (-0.5)   0.5 , Vector3 (-0.5)   0.5    0.5
-  , Vector3 (-0.5)   0.5    0.5 , Vector3 (-0.5)   0.5  (-0.5), Vector3 (-0.5) (-0.5) (-0.5), Vector3 (-0.5) (-0.5)   0.5
-  , Vector3   0.5  (-0.5)   0.5 , Vector3   0.5  (-0.5) (-0.5), Vector3 (-0.5) (-0.5) (-0.5), Vector3 (-0.5) (-0.5)   0.5
-  , Vector3   0.5    0.5  (-0.5), Vector3   0.5  (-0.5) (-0.5), Vector3 (-0.5) (-0.5) (-0.5), Vector3 (-0.5)   0.5  (-0.5)
-  ]
-
-
-cubePositions :: [Vector3 GLfloat]
-cubePositions =
+examplePositions :: [Vector3 GLfloat]
+examplePositions =
   [
     Vector3 (-1) (-1) (-1)
   , Vector3 (-1) (-1)   1
@@ -104,30 +78,50 @@ cubePositions =
   ]
 
 
-cubeScales :: [GLfloat]
-cubeScales = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40]
-
-
-cubeRotations :: [Vector4 GLfloat]
-cubeRotations =
+exampleScales :: [Vector3 GLfloat]
+exampleScales = 
   [
-    Vector4 1 0 0 1
-  , Vector4 1 0 0 1
-  , Vector4 1 0 0 1
-  , Vector4 1 0 0 1
-  , Vector4 1 0 0 1
-  , Vector4 1 0 0 1
-  , Vector4 1 0 0 1
-  , Vector4 1 0 0 1
+    Vector3 0.15 0.15 0.15
+  , Vector3 0.20 0.20 0.20
+  , Vector3 0.25 0.25 0.25
+  , Vector3 0.30 0.30 0.30
+  , Vector3 0.35 0.35 0.35
+  , Vector3 0.40 0.40 0.40
+  , Vector3 0.45 0.45 0.45
+  , Vector3 0.50 0.50 0.50
   ]
 
 
-cubeColors :: [GLuint]
-cubeColors = [0x80808080, 0xA0808080, 0x80A08080, 0x8080A080, 0xA0A0A0A0, 0x80A0A0A0, 0xA080A0A0, 0xA0A080A0]
+exampleRotations :: [Vector4 GLfloat]
+exampleRotations =
+  [
+    Vector4 0 0 0 1
+  , Vector4 0 0 0 1
+  , Vector4 0 0 0 1
+  , Vector4 0 0 0 1
+  , Vector4 0 0 0 1
+  , Vector4 0 0 0 1
+  , Vector4 0 0 0 1
+  , Vector4 0 0 0 1
+  ]
 
 
-testSetup :: IO (IO ())
-testSetup =
+exampleColors :: [GLuint]
+exampleColors =
+  [
+    0x80808080
+  , 0xA0808080
+  , 0x80A08080
+  , 0x8080A080
+  , 0xA0A0A0A0
+  , 0x80A0A0A0
+  , 0xA080A0A0
+  , 0xA0A080A0
+  ]
+
+
+testSetup :: IORef GLfloat -> IO (IO ())
+testSetup angle =
   do
 
     debugOutput $=! Enabled
@@ -161,26 +155,28 @@ testSetup =
           return
             (
               do
-                vertexAttribArray l $=! Enabled
                 bindBuffer ArrayBuffer $=! Just bufferObject
                 vertexAttribPointer l $=! (g, VertexArrayDescriptor k t (fromIntegral m) nullPtr)
-                glVertexAttribDivisorARB l' i
+                when i
+                 $ glVertexAttribDivisorARB l' 1
+                vertexAttribArray l $=! Enabled
             , bufferObject
             )
+      (primitiveMode, primitives) = cube (1 :: GLfloat)
 
-    (quadsBinder    , _quadsBO    ) <- buildBuffer "mesh_position"     3 Float       ToFloat      0 cubeQuads
-    (positionsBinder, _positionsBO) <- buildBuffer "instance_position" 3 Float       ToFloat      1 cubePositions
-    (rotationsBinder, _rotationsBO) <- buildBuffer "instance_rotation" 4 Float       ToFloat      1 cubeRotations
-    (scalesBinder   , _scalesBO   ) <- buildBuffer "instance_scale"    3 Float       ToFloat      1 cubeScales
-    (colorsBinder   , _colorsBO   ) <- buildBuffer "instance_color"    1 UnsignedInt KeepIntegral 1 cubeColors
+    (quadsBinder    , _quadsBO    ) <- buildBuffer "mesh_position"     3 Float       ToFloat      False primitives
+    (positionsBinder, _positionsBO) <- buildBuffer "instance_position" 3 Float       ToFloat      True  examplePositions
+    (rotationsBinder, _rotationsBO) <- buildBuffer "instance_rotation" 4 Float       ToFloat      True  exampleRotations
+    (scalesBinder   , _scalesBO   ) <- buildBuffer "instance_scale"    3 Float       ToFloat      True  exampleScales
+    (colorsBinder   , _colorsBO   ) <- buildBuffer "instance_color"    1 UnsignedInt KeepIntegral True  exampleColors
 
     return
       $ do
-        putStrLn "DRAW"
         currentProgram $=! Just program
+        angle' <- get angle
         let
           projection = perspective (pi / 3) 1 0.1 10
-          modelView = lookAt (V3 (-5 :: GLfloat) 0 0) (V3 0 0 0) (V3 0 1 0)
+          modelView = lookAt (V3 (-5 :: GLfloat) (1 +sin angle') (2 + cos angle')) (V3 0 0 0) (V3 0 1 0)
           (V4 (V4 a00 a01 a02 a03) (V4 a10 a11 a12 a13) (V4 a20 a21 a22 a23) (V4 a30 a31 a32 a33)) = projection !*! modelView
         projectionModelView <- newMatrix RowMajor [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] :: IO (GLmatrix GLfloat)
         uniform projectionModelViewLoc $=! projectionModelView
@@ -189,7 +185,12 @@ testSetup =
         rotationsBinder
         scalesBinder
         colorsBinder
-        drawArraysInstanced Quads 0 6 8
+        drawArraysInstanced
+          primitiveMode
+          0
+          (fromIntegral $ length primitives)
+          (fromIntegral $ length examplePositions)
+
 
 -- | The main action.
 main :: IO ()
@@ -205,88 +206,19 @@ main =
     _ <- createWindow "DLP Stereo OpenGL Example"
     depthFunc $=! Just Less 
     when ("--fullscreen" `elem` arguments) fullScreen
-    angle <- newIORef 0
     let encoding
           | "--quadbuffer" `elem` arguments = QuadBuffer
           | "--mono"       `elem` arguments = LeftOnly
           | "--cardboard"  `elem` arguments = SideBySide
           | otherwise                       = FrameSequential
-    testDraw <- testSetup
+    angle <- newIORef 0
+    testDraw <- testSetup angle
     dlpDisplayCallback $=! def {dlpEncoding = encoding, doDisplay = const testDraw}
---  dlpDisplayCallback $=! def {dlpEncoding = encoding, doDisplay = display angle}
---  idleCallback $=! Just (idle angle)
+    idleCallback $=! Just (idle angle)
     mainLoop
 
-
--- | The idle callback.
 idle :: IORef GLfloat -> IdleCallback
 idle angle =
   do
-    angle $~! (+ 0.1)
+    angle $~! (+ 0.02)
     postRedisplay Nothing
-
-
--- | Draw rotating cubes.
-display :: IORef GLfloat -> DlpDisplayCallback
-display angle eye =
-  do
-    angle' <- get angle
-    let offset = case eye of
-                   LeftDlp  ->  0.05 
-                   RightDlp -> -0.05 :: GLfloat
-    loadIdentity
-    preservingMatrix $ do
-      translate $ Vector3 offset 0 0.5
-      rotate angle' $ Vector3 1 1 1
-      color $ Color3 0.5 0.35 (0 :: GLfloat)
-      cube 0.5
-      color $ Color3 0.5 0.65 (1 :: GLfloat)
-      cubeFrame 0.5
-    preservingMatrix $ do
-      translate $ Vector3 offset 0 0
-      rotate (- angle') $ Vector3 1 1 1
-      color $ Color3 0 0.35 (0.5 :: GLfloat)
-      cube 0.25
-      color $ Color3 1 0.65 (0.5 :: GLfloat)
-      cubeFrame 0.25
-
-
--- | Make a cube.  *Source:* \<<https://wiki.haskell.org/OpenGLTutorial2>\>.
-cube :: GLfloat -> IO ()
-cube w =
-  renderPrimitive Quads
-    $ mapM_ vertex3f
-    [
-      ( w, w, w), ( w, w,-w), ( w,-w,-w), ( w,-w, w)
-    , ( w, w, w), ( w, w,-w), (-w, w,-w), (-w, w, w)
-    , ( w, w, w), ( w,-w, w), (-w,-w, w), (-w, w, w)
-    , (-w, w, w), (-w, w,-w), (-w,-w,-w), (-w,-w, w)
-    , ( w,-w, w), ( w,-w,-w), (-w,-w,-w), (-w,-w, w)
-    , ( w, w,-w), ( w,-w,-w), (-w,-w,-w), (-w, w,-w)
-    ]
-
-
--- | Make the frame of a cube.  *Source:* \<<https://wiki.haskell.org/OpenGLTutorial2>\>.
-cubeFrame :: GLfloat -> IO ()
-cubeFrame w =
-  renderPrimitive Lines
-    $ mapM_ vertex3f
-    [
-      ( w,-w, w), ( w, w, w)
-    , ( w, w, w), (-w, w, w)
-    , (-w, w, w), (-w,-w, w)
-    , (-w,-w, w), ( w,-w, w)
-    , ( w,-w, w), ( w,-w,-w)
-    , ( w, w, w), ( w, w,-w)
-    , (-w, w, w), (-w, w,-w)
-    , (-w,-w, w), (-w,-w,-w)
-    , ( w,-w,-w), ( w, w,-w)
-    , ( w, w,-w), (-w, w,-w)
-    , (-w, w,-w), (-w,-w,-w)
-    , (-w,-w,-w), ( w,-w,-w)
-    ]
-
-
--- | Make a vertex.
-vertex3f :: (GLfloat, GLfloat, GLfloat) -> IO ()
-vertex3f (x, y, z) = vertex $ Vertex3 x y z
