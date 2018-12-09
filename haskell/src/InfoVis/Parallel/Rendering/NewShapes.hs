@@ -177,7 +177,55 @@ square :: Floating a
 square w = rectangle w w
 
 
-arrow = undefined
+arrow :: (Floating a, Ord a)
+      => a
+      -> a
+      -> a
+      -> a
+      -> (PrimitiveMode, [Vertex3 a])
+arrow l d f o =
+  let
+    t =
+      [
+        Vertex3 (if x > 0 then (1 - f) * x else x) y z
+      |
+        Vertex3 x y z <- snd $ tube l d
+      ]
+    q0 = Vertex3 (l / 2) 0 0
+    q1 = t !!  1
+    q2 = t !!  2
+    q3 = t !!  6
+    q4 = t !! 10
+    q5 = t !! 14
+    q6 = t !! 18
+    q7 = t !! 22
+    q8 = t !! 26
+    out (Vertex3 x y z) = Vertex3 x (o * y) (o * z)
+    mid (Vertex3 x y z) (Vertex3 x' y' z') = Vertex3 ((x + x') / 2) (o * (y + y') / 2) (o * (z + z') / 2)
+  in
+    (
+      Quads
+    , t
+      ++
+      [
+        q2, q1, out q1   , out q2
+      , q3, q2, out q2   , out q3
+      , q4, q3, out q3   , out q4
+      , q5, q4, out q4   , out q5
+      , q6, q5, out q5   , out q6
+      , q7, q6, out q6   , out q7
+      , q8, q7, out q8   , out q8
+      , q1, q8, out q8   , out q1
+      , q0, out q2, mid q2 q1, out q1
+      , q0, out q3, mid q3 q2, out q2
+      , q0, out q4, mid q4 q3, out q3
+      , q0, out q5, mid q5 q4, out q4
+      , q0, out q6, mid q6 q5, out q5
+      , q0, out q7, mid q7 q6, out q6
+      , q0, out q8, mid q8 q7, out q7
+      , q0, out q1, mid q1 q8, out q8
+      ]
+    )
 
 
 cone :: Floating a

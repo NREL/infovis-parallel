@@ -96,14 +96,18 @@ exampleRotations :: [Vector4 GLfloat]
 exampleRotations =
   [
     Vector4 0 0 0 1
-  , Vector4 0 0 0 1
-  , Vector4 0 0 0 1
-  , Vector4 0 0 0 1
-  , Vector4 0 0 0 1
-  , Vector4 0 0 0 1
-  , Vector4 0 0 0 1
-  , Vector4 0 0 0 1
+  , Vector4 s 0 0 s
+  , Vector4 0 s 0 s
+  , Vector4 0 0 s s
+  , Vector4 m 0 0 s
+  , Vector4 0 m 0 s
+  , Vector4 0 0 m s
+  , Vector4 0 n 0 0
   ]
+    where
+      s = 1 / sqrt 2
+      m = - s
+      n = - 1
 
 
 exampleColors :: [GLuint]
