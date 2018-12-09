@@ -4,7 +4,8 @@
 module InfoVis.Parallel.Rendering.Program (
   ShapeProgram
 , prepareShapeProgram
-, selectProgram
+, deleteShapeProgram
+, selectShapeProgram
 , setProjectionModelView
 , bindMesh
 , bindPositions
@@ -18,7 +19,7 @@ import Control.Monad (when)
 import Foreign.Ptr (nullPtr)
 import Graphics.GL.ARB.InstancedArrays (glVertexAttribDivisorARB)
 import Graphics.GL.Types (GLfloat, GLuint)
-import Graphics.Rendering.OpenGL.GL (($=!), get)
+import Graphics.Rendering.OpenGL.GL (($=!), deleteObjectName, get)
 import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferObject, BufferTarget(..), bindBuffer)
 import Graphics.Rendering.OpenGL.GL.CoordTrans(GLmatrix, MatrixOrder(RowMajor), newMatrix)
 import Graphics.Rendering.OpenGL.GL.Shaders.Attribs (attribLocation)
@@ -112,9 +113,14 @@ prepareShapeProgram =
     return ShapeProgram{..}
 
 
-selectProgram :: Maybe ShapeProgram
-              -> IO ()
-selectProgram = (currentProgram $=!) . fmap program
+deleteShapeProgram :: ShapeProgram
+                   -> IO ()
+deleteShapeProgram ShapeProgram{..} = deleteObjectName program
+
+
+selectShapeProgram :: Maybe ShapeProgram
+                   -> IO ()
+selectShapeProgram = (currentProgram $=!) . fmap program
 
 
 setProjectionModelView :: ShapeProgram

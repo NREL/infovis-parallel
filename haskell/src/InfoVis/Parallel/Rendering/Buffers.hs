@@ -4,6 +4,7 @@
 module InfoVis.Parallel.Rendering.Buffers (
   ShapeBuffer
 , makeShapeBuffer
+, deleteShapeBuffer
 , updateInstances
 , drawInstances
 , buildBuffer
@@ -14,12 +15,12 @@ import Data.Array.Storable (newListArray, withStorableArray)
 import Data.Maybe (catMaybes)
 import Foreign.Storable (Storable, sizeOf)
 import Graphics.GL.Types (GLfloat, GLuint)
-import Graphics.Rendering.OpenGL.GL (($=!), genObjectName)
+import Graphics.Rendering.OpenGL.GL (($=!), deleteObjectName, deleteObjectNames, genObjectName)
 import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferObject, BufferTarget(..), BufferUsage(DynamicDraw), bindBuffer, bufferData)
 import Graphics.Rendering.OpenGL.GL.PrimitiveMode (PrimitiveMode(..))
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
 import Graphics.Rendering.OpenGL.GL.VertexArrays (NumArrayIndices, NumInstances, drawArraysInstanced)
-import InfoVis.Parallel.Rendering.Program -- FIXME
+import InfoVis.Parallel.Rendering.Program (ShapeProgram, bindColors, bindMesh, bindPositions, bindRotations, bindScales, selectShapeProgram, setProjectionModelView)
 import Linear.Matrix (M44)
 
 
@@ -54,6 +55,11 @@ makeShapeBuffer shapeProgram (primitiveMode, primitives) =
     return ShapeBuffer{..}
 
 
+deleteShapeBuffer :: ShapeBuffer
+                  -> IO ()
+deleteShapeBuffer ShapeBuffer{..} = deleteObjectNames $ catMaybes [Just mesh, positions, rotations, scales, colors]
+
+
 updateInstances :: Maybe [Vertex3 GLfloat]
                 -> Maybe [Vector4 GLfloat]
                 -> Maybe [Vector3 GLfloat]
@@ -64,10 +70,13 @@ updateInstances positions' rotations' scales' colors' shapeBuffer@ShapeBuffer{..
   do
     let
       instanceCount' = catMaybes [length <$> positions', length <$> rotations', length <$> scales', length <$> colors']
-    positions'' <- maybe (return positions) (fmap Just . buildBuffer) positions'
-    rotations'' <- maybe (return rotations) (fmap Just . buildBuffer) rotations'
-    scales''    <- maybe (return scales   ) (fmap Just . buildBuffer) scales'
-    colors''    <- maybe (return colors   ) (fmap Just . buildBuffer) colors'
+      replace Nothing       (Just items) =                            Just <$> buildBuffer items
+      replace (Just buffer) (Just items) = deleteObjectName buffer >> Just <$> buildBuffer items
+      replace old           Nothing      = return old
+    positions'' <- replace positions positions'
+    rotations'' <- replace rotations rotations'
+    scales''    <- replace scales    scales'
+    colors''    <- replace colors    colors'
     return
       shapeBuffer
       {
@@ -86,7 +95,7 @@ drawInstances :: ShapeBuffer
 drawInstances ShapeBuffer{..} projection modelView =
   do
 
-    selectProgram $ Just shapeProgram
+    selectShapeProgram $ Just shapeProgram
 
     setProjectionModelView shapeProgram projection modelView 
 
@@ -98,7 +107,7 @@ drawInstances ShapeBuffer{..} projection modelView =
 
     drawArraysInstanced primitiveMode 0 vertexCount instanceCount
 
-    selectProgram Nothing
+    selectShapeProgram Nothing
 
 
 buildBuffer :: Storable a
