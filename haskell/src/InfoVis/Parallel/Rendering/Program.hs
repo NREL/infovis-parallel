@@ -2,7 +2,8 @@
 
 
 module InfoVis.Parallel.Rendering.Program (
-  prepareShapeProgram
+  ShapeProgram
+, prepareShapeProgram
 , selectProgram
 , setProjectionModelView
 , bindMesh

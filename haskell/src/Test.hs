@@ -4,51 +4,35 @@ module Main (
 
 
 import Control.Monad (when)
-import Data.Array.Storable (newListArray, withStorableArray)
 import Data.Default (def)
 import Data.IORef (IORef, newIORef)
-import Foreign.Storable (sizeOf)
 import Graphics.GL.Types (GLfloat, GLuint)
 import Graphics.Rendering.DLP (DlpEncoding(..))
 import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), dlpDisplayCallback)
-import Graphics.Rendering.OpenGL.GL (($=!), ($~!), genObjectName, get)
-import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferTarget(..), BufferUsage(DynamicDraw), bindBuffer, bufferData)
+import Graphics.Rendering.OpenGL.GL (($=!), ($~!), get)
 import Graphics.Rendering.OpenGL.GL.DebugOutput (debugMessageCallback, debugOutput)
 import Graphics.Rendering.OpenGL.GL.PerFragment(ComparisonFunction(Less))
-import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..))
-import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..), drawArraysInstanced)
+import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
+import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..))
 import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
-import InfoVis.Parallel.Rendering.NewShapes
+import InfoVis.Parallel.Rendering.Buffers (drawInstances, makeShapeBuffer, updateInstances)
+import InfoVis.Parallel.Rendering.NewShapes (cube)
 import InfoVis.Parallel.Rendering.Program
 import Linear.Projection (lookAt, perspective)
 import Linear.V3 (V3(..))
 
 
-examplePositions :: [Vector3 GLfloat]
+examplePositions :: [Vertex3 GLfloat]
 examplePositions =
   [
-    Vector3 (-1) (-1) (-1)
-  , Vector3 (-1) (-1)   1
-  , Vector3 (-1)   1  (-1)
-  , Vector3 (-1)   1    1
-  , Vector3   1  (-1) (-1)
-  , Vector3   1  (-1)   1
-  , Vector3   1    1  (-1)
-  , Vector3   1    1    1
-  ]
-
-
-exampleScales :: [Vector3 GLfloat]
-exampleScales = 
-  [
-    Vector3 0.15 0.15 0.15
-  , Vector3 0.20 0.20 0.20
-  , Vector3 0.25 0.25 0.25
-  , Vector3 0.30 0.30 0.30
-  , Vector3 0.35 0.35 0.35
-  , Vector3 0.40 0.40 0.40
-  , Vector3 0.45 0.45 0.45
-  , Vector3 0.50 0.50 0.50
+    Vertex3 (-1) (-1) (-1)
+  , Vertex3 (-1) (-1)   1
+  , Vertex3 (-1)   1  (-1)
+  , Vertex3 (-1)   1    1
+  , Vertex3   1  (-1) (-1)
+  , Vertex3   1  (-1)   1
+  , Vertex3   1    1  (-1)
+  , Vertex3   1    1    1
   ]
 
 
@@ -68,6 +52,20 @@ exampleRotations =
       s = 1 / sqrt 2
       m = - s
       n = - 1
+
+
+exampleScales :: [Vector3 GLfloat]
+exampleScales = 
+  [
+    Vector3 0.15 0.15 0.15
+  , Vector3 0.20 0.20 0.20
+  , Vector3 0.25 0.25 0.25
+  , Vector3 0.30 0.30 0.30
+  , Vector3 0.35 0.35 0.35
+  , Vector3 0.40 0.40 0.40
+  , Vector3 0.45 0.45 0.45
+  , Vector3 0.50 0.50 0.50
+  ]
 
 
 exampleColors :: [GLuint]
@@ -93,45 +91,21 @@ testSetup angle =
 
     shapeProgram <- prepareShapeProgram
 
-    let
-      buildBuffer xs =
-        do
-          let
-            m = sizeOf $ head xs
-            n = length xs
-            size = n * m
-          bufferObject <- genObjectName
-          bindBuffer ArrayBuffer $=! Just bufferObject
-          values <- newListArray (0, size) xs
-          withStorableArray values $ \ptr -> bufferData ArrayBuffer $=! (toEnum size, ptr, DynamicDraw)
-          bindBuffer ArrayBuffer $=! Nothing
-          return bufferObject
-      (primitiveMode, primitives) = cube (1 :: GLfloat)
-
-    quadsBO     <- buildBuffer primitives
-    positionsBO <- buildBuffer examplePositions
-    rotationsBO <- buildBuffer exampleRotations
-    scalesBO    <- buildBuffer exampleScales
-    colorsBO    <- buildBuffer exampleColors
+    shapeBuffer <-
+      makeShapeBuffer shapeProgram (cube 1)
+        >>= updateInstances
+                (Just examplePositions)
+                (Just exampleRotations)
+                (Just exampleScales   )
+                (Just exampleColors   )
 
     return
       $ do
-        selectProgram $ Just shapeProgram
         angle' <- get angle
         let
           projection = perspective (pi / 3) 1 0.1 10
           modelView = lookAt (V3 (-5 :: GLfloat) (1 +sin angle') (2 + cos angle')) (V3 0 0 0) (V3 0 1 0)
-        setProjectionModelView shapeProgram projection modelView 
-        shapeProgram `bindMesh`      Just quadsBO
-        shapeProgram `bindPositions` Just positionsBO
-        shapeProgram `bindRotations` Just rotationsBO
-        shapeProgram `bindScales`    Just scalesBO
-        shapeProgram `bindColors`    Just colorsBO
-        drawArraysInstanced
-          primitiveMode
-          0
-          (fromIntegral $ length primitives)
-          (fromIntegral $ length examplePositions)
+        drawInstances shapeBuffer projection modelView
 
 
 -- | The main action.
