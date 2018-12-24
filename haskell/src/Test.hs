@@ -14,7 +14,7 @@ import Graphics.Rendering.OpenGL.GL.DebugOutput (debugMessageCallback, debugOutp
 import Graphics.Rendering.OpenGL.GL.PerFragment(ComparisonFunction(Less))
 import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..))
 import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
-import InfoVis.Parallel.NewTypes (Geometry(..), Shape(..))
+import InfoVis.Parallel.NewTypes (Geometry(..), Identifier, Shape(..))
 import InfoVis.Parallel.Rendering.Frames (drawFrame, makeFrame)
 import InfoVis.Parallel.Rendering.Program
 import Linear.Affine (Point(..))
@@ -22,17 +22,17 @@ import Linear.Projection (lookAt, perspective)
 import Linear.V3 (V3(..))
 
 
-example :: [Geometry]
+example :: [(Identifier, Geometry)]
 example =
   [
-    Geometry (Points [[P (V3 (-1) (-1) (-1))]]) 0.15 0x80808080 ""
-  , Geometry (Points [[P (V3 (-1) (-1)   1 )]]) 0.20 0xA0808080 ""
-  , Geometry (Points [[P (V3 (-1)   1  (-1))]]) 0.25 0x80A08080 ""
-  , Geometry (Points [[P (V3 (-1)   1    1 )]]) 0.30 0x8080A080 ""
-  , Geometry (Points [[P (V3   1  (-1) (-1))]]) 0.35 0xA0A0A0A0 ""
-  , Geometry (Points [[P (V3   1  (-1)   1 )]]) 0.40 0x80A0A0A0 ""
-  , Geometry (Points [[P (V3   1    1  (-1))]]) 0.45 0xA080A0A0 ""
-  , Geometry (Points [[P (V3   1    1    1 )]]) 0.50 0xA0A080A0 ""
+    (1, Geometry (Points [[P (V3 (-1) (-1) (-1))]]) 0.15 0x80808080 "")
+  , (2, Geometry (Points [[P (V3 (-1) (-1)   1 )]]) 0.20 0xA0808080 "")
+  , (3, Geometry (Points [[P (V3 (-1)   1  (-1))]]) 0.25 0x80A08080 "")
+  , (4, Geometry (Points [[P (V3 (-1)   1    1 )]]) 0.30 0x8080A080 "")
+  , (5, Geometry (Points [[P (V3   1  (-1) (-1))]]) 0.35 0xA0A0A0A0 "")
+  , (6, Geometry (Points [[P (V3   1  (-1)   1 )]]) 0.40 0x80A0A0A0 "")
+  , (7, Geometry (Points [[P (V3   1    1  (-1))]]) 0.45 0xA080A0A0 "")
+  , (8, Geometry (Points [[P (V3   1    1    1 )]]) 0.50 0xA0A080A0 "")
   ]
 
 

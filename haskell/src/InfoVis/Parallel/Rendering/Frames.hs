@@ -8,9 +8,10 @@ module InfoVis.Parallel.Rendering.Frames (
 ) where
 
 
+import Data.List (unzip4)
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
 import InfoVis.Parallel.NewTypes (Geometry(..), Identifier, Shape(..))
-import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, ShapeSection(..), drawInstances, makeShapeBuffer, setInstances)
+import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, drawInstances, insertPositions, updateColors, updateRotations, updateScales, prepareShapeBuffer)
 import InfoVis.Parallel.Rendering.NewShapes (cube)
 import InfoVis.Parallel.Rendering.Program (ShapeProgram)
 import Linear.Affine (Point(..))
@@ -32,7 +33,7 @@ data Frame =
 
 
 makeFrame :: ShapeProgram
-          -> [Geometry]
+          -> [(Identifier, Geometry)]
           -> IO Frame
 makeFrame program gs =
   do
@@ -58,12 +59,12 @@ drawFrame projection modelView Frame{..} =
 data GeometryFrame =
     ShapeFrame
     {
-      geometries :: M.Map Identifier [Geometry]
+      geometries :: M.Map Identifier Geometry
     , buffer     :: ShapeBuffer
     }
   | LabelFrame
     {
-      geometries :: M.Map Identifier [Geometry]
+      geometries :: M.Map Identifier Geometry
     }
 
 
@@ -72,7 +73,7 @@ drawGeometryFrame :: Real a
                   -> M44 a
                   -> GeometryFrame
                   -> IO ()
-drawGeometryFrame projection modelView ShapeFrame{..} =
+drawGeometryFrame projection modelView shapeFrame@ShapeFrame{..} =
   drawInstances
     (fmap realToFrac <$> projection)
     (fmap realToFrac <$> modelView)
@@ -80,32 +81,34 @@ drawGeometryFrame projection modelView ShapeFrame{..} =
 
 
 makeGeometryFrame :: ShapeProgram
-                  -> [Geometry]
+                  -> [(Identifier, Geometry)]
                   -> IO GeometryFrame
 makeGeometryFrame program gs =
   do
     let
-      section = mconcat $ makeSection <$> gs
-      geometries = M.empty
-    buffer <- makeShapeBuffer program (cube 1) >>= setInstances section
+      (positions, rotations, scales, colors) =
+        unzip4
+          [
+            (
+              (
+                identifier
+              , case shape of
+                  Points pss -> (\(P (V3 x y z)) -> realToFrac <$> Vertex3 x y z) <$> concat pss
+                  _          -> []
+              )
+            , (identifier, Vector4 0 0 0 1                      )
+            , (identifier, realToFrac <$> Vector3 size size size)
+            , (identifier, color                                )
+            )
+          |
+            (identifier, Geometry{..}) <- gs
+          ]
+      geometries = M.fromList gs
+    buffer' <-
+      updateColors colors
+      . updateScales scales
+      . updateRotations rotations
+      . insertPositions positions
+      <$>  createShapeBuffer 10000 program (cube 1)
+    buffer <- prepareShapeBuffer buffer'
     return ShapeFrame{..} 
-
-
-makeSection :: Geometry
-            -> ShapeSection
-makeSection Geometry{..} =
-  let
-    (positionSection, rotationSection, scaleSection) =
-      case shape of
-        Points pss -> let
-                        points = (\(P (V3 x y z)) -> realToFrac <$> Vertex3 x y z) <$> concat pss
-                        n = length points
-                      in
-                        (
-                          points
-                        , replicate n $ Vector4 0 0 0 1
-                        , replicate n $ realToFrac <$> Vector3 size size size
-                        )
-    colorSection = replicate (length positionSection) color
-  in
-    ShapeSection{..}
