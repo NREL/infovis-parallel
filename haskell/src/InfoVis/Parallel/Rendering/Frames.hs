@@ -15,7 +15,7 @@ import Control.Monad (liftM2)
 import Graphics.GL.Types (GLfloat)
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
 import InfoVis.Parallel.NewTypes (Geometry(..), Glyph(..), Identifier, Shape(..))
-import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, destroyShapeBuffer, drawInstances, insertPositions, updateColor, updateRotation, updateScale, prepareShapeBuffer)
+import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, destroyShapeBuffer, drawInstances, insertPositions, updateColor, updateRotations, updateScale, prepareShapeBuffer)
 import InfoVis.Parallel.Rendering.NewShapes (Mesh, arrow, cube, icosahedron, square, tube)
 import InfoVis.Parallel.Rendering.Program (ShapeProgram)
 import Linear.Affine (Point(..))
@@ -178,20 +178,25 @@ insertGeometryFrame _ geometryFrame@LabelFrame{} =
   geometryFrame
 insertGeometryFrame (identifier, geometry@Geometry{..}) geometryFrame@ShapeFrame{..} =
   let
-    (positions, rotation, scale) =
+    (positions, rotations, scale) =
       case shape of
-        Points _ pss -> (
-                          (\(P (V3 x y z)) -> realToFrac <$> Vertex3 x y z) <$> concat pss
-                        , Vector4 0 0 0 1
-                        , realToFrac <$> Vector3 size size size
-                        )
-        _            -> undefined
+        Points _   pss -> (
+                            (\(P (V3 x y z)) -> realToFrac <$> Vertex3 x y z) <$> concat pss
+                          , replicate (sum $ length <$> pss) $ Vector4 0 0 0 1
+                          , realToFrac <$> Vector3 size size size
+                          )
+        Polylines  pps -> let
+                          in
+                            undefined
+        Rectangles pps -> undefined
+        Label      _   -> undefined
+        Axis       pps -> undefined
   in
     geometryFrame
     {
       geometries = M.insert identifier geometry geometries
     , buffer     =   updateColor     (identifier, color    )
                    . updateScale     (identifier, scale    )
-                   . updateRotation  (identifier, rotation )
+                   . updateRotations (identifier, rotations)
                    $ insertPositions (identifier, positions) buffer
     }

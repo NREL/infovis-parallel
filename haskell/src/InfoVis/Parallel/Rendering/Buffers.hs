@@ -11,7 +11,7 @@ module InfoVis.Parallel.Rendering.Buffers (
 , hasIdentifier
 , insertPositions
 , updatePositions
-, updateRotation
+, updateRotations
 , updateScale
 , updateColor
 , deleteInstances
@@ -175,24 +175,31 @@ insertPosition shapeBuffer@ShapeBuffer{..} (identifier, vertex) =
     }
 
 
-updatePositions :: ShapeBuffer
-                -> (Identifier, [Vertex3 GLfloat])
+updatePositions :: (Identifier, [Position])
                 -> ShapeBuffer
-updatePositions shapeBuffer@ShapeBuffer{..} (identifier, vertices) =
+                -> ShapeBuffer
+updatePositions = updateAttributes positionsLens
+
+  
+updateRotations :: (Identifier, [Rotation])
+               -> ShapeBuffer
+               -> ShapeBuffer
+updateRotations = updateAttributes rotationsLens
+ 
+
+updateAttributes :: Lens' ShapeBuffer (IM.IntMap a)
+                -> (Identifier, [a])
+                -> ShapeBuffer
+                -> ShapeBuffer
+updateAttributes field (identifier, values) shapeBuffer@ShapeBuffer{..} =
   over
-    positionsLens
+    field
     (
       IM.union
-        $ IM.fromList (zip (IS.toList $ locationses M.! identifier) vertices)
+        $ IM.fromList (zip (IS.toList $ locationses M.! identifier) values)
     )
     shapeBuffer
 
-  
-updateRotation :: (Identifier, Rotation)
-               -> ShapeBuffer
-               -> ShapeBuffer
-updateRotation = updateAttribute rotationsLens
- 
 
 updateScale :: (Identifier, Scale)
             -> ShapeBuffer
