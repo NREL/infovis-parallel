@@ -1,5 +1,6 @@
 module InfoVis.Parallel.Rendering.NewShapes (
-  box
+  Mesh
+, box
 , cube
 , tube
 , icosahedron
@@ -14,11 +15,14 @@ import Graphics.Rendering.OpenGL.GL.PrimitiveMode (PrimitiveMode(..))
 import Graphics.Rendering.OpenGL.GL.Tensor (Vertex3(..))
 
 
+type Mesh a = (PrimitiveMode, [Vertex3 a])
+
+
 box :: Floating a
     => a
     -> a
     -> a
-    -> (PrimitiveMode, [Vertex3 a])
+    -> Mesh a
 box x y z =
   let
     x' = x / 2
@@ -48,14 +52,14 @@ box x y z =
 
 cube :: Floating a
      => a
-     -> (PrimitiveMode, [Vertex3 a])
+     -> Mesh a
 cube d = box d d d
 
 
 tube :: Floating a
      => a
      -> a
-     -> (PrimitiveMode, [Vertex3 a])
+     -> Mesh a
 tube l d =
   let
     s = d / (1 + 2 * sqrt 2)
@@ -102,7 +106,7 @@ tube l d =
 
 icosahedron :: Floating a
             => a
-            -> (PrimitiveMode, [Vertex3 a])
+            -> Mesh a
 icosahedron d =
   let
     phi = (1 + sqrt 5) / 2
@@ -152,7 +156,7 @@ icosahedron d =
 rectangle :: Floating a
           => a
           -> a
-          -> (PrimitiveMode, [Vertex3 a])
+          -> Mesh a
 rectangle h w =
   let
     h2 = h / 2
@@ -173,7 +177,7 @@ rectangle h w =
 
 square :: Floating a
        => a
-       -> (PrimitiveMode, [Vertex3 a])
+       -> Mesh a
 square w = rectangle w w
 
 
@@ -182,7 +186,7 @@ arrow :: (Floating a, Ord a)
       -> a
       -> a
       -> a
-      -> (PrimitiveMode, [Vertex3 a])
+      -> Mesh a
 arrow l d f o =
   let
     t =
@@ -231,7 +235,7 @@ arrow l d f o =
 cone :: Floating a
      => a
      -> a
-     -> (PrimitiveMode, [Vertex3 a])
+     -> Mesh a
 cone l d =
   let
     r = d / 2

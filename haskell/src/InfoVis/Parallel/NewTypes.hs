@@ -16,6 +16,7 @@ module InfoVis.Parallel.NewTypes (
 , Buttons
 , Geometry(..)
 , Shape(..)
+, Glyph(..)
 ) where
 
 
@@ -75,8 +76,12 @@ data Geometry =
     deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
+data Glyph = Cube | Sphere
+  deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+
 data Shape =
-    Points [[Position]]
+    Points Glyph [[Position]]
   | Polylines [[Position]]
   | Rectangles [(Position, Displacement, Displacement)]
   | Label (Position, Displacement, Displacement)

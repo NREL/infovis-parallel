@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns  #-}
+{-# LANGUAGE Rank2Types      #-}
 {-# LANGUAGE RecordWildCards #-}
 
 
@@ -5,17 +7,20 @@ module InfoVis.Parallel.Rendering.Buffers (
   ShapeBuffer
 , createShapeBuffer
 , prepareShapeBuffer
-, deleteShapeBuffer
+, destroyShapeBuffer
+, hasIdentifier
 , insertPositions
 , updatePositions
-, updateRotations
-, updateScales
-, updateColors
+, updateRotation
+, updateScale
+, updateColor
 , deleteInstances
 , drawInstances
 ) where
 
 
+import Control.Lens.Lens (Lens', lens)
+import Control.Lens.Setter (over)
 import Control.Monad (unless)
 import Data.Array.Storable (getElems, newArray, newListArray, touchStorableArray, withStorableArray)
 import Foreign.Ptr (plusPtr)
@@ -32,23 +37,35 @@ import Linear.Matrix (M44)
 import System.IO (hPrint, stderr)
 
 import qualified Data.IntMap.Lazy as IM (IntMap, empty, findMin, fromList, insert, null, toList, union)
-import qualified Data.Map.Strict as M (Map, (!), delete, empty, foldl, insertWith)
+import qualified Data.Map.Strict as M (Map, (!), delete, empty, foldl, insertWith, member)
 import qualified Data.IntSet as IS (IntSet, deleteFindMin, empty, findMax, foldl, fromList, null, singleton, toList, union)
 
 
-zeroPosition :: Vertex3 GLfloat
+type Position = Vertex3 GLfloat
+
+
+zeroPosition :: Position
 zeroPosition = Vertex3 0 0 0
 
 
-zeroRotation :: Vector4 GLfloat
+type Rotation = Vector4 GLfloat
+
+
+zeroRotation :: Rotation
 zeroRotation = Vector4 0 0 0 0
 
 
-zeroScale :: Vector3 GLfloat
+type Scale = Vector3 GLfloat
+
+
+zeroScale :: Scale
 zeroScale = Vector3 0 0 0
 
 
-zeroColor :: GLuint
+type Color = GLuint
+
+
+zeroColor :: Color
 zeroColor = 0
 
 
@@ -66,18 +83,40 @@ data ShapeBuffer =
   , colors           :: BufferObject
   , size             :: Int
   , empties          :: IS.IntSet
-  , locations        :: M.Map Identifier IS.IntSet
-  , pendingPositions :: IM.IntMap (Vertex3 GLfloat)
-  , pendingRotations :: IM.IntMap (Vector4 GLfloat)
-  , pendingScales    :: IM.IntMap (Vector3 GLfloat)
-  , pendingColors    :: IM.IntMap GLuint
+  , locationses      :: M.Map Identifier IS.IntSet
+  , pendingPositions :: IM.IntMap Position
+  , pendingRotations :: IM.IntMap Rotation
+  , pendingScales    :: IM.IntMap Scale
+  , pendingColors    :: IM.IntMap Color
   , pendingSize      :: Int
   }
 
 
+positionsLens :: Lens' ShapeBuffer (IM.IntMap Position)
+positionsLens = lens pendingPositions (\s pendingPositions -> s {pendingPositions})
+
+
+rotationsLens :: Lens' ShapeBuffer (IM.IntMap Rotation)
+rotationsLens = lens pendingRotations (\s pendingRotations -> s {pendingRotations})
+
+
+scalesLens :: Lens' ShapeBuffer (IM.IntMap Scale)
+scalesLens = lens pendingScales (\s pendingScales -> s {pendingScales})
+
+
+colorsLens :: Lens' ShapeBuffer (IM.IntMap Color)
+colorsLens = lens pendingColors (\s pendingColors -> s {pendingColors})
+
+
+hasIdentifier :: ShapeBuffer
+              -> Identifier
+              -> Bool
+hasIdentifier = flip M.member . locationses
+
+
 createShapeBuffer :: Int
                   -> ShapeProgram
-                  -> (PrimitiveMode, [Vertex3 GLfloat])
+                  -> (PrimitiveMode, [Position])
                   -> IO ShapeBuffer
 createShapeBuffer size shapeProgram (primitiveMode, primitives) =
   do
@@ -90,7 +129,7 @@ createShapeBuffer size shapeProgram (primitiveMode, primitives) =
       vertexCount   = fromIntegral $ length primitives
       instanceCount = 0
       empties = IS.fromList [0..(size-1)]
-      locations = M.empty
+      locationses = M.empty
       pendingPositions = IM.empty
       pendingRotations = IM.empty
       pendingScales    = IM.empty
@@ -99,24 +138,21 @@ createShapeBuffer size shapeProgram (primitiveMode, primitives) =
     return ShapeBuffer{..}
 
 
-deleteShapeBuffer :: ShapeBuffer
-                  -> IO ()
-deleteShapeBuffer ShapeBuffer{..} = deleteObjectNames [mesh, positions, rotations, scales, colors]
+destroyShapeBuffer :: ShapeBuffer
+                   -> IO ()
+destroyShapeBuffer ShapeBuffer{..} = deleteObjectNames [mesh, positions, rotations, scales, colors]
 
 
-insertPositions :: [(Identifier, [Vertex3 GLfloat])]
+insertPositions :: (Identifier, [Position])
                 -> ShapeBuffer
                 -> ShapeBuffer
-insertPositions =
-  flip (foldl $ uncurry . insertPosition)
-    . concatMap (uncurry ((<$>) . (,)))
+insertPositions = flip $ (. uncurry ((<$>) . (,))) . foldl insertPosition
 
 
 insertPosition :: ShapeBuffer
-               -> Identifier
-               -> Vertex3 GLfloat
+               -> (Identifier, Position)
                -> ShapeBuffer
-insertPosition shapeBuffer@ShapeBuffer{..} identifier vertex =
+insertPosition shapeBuffer@ShapeBuffer{..} (identifier, vertex) =
   let
     (empties', pendingSize'') =
       if IS.null empties
@@ -133,85 +169,70 @@ insertPosition shapeBuffer@ShapeBuffer{..} identifier vertex =
     shapeBuffer
     {
       empties          = empties''
-    , locations        = M.insertWith IS.union identifier (IS.singleton location) locations
+    , locationses      = M.insertWith IS.union identifier (IS.singleton location) locationses
     , pendingPositions = IM.insert location vertex pendingPositions
     , pendingSize      = pendingSize''
     }
 
 
-updatePositions :: [(Identifier, [Vertex3 GLfloat])]
+updatePositions :: ShapeBuffer
+                -> (Identifier, [Vertex3 GLfloat])
                 -> ShapeBuffer
-                -> ShapeBuffer
-updatePositions updates shapeBuffer@ShapeBuffer{..} =
-  let
-    pending =
-      foldl
-        (
-          \pending' (identifier, vertices) ->
-            let
-              locations' = IS.toList $ locations M.! identifier
-            in
-              IM.fromList (zip locations' vertices)
-                `IM.union` pending'
-        )
-        pendingPositions
-        updates
-
-  in
-    shapeBuffer {pendingPositions = pending}
+updatePositions shapeBuffer@ShapeBuffer{..} (identifier, vertices) =
+  over
+    positionsLens
+    (
+      IM.union
+        $ IM.fromList (zip (IS.toList $ locationses M.! identifier) vertices)
+    )
+    shapeBuffer
 
   
-updateRotations :: [(Identifier, Vector4 GLfloat)]
+updateRotation :: (Identifier, Rotation)
+               -> ShapeBuffer
+               -> ShapeBuffer
+updateRotation = updateAttribute rotationsLens
+ 
+
+updateScale :: (Identifier, Scale)
+            -> ShapeBuffer
+            -> ShapeBuffer
+updateScale = updateAttribute scalesLens
+ 
+
+updateColor :: (Identifier, Color)
+            -> ShapeBuffer
+            -> ShapeBuffer
+updateColor = updateAttribute colorsLens
+ 
+
+updateAttribute :: Lens' ShapeBuffer (IM.IntMap a)
+                -> (Identifier, a)
                 -> ShapeBuffer
                 -> ShapeBuffer
-updateRotations updates shapeBuffer@ShapeBuffer{..} = shapeBuffer {pendingRotations = updateAttributes locations updates pendingRotations}
- 
-
-updateScales :: [(Identifier, Vector3 GLfloat)]
-             -> ShapeBuffer
-             -> ShapeBuffer
-updateScales updates shapeBuffer@ShapeBuffer{..} = shapeBuffer {pendingScales = updateAttributes locations updates pendingScales}
- 
-
-updateColors :: [(Identifier, GLuint)]
-             -> ShapeBuffer
-             -> ShapeBuffer
-updateColors updates shapeBuffer@ShapeBuffer{..} = shapeBuffer {pendingColors = updateAttributes locations updates pendingColors}
- 
-
-updateAttributes :: M.Map Identifier IS.IntSet
-                 -> [(Identifier, a)]
-                 -> IM.IntMap a
-                 -> IM.IntMap a
-updateAttributes locations updates pending =
-  foldl
+updateAttribute field (identifier, value) shapeBuffer@ShapeBuffer{..} =
+  over
+    field
     (
-      \pending' (identifier, value) ->
-        let
-          locations' = locations M.! identifier
-        in
-          IS.foldl
-            (flip $ flip IM.insert value)
-            pending'
-            locations'
+      flip
+        (IS.foldl (flip $ flip IM.insert value))
+        $ locationses M.! identifier
     )
-    pending
-    updates
+    shapeBuffer
 
 
-
-deleteInstances :: [Identifier]
+deleteInstances :: ShapeBuffer
+                -> [Identifier]
                 -> ShapeBuffer
-                -> ShapeBuffer
-deleteInstances identifiers shapeBuffer@ShapeBuffer{..} =
+deleteInstances shapeBuffer@ShapeBuffer{..} identifiers =
   let
-    locations' = foldl (flip $ IS.union . (locations M.!)) IS.empty identifiers
+    locations = foldl (flip $ IS.union . (locationses M.!)) IS.empty identifiers
   in
     shapeBuffer
     {
-      empties       = empties `IS.union` locations'
-    , locations     = foldl (flip M.delete) locations identifiers
-    , pendingScales = IS.foldl (flip $ flip IM.insert zeroScale) pendingScales locations'
+      empties       = empties `IS.union` locations
+    , locationses     = foldl (flip M.delete) locationses identifiers
+    , pendingScales = IS.foldl (flip $ flip IM.insert zeroScale) pendingScales locations
     }
 
 
@@ -233,7 +254,7 @@ updateShapeBuffer shapeBuffer@ShapeBuffer{..} =
            return
              shapeBuffer
              {
-               instanceCount    = fromIntegral $ IS.findMax (M.foldl IS.union (IS.singleton (-1)) locations) + 1
+               instanceCount    = fromIntegral $ IS.findMax (M.foldl IS.union (IS.singleton (-1)) locationses) + 1
              , pendingPositions = IM.empty
              , pendingRotations = IM.empty
              , pendingScales    = IM.empty
