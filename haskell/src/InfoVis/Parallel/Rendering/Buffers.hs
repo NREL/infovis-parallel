@@ -12,7 +12,7 @@ module InfoVis.Parallel.Rendering.Buffers (
 , insertPositions
 , updatePositions
 , updateRotations
-, updateScale
+, updateScales
 , updateColor
 , deleteInstances
 , drawInstances
@@ -52,7 +52,7 @@ type Rotation = Vector4 GLfloat
 
 
 zeroRotation :: Rotation
-zeroRotation = Vector4 0 0 0 0
+zeroRotation = Vector4 0 0 0 1
 
 
 type Scale = Vector3 GLfloat
@@ -187,6 +187,12 @@ updateRotations :: (Identifier, [Rotation])
 updateRotations = updateAttributes rotationsLens
  
 
+updateScales :: (Identifier, [Scale])
+             -> ShapeBuffer
+             -> ShapeBuffer
+updateScales = updateAttributes scalesLens
+ 
+
 updateAttributes :: Lens' ShapeBuffer (IM.IntMap a)
                 -> (Identifier, [a])
                 -> ShapeBuffer
@@ -200,12 +206,6 @@ updateAttributes field (identifier, values) shapeBuffer@ShapeBuffer{..} =
     )
     shapeBuffer
 
-
-updateScale :: (Identifier, Scale)
-            -> ShapeBuffer
-            -> ShapeBuffer
-updateScale = updateAttribute scalesLens
- 
 
 updateColor :: (Identifier, Color)
             -> ShapeBuffer

@@ -161,10 +161,10 @@ rectangle h w =
   let
     h2 = h / 2
     w2 = w / 2
-    p1 = Vertex3 0   h2    w2
-    p2 = Vertex3 0   h2  (-w2)
-    p3 = Vertex3 0 (-h2)   w2
-    p4 = Vertex3 0 (-h2) (-w2)
+    p1 = Vertex3   h2  0   w2
+    p2 = Vertex3   h2  0 (-w2)
+    p3 = Vertex3 (-h2) 0   w2
+    p4 = Vertex3 (-h2) 0 (-w2)
   in
     (
       Quads

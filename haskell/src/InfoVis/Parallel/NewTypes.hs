@@ -83,7 +83,7 @@ data Glyph = Cube | Sphere
 data Shape =
     Points Glyph [[Position]]
   | Polylines [[Position]]
-  | Rectangles [(Position, Displacement, Displacement)]
-  | Label (Position, Displacement, Displacement)
-  | Axis (Position, Displacement)
+  | Rectangles [(Position, Position, Position)]
+  | Label (Position, Position, Position)
+  | Axis (Position, Position)
     deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)

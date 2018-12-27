@@ -56,11 +56,13 @@ executable infovis-parallel
 
 executable infovis-test
   main-is          : Test.hs
-  other-modules    : InfoVis.Parallel.NewTypes
+  other-modules    : Data.Math.Util
+                     InfoVis.Parallel.NewTypes
                      InfoVis.Parallel.Rendering.Buffers
                      InfoVis.Parallel.Rendering.Frames
                      InfoVis.Parallel.Rendering.NewShapes
                      InfoVis.Parallel.Rendering.Program
+                     Linear.Util
   hs-source-dirs   : src
   build-depends    : base >= 4.10 && < 4.11
                    , aeson
