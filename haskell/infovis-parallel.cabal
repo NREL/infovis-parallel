@@ -63,6 +63,7 @@ executable infovis-test
                      InfoVis.Parallel.Rendering.NewShapes
                      InfoVis.Parallel.Rendering.Program
                      Linear.Util
+                     Linear.Util.Graphics
   hs-source-dirs   : src
   build-depends    : base >= 4.10 && < 4.11
                    , aeson

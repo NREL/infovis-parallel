@@ -14,22 +14,28 @@ module InfoVis.Parallel.Rendering.Frames (
 
 
 import Control.Monad (liftM2)
-import Data.List (zipWith4)
-import Debug.Trace (trace)
+import Data.Bits ((.&.), shift)
 import Graphics.GL.Types (GLfloat)
+import Graphics.Rendering.OpenGL.GL.CoordTrans (MatrixComponent, preservingMatrix)
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
+import Graphics.Rendering.OpenGL.GL.VertexSpec (Color4(..))
+import Graphics.UI.GLUT.Fonts (StrokeFont(MonoRoman), fontHeight, renderString)
 import InfoVis.Parallel.NewTypes (Geometry(..), Glyph(..), Identifier, Shape(..))
 import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, destroyShapeBuffer, drawInstances, insertPositions, updateColor, updateRotations, updateScales, prepareShapeBuffer)
 import InfoVis.Parallel.Rendering.NewShapes (Mesh, arrow, cube, icosahedron, square, tube)
-import InfoVis.Parallel.Rendering.Program (ShapeProgram)
+import InfoVis.Parallel.Rendering.Program (ShapeProgram, setProjectionModelView')
 import Linear.Affine (Point(..), (.-.), (.+^))
 import Linear.Matrix (M44)
 import Linear.Metric (norm)
 import Linear.Quaternion (Quaternion(..), rotate)
 import Linear.Util (rotationFromPlane, rotationFromVectorPair)
 import Linear.V3 (V3(..))
+import Linear.Vector (zero)
 
 import qualified Data.Map.Strict as M (Map, adjust, elems, empty, fromList, insert, toList)
+import qualified Graphics.Rendering.OpenGL.GL.CoordTrans as G (scale, translate)
+import qualified Graphics.Rendering.OpenGL.GL.VertexSpec as G (color)
+import qualified Linear.Util.Graphics as G (toRotation, toVector3)
 
 
 data ShapeMesh =
@@ -109,7 +115,7 @@ prepareFrame =
     . unFrame
 
 
-drawFrame :: Real a
+drawFrame :: (MatrixComponent a, Real a)
           => M44 a
           -> M44 a
           -> Frame
@@ -164,13 +170,40 @@ prepareGeometryFrame geometryFrame@ShapeFrame{..} =
       }
 
 
-drawGeometryFrame :: Real a
+drawGeometryFrame :: (MatrixComponent a, Real a)
                   => M44 a
                   -> M44 a
                   -> GeometryFrame
                   -> IO ()
-drawGeometryFrame _ _ LabelFrame{..} =
-  return ()
+drawGeometryFrame projection modelView LabelFrame{..} =
+  do
+    fh <- fontHeight MonoRoman
+    setProjectionModelView' projection modelView
+    sequence_
+      [
+        preservingMatrix
+          $ do
+            G.color
+              $ Color4
+                (fromIntegral ((0xFF000000 .&. color) `shift` (-24)) / 255           )
+                (fromIntegral ((0x00FF0000 .&. color) `shift` (-16)) / 255           )
+                (fromIntegral ((0x0000FF00 .&. color) `shift` ( -8)) / 255           )
+                (fromIntegral ( 0x000000FF .&. color               ) / 255 :: GLfloat)
+            G.translate $ G.toVector3 o'
+            G.toRotation q
+            G.scale s s s
+            G.translate $ Vector3 0 (0.25 * fh) 0
+--          G.translate $ Vector3 0 (33.33 / (119.05 + 33.33) * fh) 0
+            renderString MonoRoman text
+      |
+        Geometry{..} <- M.elems geometries
+      , let
+          Label (o, w, h) = shape
+          o' = o .-. zero
+          h' = h .-. o
+          q = rotationFromPlane (V3 1 0 0) (V3 0 1 0) o w h
+          s = realToFrac (norm h') / fh
+      ]      
 drawGeometryFrame projection modelView ShapeFrame{..} =
   drawInstances
     (fmap realToFrac <$> projection)
@@ -181,8 +214,11 @@ drawGeometryFrame projection modelView ShapeFrame{..} =
 insertGeometryFrame :: (Identifier, Geometry)
                     -> GeometryFrame
                     -> GeometryFrame
-insertGeometryFrame _ geometryFrame@LabelFrame{} =
+insertGeometryFrame (identifier, geometry) geometryFrame@LabelFrame{..} =
   geometryFrame
+  {
+    geometries = M.insert identifier geometry geometries
+  }
 insertGeometryFrame (identifier, geometry@Geometry{..}) geometryFrame@ShapeFrame{..} =
   let
     noRotation = Quaternion 1 $ V3 0 0 0

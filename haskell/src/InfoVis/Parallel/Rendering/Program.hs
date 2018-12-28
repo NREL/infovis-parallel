@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 
 module InfoVis.Parallel.Rendering.Program (
@@ -7,6 +8,7 @@ module InfoVis.Parallel.Rendering.Program (
 , deleteShapeProgram
 , selectShapeProgram
 , setProjectionModelView
+, setProjectionModelView'
 , bindMesh
 , bindPositions
 , bindRotations
@@ -21,7 +23,7 @@ import Graphics.GL.ARB.InstancedArrays (glVertexAttribDivisorARB)
 import Graphics.GL.Types (GLfloat, GLuint)
 import Graphics.Rendering.OpenGL.GL (($=!), deleteObjectName, get)
 import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferObject, BufferTarget(..), bindBuffer)
-import Graphics.Rendering.OpenGL.GL.CoordTrans(GLmatrix, MatrixOrder(RowMajor), newMatrix)
+import Graphics.Rendering.OpenGL.GL.CoordTrans(GLmatrix, Matrix, MatrixComponent, MatrixOrder(RowMajor), matrix, newMatrix)
 import Graphics.Rendering.OpenGL.GL.Shaders.Attribs (attribLocation)
 import Graphics.Rendering.OpenGL.GL.Shaders.ProgramObjects (Program, attachShader, createProgram, currentProgram, linkProgram, programSeparable)
 import Graphics.Rendering.OpenGL.GL.Shaders.ShaderObjects (ShaderType(VertexShader), compileShader, createShader, shaderSourceBS)
@@ -129,10 +131,29 @@ setProjectionModelView :: ShapeProgram
                        -> IO ()
 setProjectionModelView ShapeProgram{..} projection modelView =
   do
-    let
-      (V4 (V4 a00 a01 a02 a03) (V4 a10 a11 a12 a13) (V4 a20 a21 a22 a23) (V4 a30 a31 a32 a33)) = projection !*! modelView
-    matrix <- newMatrix RowMajor [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] :: IO (GLmatrix GLfloat)
-    uniform pmvLocation $=! matrix
+    matrx <- makeMatrix projection modelView
+    uniform pmvLocation $=! (matrx :: GLmatrix GLfloat)
+
+
+setProjectionModelView' :: forall a . (MatrixComponent a, Num a)
+                        => M44 a
+                        -> M44 a
+                        -> IO ()
+setProjectionModelView' projection modelView =
+  do
+    matrx <- makeMatrix projection modelView
+    matrix Nothing $=! (matrx :: GLmatrix a)
+
+
+makeMatrix :: (MatrixComponent a, Num a, Matrix m)
+           => M44 a
+           -> M44 a
+           -> IO (m a)
+makeMatrix projection modelView =
+  let
+    (V4 (V4 a00 a01 a02 a03) (V4 a10 a11 a12 a13) (V4 a20 a21 a22 a23) (V4 a30 a31 a32 a33)) = projection !*! modelView
+  in
+    newMatrix RowMajor [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33]
 
 
 bindMesh :: ShapeProgram
