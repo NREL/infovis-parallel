@@ -4,12 +4,14 @@
 
 
 module InfoVis.Parallel.Rendering.Frames (
-  Frame
-, createFrame
-, destroyFrame
-, insertFrame
-, prepareFrame
-, drawFrame
+  Manager
+, createManager
+, destroyManager
+, setFrame
+, addFrame
+, insert
+, prepare
+, draw
 ) where
 
 
@@ -23,7 +25,7 @@ import Graphics.UI.GLUT.Fonts (StrokeFont(MonoRoman), fontHeight, renderString)
 import InfoVis.Parallel.NewTypes (Geometry(..), Glyph(..), Identifier, Shape(..))
 import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, destroyShapeBuffer, drawInstances, insertPositions, updateColor, updateRotations, updateScales, prepareShapeBuffer)
 import InfoVis.Parallel.Rendering.NewShapes (Mesh, arrow, cube, icosahedron, square, tube)
-import InfoVis.Parallel.Rendering.Program (ShapeProgram, setProjectionModelView')
+import InfoVis.Parallel.Rendering.Program (ShapeProgram, prepareShapeProgram, setProjectionModelView')
 import Linear.Affine (Point(..), (.-.), (.+^))
 import Linear.Matrix (M44)
 import Linear.Metric (norm)
@@ -32,10 +34,99 @@ import Linear.Util (rotationFromPlane, rotationFromVectorPair)
 import Linear.V3 (V3(..))
 import Linear.Vector (zero)
 
-import qualified Data.Map.Strict as M (Map, adjust, elems, empty, fromList, insert, toList)
+import qualified Data.Map.Strict as M (Map, (!), adjust, elems, empty, fromList, insert, toList)
 import qualified Graphics.Rendering.OpenGL.GL.CoordTrans as G (scale, translate)
 import qualified Graphics.Rendering.OpenGL.GL.VertexSpec as G (color)
+import qualified InfoVis.Parallel.NewTypes as I (Frame)
 import qualified Linear.Util.Graphics as G (toRotation, toVector3)
+
+
+type FrameNumber = I.Frame
+
+
+data Manager =
+  Manager
+  {
+    program :: ShapeProgram
+  , frames  :: M.Map FrameNumber Frame
+  , current :: FrameNumber
+  }
+
+
+setFrame :: FrameNumber
+         -> Manager
+         -> Manager
+setFrame frame frameManager =
+  frameManager
+  {
+    current = frame
+  }
+
+
+createManager :: IO Manager
+createManager =
+  do
+    let
+      frames = M.empty
+      current = undefined
+    program <- prepareShapeProgram
+    return Manager{..}
+
+
+destroyManager :: Manager
+               -> IO ()
+destroyManager Manager{..} = mapM_ destroyFrame $ M.elems frames
+
+
+addFrame :: FrameNumber
+         -> Manager
+         -> IO Manager
+addFrame frame frameManager@Manager{..} =
+  do
+    newFrame <- createFrame program
+    return
+      frameManager
+      {
+        frames = M.insert frame newFrame frames
+      }
+
+
+insert :: Manager
+       -> FrameNumber
+       -> [(Identifier, Geometry)]
+       -> Manager
+insert frameManager@Manager{..} frameNumber identifierGeometries =
+  let
+    frame = insertFrame (frames M.! frameNumber) identifierGeometries
+  in
+    frameManager
+    {
+      frames = M.insert frameNumber frame frames
+    }
+
+
+prepare :: FrameNumber
+        -> Manager
+        -> IO Manager
+prepare frameNumber frameManager@Manager{..} =
+  do
+    frame <- prepareFrame $ frames M.! frameNumber
+    return
+      frameManager
+      {
+        frames = M.insert frameNumber frame frames
+      }
+
+
+draw :: (MatrixComponent a, Real a)
+     => FrameNumber
+     -> M44 a
+     -> M44 a
+     -> Manager
+     -> IO ()
+draw frameNumber projection modelView Manager{..} =
+  drawFrame projection modelView
+    $ frames M.! frameNumber
 
 
 data ShapeMesh =
@@ -73,7 +164,7 @@ findShapeMesh Geometry{..} =
 newtype Frame =
   Frame
   {
-    unFrame :: M.Map ShapeMesh GeometryFrame
+    unFrame :: M.Map ShapeMesh Display
   }
 
 
@@ -82,12 +173,12 @@ createFrame :: ShapeProgram
 createFrame program =
   Frame
     . M.fromList
-    <$> mapM (liftM2 fmap (,) $ createGeometryFrame program) [minBound..maxBound]
+    <$> mapM (liftM2 fmap (,) $ createDisplay program) [minBound..maxBound]
 
 
 destroyFrame :: Frame
              -> IO ()
-destroyFrame Frame{..} = mapM_ destroyGeometryFrame $ M.elems unFrame
+destroyFrame Frame{..} = mapM_ destroyDisplay $ M.elems unFrame
 
 
 insertFrame :: Frame
@@ -99,7 +190,7 @@ insertFrame Frame{..} =
       (
         \unFrame' identifierGeometry@(_, geometry) ->
           M.adjust
-            (insertGeometryFrame identifierGeometry)
+            (insertDisplay identifierGeometry)
             (findShapeMesh geometry)
             unFrame'
       )
@@ -110,7 +201,7 @@ prepareFrame :: Frame
              -> IO Frame
 prepareFrame =
   fmap (Frame . M.fromList)
-    . mapM (uncurry ((. prepareGeometryFrame) . (<$>) . (,)))
+    . mapM (uncurry ((. prepareDisplay) . (<$>) . (,)))
     . M.toList
     . unFrame
 
@@ -120,62 +211,63 @@ drawFrame :: (MatrixComponent a, Real a)
           -> M44 a
           -> Frame
           -> IO ()
-drawFrame projection modelView Frame{..} = mapM_ (drawGeometryFrame projection modelView) $ M.elems unFrame
+drawFrame projection modelView Frame{..} = mapM_ (drawDisplay projection modelView) $ M.elems unFrame
 
 
-data GeometryFrame =
-    ShapeFrame
+data Display =
+    ShapeDisplay
     {
       geometries :: M.Map Identifier Geometry
     , buffer     :: ShapeBuffer
     }
-  | LabelFrame
+  | LabelDisplay
     {
       geometries :: M.Map Identifier Geometry
     }
 
 
-createGeometryFrame :: ShapeProgram
-                    -> ShapeMesh
-                    -> IO GeometryFrame
-createGeometryFrame _ LabelMesh =
+createDisplay :: ShapeProgram
+              -> ShapeMesh
+              -> IO Display
+createDisplay _ LabelMesh =
   let
     geometries = M.empty
   in
-    return LabelFrame{..}
-createGeometryFrame program shapeMesh =
+    return LabelDisplay{..}
+createDisplay program shapeMesh =
   do
     buffer <- createShapeBuffer 10000 program $ mesh shapeMesh
     let
       geometries = M.empty
-    return ShapeFrame{..}
+    return ShapeDisplay{..}
 
 
-destroyGeometryFrame :: GeometryFrame -> IO ()
-destroyGeometryFrame LabelFrame{}   = return ()
-destroyGeometryFrame ShapeFrame{..} = destroyShapeBuffer buffer
+destroyDisplay :: Display
+               -> IO ()
+destroyDisplay LabelDisplay{}   = return ()
+destroyDisplay ShapeDisplay{..} = destroyShapeBuffer buffer
         
    
-prepareGeometryFrame :: GeometryFrame
-                     -> IO GeometryFrame
-prepareGeometryFrame geometryFrame@LabelFrame{} =
-  return geometryFrame
-prepareGeometryFrame geometryFrame@ShapeFrame{..} =
+prepareDisplay :: Display
+               -> IO Display
+prepareDisplay display@LabelDisplay{} =
+  return display
+prepareDisplay display@ShapeDisplay{..} =
   do
     buffer' <- prepareShapeBuffer buffer
     return
-      geometryFrame
+      display
       {
         buffer = buffer'
       }
 
 
-drawGeometryFrame :: (MatrixComponent a, Real a)
-                  => M44 a
-                  -> M44 a
-                  -> GeometryFrame
-                  -> IO ()
-drawGeometryFrame projection modelView LabelFrame{..} =
+drawDisplay :: (MatrixComponent a, Real a)
+            => M44 a
+            -> M44 a
+            -> Display
+            -> IO ()
+drawDisplay projection modelView LabelDisplay{..} =
   do
     fh <- fontHeight MonoRoman
     setProjectionModelView' projection modelView
@@ -204,22 +296,22 @@ drawGeometryFrame projection modelView LabelFrame{..} =
           q = rotationFromPlane (V3 1 0 0) (V3 0 1 0) o w h
           s = realToFrac (norm h') / fh
       ]      
-drawGeometryFrame projection modelView ShapeFrame{..} =
+drawDisplay projection modelView ShapeDisplay{..} =
   drawInstances
     (fmap realToFrac <$> projection)
     (fmap realToFrac <$> modelView )
     buffer
 
 
-insertGeometryFrame :: (Identifier, Geometry)
-                    -> GeometryFrame
-                    -> GeometryFrame
-insertGeometryFrame (identifier, geometry) geometryFrame@LabelFrame{..} =
-  geometryFrame
+insertDisplay :: (Identifier, Geometry)
+              -> Display
+              -> Display
+insertDisplay (identifier, geometry) display@LabelDisplay{..} =
+  display
   {
     geometries = M.insert identifier geometry geometries
   }
-insertGeometryFrame (identifier, geometry@Geometry{..}) geometryFrame@ShapeFrame{..} =
+insertDisplay (identifier, geometry@Geometry{..}) display@ShapeDisplay{..} =
   let
     noRotation = Quaternion 1 $ V3 0 0 0
     right = V3 1 0 0
@@ -271,7 +363,7 @@ insertGeometryFrame (identifier, geometry@Geometry{..}) geometryFrame@ShapeFrame
                             , V3 (norm ud) size size
                             )]
   in
-    geometryFrame
+    display
     {
       geometries = M.insert identifier geometry geometries
     , buffer     =   updateColor     (identifier,                color    )
