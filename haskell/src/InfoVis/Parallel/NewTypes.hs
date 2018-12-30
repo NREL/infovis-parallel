@@ -17,10 +17,12 @@ module InfoVis.Parallel.NewTypes (
 , Geometry(..)
 , Shape(..)
 , Glyph(..)
+, DeltaGeometry(..)
 ) where
 
 
 import Data.Aeson.Types (FromJSON, ToJSON)
+import Data.Default (Default(..))
 import Data.Int (Int32, Int64)
 import Data.Word (Word32)
 import GHC.Generics (Generic)
@@ -77,7 +79,10 @@ data Geometry =
 
 
 data Glyph = Cube | Sphere
-  deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+  deriving (Enum, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+instance Default Glyph where
+  def = Cube
 
 
 data Shape =
@@ -86,4 +91,18 @@ data Shape =
   | Rectangles [(Position, Position, Position)]
   | Label (Position, Position, Position)
   | Axis (Position, Position)
+    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+
+data DeltaGeometry =
+  DeltaGeometry
+  {
+    frame      :: Frame
+  , identifier :: Identifier
+  , deltaShape :: Maybe Shape
+  , deltaSize  :: Maybe Double
+  , deltaColor :: Maybe Color
+  , deltaText  :: Maybe String
+  , deltaGlyph :: Maybe Glyph
+  }
     deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)

@@ -1,8 +1,6 @@
 {-# LANGUAGE DataKinds             #-}
-{-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
 
@@ -37,7 +35,7 @@ module InfoVis.Parallel.ProtoBuf (
 import Control.Lens.Getter ((^.))
 import Control.Lens.Lens (Lens', (&), lens)
 import Control.Lens.Setter ((.~))
-import Control.Lens.Tuple (_1, _2, _3, _4, _5)
+import Control.Lens.Tuple (_1, _3, _4, _5, _6)
 import Control.Monad (guard)
 import Data.Aeson ((.=), (.:?))
 import Data.Aeson.Types (FromJSON(..), ToJSON(..), object, withObject)
@@ -49,7 +47,7 @@ import Data.Maybe (fromMaybe)
 import Data.ProtocolBuffers (Decode, Encode, Message, Optional, Packed, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
 import Data.Serialize (runGetLazy, runPutLazy)
 import GHC.Generics (Generic)
-import InfoVis.Parallel.NewTypes (Buttons, Color, Frame, Identifier, PositionRotation, Shape(..))
+import InfoVis.Parallel.NewTypes (Buttons, Color, DeltaGeometry(..), Frame, Identifier, PositionRotation, Shape(..))
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
@@ -355,25 +353,13 @@ data GeometryPB =
   , size' :: Optional  9 (Value Double    )
   , colr' :: Optional 10 (Value Color     )
   , text' :: Optional 11 (Value String    )
+  , glyp' :: Optional 12 (Value Int32     )
   }
     deriving (Generic, Show)
 
 instance Decode GeometryPB
 
 instance Encode GeometryPB
-
-
-data DeltaGeometry =
-  DeltaGeometry
-  {
-    frame      :: Frame
-  , identifier :: Identifier
-  , deltaShape :: Maybe Shape
-  , deltaSize  :: Maybe Double
-  , deltaColor :: Maybe Color
-  , deltaText  :: Maybe String
-  }
-    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
 shapeBit :: (Bits a, Num a) => a
@@ -392,6 +378,10 @@ textBit :: (Bits a, Num a) => a
 textBit = 1 `shift` 3
 
 
+glyphBit :: (Bits a, Num a) => a
+glyphBit = 1 `shift` 4
+
+
 toGeometry :: GeometryPB -> DeltaGeometry
 toGeometry GeometryPB{..} =
   let
@@ -405,14 +395,16 @@ toGeometry GeometryPB{..} =
         toShape
           (
             getField typp'
+          , getField glyp'
           , getField cnts'
           , getField posx'
           , getField posy'
           , getField posz'
           )
-    deltaSize  = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def $ getField size')
-    deltaColor = guard (colorBit .&. mask /= 0) >> return (fromMaybe def $ getField colr')
-    deltaText  = guard (textBit  .&. mask /= 0) >> return (fromMaybe def $ getField text')
+    deltaSize  = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def                         $ getField size')
+    deltaColor = guard (colorBit .&. mask /= 0) >> return (fromMaybe def                         $ getField colr')
+    deltaText  = guard (textBit  .&. mask /= 0) >> return (fromMaybe def                         $ getField text')
+    deltaGlyph = guard (glyphBit .&. mask /= 0) >> return (maybe     def (toEnum . fromIntegral) $ getField glyp')
   in
     DeltaGeometry{..}
 
@@ -425,6 +417,7 @@ fromGeometry DeltaGeometry{..} =
       . maybe (sizeBit  .|.) (const id) deltaSize
       . maybe (colorBit .|.) (const id) deltaColor
       . maybe (textBit  .|.) (const id) deltaText
+      . maybe (glyphBit .|.) (const id) deltaGlyph
       $ 0
     shape' = fromShape <$> deltaShape
   in
@@ -434,33 +427,35 @@ fromGeometry DeltaGeometry{..} =
     , iden' = putField $ Just identifier
     , typp' = putField $ (^. _1) <$> shape'
     , mask' = putField $ Just mask
-    , cnts' = putField $ maybe [] (^. _2) shape'
-    , posx' = putField $ maybe [] (^. _3) shape'
-    , posy' = putField $ maybe [] (^. _4) shape'
-    , posz' = putField $ maybe [] (^. _5) shape'
-    , size' = putField deltaSize
-    , colr' = putField deltaColor
-    , text' = putField deltaText
+    , cnts' = putField $ maybe [] (^. _3) shape'
+    , posx' = putField $ maybe [] (^. _4) shape'
+    , posy' = putField $ maybe [] (^. _5) shape'
+    , posz' = putField $ maybe [] (^. _6) shape'
+    , size' = putField                               deltaSize
+    , colr' = putField                               deltaColor
+    , text' = putField                               deltaText
+    , glyp' = putField $ fromIntegral . fromEnum <$> deltaGlyph
     }
 
 
-toShape :: (Maybe Int32, [Int32], [Double], [Double], [Double]) -> Maybe Shape
-toShape (ty', cs, xs, ys, zs) =
+toShape :: (Maybe Int32, Maybe Int32, [Int32], [Double], [Double], [Double]) -> Maybe Shape
+toShape (ty', gl', cs, xs, ys, zs) =
   do
     ty <- ty'
     let
+      gl = maybe def (toEnum . fromIntegral) gl'
       n = fromIntegral $ sum cs
       ps = zipWith3 V3 xs ys zs
-      to2 [origin, horizontal] = (P origin, horizontal)
+      to2 [origin, horizontal] = (P origin, P horizontal)
       to2 _ = undefined
-      to3 [origin, horizontal, vertical] = (P origin, horizontal, vertical)
+      to3 [origin, horizontal, vertical] = (P origin, P horizontal, P vertical)
       to3 _ = undefined
     guard
       $  n == length xs
       && n == length ys
       && n == length zs
     case ty of
-      1 -> return . Points    . splitPlaces cs $ P <$> ps
+      1 -> return . Points gl . splitPlaces cs $ P <$> ps
       2 -> return . Polylines . splitPlaces cs $ P <$> ps
       3 -> do
              guard
@@ -484,15 +479,15 @@ toShape (ty', cs, xs, ys, zs) =
       _ -> Nothing
 
 
-fromShape :: Shape -> (Int32, [Int32], [Double], [Double], [Double])
-fromShape (Points pointSets) =
+fromShape :: Shape -> (Int32, Int32, [Int32], [Double], [Double], [Double])
+fromShape (Points gl pointSets) =
   let
     cs = fromIntegral . length <$> pointSets
     xs = concatMap (fmap $ \(P (V3 x _ _)) -> x) pointSets
     ys = concatMap (fmap $ \(P (V3 _ y _)) -> y) pointSets
     zs = concatMap (fmap $ \(P (V3 _ _ z)) -> z) pointSets
   in
-    (1, cs, xs, ys, zs)
+    (1, fromIntegral $ fromEnum gl, cs, xs, ys, zs)
 fromShape (Polylines polylines) =
   let
     cs = fromIntegral . length <$> polylines
@@ -500,19 +495,19 @@ fromShape (Polylines polylines) =
     ys = concatMap (fmap $ \(P (V3 _ y _)) -> y) polylines
     zs = concatMap (fmap $ \(P (V3 _ _ z)) -> z) polylines
   in
-    (2, cs, xs, ys, zs)
+    (2, 0, cs, xs, ys, zs)
 fromShape (Rectangles rectangles) =
   let
     cs = fmap (const 3) rectangles
-    xs = concatMap (\(P (V3 x0 _  _ ), V3 x1 _  _ , V3 x2 _  _ ) -> [x0, x1, x2]) rectangles
-    ys = concatMap (\(P (V3 _  y0 _ ), V3 _  y1 _ , V3 _  y2 _ ) -> [y0, y1, y2]) rectangles
-    zs = concatMap (\(P (V3 _  _  z0), V3 _  _  z1, V3 _  _  z2) -> [z0, z1, z2]) rectangles
+    xs = concatMap (\(P (V3 x0 _  _ ), P (V3 x1 _  _ ), P (V3 x2 _  _ )) -> [x0, x1, x2]) rectangles
+    ys = concatMap (\(P (V3 _  y0 _ ), P (V3 _  y1 _ ), P (V3 _  y2 _ )) -> [y0, y1, y2]) rectangles
+    zs = concatMap (\(P (V3 _  _  z0), P (V3 _  _  z1), P (V3 _  _  z2)) -> [z0, z1, z2]) rectangles
   in
-    (3, cs, xs, ys, zs)
-fromShape (Label (P (V3 x0 y0 z0), V3 x1 y1 z1, V3 x2 y2 z2)) =
-  (4, [3], [x0, x1, x2], [y0, y1, y2], [z0, z1, z2])
-fromShape (Axis (P (V3 x0 y0 z0), V3 x1 y1 z1)) =
-  (5, [2], [x0, x1], [y0, y1], [z0, z1])
+    (3, 0, cs, xs, ys, zs)
+fromShape (Label (P (V3 x0 y0 z0), P (V3 x1 y1 z1), P (V3 x2 y2 z2))) =
+  (4, 0, [3], [x0, x1, x2], [y0, y1, y2], [z0, z1, z2])
+fromShape (Axis (P (V3 x0 y0 z0), P (V3 x1 y1 z1))) =
+  (5, 0, [2], [x0, x1], [y0, y1], [z0, z1])
 
 
 data LocationPB =

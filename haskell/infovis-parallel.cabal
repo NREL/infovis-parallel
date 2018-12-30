@@ -57,6 +57,7 @@ executable infovis-parallel
 executable infovis-test
   main-is          : Test.hs
   other-modules    : Data.Math.Util
+                     InfoVis.Parallel.ProtoBuf
                      InfoVis.Parallel.NewTypes
                      InfoVis.Parallel.Rendering.Buffers
                      InfoVis.Parallel.Rendering.Frames
