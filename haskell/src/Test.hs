@@ -6,6 +6,9 @@ module Main (
 import Control.Monad (when)
 import Data.Default (def)
 import Data.IORef (IORef, newIORef)
+import Control.Lens.Getter ((^.))
+import Data.ProtocolBuffers (decodeMessage)
+import Data.Serialize (runGet)
 import Graphics.GL.Types (GLfloat)
 import Graphics.Rendering.DLP (DlpEncoding(..))
 import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), dlpDisplayCallback)
@@ -14,11 +17,14 @@ import Graphics.Rendering.OpenGL.GL.DebugOutput (debugMessageCallback, debugOutp
 import Graphics.Rendering.OpenGL.GL.PerFragment(ComparisonFunction(Less))
 import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..))
 import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
+import InfoVis.Parallel.ProtoBuf (Request, upsert)
 import InfoVis.Parallel.NewTypes (DeltaGeometry(..), Glyph(..), Shape(..))
 import InfoVis.Parallel.Rendering.Frames (addFrame, createManager, draw, insert, prepare)
 import Linear.Affine (Point(..))
 import Linear.Projection (lookAt, perspective)
 import Linear.V3 (V3(..))
+
+import qualified Data.ByteString as BS (readFile)
 
 
 example :: [DeltaGeometry]
@@ -65,17 +71,17 @@ example =
   ]
 
 
-testSetup :: IORef GLfloat -> IO (IO ())
-testSetup angle =
+testSetup :: [DeltaGeometry] -> IORef GLfloat -> IO (IO ())
+testSetup deltaGeometries angle =
   do
 
     debugOutput $=! Enabled
     debugMessageCallback $=! Just print
 
-    manager' <- createManager >>= addFrame 0
+    manager' <- createManager >>= addFrame 1
     let
-      manager'' = insert manager' example
-    manager <- prepare 0 manager''
+      manager'' = insert manager' $ if True then deltaGeometries else example
+    manager <- prepare 1 manager''
 
     return
       $ do
@@ -83,7 +89,7 @@ testSetup angle =
         let
           projection = perspective (pi / 3) 1 0.1 10
           modelView = lookAt (V3 (1 + sin angle') (2 + cos angle') (5 :: GLfloat)) (V3 0 0 0) (V3 0 1 0)
-        draw 0 projection modelView manager
+        draw 1 projection modelView manager
 
 
 -- | The main action.
@@ -96,6 +102,10 @@ main =
     putStrLn "    Use the --cardboard flag to run in side-by-side (Google Cardboard) mode."
     putStrLn "    Use the --quadbuffer flag to run in quad buffer stereo mode."
     (_, arguments) <- getArgsAndInitialize
+    print arguments
+    Right buffer <- fmap (runGet decodeMessage) . BS.readFile $ arguments !! 2 :: IO (Either String Request)
+    print $ buffer ^. upsert
+--  buffers <- runGetLazy decodeMessage <$> mapM BS.readFile $ drop 2 arguments
     initialDisplayMode $=! (if "--quadbuffer" `elem` arguments then (Stereoscopic :) else id) [WithDepthBuffer, DoubleBuffered]
     _ <- createWindow "DLP Stereo OpenGL Example"
     depthFunc $=! Just Less 
@@ -106,7 +116,7 @@ main =
           | "--cardboard"  `elem` arguments = SideBySide
           | otherwise                       = FrameSequential
     angle <- newIORef 0
-    testDraw <- testSetup angle
+    testDraw <- testSetup (buffer ^. upsert) angle
     dlpDisplayCallback $=! def {dlpEncoding = encoding, doDisplay = const testDraw}
     idleCallback $=! Just (idle angle)
     mainLoop
