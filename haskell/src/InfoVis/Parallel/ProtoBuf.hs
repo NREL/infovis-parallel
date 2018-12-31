@@ -44,7 +44,7 @@ import Data.Default (Default(..))
 import Data.Int (Int32)
 import Data.List.Split (splitPlaces)
 import Data.Maybe (fromMaybe)
-import Data.ProtocolBuffers (Decode, Encode, Message, Optional, Packed, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
+import Data.ProtocolBuffers (Decode, Encode, Fixed, Message, Optional, Packed, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
 import Data.Serialize (runGetLazy, runPutLazy)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.NewTypes (Buttons, Color, DeltaGeometry(..), Frame, Identifier, PositionRotation, Shape(..))
@@ -173,18 +173,18 @@ toolSet =
 data Response =
   Response
   {
-    shown'     :: Optional  1 (Value   Frame     )
-  , message'   :: Optional  2 (Value   String    )
-  , hover'     :: Packed    3 (Value   Identifier)
-  , unhover'   :: Packed    4 (Value   Identifier)
-  , select'    :: Packed    5 (Value   Identifier)
-  , deselect'  :: Packed    6 (Value   Identifier)
-  , viewloc'   :: Optional  7 (Message LocationPB)
-  , toolloc'   :: Optional  8 (Message LocationPB)
-  , depressed' :: Optional  9 (Value   Buttons   )
-  , pressed'   :: Optional 10 (Value   Buttons   )
-  , released'  :: Optional 11 (Value   Buttons   )
-  , analog'    :: Packed   12 (Value   Double    )
+    shown'     :: Optional  1 (Value   Frame          )
+  , message'   :: Optional  2 (Value   String         )
+  , hover'     :: Packed    3 (Value   Identifier     )
+  , unhover'   :: Packed    4 (Value   Identifier     )
+  , select'    :: Packed    5 (Value   Identifier     )
+  , deselect'  :: Packed    6 (Value   Identifier     )
+  , viewloc'   :: Optional  7 (Message LocationPB     )
+  , toolloc'   :: Optional  8 (Message LocationPB     )
+  , depressed' :: Optional  9 (Value   (Fixed Buttons))
+  , pressed'   :: Optional 10 (Value   (Fixed Buttons))
+  , released'  :: Optional 11 (Value   (Fixed Buttons))
+  , analog'    :: Packed   12 (Value   Double         )
   }
     deriving (Generic, Show)
 
@@ -211,35 +211,35 @@ instance FromJSON Response where
     withObject "Response"
       $ \v ->
       do
-        shown'     <- putField                             <$> v .:? "frame"
-        message'   <- putField                             <$> v .:? "message"
-        hover'     <- putField . fromMaybe def             <$> v .:? "hover"
-        unhover'   <- putField . fromMaybe def             <$> v .:? "unhover"
-        select'    <- putField . fromMaybe def             <$> v .:? "select"
-        deselect'  <- putField . fromMaybe def             <$> v .:? "deselect"
-        viewloc'   <- putField . fmap fromPositionRotation <$> v .:? "viewloc"
-        toolloc'   <- putField . fmap fromPositionRotation <$> v .:? "toolloc"
-        depressed' <- putField                             <$> v .:? "depressed"
-        pressed'   <- putField                             <$> v .:? "pressed"
-        released'  <- putField                             <$> v .:? "released"
+        shown'     <- putField                                               <$> v .:? "frame"
+        message'   <- putField                                               <$> v .:? "message"
+        hover'     <- putField . fromMaybe def                               <$> v .:? "hover"
+        unhover'   <- putField . fromMaybe def                               <$> v .:? "unhover"
+        select'    <- putField . fromMaybe def                               <$> v .:? "select"
+        deselect'  <- putField . fromMaybe def                               <$> v .:? "deselect"
+        viewloc'   <- putField . fmap fromPositionRotation                   <$> v .:? "viewloc"
+        toolloc'   <- putField . fmap fromPositionRotation                   <$> v .:? "toolloc"
+        depressed' <- putField . fmap (fromIntegral :: Int -> Fixed Buttons) <$> v .:? "depressed"
+        pressed'   <- putField . fmap (fromIntegral :: Int -> Fixed Buttons) <$> v .:? "pressed"
+        released'  <- putField . fmap (fromIntegral :: Int -> Fixed Buttons) <$> v .:? "released"
         analog'    <- putField . fromMaybe def             <$> v .:? "analog"
         return Response{..}
 
 instance ToJSON Response where
   toJSON Response{..} =
     object
-     . maybe id ((:) . ("frame"     .=)) (                       getField shown'    )
-     . maybe id ((:) . ("message"   .=)) (                       getField message'  )
-     . option           "hover"          (                       getField hover'    )
-     . option           "unhover"        (                       getField unhover'  )
-     . option           "select"         (                       getField select'   )
-     . option           "deselect"       (                       getField deselect' )
-     . maybe id ((:) . ("viewloc"   .=)) (toPositionRotation <$> getField viewloc'  )
-     . maybe id ((:) . ("toolloc"   .=)) (toPositionRotation <$> getField toolloc'  )
-     . maybe id ((:) . ("depressed" .=)) (                       getField depressed')
-     . maybe id ((:) . ("pressed"   .=)) (                       getField pressed'  )
-     . maybe id ((:) . ("released"  .=)) (                       getField released' )
-     . option           "analog"         (                       getField analog'   )
+     . maybe id ((:) . ("frame"     .=)) (                                           getField shown'    )
+     . maybe id ((:) . ("message"   .=)) (                                           getField message'  )
+     . option           "hover"          (                                           getField hover'    )
+     . option           "unhover"        (                                           getField unhover'  )
+     . option           "select"         (                                           getField select'   )
+     . option           "deselect"       (                                           getField deselect' )
+     . maybe id ((:) . ("viewloc"   .=)) (toPositionRotation                     <$> getField viewloc'  )
+     . maybe id ((:) . ("toolloc"   .=)) (toPositionRotation                     <$> getField toolloc'  )
+     . maybe id ((:) . ("depressed" .=)) ((fromIntegral :: Fixed Buttons -> Int) <$> getField depressed')
+     . maybe id ((:) . ("pressed"   .=)) ((fromIntegral :: Fixed Buttons -> Int) <$> getField pressed'  )
+     . maybe id ((:) . ("released"  .=)) ((fromIntegral :: Fixed Buttons -> Int) <$> getField released' )
+     . option           "analog"         (                                           getField analog'   )
      $ []
     where
       option s v = if null v then id else ((s .= v) :)
@@ -342,18 +342,18 @@ analog =
 data GeometryPB =
   GeometryPB
   {
-    fram' :: Optional  1 (Value Frame     )
-  , iden' :: Optional  2 (Value Identifier)
-  , typp' :: Optional  3 (Value Int32     )
-  , mask' :: Optional  4 (Value Int32     )
-  , cnts' :: Packed    5 (Value Int32     )
-  , posx' :: Packed    6 (Value Double    )
-  , posy' :: Packed    7 (Value Double    )
-  , posz' :: Packed    8 (Value Double    )
-  , size' :: Optional  9 (Value Double    )
-  , colr' :: Optional 10 (Value Color     )
-  , text' :: Optional 11 (Value String    )
-  , glyp' :: Optional 12 (Value Int32     )
+    fram' :: Optional  1 (Value Frame        )
+  , iden' :: Optional  2 (Value Identifier   )
+  , typp' :: Optional  3 (Value Int32        )
+  , mask' :: Optional  4 (Value Int32        )
+  , cnts' :: Packed    5 (Value Int32        )
+  , posx' :: Packed    6 (Value Double       )
+  , posy' :: Packed    7 (Value Double       )
+  , posz' :: Packed    8 (Value Double       )
+  , size' :: Optional  9 (Value Double       )
+  , colr' :: Optional 10 (Value (Fixed Color))
+  , text' :: Optional 11 (Value String       )
+  , glyp' :: Optional 12 (Value Int32        )
   }
     deriving (Generic, Show)
 
@@ -402,7 +402,7 @@ toGeometry GeometryPB{..} =
           , getField posz'
           )
     deltaSize  = guard (sizeBit  .&. mask /= 0) >> return (fromMaybe def                         $ getField size')
-    deltaColor = guard (colorBit .&. mask /= 0) >> return (fromMaybe def                         $ getField colr')
+    deltaColor = guard (colorBit .&. mask /= 0) >> return (maybe     def fromIntegral            $ getField colr')
     deltaText  = guard (textBit  .&. mask /= 0) >> return (fromMaybe def                         $ getField text')
     deltaGlyph = guard (glyphBit .&. mask /= 0) >> return (maybe     def (toEnum . fromIntegral) $ getField glyp')
   in
@@ -432,7 +432,7 @@ fromGeometry DeltaGeometry{..} =
     , posy' = putField $ maybe [] (^. _5) shape'
     , posz' = putField $ maybe [] (^. _6) shape'
     , size' = putField                               deltaSize
-    , colr' = putField                               deltaColor
+    , colr' = putField $ fromIntegral            <$> deltaColor
     , text' = putField                               deltaText
     , glyp' = putField $ fromIntegral . fromEnum <$> deltaGlyph
     }
