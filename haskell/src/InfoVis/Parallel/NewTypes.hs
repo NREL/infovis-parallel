@@ -77,6 +77,16 @@ data Geometry =
   }
     deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
+instance Default Geometry where
+  def =
+    Geometry
+    {
+      shape = Points def def
+    , size  = def
+    , color = def
+    , text  = def
+    }
+
 
 data Glyph = Cube | Sphere
   deriving (Enum, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)

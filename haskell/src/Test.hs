@@ -14,54 +14,54 @@ import Graphics.Rendering.OpenGL.GL.DebugOutput (debugMessageCallback, debugOutp
 import Graphics.Rendering.OpenGL.GL.PerFragment(ComparisonFunction(Less))
 import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..))
 import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
-import InfoVis.Parallel.NewTypes (Geometry(..), Glyph(..), Identifier, Shape(..))
+import InfoVis.Parallel.NewTypes (DeltaGeometry(..), Glyph(..), Shape(..))
 import InfoVis.Parallel.Rendering.Frames (addFrame, createManager, draw, insert, prepare)
 import Linear.Affine (Point(..))
 import Linear.Projection (lookAt, perspective)
 import Linear.V3 (V3(..))
 
 
-example :: [(Identifier, Geometry)]
+example :: [DeltaGeometry]
 example =
   [
-    ( 1, Geometry (Points Cube   [ [ P (V3 (-1.0) (-1.0) (-1.0))] ]) 0.15 0x80808080 "")
-  , ( 2, Geometry (Points Cube   [ [ P (V3 (-1.0) (-1.0)   1.0 )] ]) 0.20 0xA0808080 "")
-  , ( 3, Geometry (Points Cube   [ [ P (V3 (-1.0)   1.0  (-1.0))] ]) 0.25 0x80A08080 "")
-  , ( 4, Geometry (Points Sphere [ [ P (V3 (-1.0)   1.0    1.0 )] ]) 0.30 0x8080A080 "")
-  , ( 5, Geometry (Points Cube   [ [ P (V3   1.0  (-1.0) (-1.0))] ]) 0.35 0xA0A0A0A0 "")
-  , ( 6, Geometry (Points Cube   [ [ P (V3   1.0  (-1.0)   1.0 )] ]) 0.40 0x80A0A0A0 "")
-  , ( 7, Geometry (Points Cube   [ [ P (V3   1.0    1.0  (-1.0))] ]) 0.45 0xA080A0A0 "")
-  , ( 8, Geometry (Points Cube   [ [ P (V3   1.0    1.0    1.0 )] ]) 0.50 0xA0A080A0 "")
-  , ( 9, Geometry (Polylines     [
+    DeltaGeometry 0 1 (Just $ Points Cube   [ [ P (V3 (-1.0) (-1.0) (-1.0))] ]) (Just 0.15) (Just 0x80808080) (Just "") Nothing
+  , DeltaGeometry 0 2 (Just $ Points Cube   [ [ P (V3 (-1.0) (-1.0)   1.0 )] ]) (Just 0.20) (Just 0xA0808080) (Just "") Nothing
+  , DeltaGeometry 0 3 (Just $ Points Cube   [ [ P (V3 (-1.0)   1.0  (-1.0))] ]) (Just 0.25) (Just 0x80A08080) (Just "") Nothing
+  , DeltaGeometry 0 4 (Just $ Points Sphere [ [ P (V3 (-1.0)   1.0    1.0 )] ]) (Just 0.30) (Just 0x8080A080) (Just "") Nothing
+  , DeltaGeometry 0 5 (Just $ Points Cube   [ [ P (V3   1.0  (-1.0) (-1.0))] ]) (Just 0.35) (Just 0xA0A0A0A0) (Just "") Nothing
+  , DeltaGeometry 0 6 (Just $ Points Cube   [ [ P (V3   1.0  (-1.0)   1.0 )] ]) (Just 0.40) (Just 0x80A0A0A0) (Just "") Nothing
+  , DeltaGeometry 0 7 (Just $ Points Cube   [ [ P (V3   1.0    1.0  (-1.0))] ]) (Just 0.45) (Just 0xA080A0A0) (Just "") Nothing
+  , DeltaGeometry 0 8 (Just $ Points Cube   [ [ P (V3   1.0    1.0    1.0 )] ]) (Just 0.50) (Just 0xA0A080A0) (Just "") Nothing
+  , DeltaGeometry 0 9 (Just $ Polylines     [
                                    [
                                      P (V3 (-1.0) (-1.0) (-1.0))
                                    , P (V3   1.0    1.0    1.0 )
                                    ]
-                                 ]) 0.05 0XA0A0A0FF "")
-  , (10, Geometry (Rectangles    [
+                                 ]) (Just 0.05) (Just 0XA0A0A0FF) (Just "") Nothing
+  , DeltaGeometry 0 10 (Just $ Rectangles    [
                                    (
                                      P (V3 (-1.0) (-1.0) (-1.0))
                                    , P (V3   1.0  (-1.0) (-1.0))
                                    , P (V3 (-1.0) (-1.0)   1.0 )
                                    )
-                                 ]) 0.01 0xFF0000FF "")
-  , (11, Geometry (Axis            (
+                                 ]) (Just 0.01) (Just 0xFF0000FF) (Just "") Nothing
+  , DeltaGeometry 0 11 (Just $ Axis            (
                                      P (V3   1.0  (-1.0) (-1.0))
                                    , P (V3 (-1.0)   1.0    1.0 )
                                    )
-                                  ) 0.05 0X00A000FF "")
-  , (12, Geometry (Label           (
+                                  ) (Just 0.05) (Just 0X00A000FF) (Just "") Nothing
+  , DeltaGeometry 0 12 (Just $ Label           (
                                      P (V3 (-1.0) (-1.0) (-1.0))
                                    , P (V3   1.0    1.0    1.0 )
                                    , P (V3 (-2.0)   0.0  (-2.0))
                                    )
-                                  ) 0.10 0X0000FFFF "Testjwg")
-  , (13, Geometry (Label           (
+                                  ) (Just 0.10) (Just 0X0000FFFF) (Just "Testjwg") Nothing
+  , DeltaGeometry 0 13 (Just $ Label           (
                                      P (V3 (-1.0) (-1.0)   1.0 )
                                    , P (V3   1.0  (-1.0)   1.0 )
                                    , P (V3 (-1.0) (-0.9)   1.0 )
                                    )
-                                  ) 0.10 0X00FF00FF "jTjgG")
+                                  ) (Just 0.10) (Just 0X00FF00FF) (Just "jTjgG") Nothing
   ]
 
 
@@ -74,7 +74,7 @@ testSetup angle =
 
     manager' <- createManager >>= addFrame 0
     let
-      manager'' = insert manager' 0 example
+      manager'' = insert manager' example
     manager <- prepare 0 manager''
 
     return

@@ -14,7 +14,7 @@ module InfoVis.Parallel.Rendering.Buffers (
 , updateRotations
 , updateScales
 , updateColor
-, deleteInstances
+, deleteInstance
 , drawInstances
 ) where
 
@@ -37,7 +37,7 @@ import Linear.Matrix (M44)
 import System.IO (hPrint, stderr)
 
 import qualified Data.IntMap.Lazy as IM (IntMap, empty, findMin, fromList, insert, null, toList, union)
-import qualified Data.Map.Strict as M (Map, (!), delete, empty, foldl, insertWith, member)
+import qualified Data.Map.Strict as M (Map, delete, empty, findWithDefault, foldl, insertWith, member)
 import qualified Data.IntSet as IS (IntSet, deleteFindMin, empty, findMax, foldl, fromList, null, singleton, toList, union)
 
 
@@ -182,8 +182,8 @@ updatePositions = updateAttributes positionsLens
 
   
 updateRotations :: (Identifier, [Rotation])
-               -> ShapeBuffer
-               -> ShapeBuffer
+                -> ShapeBuffer
+                -> ShapeBuffer
 updateRotations = updateAttributes rotationsLens
  
 
@@ -194,15 +194,15 @@ updateScales = updateAttributes scalesLens
  
 
 updateAttributes :: Lens' ShapeBuffer (IM.IntMap a)
-                -> (Identifier, [a])
-                -> ShapeBuffer
-                -> ShapeBuffer
+                 -> (Identifier, [a])
+                 -> ShapeBuffer
+                 -> ShapeBuffer
 updateAttributes field (identifier, values) shapeBuffer@ShapeBuffer{..} =
   over
     field
     (
       IM.union
-        $ IM.fromList (zip (IS.toList $ locationses M.! identifier) values)
+        $ IM.fromList (zip (IS.toList $ M.findWithDefault IS.empty identifier locationses) values)
     )
     shapeBuffer
 
@@ -223,22 +223,22 @@ updateAttribute field (identifier, value) shapeBuffer@ShapeBuffer{..} =
     (
       flip
         (IS.foldl (flip $ flip IM.insert value))
-        $ locationses M.! identifier
+        $ M.findWithDefault IS.empty identifier locationses
     )
     shapeBuffer
 
 
-deleteInstances :: ShapeBuffer
-                -> [Identifier]
-                -> ShapeBuffer
-deleteInstances shapeBuffer@ShapeBuffer{..} identifiers =
+deleteInstance :: ShapeBuffer
+               -> Identifier
+               -> ShapeBuffer
+deleteInstance shapeBuffer@ShapeBuffer{..} identifier =
   let
-    locations = foldl (flip $ IS.union . (locationses M.!)) IS.empty identifiers
+    locations = M.findWithDefault IS.empty identifier locationses
   in
     shapeBuffer
     {
       empties       = empties `IS.union` locations
-    , locationses     = foldl (flip M.delete) locationses identifiers
+    , locationses   = M.delete identifier locationses
     , pendingScales = IS.foldl (flip $ flip IM.insert zeroScale) pendingScales locations
     }
 

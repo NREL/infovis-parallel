@@ -10,6 +10,7 @@ module InfoVis.Parallel.Rendering.Frames (
 , setFrame
 , addFrame
 , insert
+, delete
 , prepare
 , draw
 ) where
@@ -17,13 +18,15 @@ module InfoVis.Parallel.Rendering.Frames (
 
 import Control.Monad (liftM2)
 import Data.Bits ((.&.), shift)
+import Data.Default (def)
+import Data.Maybe (fromMaybe)
 import Graphics.GL.Types (GLfloat)
 import Graphics.Rendering.OpenGL.GL.CoordTrans (MatrixComponent, preservingMatrix)
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
 import Graphics.Rendering.OpenGL.GL.VertexSpec (Color4(..))
 import Graphics.UI.GLUT.Fonts (StrokeFont(MonoRoman), fontHeight, renderString)
-import InfoVis.Parallel.NewTypes (Geometry(..), Glyph(..), Identifier, Shape(..))
-import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, destroyShapeBuffer, drawInstances, insertPositions, updateColor, updateRotations, updateScales, prepareShapeBuffer)
+import InfoVis.Parallel.NewTypes (DeltaGeometry(..), Geometry(..), Glyph(..), Identifier, Shape(..))
+import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, deleteInstance, destroyShapeBuffer, drawInstances, insertPositions, updateColor, updateRotations, updateScales, prepareShapeBuffer)
 import InfoVis.Parallel.Rendering.NewShapes (Mesh, arrow, cube, icosahedron, square, tube)
 import InfoVis.Parallel.Rendering.Program (ShapeProgram, prepareShapeProgram, setProjectionModelView')
 import Linear.Affine (Point(..), (.-.), (.+^))
@@ -34,7 +37,7 @@ import Linear.Util (rotationFromPlane, rotationFromVectorPair)
 import Linear.V3 (V3(..))
 import Linear.Vector (zero)
 
-import qualified Data.Map.Strict as M (Map, (!), adjust, elems, empty, fromList, insert, toList)
+import qualified Data.Map.Strict as M (Map, (!), delete, elems, empty, findWithDefault, fromList, insert, lookup, map, mapWithKey, toList)
 import qualified Graphics.Rendering.OpenGL.GL.CoordTrans as G (scale, translate)
 import qualified Graphics.Rendering.OpenGL.GL.VertexSpec as G (color)
 import qualified InfoVis.Parallel.NewTypes as I (Frame)
@@ -92,17 +95,29 @@ addFrame frame frameManager@Manager{..} =
 
 
 insert :: Manager
-       -> FrameNumber
-       -> [(Identifier, Geometry)]
+       -> [DeltaGeometry]
        -> Manager
-insert frameManager@Manager{..} frameNumber identifierGeometries =
-  let
-    frame = insertFrame (frames M.! frameNumber) identifierGeometries
-  in
-    frameManager
-    {
-      frames = M.insert frameNumber frame frames
-    }
+insert = foldl insert' 
+
+
+insert' :: Manager
+        -> DeltaGeometry
+        -> Manager
+insert' frameManager@Manager{..} geometry@DeltaGeometry{..} =
+  frameManager
+  {
+    frames = M.insert frame (insertFrame (frames M.! frame) geometry) frames
+  }
+
+
+delete :: Manager
+       -> [Identifier]
+       -> Manager
+delete frameManager@Manager{..} identifiers =
+  frameManager
+  {
+    frames = M.map (`deleteFrame` identifiers) frames
+  }
 
 
 prepare :: FrameNumber
@@ -149,9 +164,9 @@ mesh LabelMesh     = undefined
 mesh AxisMesh      = arrow 1 1 0.1 2
 
 
-findShapeMesh :: Geometry
+findShapeMesh :: Shape
               -> ShapeMesh
-findShapeMesh Geometry{..} =
+findShapeMesh shape =
   case shape of
     Points     Cube   _ -> CubeMesh
     Points     Sphere _ -> SphereMesh
@@ -182,19 +197,20 @@ destroyFrame Frame{..} = mapM_ destroyDisplay $ M.elems unFrame
 
 
 insertFrame :: Frame
-            -> [(Identifier, Geometry)]
+            -> DeltaGeometry
             -> Frame
-insertFrame Frame{..} =
+insertFrame Frame{..} deltaGeometry =
   Frame
-    . foldl
-      (
-        \unFrame' identifierGeometry@(_, geometry) ->
-          M.adjust
-            (insertDisplay identifierGeometry)
-            (findShapeMesh geometry)
-            unFrame'
-      )
-      unFrame
+    $ M.mapWithKey (insertDisplay deltaGeometry)
+    unFrame      
+
+
+deleteFrame :: Frame
+            -> [Identifier]
+            -> Frame
+deleteFrame Frame{..} identifiers =
+  Frame
+    $ M.map (`deleteDisplay` identifiers) unFrame
 
 
 prepareFrame :: Frame
@@ -303,15 +319,116 @@ drawDisplay projection modelView ShapeDisplay{..} =
     buffer
 
 
-insertDisplay :: (Identifier, Geometry)
+merge :: Geometry
+      -> DeltaGeometry
+      -> Geometry
+merge Geometry{..} DeltaGeometry{..} =
+  Geometry
+  {
+    shape = case (deltaShape, deltaGlyph) of
+              (Just (Points _ pps), Just g') -> Points g' pps
+              (Just shape'        , _      ) -> shape'
+              _                              -> shape
+  , size  = fromMaybe size  deltaSize
+  , color = fromMaybe color deltaColor
+  , text  = fromMaybe text  deltaText
+  }
+
+
+data Revision =
+    Insertion
+  | Deletion
+  | Recoloring
+  | None
+
+
+revision :: ShapeMesh
+         -> DeltaGeometry
+         -> M.Map Identifier Geometry
+         -> Revision
+revision shapeMesh DeltaGeometry{..} geometries' =
+  let
+    old = identifier `M.lookup` geometries'
+    Just shapeMesh' = findShapeMesh <$> deltaShape
+    CubeMesh   `morph` SphereMesh = True
+    SphereMesh `morph` CubeMesh   = True
+    _          `morph` _          = False
+  in
+    case (old, deltaShape, deltaSize, deltaColor, shapeMesh == shapeMesh', shapeMesh `morph` shapeMesh') of
+      (Nothing, Just _, _     , _     , True , _    ) -> Insertion
+      (Nothing, _     , _     , _     , _    , _    ) -> None
+      (_      , Just _, _     , _     , False, True ) -> Deletion
+      (_      , Just _, _     , _     , False, _    ) -> None
+      (_      , Just _, _     , _     , _    , _    ) -> Insertion
+      (_      , _     , Just _, _     , _    , _    ) -> Insertion
+      (_      , _     , _     , Just _, _    , _    ) -> Recoloring
+      (_      , _     , _     , _     , _    , _    ) -> None
+
+
+deleteDisplay :: Display
+              -> [Identifier]
               -> Display
-              -> Display
-insertDisplay (identifier, geometry) display@LabelDisplay{..} =
+deleteDisplay display@LabelDisplay{..} identifiers =
   display
   {
-    geometries = M.insert identifier geometry geometries
+    geometries = foldl (flip M.delete) geometries identifiers
   }
-insertDisplay (identifier, geometry@Geometry{..}) display@ShapeDisplay{..} =
+deleteDisplay display@ShapeDisplay{..} identifiers =
+  display
+  {
+    geometries = foldl (flip M.delete) geometries identifiers
+  , buffer     = foldl deleteInstance buffer identifiers
+  }
+
+
+insertDisplay :: DeltaGeometry
+              -> ShapeMesh
+              -> Display
+              -> Display
+insertDisplay deltaGeometry@DeltaGeometry{..} shapeMesh display@LabelDisplay{..} =
+  let
+    old = M.findWithDefault def identifier geometries
+    new = old `merge` deltaGeometry
+  in
+    case revision shapeMesh deltaGeometry geometries of
+      None      -> display
+      Deletion  -> display
+                   {
+                     geometries = M.delete identifier geometries
+                   }
+      _         -> display
+                   {
+                     geometries = M.insert identifier new geometries
+                   }
+insertDisplay deltaGeometry@DeltaGeometry{..} shapeMesh display@ShapeDisplay{..} =
+  let
+    old = M.findWithDefault def identifier geometries
+    new = old `merge` deltaGeometry
+  in
+    case revision shapeMesh deltaGeometry geometries of
+      None      -> display
+      Deletion  -> display
+                   {
+                     geometries = M.delete identifier geometries
+                   , buffer     = deleteInstance buffer identifier
+                   }
+      Insertion -> display
+                   {
+                     geometries = M.insert identifier new geometries
+                   , buffer     = updateDisplay (identifier, new) $ deleteInstance buffer identifier
+                   }
+      Recoloring-> display
+                   {
+                     geometries = M.insert identifier new geometries
+                   , buffer     = updateColor (identifier, color new) buffer
+                   }
+    
+
+
+updateDisplay :: (Identifier, Geometry)
+              -> ShapeBuffer
+              -> ShapeBuffer
+updateDisplay (identifier, Geometry{..}) =
   let
     noRotation = Quaternion 1 $ V3 0 0 0
     right = V3 1 0 0
@@ -363,11 +480,7 @@ insertDisplay (identifier, geometry@Geometry{..}) display@ShapeDisplay{..} =
                             , V3 (norm ud) size size
                             )]
   in
-    display
-    {
-      geometries = M.insert identifier geometry geometries
-    , buffer     =   updateColor     (identifier,                color    )
-                   . updateScales    (identifier, toScale    <$> scales   )
-                   . updateRotations (identifier, toRotation <$> rotations)
-                   $ insertPositions (identifier, toPosition <$> positions) buffer
-    }
+      updateColor     (identifier,                color    )
+    . updateScales    (identifier, toScale    <$> scales   )
+    . updateRotations (identifier, toRotation <$> rotations)
+    . insertPositions (identifier, toPosition <$> positions)
