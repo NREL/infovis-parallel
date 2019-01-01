@@ -40,7 +40,7 @@ import Linear.Util (rotationFromPlane, rotationFromVectorPair)
 import Linear.V3 (V3(..))
 import Linear.Vector (zero)
 
-import qualified Data.Map.Strict as M (Map, (!), alter, delete, elems, empty, findWithDefault, fromList, keys, insert, lookup, map, mapWithKey)
+import qualified Data.Map.Strict as M (Map, (!), alter, delete, elems, empty, findWithDefault, fromList, keys, insert, lookup, map, mapWithKey, null)
 import qualified Graphics.Rendering.OpenGL.GL.CoordTrans as G (scale, translate)
 import qualified Graphics.Rendering.OpenGL.GL.VertexSpec as G (color)
 import qualified InfoVis.Parallel.NewTypes as I (Frame)
@@ -109,6 +109,12 @@ insert' manager@Manager{..} geometry@DeltaGeometry{..} =
         M.alter
           (Just . (`insertFrame` geometry) . fromMaybe (createFrame program))
           frame
+      )
+    & over currentLens
+      (
+        if M.null frames
+          then const frame
+          else id
       )
 
 

@@ -19,7 +19,7 @@ import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..))
 import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
 import InfoVis.Parallel.ProtoBuf (Request, upsert)
 import InfoVis.Parallel.NewTypes (DeltaGeometry(..), Glyph(..), Shape(..))
-import InfoVis.Parallel.Rendering.Frames (createManager, draw, insert, prepare, set)
+import InfoVis.Parallel.Rendering.Frames (createManager, draw, insert, prepare)
 import Linear.Affine (Point(..))
 import Linear.Projection (lookAt, perspective)
 import Linear.V3 (V3(..))
@@ -78,10 +78,10 @@ testSetup deltaGeometries angle =
     debugOutput $=! Enabled
     debugMessageCallback $=! Just print
 
-    manager' <- createManager
-    let
-      manager'' = insert manager' $ if True then deltaGeometries else concatMap (replicate 1) example
-    manager <- set 1 <$> prepare manager''
+    manager <-
+      (prepare =<<)
+        $ flip insert (if True then deltaGeometries else concatMap (replicate 1) example)
+        <$> createManager
 
     return
       $ do
