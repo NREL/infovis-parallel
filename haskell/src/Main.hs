@@ -36,6 +36,7 @@ import System.Exit (die)
 
 import qualified InfoVis.Parallel.Compiler as I (compileBuffers)
 import qualified InfoVis.Parallel.Sender as I (sendBuffers)
+import qualified InfoVis.Parallel.Visualizer as I (visualizeBuffers)
 
 
 deriving instance Data Severity
@@ -57,6 +58,12 @@ data InfoVis =
     , buffers  :: [FilePath]
     , output   :: FilePath
     }
+  | Visualize
+    {
+      logging  :: Severity
+    , config   :: FilePath
+    , buffers  :: [FilePath]
+    }
     deriving (Data, Show, Typeable)
 
 
@@ -66,6 +73,7 @@ infovis =
     [
       sendBuffers
     , compile
+    , visualize
     ]
       &= summary ("InfoVis-Parallel command line, Version " ++ stringVersion ++ " by National Renewable Energy Laboratory")
       &= program "infovis-parallel"
@@ -126,6 +134,20 @@ compile =
     &= details []
 
 
+visualize :: InfoVis
+visualize =
+  Visualize
+  {
+    config  = "config.yaml"
+           &= typ "YAML"
+           &= help "Visualization parameters"
+  }
+    &= explicit
+    &= name "visualize"
+    &= help "Visualize protocol buffers serialized as binary files."
+    &= details []
+
+
 main :: IO ()
 main =
   do
@@ -144,3 +166,4 @@ dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          -> m ()
 dispatch SendBuffers{..} = I.sendBuffers host port path sendText buffers
 dispatch Compile{..} = I.compileBuffers buffers output
+dispatch Visualize{..} = I.visualizeBuffers config (logging == Debug) buffers

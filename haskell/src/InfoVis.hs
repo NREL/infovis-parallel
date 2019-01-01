@@ -41,7 +41,7 @@ import System.IO.Error (tryIOError)
 
 
 stringVersion :: String
-stringVersion = showVersion version ++ ", © 2018"
+stringVersion = showVersion version ++ ", © 2019"
 
 
 type SeverityLog = MonadLog (WithSeverity String)

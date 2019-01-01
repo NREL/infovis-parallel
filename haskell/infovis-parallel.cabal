@@ -26,45 +26,20 @@ source-repository head
 executable infovis-parallel
   main-is          : Main.hs
   other-modules    : Paths_infovis_parallel
+                     Data.Math.Util
                      InfoVis
                      InfoVis.Parallel.Compiler
-                     InfoVis.Parallel.ProtoBuf
                      InfoVis.Parallel.NewTypes
-                     InfoVis.Parallel.Sender
-  hs-source-dirs   : src
-  build-depends    : base >= 4.10 && < 4.11
-                   , aeson
-                   , base64-bytestring
-                   , bytestring
-                   , cereal
-                   , cmdargs
-                   , containers
-                   , data-default
-                   , lens
-                   , linear
-                   , logging-effect
-                   , mtl
-                   , protobuf
-                   , split
-                   , text
-                   , websockets
-                   , yaml
---other-extensions :    
-  ghc-options      : -threaded -Wall
-  default-language : Haskell2010
-
-
-executable infovis-test
-  main-is          : Test.hs
-  other-modules    : Data.Math.Util
                      InfoVis.Parallel.ProtoBuf
-                     InfoVis.Parallel.NewTypes
                      InfoVis.Parallel.Rendering.Buffers
                      InfoVis.Parallel.Rendering.Frames
                      InfoVis.Parallel.Rendering.NewShapes
                      InfoVis.Parallel.Rendering.Program
+                     InfoVis.Parallel.Sender
+                     InfoVis.Parallel.Visualizer
                      Linear.Util
                      Linear.Util.Graphics
+                     Linear.Util.Instances
   hs-source-dirs   : src
   build-depends    : base >= 4.10 && < 4.11
                    , aeson
@@ -84,13 +59,13 @@ executable infovis-test
                    , logging-effect
                    , mtl
                    , OpenGL
-                   , OpenGLRaw
                    , opengl-dlp-stereo
+                   , OpenGLRaw
                    , protobuf
                    , split
                    , text
-                   , websockets
                    , vector
+                   , websockets
                    , yaml
 --other-extensions :    
   ghc-options      : -threaded -Wall

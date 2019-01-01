@@ -19,7 +19,7 @@ module InfoVis.Parallel.Rendering.Frames (
 import Control.Lens.Lens (Lens', (&), lens)
 import Control.Lens.Setter ((.~), over)
 import Control.Lens.Traversal (traverseOf)
-import Control.Monad (ap)
+import Control.Monad (ap, unless)
 import Data.Bits ((.&.), shift)
 import Data.Default (def)
 import Data.Maybe (fromMaybe)
@@ -138,7 +138,8 @@ draw :: (MatrixComponent a, Real a)
      -> Manager
      -> IO ()
 draw projection modelView Manager{..} =
-  drawFrame projection modelView
+  unless (M.null frames)
+    . drawFrame projection modelView
     $ frames M.! current
 
 

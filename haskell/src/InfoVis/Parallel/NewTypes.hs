@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE FlexibleInstances     #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -28,6 +27,7 @@ import Data.Word (Word32)
 import GHC.Generics (Generic)
 import Linear.Affine(Point)
 import Linear.Quaternion (Quaternion)
+import Linear.Util.Instances ()
 import Linear.V3 (V3)
 
 
@@ -39,23 +39,11 @@ type Identifier = Int64
 
 type Position = Point V3 Double
 
-instance FromJSON Position
-
-instance ToJSON Position
-
 
 type Displacement = V3 Double
 
-instance FromJSON Displacement
-
-instance ToJSON Displacement
-
 
 type Rotation = Quaternion Double
-
-instance FromJSON Rotation
-
-instance ToJSON Rotation
 
 
 type PositionRotation = (Position, Rotation)
