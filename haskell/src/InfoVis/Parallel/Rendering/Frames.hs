@@ -9,7 +9,6 @@ module InfoVis.Parallel.Rendering.Frames (
 , destroyManager
 , set
 , listFrames
-, addFrame
 , insert
 , delete
 , prepare
@@ -41,7 +40,7 @@ import Linear.Util (rotationFromPlane, rotationFromVectorPair)
 import Linear.V3 (V3(..))
 import Linear.Vector (zero)
 
-import qualified Data.Map.Strict as M (Map, (!), delete, elems, empty, findWithDefault, fromList, keys, insert, lookup, map, mapWithKey)
+import qualified Data.Map.Strict as M (Map, (!), alter, delete, elems, empty, findWithDefault, fromList, keys, insert, lookup, map, mapWithKey)
 import qualified Graphics.Rendering.OpenGL.GL.CoordTrans as G (scale, translate)
 import qualified Graphics.Rendering.OpenGL.GL.VertexSpec as G (color)
 import qualified InfoVis.Parallel.NewTypes as I (Frame)
@@ -94,15 +93,6 @@ destroyManager :: Manager
 destroyManager = mapM_ destroyFrame . frames
 
 
-addFrame :: FrameNumber
-         -> Manager
-         -> Manager
-addFrame frame manager@Manager{..} =
-  manager
-    & over framesLens
-      (M.insert frame $ createFrame program)
-
-
 insert :: Manager
        -> [DeltaGeometry]
        -> Manager
@@ -115,7 +105,11 @@ insert' :: Manager
 insert' manager@Manager{..} geometry@DeltaGeometry{..} =
   manager
     & over framesLens
-      (M.insert frame $ insertFrame (frames M.! frame) geometry)
+      (
+        M.alter
+          (Just . (`insertFrame` geometry) . fromMaybe (createFrame program))
+          frame
+      )
 
 
 delete :: Manager
