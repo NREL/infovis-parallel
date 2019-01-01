@@ -7,7 +7,8 @@ module InfoVis.Parallel.Rendering.Frames (
   Manager
 , createManager
 , destroyManager
-, setFrame
+, set
+, listFrames
 , addFrame
 , insert
 , delete
@@ -16,6 +17,9 @@ module InfoVis.Parallel.Rendering.Frames (
 ) where
 
 
+import Control.Lens.Lens (Lens', (&), lens)
+import Control.Lens.Setter ((.~), over)
+import Control.Lens.Traversal (traverseOf)
 import Control.Monad (liftM2)
 import Data.Bits ((.&.), shift)
 import Data.Default (def)
@@ -37,7 +41,7 @@ import Linear.Util (rotationFromPlane, rotationFromVectorPair)
 import Linear.V3 (V3(..))
 import Linear.Vector (zero)
 
-import qualified Data.Map.Strict as M (Map, (!), delete, elems, empty, findWithDefault, fromList, insert, lookup, map, mapWithKey, toList)
+import qualified Data.Map.Strict as M (Map, (!), delete, elems, empty, findWithDefault, fromList, keys, insert, lookup, map, mapWithKey)
 import qualified Graphics.Rendering.OpenGL.GL.CoordTrans as G (scale, translate)
 import qualified Graphics.Rendering.OpenGL.GL.VertexSpec as G (color)
 import qualified InfoVis.Parallel.NewTypes as I (Frame)
@@ -56,14 +60,23 @@ data Manager =
   }
 
 
-setFrame :: FrameNumber
-         -> Manager
-         -> Manager
-setFrame frame frameManager =
-  frameManager
-  {
-    current = frame
-  }
+framesLens :: Lens' Manager (M.Map FrameNumber Frame)
+framesLens = lens frames $ \s x -> s {frames = x}
+
+
+currentLens :: Lens' Manager FrameNumber
+currentLens = lens current $ \s x -> s {current = x}
+
+
+set :: FrameNumber
+    -> Manager
+    -> Manager
+set = (currentLens .~)
+
+
+listFrames :: Manager
+           -> [FrameNumber]
+listFrames = M.keys . frames
 
 
 createManager :: IO Manager
@@ -71,27 +84,26 @@ createManager =
   do
     let
       frames = M.empty
-      current = undefined
+      current = error "The current frame has not been set."
     program <- prepareShapeProgram
     return Manager{..}
 
 
 destroyManager :: Manager
                -> IO ()
-destroyManager Manager{..} = mapM_ destroyFrame $ M.elems frames
+destroyManager = mapM_ destroyFrame . frames
 
 
 addFrame :: FrameNumber
          -> Manager
          -> IO Manager
-addFrame frame frameManager@Manager{..} =
+addFrame frame manager@Manager{..} =
   do
     newFrame <- createFrame program
     return
-      frameManager
-      {
-        frames = M.insert frame newFrame frames
-      }
+      $ manager
+      & over framesLens
+        (M.insert frame newFrame)
 
 
 insert :: Manager
@@ -103,45 +115,34 @@ insert = foldl insert'
 insert' :: Manager
         -> DeltaGeometry
         -> Manager
-insert' frameManager@Manager{..} geometry@DeltaGeometry{..} =
-  frameManager
-  {
-    frames = M.insert frame (insertFrame (frames M.! frame) geometry) frames
-  }
+insert' manager@Manager{..} geometry@DeltaGeometry{..} =
+  manager
+    & over framesLens
+      (M.insert frame $ insertFrame (frames M.! frame) geometry)
 
 
 delete :: Manager
        -> [Identifier]
        -> Manager
-delete frameManager@Manager{..} identifiers =
-  frameManager
-  {
-    frames = M.map (`deleteFrame` identifiers) frames
-  }
+delete manager identifiers =
+  manager
+    & over framesLens
+      (M.map (`deleteFrame` identifiers))
 
 
-prepare :: FrameNumber
-        -> Manager
+prepare :: Manager
         -> IO Manager
-prepare frameNumber frameManager@Manager{..} =
-  do
-    frame <- prepareFrame $ frames M.! frameNumber
-    return
-      frameManager
-      {
-        frames = M.insert frameNumber frame frames
-      }
+prepare = traverseOf framesLens $ mapM prepareFrame
 
 
 draw :: (MatrixComponent a, Real a)
-     => FrameNumber
-     -> M44 a
+     => M44 a
      -> M44 a
      -> Manager
      -> IO ()
-draw frameNumber projection modelView Manager{..} =
+draw projection modelView Manager{..} =
   drawFrame projection modelView
-    $ frames M.! frameNumber
+    $ frames M.! current
 
 
 data ShapeMesh =
@@ -176,50 +177,36 @@ findShapeMesh shape =
     Axis              _ -> AxisMesh
 
 
-newtype Frame =
-  Frame
-  {
-    unFrame :: M.Map ShapeMesh Display
-  }
+type Frame = M.Map ShapeMesh Display
 
 
 createFrame :: ShapeProgram
             -> IO Frame
 createFrame program =
-  Frame
-    . M.fromList
+  M.fromList
     <$> mapM (liftM2 fmap (,) $ createDisplay program) [minBound..maxBound]
 
 
 destroyFrame :: Frame
              -> IO ()
-destroyFrame Frame{..} = mapM_ destroyDisplay $ M.elems unFrame
+destroyFrame = mapM_ destroyDisplay
 
 
 insertFrame :: Frame
             -> DeltaGeometry
             -> Frame
-insertFrame Frame{..} deltaGeometry =
-  Frame
-    $ M.mapWithKey (insertDisplay deltaGeometry)
-    unFrame      
+insertFrame frame deltaGeometry = M.mapWithKey (insertDisplay deltaGeometry) frame      
 
 
 deleteFrame :: Frame
             -> [Identifier]
             -> Frame
-deleteFrame Frame{..} identifiers =
-  Frame
-    $ M.map (`deleteDisplay` identifiers) unFrame
+deleteFrame frame identifiers = M.map (`deleteDisplay` identifiers) frame 
 
 
 prepareFrame :: Frame
              -> IO Frame
-prepareFrame =
-  fmap (Frame . M.fromList)
-    . mapM (uncurry ((. prepareDisplay) . (<$>) . (,)))
-    . M.toList
-    . unFrame
+prepareFrame = mapM prepareDisplay
 
 
 drawFrame :: (MatrixComponent a, Real a)
@@ -227,7 +214,7 @@ drawFrame :: (MatrixComponent a, Real a)
           -> M44 a
           -> Frame
           -> IO ()
-drawFrame projection modelView Frame{..} = mapM_ (drawDisplay projection modelView) $ M.elems unFrame
+drawFrame projection modelView = mapM_ $ drawDisplay projection modelView
 
 
 data Display =
@@ -242,20 +229,19 @@ data Display =
     }
 
 
+geometriesLens :: Lens' Display (M.Map Identifier Geometry)
+geometriesLens = lens geometries $ \s x -> s {geometries = x}
+
+
+bufferLens :: Lens' Display ShapeBuffer
+bufferLens = lens buffer $ \s x -> s {buffer = x}
+
+
 createDisplay :: ShapeProgram
               -> ShapeMesh
               -> IO Display
-createDisplay _ LabelMesh =
-  let
-    geometries = M.empty
-  in
-    return LabelDisplay{..}
-createDisplay program shapeMesh =
-  do
-    buffer <- createShapeBuffer 10000 program $ mesh shapeMesh
-    let
-      geometries = M.empty
-    return ShapeDisplay{..}
+createDisplay _       LabelMesh = return $ LabelDisplay M.empty
+createDisplay program shapeMesh = ShapeDisplay M.empty <$> createShapeBuffer 10000 program (mesh shapeMesh)
 
 
 destroyDisplay :: Display
@@ -266,16 +252,8 @@ destroyDisplay ShapeDisplay{..} = destroyShapeBuffer buffer
    
 prepareDisplay :: Display
                -> IO Display
-prepareDisplay display@LabelDisplay{} =
-  return display
-prepareDisplay display@ShapeDisplay{..} =
-  do
-    buffer' <- prepareShapeBuffer buffer
-    return
-      display
-      {
-        buffer = buffer'
-      }
+prepareDisplay display@LabelDisplay{}   = return display
+prepareDisplay display@ShapeDisplay{..} = display & traverseOf bufferLens prepareShapeBuffer
 
 
 drawDisplay :: (MatrixComponent a, Real a)
@@ -370,15 +348,14 @@ deleteDisplay :: Display
               -> Display
 deleteDisplay display@LabelDisplay{..} identifiers =
   display
-  {
-    geometries = foldl (flip M.delete) geometries identifiers
-  }
+    & over geometriesLens
+      (flip (foldl (flip M.delete)) identifiers)
 deleteDisplay display@ShapeDisplay{..} identifiers =
   display
-  {
-    geometries = foldl (flip M.delete) geometries identifiers
-  , buffer     = foldl deleteInstance buffer identifiers
-  }
+    & over geometriesLens
+      (flip (foldl (flip M.delete)) identifiers)
+    & over bufferLens
+      (flip (foldl deleteInstance) identifiers)
 
 
 insertDisplay :: DeltaGeometry
@@ -393,13 +370,9 @@ insertDisplay deltaGeometry@DeltaGeometry{..} shapeMesh display@LabelDisplay{..}
     case revision shapeMesh deltaGeometry geometries of
       None      -> display
       Deletion  -> display
-                   {
-                     geometries = M.delete identifier geometries
-                   }
+                     & over geometriesLens (M.delete identifier)
       _         -> display
-                   {
-                     geometries = M.insert identifier new geometries
-                   }
+                     & over geometriesLens (M.insert identifier new)
 insertDisplay deltaGeometry@DeltaGeometry{..} shapeMesh display@ShapeDisplay{..} =
   let
     old = M.findWithDefault def identifier geometries
@@ -408,22 +381,15 @@ insertDisplay deltaGeometry@DeltaGeometry{..} shapeMesh display@ShapeDisplay{..}
     case revision shapeMesh deltaGeometry geometries of
       None      -> display
       Deletion  -> display
-                   {
-                     geometries = M.delete identifier geometries
-                   , buffer     = deleteInstance buffer identifier
-                   }
+                     & over geometriesLens (M.delete identifier)
+                     & over bufferLens     (`deleteInstance` identifier)
       Insertion -> display
-                   {
-                     geometries = M.insert identifier new geometries
-                   , buffer     = updateDisplay (identifier, new) $ deleteInstance buffer identifier
-                   }
+                     & over geometriesLens (M.insert identifier new)
+                     & over bufferLens     (updateDisplay (identifier, new) . flip deleteInstance identifier)
       Recoloring-> display
-                   {
-                     geometries = M.insert identifier new geometries
-                   , buffer     = updateColor (identifier, color new) buffer
-                   }
+                     & over geometriesLens (M.insert identifier new)
+                     & over bufferLens     (updateColor (identifier, color new))
     
-
 
 updateDisplay :: (Identifier, Geometry)
               -> ShapeBuffer

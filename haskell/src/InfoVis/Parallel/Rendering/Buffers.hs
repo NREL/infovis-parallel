@@ -349,7 +349,7 @@ updateBuffer updates bufferObject =
       bindBuffer ArrayBuffer $=! Nothing
 
 
-expandBuffer :: Show a => Storable a
+expandBuffer :: Storable a
              => a
              -> Int
              -> Int

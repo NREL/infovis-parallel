@@ -19,7 +19,7 @@ import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..))
 import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
 import InfoVis.Parallel.ProtoBuf (Request, upsert)
 import InfoVis.Parallel.NewTypes (DeltaGeometry(..), Glyph(..), Shape(..))
-import InfoVis.Parallel.Rendering.Frames (addFrame, createManager, draw, insert, prepare)
+import InfoVis.Parallel.Rendering.Frames (addFrame, createManager, draw, insert, prepare, set)
 import Linear.Affine (Point(..))
 import Linear.Projection (lookAt, perspective)
 import Linear.V3 (V3(..))
@@ -78,10 +78,10 @@ testSetup deltaGeometries angle =
     debugOutput $=! Enabled
     debugMessageCallback $=! Just print
 
-    manager' <- createManager >>= addFrame 1
+    manager' <- createManager >>= addFrame 1 >>= addFrame 2 >>= addFrame 3
     let
       manager'' = insert manager' $ if True then deltaGeometries else example
-    manager <- prepare 1 manager''
+    manager <- set 1 <$> prepare manager''
 
     return
       $ do
@@ -89,7 +89,7 @@ testSetup deltaGeometries angle =
         let
           projection = perspective (pi / 3) 1 0.1 10
           modelView = lookAt (V3 (1 + sin angle') (2 + cos angle') (5 :: GLfloat)) (V3 0 0 0) (V3 0 1 0)
-        draw 1 projection modelView manager
+        draw projection modelView manager
 
 
 -- | The main action.
