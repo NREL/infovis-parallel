@@ -21,7 +21,7 @@ module InfoVis.Parallel.Rendering.Buffers (
 
 import Control.Lens.Lens (Lens', lens)
 import Control.Lens.Setter (over)
-import Control.Monad (unless)
+import Control.Monad (unless, when)
 import Data.Array.Storable (getElems, newArray, newListArray, touchStorableArray, withStorableArray)
 import Foreign.Ptr (plusPtr)
 import Foreign.Storable (Storable, poke, sizeOf)
@@ -74,7 +74,7 @@ data ShapeBuffer =
   {
     shapeProgram     :: ShapeProgram
   , primitiveMode    :: PrimitiveMode
-  , mesh             :: BufferObject
+  , mesh             :: Either (IO BufferObject) BufferObject
   , vertexCount      :: NumArrayIndices
   , instanceCount    :: NumInstances
   , positions        :: BufferObject
@@ -114,33 +114,37 @@ hasIdentifier :: ShapeBuffer
 hasIdentifier = flip M.member . locationses
 
 
-createShapeBuffer :: Int
-                  -> ShapeProgram
+createShapeBuffer :: ShapeProgram
                   -> (PrimitiveMode, [Position])
-                  -> IO ShapeBuffer
-createShapeBuffer size shapeProgram (primitiveMode, primitives) =
-  do
-    mesh      <- buildBuffer primitives
-    positions <- buildBuffer $ replicate size zeroPosition
-    rotations <- buildBuffer $ replicate size zeroRotation
-    scales    <- buildBuffer $ replicate size zeroScale
-    colors    <- buildBuffer $ replicate size zeroColor
-    let
-      vertexCount   = fromIntegral $ length primitives
-      instanceCount = 0
-      empties = IS.fromList [0..(size-1)]
-      locationses = M.empty
-      pendingPositions = IM.empty
-      pendingRotations = IM.empty
-      pendingScales    = IM.empty
-      pendingColors    = IM.empty
-      pendingSize = size
-    return ShapeBuffer{..}
+                  -> ShapeBuffer
+createShapeBuffer shapeProgram (primitiveMode, primitives) =
+  let
+    mesh      = Left $ buildBuffer primitives
+    positions = undefined
+    rotations = undefined
+    scales    = undefined
+    colors    = undefined
+    vertexCount   = fromIntegral $ length primitives
+    instanceCount = 0
+    size = 0
+    empties = IS.empty
+    locationses = M.empty
+    pendingPositions = IM.empty
+    pendingRotations = IM.empty
+    pendingScales    = IM.empty
+    pendingColors    = IM.empty
+    pendingSize = size
+  in
+    ShapeBuffer{..}
 
 
 destroyShapeBuffer :: ShapeBuffer
                    -> IO ()
-destroyShapeBuffer ShapeBuffer{..} = deleteObjectNames [mesh, positions, rotations, scales, colors]
+destroyShapeBuffer ShapeBuffer{..}
+  | size == 0 = return ()
+  | otherwise = case mesh of
+                  Left  _     -> deleteObjectNames [       positions, rotations, scales, colors]
+                  Right mesh' -> deleteObjectNames [mesh', positions, rotations, scales, colors]
 
 
 insertPositions :: (Identifier, [Position])
@@ -275,14 +279,16 @@ expandShapeBuffer shapeBuffer@ShapeBuffer{..} =
   if pendingSize <= size
     then return shapeBuffer
     else do
-           positions' <- expandBuffer zeroPosition size pendingSize positions
-           rotations' <- expandBuffer zeroRotation size pendingSize rotations
-           scales'    <- expandBuffer zeroScale    size pendingSize scales
-           colors'    <- expandBuffer zeroColor    size pendingSize colors
+           mesh' <- either id return mesh
+           positions' <- if size == 0 then buildBuffer $ replicate pendingSize zeroPosition else expandBuffer zeroPosition size pendingSize positions
+           rotations' <- if size == 0 then buildBuffer $ replicate pendingSize zeroRotation else expandBuffer zeroRotation size pendingSize rotations
+           scales'    <- if size == 0 then buildBuffer $ replicate pendingSize zeroScale    else expandBuffer zeroScale    size pendingSize scales
+           colors'    <- if size == 0 then buildBuffer $ replicate pendingSize zeroColor    else expandBuffer zeroColor    size pendingSize colors
            return 
              shapeBuffer
              {
-               size      = pendingSize
+               mesh      = Right mesh'
+             , size      = pendingSize
              , positions = positions'
              , rotations = rotations'
              , scales    = scales'
@@ -295,10 +301,13 @@ drawInstances :: M44 GLfloat
               -> ShapeBuffer
               -> IO ()
 drawInstances projection modelView ShapeBuffer{..} =
-  do
+  when (size > 0)
+    $ do
+    let
+      Right mesh' = mesh
     selectShapeProgram $ Just shapeProgram
     setProjectionModelView shapeProgram projection modelView 
-    shapeProgram `bindMesh`      Just mesh
+    shapeProgram `bindMesh`      Just mesh'
     shapeProgram `bindPositions` Just positions
     shapeProgram `bindRotations` Just rotations
     shapeProgram `bindScales`    Just scales

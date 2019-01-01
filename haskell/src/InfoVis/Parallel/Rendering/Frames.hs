@@ -20,7 +20,7 @@ module InfoVis.Parallel.Rendering.Frames (
 import Control.Lens.Lens (Lens', (&), lens)
 import Control.Lens.Setter ((.~), over)
 import Control.Lens.Traversal (traverseOf)
-import Control.Monad (liftM2)
+import Control.Monad (ap)
 import Data.Bits ((.&.), shift)
 import Data.Default (def)
 import Data.Maybe (fromMaybe)
@@ -96,14 +96,11 @@ destroyManager = mapM_ destroyFrame . frames
 
 addFrame :: FrameNumber
          -> Manager
-         -> IO Manager
+         -> Manager
 addFrame frame manager@Manager{..} =
-  do
-    newFrame <- createFrame program
-    return
-      $ manager
-      & over framesLens
-        (M.insert frame newFrame)
+  manager
+    & over framesLens
+      (M.insert frame $ createFrame program)
 
 
 insert :: Manager
@@ -181,10 +178,11 @@ type Frame = M.Map ShapeMesh Display
 
 
 createFrame :: ShapeProgram
-            -> IO Frame
+            -> Frame
 createFrame program =
   M.fromList
-    <$> mapM (liftM2 fmap (,) $ createDisplay program) [minBound..maxBound]
+    $ ap (,) (createDisplay program)
+    <$> [minBound..maxBound]
 
 
 destroyFrame :: Frame
@@ -239,9 +237,9 @@ bufferLens = lens buffer $ \s x -> s {buffer = x}
 
 createDisplay :: ShapeProgram
               -> ShapeMesh
-              -> IO Display
-createDisplay _       LabelMesh = return $ LabelDisplay M.empty
-createDisplay program shapeMesh = ShapeDisplay M.empty <$> createShapeBuffer 10000 program (mesh shapeMesh)
+              -> Display
+createDisplay _       LabelMesh = LabelDisplay M.empty
+createDisplay program shapeMesh = ShapeDisplay M.empty $ createShapeBuffer program (mesh shapeMesh)
 
 
 destroyDisplay :: Display

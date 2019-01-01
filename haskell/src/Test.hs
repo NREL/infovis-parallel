@@ -78,7 +78,7 @@ testSetup deltaGeometries angle =
     debugOutput $=! Enabled
     debugMessageCallback $=! Just print
 
-    manager' <- createManager >>= addFrame 1 >>= addFrame 2 >>= addFrame 3
+    manager' <- addFrame 1 . addFrame 2 . addFrame 3 <$> createManager
     let
       manager'' = insert manager' $ if True then deltaGeometries else example
     manager <- set 1 <$> prepare manager''
@@ -104,7 +104,6 @@ main =
     (_, arguments) <- getArgsAndInitialize
     print arguments
     Right buffer <- fmap (runGet decodeMessage) . BS.readFile $ arguments !! 2 :: IO (Either String Request)
-    print $ buffer ^. upsert
 --  buffers <- runGetLazy decodeMessage <$> mapM BS.readFile $ drop 2 arguments
     initialDisplayMode $=! (if "--quadbuffer" `elem` arguments then (Stereoscopic :) else id) [WithDepthBuffer, DoubleBuffered]
     _ <- createWindow "DLP Stereo OpenGL Example"
