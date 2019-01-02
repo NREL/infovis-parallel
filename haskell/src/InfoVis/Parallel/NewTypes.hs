@@ -25,6 +25,7 @@ import Data.Default (Default(..))
 import Data.Int (Int32, Int64)
 import Data.Word (Word32)
 import GHC.Generics (Generic)
+import Graphics.OpenGL.Util.Types (PointOfView)
 import Linear.Affine(Point)
 import Linear.Quaternion (Quaternion)
 import Linear.Util.Instances ()
@@ -46,7 +47,7 @@ type Displacement = V3 Double
 type Rotation = Quaternion Double
 
 
-type PositionRotation = (Position, Rotation)
+type PositionRotation = PointOfView Double
 
 
 type Color = Word32

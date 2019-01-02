@@ -27,6 +27,9 @@ executable infovis-parallel
   main-is          : Main.hs
   other-modules    : Paths_infovis_parallel
                      Data.Math.Util
+                     Graphics.OpenGL.Util.Projection
+                     Graphics.OpenGL.Util.Setup
+                     Graphics.OpenGL.Util.Types
                      InfoVis
                      InfoVis.Parallel.Compiler
                      InfoVis.Parallel.NewTypes

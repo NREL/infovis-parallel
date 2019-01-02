@@ -6,7 +6,7 @@
 
 module Graphics.OpenGL.Util.Types (
   Stereo(..)
-, Viewers(..)
+, Viewer(..)
 , Display(..)
 , Screen(..)
 , upperRight
@@ -37,14 +37,14 @@ instance Default Stereo where
   def = Mono
 
 
-data Viewers a =
-  Viewers
+data Viewer a =
+  Viewer
   {
     stereo        :: Stereo
   , nearPlane     :: a
   , farPlane      :: a
   , eyeSeparation :: V3 a
-  , displays      :: [Display a]
+  , display       :: Display a
   }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 

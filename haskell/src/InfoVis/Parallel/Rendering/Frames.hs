@@ -24,16 +24,15 @@ import Data.Bits ((.&.), shift)
 import Data.Default (def)
 import Data.Maybe (fromMaybe)
 import Graphics.GL.Types (GLfloat)
-import Graphics.Rendering.OpenGL.GL.CoordTrans (MatrixComponent, preservingMatrix)
+import Graphics.Rendering.OpenGL.GL.CoordTrans (preservingMatrix)
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
 import Graphics.Rendering.OpenGL.GL.VertexSpec (Color4(..))
 import Graphics.UI.GLUT.Fonts (StrokeFont(MonoRoman), fontHeight, renderString)
 import InfoVis.Parallel.NewTypes (DeltaGeometry(..), Geometry(..), Glyph(..), Identifier, Shape(..))
 import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, deleteInstance, destroyShapeBuffer, drawInstances, insertPositions, updateColor, updateRotations, updateScales, prepareShapeBuffer)
 import InfoVis.Parallel.Rendering.NewShapes (Mesh, arrow, cube, icosahedron, square, tube)
-import InfoVis.Parallel.Rendering.Program (ShapeProgram, prepareShapeProgram, setProjectionModelView')
+import InfoVis.Parallel.Rendering.Program (ShapeProgram, prepareShapeProgram)
 import Linear.Affine (Point(..), (.-.), (.+^))
-import Linear.Matrix (M44)
 import Linear.Metric (norm)
 import Linear.Quaternion (Quaternion(..), rotate)
 import Linear.Util (rotationFromPlane, rotationFromVectorPair)
@@ -132,14 +131,11 @@ prepare :: Manager
 prepare = traverseOf framesLens $ mapM prepareFrame
 
 
-draw :: (MatrixComponent a, Real a)
-     => M44 a
-     -> M44 a
-     -> Manager
+draw :: Manager
      -> IO ()
-draw projection modelView Manager{..} =
+draw Manager{..} =
   unless (M.null frames)
-    . drawFrame projection modelView
+    . drawFrame
     $ frames M.! current
 
 
@@ -208,12 +204,9 @@ prepareFrame :: Frame
 prepareFrame = mapM prepareDisplay
 
 
-drawFrame :: (MatrixComponent a, Real a)
-          => M44 a
-          -> M44 a
-          -> Frame
+drawFrame :: Frame
           -> IO ()
-drawFrame projection modelView = mapM_ $ drawDisplay projection modelView
+drawFrame = mapM_ drawDisplay
 
 
 data Display =
@@ -255,15 +248,11 @@ prepareDisplay display@LabelDisplay{}   = return display
 prepareDisplay display@ShapeDisplay{..} = display & traverseOf bufferLens prepareShapeBuffer
 
 
-drawDisplay :: (MatrixComponent a, Real a)
-            => M44 a
-            -> M44 a
-            -> Display
+drawDisplay :: Display
             -> IO ()
-drawDisplay projection modelView LabelDisplay{..} =
+drawDisplay LabelDisplay{..} =
   do
     fh <- fontHeight MonoRoman
-    setProjectionModelView' projection modelView
     sequence_
       [
         preservingMatrix
@@ -289,10 +278,8 @@ drawDisplay projection modelView LabelDisplay{..} =
           q = rotationFromPlane (V3 1 0 0) (V3 0 1 0) o w h
           s = realToFrac (norm h') / fh
       ]      
-drawDisplay projection modelView ShapeDisplay{..} =
+drawDisplay ShapeDisplay{..} =
   drawInstances
-    (fmap realToFrac <$> projection)
-    (fmap realToFrac <$> modelView )
     buffer
 
 

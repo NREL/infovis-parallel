@@ -1,7 +1,5 @@
-{-# LANGUAGE DeriveAnyClass   #-}
-{-# LANGUAGE DeriveGeneric    #-}
+{-# LANGUAGE CPP              #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE RecordWildCards  #-}
 
 
 module InfoVis.Parallel.Visualizer (
@@ -10,58 +8,31 @@ module InfoVis.Parallel.Visualizer (
 
 
 import Control.Lens.Getter ((^.))
-import Control.Monad (join, when)
+import Control.Monad (join)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
-import Data.Aeson.Types (FromJSON, ToJSON)
-import Data.Default (def)
-import Data.IORef (IORef, newIORef)
+import Data.IORef (IORef, newIORef, readIORef)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
 import Data.Yaml (decodeFileEither)
-import GHC.Generics (Generic)
-import Graphics.GL.Types (GLfloat)
-import Graphics.Rendering.DLP (DlpEncoding(..))
-import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), dlpDisplayCallback)
-import Graphics.Rendering.OpenGL.GL (($=!), ($~!), get)
-import Graphics.Rendering.OpenGL.GL.DebugOutput (debugMessageCallback, debugOutput)
-import Graphics.Rendering.OpenGL.GL.PerFragment(ComparisonFunction(Less))
-import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(..))
-import Graphics.UI.GLUT (DisplayMode(..), IdleCallback, createWindow, depthFunc, fullScreen, getArgsAndInitialize, idleCallback, initialDisplayMode, mainLoop, postRedisplay)
+import Graphics.OpenGL.Util.Setup (dlpViewerDisplay, setup)
+import Graphics.OpenGL.Util.Types (Viewer(..))
+import Graphics.Rendering.OpenGL (($=!), ($~!))
+import Graphics.UI.GLUT (mainLoop)
+import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
+import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (SeverityLog, guardIO)
-import InfoVis.Parallel.NewTypes (DeltaGeometry, Displacement, Position)
+import InfoVis.Parallel.NewTypes (DeltaGeometry)
 import InfoVis.Parallel.ProtoBuf (upsert)
 import InfoVis.Parallel.Rendering.Frames (createManager, draw, insert, prepare)
-import Linear.Projection (lookAt, perspective)
+import Linear.Affine (Point(..))
+import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
 
 import qualified Data.ByteString as BS (readFile)
 
-
-data Stereo =
-    DLP        -- ^ Frame-sequential DLP 3D ReadySync stereo.
-  | QuadBuffer -- ^ Quad buffer stereo.
-  | Cardboard  -- ^ Google Cardboard stereo.
-  | Mono       -- ^ No stereo.
-    deriving (Bounded, Enum, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
-
-
-data Configuration =
-  Configuration
-  {
-    stereo        :: Stereo
-  , nearPlane     :: Double
-  , farPlane      :: Double
-  , eyeSeparation :: Displacement
-  , host          :: Maybe String
-  , port          :: Maybe Int
-  , identifier    :: Maybe String
-  , geometry      :: Maybe String
-  , lowerLeft     :: Position
-  , lowerRight    :: Position
-  , upperLeft     :: Position
-  }
-    deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
-
+#ifdef INFOVIS_SWAP_GROUP
+import Graphics.OpenGL.Functions (joinSwapGroup)
+#endif
 
 
 visualizeBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -72,7 +43,7 @@ visualizeBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
 visualizeBuffers configurationFile debug bufferFiles =
   do
 
-    Configuration{..} <-
+    viewer <-
       join
         $ liftEither
         . either (Left . show) Right
@@ -84,39 +55,41 @@ visualizeBuffers configurationFile debug bufferFiles =
         $ mapM (fmap (runGet decodeMessage) . BS.readFile)
           bufferFiles
 
-    when debug
-      $ do
-          debugOutput          $=! Enabled
-          debugMessageCallback $=! Just print -- FIXME: Use `logDebug`.
-    
-    _ <- getArgsAndInitialize
-    initialDisplayMode $=! [WithDepthBuffer, DoubleBuffered]
-    _ <- createWindow "DLP Stereo OpenGL Example"
-    depthFunc $=! Just Less 
-    fullScreen
+    dlp <-
+      guardIO
+        $ setup debug "InfoVis Parallel" "InfoVis Parallel" (viewer :: Viewer Double)
 
     manager <-
       guardIO
         . (>>= prepare)
         $ flip (foldl insert) ((^. upsert) <$> buffers :: [[DeltaGeometry]])
         <$> createManager
- 
+
     angle <- guardIO $ newIORef 0
     let
-      testDraw =
+      eye =
         do
-        angle' <- get angle
-        let
-          projection = perspective (pi / 3) 1 0.1 10
-          modelView = lookAt (V3 (1 + sin angle') (2 + cos angle') (5 :: GLfloat)) (V3 0 0 0) (V3 0 1 0)
-        draw projection modelView manager
+          angle' <- readIORef angle
+          return
+            (
+              P $ V3 (1 + sin angle') (2 + cos angle') 5
+            , Quaternion 0 $ V3 0 1 0
+            )
 
-    dlpDisplayCallback $=! def {dlpEncoding = LeftOnly, doDisplay = const testDraw}
+    guardIO
+      . dlpViewerDisplay dlp viewer eye
+      $ draw manager
+
     idleCallback $=! Just (idle angle)
+
+#ifdef INFOVIS_SWAP_GROUP
+    _ <- maybe (return False) joinSwapGroup useSwapGroup
+#endif
+
     mainLoop
 
 
-idle :: IORef GLfloat -> IdleCallback
+idle :: IORef Double -> IdleCallback
 idle angle =
   do
     angle $~! (+ 0.01)

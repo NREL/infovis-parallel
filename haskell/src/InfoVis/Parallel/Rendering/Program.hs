@@ -9,6 +9,7 @@ module InfoVis.Parallel.Rendering.Program (
 , selectShapeProgram
 , setProjectionModelView
 , setProjectionModelView'
+, syncProjectionModelView
 , bindMesh
 , bindPositions
 , bindRotations
@@ -18,12 +19,13 @@ module InfoVis.Parallel.Rendering.Program (
 
 
 import Control.Monad (when)
+import Data.List.Split (chunksOf)
 import Foreign.Ptr (nullPtr)
 import Graphics.GL.ARB.InstancedArrays (glVertexAttribDivisorARB)
 import Graphics.GL.Types (GLfloat, GLuint)
 import Graphics.Rendering.OpenGL.GL (($=!), deleteObjectName, get)
 import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferObject, BufferTarget(..), bindBuffer)
-import Graphics.Rendering.OpenGL.GL.CoordTrans(GLmatrix, Matrix, MatrixComponent, MatrixOrder(RowMajor), matrix, newMatrix)
+import Graphics.Rendering.OpenGL.GL.CoordTrans(GLmatrix, Matrix, MatrixComponent, MatrixMode(..), MatrixOrder(RowMajor), getMatrixComponents, matrix, matrixMode, newMatrix)
 import Graphics.Rendering.OpenGL.GL.Shaders.Attribs (attribLocation)
 import Graphics.Rendering.OpenGL.GL.Shaders.ProgramObjects (Program, attachShader, createProgram, currentProgram, linkProgram, programSeparable)
 import Graphics.Rendering.OpenGL.GL.Shaders.ShaderObjects (ShaderType(VertexShader), compileShader, createShader, shaderSourceBS)
@@ -125,13 +127,14 @@ selectShapeProgram :: Maybe ShapeProgram
 selectShapeProgram = (currentProgram $=!) . fmap program
 
 
-setProjectionModelView :: ShapeProgram
-                       -> M44 GLfloat
-                       -> M44 GLfloat
+setProjectionModelView :: Real a
+                       => ShapeProgram
+                       -> M44 a
+                       -> M44 a
                        -> IO ()
 setProjectionModelView ShapeProgram{..} projection modelView =
   do
-    matrx <- makeMatrix projection modelView
+    matrx <- makeMatrix (fmap realToFrac <$> projection) (fmap realToFrac <$> modelView)
     uniform pmvLocation $=! (matrx :: GLmatrix GLfloat)
 
 
@@ -143,6 +146,22 @@ setProjectionModelView' projection modelView =
   do
     matrx <- makeMatrix projection modelView
     matrix Nothing $=! (matrx :: GLmatrix a)
+
+
+syncProjectionModelView :: ShapeProgram
+                        -> IO ()
+syncProjectionModelView shapeProgram =
+ do
+    let
+      fetch t =
+        do
+          matrixMode $=! t
+          m <- get $ matrix Nothing :: IO (GLmatrix GLfloat)
+          [r1, r2, r3, r4] <- fmap (\[c1, c2, c3, c4] -> V4 c1 c2 c3 c4) . chunksOf 4 <$> getMatrixComponents RowMajor m
+          return $ V4 r1 r2 r3 r4 :: IO (M44 GLfloat)
+    projection <- fetch   Projection
+    modelView  <- fetch $ Modelview 0
+    setProjectionModelView shapeProgram projection modelView
 
 
 makeMatrix :: (MatrixComponent a, Num a, Matrix m)

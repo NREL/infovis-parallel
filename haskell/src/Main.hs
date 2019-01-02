@@ -139,6 +139,8 @@ visualize =
   Visualize
   {
     config  = "config.yaml"
+           &= explicit
+           &= name "config"
            &= typ "YAML"
            &= help "Visualization parameters"
   }

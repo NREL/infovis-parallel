@@ -32,8 +32,7 @@ import Graphics.Rendering.OpenGL.GL.PrimitiveMode (PrimitiveMode(..))
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
 import Graphics.Rendering.OpenGL.GL.VertexArrays (NumArrayIndices, NumInstances, drawArraysInstanced)
 import InfoVis.Parallel.NewTypes (Identifier)
-import InfoVis.Parallel.Rendering.Program (ShapeProgram, bindColors, bindMesh, bindPositions, bindRotations, bindScales, selectShapeProgram, setProjectionModelView)
-import Linear.Matrix (M44)
+import InfoVis.Parallel.Rendering.Program (ShapeProgram, bindColors, bindMesh, bindPositions, bindRotations, bindScales, selectShapeProgram, syncProjectionModelView)
 import System.IO (hPrint, stderr)
 
 import qualified Data.IntMap.Lazy as IM (IntMap, empty, findMin, fromList, insert, null, toList, union)
@@ -296,24 +295,22 @@ expandShapeBuffer shapeBuffer@ShapeBuffer{..} =
              } 
 
 
-drawInstances :: M44 GLfloat
-              -> M44 GLfloat
-              -> ShapeBuffer
+drawInstances :: ShapeBuffer
               -> IO ()
-drawInstances projection modelView ShapeBuffer{..} =
+drawInstances ShapeBuffer{..} =
   when (size > 0)
     $ do
-    let
-      Right mesh' = mesh
-    selectShapeProgram $ Just shapeProgram
-    setProjectionModelView shapeProgram projection modelView 
-    shapeProgram `bindMesh`      Just mesh'
-    shapeProgram `bindPositions` Just positions
-    shapeProgram `bindRotations` Just rotations
-    shapeProgram `bindScales`    Just scales
-    shapeProgram `bindColors`    Just colors
-    drawArraysInstanced primitiveMode 0 vertexCount instanceCount
-    selectShapeProgram Nothing
+      let
+        Right mesh' = mesh
+      selectShapeProgram $ Just shapeProgram
+      syncProjectionModelView shapeProgram
+      shapeProgram `bindMesh`      Just mesh'
+      shapeProgram `bindPositions` Just positions
+      shapeProgram `bindRotations` Just rotations
+      shapeProgram `bindScales`    Just scales
+      shapeProgram `bindColors`    Just colors
+      drawArraysInstanced primitiveMode 0 vertexCount instanceCount
+      selectShapeProgram Nothing
 
 
 buildBuffer :: Storable a

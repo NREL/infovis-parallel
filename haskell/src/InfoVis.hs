@@ -30,7 +30,7 @@ module InfoVis (
 import Control.Concurrent (forkIO)
 import Control.Concurrent.Chan (newChan, readChan, writeChan)
 import Control.Exception (SomeException, catch)
-import Control.Monad (when)
+import Control.Monad (void, when)
 import Control.Monad.Except (MonadError, MonadIO, liftIO, throwError)
 import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), logMessage, renderWithSeverity, runLoggingT)
 import Data.String (IsString(..))
@@ -69,7 +69,8 @@ withLogger :: (MonadError String m, MonadIO m, SeverityLog m)
 withLogger action =
   do
     messages <- liftIO newChan
-    liftIO
+    void
+      . liftIO
       . forkIO
       $ do
         result <- catch

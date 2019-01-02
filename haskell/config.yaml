@@ -1,0 +1,12 @@
+stereo         : Mono
+nearPlane      : 0.2
+farPlane       : 20
+eyeSeparation  : [0.1,  0,  0]
+display        :
+  identifier   : :0.0
+  geometry     : fullscreen
+# geometry     : 1200x800+700+0
+  screen       :
+    lowerLeft  : [-2, -2, 2]
+    lowerRight : [ 2, -2, 2]
+    upperLeft  : [-2,  2, 2]

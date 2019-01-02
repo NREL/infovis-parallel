@@ -12,7 +12,7 @@ module Graphics.OpenGL.Util.Setup (
 import Control.Monad (when, void)
 import Data.Default (Default(def))
 import Graphics.OpenGL.Util.Projection (OffAxisProjection(VTKOffAxis), projection)
-import Graphics.OpenGL.Util.Types (Display(..), PointOfView, Stereo(..), Viewers(..))
+import Graphics.OpenGL.Util.Types (Display(..), PointOfView, Stereo(..), Viewer(..))
 import Graphics.Rendering.DLP (DlpEncoding, DlpEye(..))
 import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), dlpDisplayCallback)
 import Graphics.Rendering.OpenGL (($=!))
@@ -37,13 +37,12 @@ import qualified Linear.Quaternion as Q (rotate)
 setup :: Bool
       -> String
       -> String
-      -> Viewers a
-      -> Int
+      -> Viewer a
       -> IO DlpEncoding
-setup debug title program Viewers{..} displayIndex =
+setup debug title program Viewer{..} =
   do
     let
-      Display{..} = displays !! displayIndex
+      Display{..} = display
       dlp = case stereo of
         DLP        -> D.FrameSequential
         QuadBuffer -> D.QuadBuffer
@@ -76,15 +75,14 @@ setup debug title program Viewers{..} displayIndex =
 
 dlpViewerDisplay :: (Conjugate a, Epsilon a, Fractional a, MatrixComponent a, Real a, RealFloat a)
                  => DlpEncoding
-                 -> Viewers a
-                 -> Int
+                 -> Viewer a
                  -> IO (PointOfView a)
                  -> DisplayCallback
                  -> IO ()
-dlpViewerDisplay dlp Viewers{..} displayIndex pov displayAction =
+dlpViewerDisplay dlp Viewer{..} pov displayAction =
   do
     let
-      Display{..} = displays !! displayIndex
+      Display{..} = display
     reshapeCallback $=! Just
       (\wh -> 
          do
