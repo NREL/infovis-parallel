@@ -21,7 +21,6 @@ import Graphics.UI.GLUT (mainLoop)
 import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (SeverityLog, guardIO)
-import InfoVis.Parallel.NewTypes (DeltaGeometry)
 import InfoVis.Parallel.ProtoBuf (upsert)
 import InfoVis.Parallel.Rendering.Frames (createManager, draw, insert, prepare)
 import Linear.Affine (Point(..))
@@ -62,7 +61,7 @@ visualizeBuffers configurationFile debug bufferFiles =
     manager <-
       guardIO
         . (>>= prepare)
-        $ flip (foldl insert) ((^. upsert) <$> buffers :: [[DeltaGeometry]])
+        $ flip (foldl insert) ((^. upsert) <$> buffers)
         <$> createManager
 
     angle <- guardIO $ newIORef 0
