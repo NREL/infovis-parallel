@@ -11,13 +11,14 @@ module Graphics.OpenGL.Util.Setup (
 
 import Control.Monad (when, void)
 import Data.Default (Default(def))
+import Data.Maybe (isJust)
 import Graphics.OpenGL.Util.Projection (OffAxisProjection(VTKOffAxis), projection)
 import Graphics.OpenGL.Util.Types (Display(..), PointOfView, Stereo(..), Viewer(..))
 import Graphics.Rendering.DLP (DlpEncoding, DlpEye(..))
 import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), dlpDisplayCallback)
 import Graphics.Rendering.OpenGL (($=!))
 import Graphics.Rendering.OpenGL.GL.CoordTrans (MatrixComponent, MatrixMode(..), Position(..), loadIdentity, matrixMode, viewport)
-import Graphics.Rendering.OpenGL.GL.DebugOutput (debugMessageCallback, debugOutput)
+import Graphics.Rendering.OpenGL.GL.DebugOutput (DebugMessage, debugMessageCallback, debugOutput)
 import Graphics.Rendering.OpenGL.GL.PerFragment (BlendingFactor(..), ComparisonFunction(..), alphaFunc, blend, blendFunc, depthFunc)
 import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(Enabled))
 import Graphics.UI.GLUT.Callbacks.Global (IdleCallback)
@@ -28,13 +29,12 @@ import Linear.Affine (Point(..), (.+^))
 import Linear.Conjugate (Conjugate)
 import Linear.Epsilon (Epsilon)
 import Linear.Vector ((*^))
-import System.IO (hPrint, stderr)
 
 import qualified Graphics.Rendering.DLP as D (DlpEncoding(..))
 import qualified Linear.Quaternion as Q (rotate)
 
 
-setup :: Bool
+setup :: Maybe (DebugMessage -> IO ())
       -> String
       -> String
       -> Viewer a
@@ -50,7 +50,7 @@ setup debug title program Viewer{..} =
         Mono       -> D.LeftOnly
     void
       . initialize program
-      . (if debug then ("-gldebug" :) else id)
+      . maybe id ( const ("-gldebug" :)) debug
       . maybe id ((("-display"  :) .) .(:)) identifier
       $ case geometry of
           Nothing           -> []
@@ -63,13 +63,13 @@ setup debug title program Viewer{..} =
     when (geometry == Just "fullscreen")
       fullScreen
     depthFunc $=! Just Less 
-    blend $=! Enabled
+    blend     $=! Enabled
     blendFunc $=! (SrcAlpha, OneMinusSrcAlpha)
     alphaFunc $=! Just (Greater, 0)
-    when debug
+    when (isJust debug)
       $ do
         debugOutput $=! Enabled
-        debugMessageCallback $=! Just (hPrint stderr)
+        debugMessageCallback $=! debug
     return dlp
 
 

@@ -33,7 +33,6 @@ import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..
 import Graphics.Rendering.OpenGL.GL.VertexArrays (NumArrayIndices, NumInstances, drawArraysInstanced)
 import InfoVis.Parallel.NewTypes (Identifier)
 import InfoVis.Parallel.Rendering.Program (ShapeProgram, bindColors, bindMesh, bindPositions, bindRotations, bindScales, selectShapeProgram, syncProjectionModelView)
-import System.IO (hPrint, stderr)
 
 import qualified Data.IntMap.Lazy as IM (IntMap, empty, findMin, fromList, insert, null, toList, union)
 import qualified Data.Map.Strict as M (Map, delete, empty, findWithDefault, foldl, insertWith, member)
@@ -351,7 +350,7 @@ updateBuffer updates bufferObject =
                 (location, value) <- IM.toList updates
               ]
         )
-        $ hPrint stderr
+        $ fail . show
       bindBuffer ArrayBuffer $=! Nothing
 
 

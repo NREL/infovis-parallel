@@ -10,6 +10,7 @@ module InfoVis.Parallel.Visualizer (
 import Control.Lens.Getter ((^.))
 import Control.Monad (join)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
+import Control.Monad.Log (logDebug, logInfo)
 import Data.IORef (IORef, newIORef, readIORef)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
@@ -26,6 +27,7 @@ import InfoVis.Parallel.Rendering.Frames (createManager, draw, insert, prepare)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
+import System.IO (hPutStrLn, stderr)
 
 import qualified Data.ByteString as BS (readFile)
 
@@ -42,22 +44,30 @@ visualizeBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
 visualizeBuffers configurationFile debug bufferFiles =
   do
 
+    logInfo $ "Reading configuration from " ++ show configurationFile ++ " . . ."
     viewer <-
       join
         $ liftEither
         . either (Left . show) Right
         <$> guardIO (decodeFileEither configurationFile)
 
+    logInfo "Reading protocol buffers . . ."
     buffers <-
       (mapM liftEither =<<)
         . guardIO
         $ mapM (fmap (runGet decodeMessage) . BS.readFile)
           bufferFiles
 
+    logDebug "Initializing OpenGL . . ."
     dlp <-
       guardIO
-        $ setup debug "InfoVis Parallel" "InfoVis Parallel" (viewer :: Viewer Double)
+        $ setup
+          (if debug then Just (hPutStrLn stderr . ("[Debug] " ++) . show) else Nothing)
+          "InfoVis Parallel"
+          "InfoVis Parallel"
+          (viewer :: Viewer Double)
 
+    logDebug "Creating array buffer manager . . ."
     manager <-
       guardIO
         . (>>= prepare)
@@ -75,6 +85,7 @@ visualizeBuffers configurationFile debug bufferFiles =
             , Quaternion 0 $ V3 0 1 0
             )
 
+    logDebug "Setting up display . . ."
     guardIO
       . dlpViewerDisplay dlp viewer eye
       $ draw manager
@@ -85,6 +96,7 @@ visualizeBuffers configurationFile debug bufferFiles =
     _ <- maybe (return False) joinSwapGroup useSwapGroup
 #endif
 
+    logDebug "Starting main loop . . ."
     mainLoop
 
 
