@@ -10,7 +10,7 @@ module InfoVis.Parallel.Visualizer (
 import Control.Lens.Getter ((^.))
 import Control.Monad (join)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
-import Control.Monad.Log (logDebug, logInfo)
+import Control.Monad.Log (Severity(..), logInfo)
 import Data.IORef (IORef, newIORef, readIORef)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
@@ -21,13 +21,12 @@ import Graphics.Rendering.OpenGL (($=!), ($~!))
 import Graphics.UI.GLUT (mainLoop)
 import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
-import InfoVis (SeverityLog, guardIO)
+import InfoVis (SeverityLog, guardIO, withLogger)
 import InfoVis.Parallel.ProtoBuf (upsert)
 import InfoVis.Parallel.Rendering.Frames (createManager, draw, insert, prepare)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
-import System.IO (hPutStrLn, stderr)
 
 import qualified Data.ByteString as BS (readFile)
 
@@ -58,46 +57,47 @@ visualizeBuffers configurationFile debug bufferFiles =
         $ mapM (fmap (runGet decodeMessage) . BS.readFile)
           bufferFiles
 
-    logDebug "Initializing OpenGL . . ."
-    dlp <-
-      guardIO
-        $ setup
-          (if debug then Just (hPutStrLn stderr . ("[Debug] " ++) . show) else Nothing)
-          "InfoVis Parallel"
-          "InfoVis Parallel"
-          (viewer :: Viewer Double)
-
-    logDebug "Creating array buffer manager . . ."
-    manager <-
-      guardIO
-        . (>>= prepare)
-        $ flip (foldl insert) ((^. upsert) <$> buffers)
-        <$> createManager
-
-    angle <- guardIO $ newIORef 0
-    let
-      eye =
+    withLogger
+      $ \logger ->
         do
-          angle' <- readIORef angle
-          return
-            (
-              P $ V3 (3 * sin angle') (2 + cos angle') 10
-            , Quaternion 0 $ V3 0 1 0
-            )
 
-    logDebug "Setting up display . . ."
-    guardIO
-      . dlpViewerDisplay dlp viewer eye
-      $ draw manager
-
-    idleCallback $=! Just (idle angle)
+          logger Debug "Initializing OpenGL . . ."
+          dlp <-
+            setup
+              (if debug then Just (logger Debug . show) else Nothing)
+              "InfoVis Parallel"
+              "InfoVis Parallel"
+              (viewer :: Viewer Double)
+      
+          logger Debug "Creating array buffer manager . . ."
+          manager <-
+            (>>= prepare)
+              $ flip (foldl insert) ((^. upsert) <$> buffers)
+              <$> createManager
+      
+          angle <- newIORef 0
+          let
+            eye =
+              do
+                angle' <- readIORef angle
+                return
+                  (
+                    P $ V3 (3 * sin angle') (2 + cos angle') 10
+                  , Quaternion 0 $ V3 0 1 0
+                  )
+      
+          logger Debug "Setting up display . . ."
+          dlpViewerDisplay dlp viewer eye
+            $ draw manager
+      
+          idleCallback $=! Just (idle angle)
 
 #ifdef INFOVIS_SWAP_GROUP
-    _ <- maybe (return False) joinSwapGroup useSwapGroup
+          _ <- maybe (return False) joinSwapGroup useSwapGroup
 #endif
 
-    logDebug "Starting main loop . . ."
-    mainLoop
+          logger Debug "Starting main loop . . ."
+          mainLoop
 
 
 idle :: IORef Double -> IdleCallback
