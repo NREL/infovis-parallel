@@ -266,17 +266,15 @@ drawDisplay LabelDisplay{..} =
             G.translate $ G.toVector3 o'
             G.toRotation q
             G.scale s s s
-            G.translate $ Vector3 0 (0.25 * fh) 0
---          G.translate $ Vector3 0 (33.33 / (119.05 + 33.33) * fh) 0
+            G.translate $ Vector3 0 (0.1 * fh) 0
             renderString MonoRoman text
       |
         Geometry{..} <- M.elems geometries
       , let
           Label (o, w, h) = shape
           o' = o .-. zero
-          h' = h .-. o
           q = rotationFromPlane (V3 1 0 0) (V3 0 1 0) o w h
-          s = realToFrac (norm h') / fh
+          s = realToFrac size / fh
       ]      
 drawDisplay ShapeDisplay{..} =
   drawInstances

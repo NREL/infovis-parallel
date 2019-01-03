@@ -71,7 +71,7 @@ visualizeBuffers configurationFile debug bufferFiles =
           angle' <- readIORef angle
           return
             (
-              P $ V3 (1 + sin angle') (2 + cos angle') 5
+              P $ V3 (3 * sin angle') (2 + cos angle') 10
             , Quaternion 0 $ V3 0 1 0
             )
 
