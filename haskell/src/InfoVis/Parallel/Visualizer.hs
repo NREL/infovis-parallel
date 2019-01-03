@@ -94,6 +94,7 @@ visualizeBuffers configurationFile debug bufferFiles =
           idleCallback $=! Just (idle angle)
 
 #ifdef INFOVIS_SWAP_GROUP
+          logger Debug "Joining swap group . . ."
           _ <- maybe (return False) joinSwapGroup useSwapGroup
 #endif
 
