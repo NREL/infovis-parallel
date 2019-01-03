@@ -88,7 +88,9 @@ withLogger action =
     loop
 
 
-guardIO :: (MonadIO m, MonadError String m) => IO a -> m a
+guardIO :: (MonadIO m, MonadError String m)
+        => IO a
+        -> m a
 guardIO =
   (either (throwError . show) return =<<)
     . liftIO
