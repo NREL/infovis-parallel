@@ -57,6 +57,7 @@ visualizeBuffers configurationFile debug bufferFiles =
         $ mapM (fmap (runGet decodeMessage) . BS.readFile)
           bufferFiles
 
+    logInfo "Forking OpenGL . . ."
     withLogger
       $ \logger ->
         do
