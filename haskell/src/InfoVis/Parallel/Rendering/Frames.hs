@@ -11,6 +11,7 @@ module InfoVis.Parallel.Rendering.Frames (
 , listFrames
 , insert
 , delete
+, reset
 , prepare
 , draw
 ) where
@@ -92,10 +93,17 @@ destroyManager :: Manager
 destroyManager = mapM_ destroyFrame . frames
 
 
-insert :: Manager
-       -> [DeltaGeometry]
+reset :: Manager
+      -> Manager
+reset =
+  over framesLens
+    $ M.map resetFrame
+
+
+insert :: [DeltaGeometry]
        -> Manager
-insert = foldl insert' 
+       -> Manager
+insert = flip $ foldl insert' 
 
 
 insert' :: Manager
@@ -117,10 +125,10 @@ insert' manager@Manager{..} geometry@DeltaGeometry{..} =
       )
 
 
-delete :: Manager
-       -> [Identifier]
+delete :: [Identifier]
        -> Manager
-delete manager identifiers =
+       -> Manager
+delete identifiers manager =
   manager
     & over framesLens
       (M.map (`deleteFrame` identifiers))
@@ -187,6 +195,11 @@ destroyFrame :: Frame
 destroyFrame = mapM_ destroyDisplay
 
 
+resetFrame :: Frame
+           -> Frame
+resetFrame = M.map resetDisplay
+
+
 insertFrame :: Frame
             -> DeltaGeometry
             -> Frame
@@ -219,6 +232,11 @@ data Display =
     {
       geometries :: M.Map Identifier Geometry
     }
+
+
+resetDisplay :: Display
+             -> Display
+resetDisplay = ap deleteDisplay (M.keys . geometries)
 
 
 geometriesLens :: Lens' Display (M.Map Identifier Geometry)

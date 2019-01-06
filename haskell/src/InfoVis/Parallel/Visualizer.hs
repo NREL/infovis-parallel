@@ -9,12 +9,11 @@ module InfoVis.Parallel.Visualizer (
 
 
 import Control.Concurrent.Chan (Chan, newChan, readChan, writeChan)
-import Control.Concurrent.MVar (MVar, newEmptyMVar, putMVar, readMVar, swapMVar, takeMVar, tryTakeMVar)
+import Control.Concurrent.MVar (MVar, newEmptyMVar, newMVar, putMVar, readMVar, swapMVar, takeMVar, tryPutMVar, tryTakeMVar)
 import Control.Lens.Getter ((^.))
 import Control.Monad (join, void, when)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logInfo)
-import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Maybe (isJust)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
@@ -27,13 +26,14 @@ import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (LogChannel, LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO, makeLogger)
 import InfoVis.Parallel.NewTypes (PositionRotation)
-import InfoVis.Parallel.ProtoBuf (Request, Response, upsert)
-import InfoVis.Parallel.Rendering.Frames (Manager, createManager, draw, insert, prepare)
+import InfoVis.Parallel.ProtoBuf (Request, Response, toolSet, viewSet)
+import InfoVis.Parallel.Rendering.Frames (Manager, createManager, delete, draw, insert, prepare, reset, set)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
 
 import qualified Data.ByteString as BS (readFile)
+import qualified InfoVis.Parallel.ProtoBuf as P (delete, frameShow, reset, upsert)
 
 #ifdef INFOVIS_SWAP_GROUP
 import Graphics.OpenGL.Functions (joinSwapGroup)
@@ -75,12 +75,24 @@ visualizeBuffers configurationFile debug bufferFiles =
 data Graphics =
   Graphics
   {
-    managerRef :: MVar Manager
+    startRef   :: MVar ()
+  , lockRef    :: MVar ()
+  , managerRef :: MVar Manager
   , povRef     :: MVar PositionRotation
   , toolRef    :: MVar PositionRotation
-  , lockRef    :: MVar ()
   }
 
+
+initialize :: IO Graphics
+initialize =
+  do
+    startRef   <- newEmptyMVar
+    lockRef    <- newEmptyMVar 
+    managerRef <- newEmptyMVar
+    povRef     <- newMVar (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
+    toolRef    <- newMVar (P $ V3 0 0  0, Quaternion 1 $ V3 0 0 0)
+    return Graphics{..}
+ 
 
 visualize :: (MonadError String m, MonadIO m, SeverityLog m)
           => FilePath
@@ -92,6 +104,8 @@ visualize :: (MonadError String m, MonadIO m, SeverityLog m)
 visualize configurationFile debug logChannel requestChannel _responseChannel =
   do
 
+    graphics <- guardIO initialize
+
     logInfo $ "Reading configuration from " ++ show configurationFile ++ " . . ."
     viewer <-
       join
@@ -99,15 +113,12 @@ visualize configurationFile debug logChannel requestChannel _responseChannel =
         . either (Left . show) Right
         <$> guardIO (decodeFileEither configurationFile)
 
-    managerRef <- guardIO newEmptyMVar
-    povRef     <- guardIO newEmptyMVar
-    toolRef    <- guardIO newEmptyMVar
-    lockRef    <- guardIO newEmptyMVar 
 
     void
       . forkLoggedIO logChannel
       $ do
-        apply Graphics{..} requestChannel
+        guardIO $ takeMVar $ startRef graphics
+        apply graphics requestChannel
         return False
 
     logInfo "Forking OpenGL . . ."
@@ -115,7 +126,7 @@ visualize configurationFile debug logChannel requestChannel _responseChannel =
       . forkLoggedOS logChannel
       . guardIO
       $ do
-        display (logIO logChannel) debug viewer Graphics{..}
+        display (logIO logChannel) debug viewer graphics
         return True
 
 
@@ -125,15 +136,24 @@ apply :: (MonadError String m, MonadIO m, SeverityLog m)
       -> m ()
 apply Graphics{..} requestChannel =
   let
+    conditionally f g x = if f x then g x else id
+    onlyJust v = maybe (return ()) (void . swapMVar v)
     loop =
       do
         request <- readChan requestChannel
-        void  $ takeMVar lockRef
+        void $ takeMVar lockRef
         manager <- readMVar managerRef
         void
           . swapMVar managerRef
-          $ insert manager (request ^. upsert)
+          . delete                             (request ^. P.delete   )
+          . insert                             (request ^. P.upsert   )
+          . conditionally id     (const reset) (request ^. P.reset    )
+          . conditionally (/= 0) set           (request ^. P.frameShow)
+          $ manager
         putMVar lockRef ()
+        onlyJust povRef  $ request ^. viewSet
+        onlyJust toolRef $ request ^. toolSet
+        loop
   in
     guardIO loop
 
@@ -158,17 +178,13 @@ display logger debug viewer Graphics{..} =
     createManager
       >>= prepare
       >>= putMVar managerRef
-
-    angleRef <- newIORef 0
-    povRef  `putMVar` (P $ V3 3 2 10 , Quaternion 0 $ V3 0 1 0)
-    toolRef `putMVar` (P $ V3 0 0  0 , Quaternion 1 $ V3 0 0 0)
     lockRef `putMVar` ()
-       
+
     logger Debug "Setting up display . . ."
     dlpViewerDisplay dlp viewer (readMVar povRef)
       $ readMVar managerRef >>= draw
 
-    idleCallback $=! Just (idle angleRef Graphics{..})
+    idleCallback $=! Just (idle Graphics{..})
 
 #ifdef INFOVIS_SWAP_GROUP
     logger Debug "Joining swap group . . ."
@@ -180,11 +196,12 @@ display logger debug viewer Graphics{..} =
     mainLoop
 
 
-idle :: IORef Double
-     -> Graphics
+idle :: Graphics
      -> IdleCallback
-idle angleRef Graphics{..} =
+idle Graphics{..} =
   do
+    void
+      $ tryPutMVar startRef ()
     lock <- tryTakeMVar lockRef
     when (isJust lock)
       $ do
@@ -193,8 +210,4 @@ idle angleRef Graphics{..} =
           >>= prepare
           >>= swapMVar managerRef
         lockRef `putMVar` ()
-    angle <- (0.02 +) <$> readIORef angleRef
-    angleRef `writeIORef` angle
-    void
-      $ povRef  `swapMVar` (P $ V3 (3 + sin angle) (2 + cos angle) 10 , Quaternion 0 $ V3 0 1 0)
     postRedisplay Nothing
