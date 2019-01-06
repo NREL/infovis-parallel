@@ -22,16 +22,21 @@ module InfoVis (
 , SeverityLogT
 , withSeverityLog
 , withLogger
+, LogChannel
+, makeLogger
+, forkLoggerIO
+, forkLoggerOS
 , guardIO
 , stringVersion
 ) where
 
 
-import Control.Concurrent (forkIO)
-import Control.Concurrent.Chan (newChan, readChan, writeChan)
+import Control.Concurrent (ThreadId, forkIO, forkOS)
+import Control.Concurrent.Chan (Chan, newChan, readChan, writeChan)
+import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 import Control.Exception (SomeException, catch)
-import Control.Monad (void, when)
-import Control.Monad.Except (MonadError, MonadIO, liftIO, throwError)
+import Control.Monad (when)
+import Control.Monad.Except (ExceptT, MonadError, MonadIO, liftIO, runExceptT, throwError)
 import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), logMessage, renderWithSeverity, runLoggingT)
 import Data.String (IsString(..))
 import Data.Version (showVersion)
@@ -68,24 +73,81 @@ withLogger :: (MonadError String m, MonadIO m, SeverityLog m)
            -> m a
 withLogger action =
   do
-    messages <- liftIO newChan
-    void
-      . liftIO
-      . forkIO
+    resultRef <- liftIO newEmptyMVar
+    (logChannel, logger) <- makeLogger
+    forkLoggerIO logChannel
+      . guardIO
       $ do
-        result <- catch
-                    (fmap Right . action $ ((writeChan messages . Right) .) . (,))
-                    (\e -> return $ Left (e :: SomeException))
-        writeChan messages $ Left result        
-    let
-      loop =
-        do
-          info <- liftIO $ readChan messages
-          case info of
-            Right (severity, message) -> logMessage (WithSeverity severity message) >> loop
-            Left  (Right result     ) -> return result
-            Left  (Left  err        ) -> throwError $ show err
-    loop
+        result <- action $ ((writeChan logChannel . Message) . ) . WithSeverity
+        putMVar resultRef result
+        return True
+    logger
+    liftIO
+      $ takeMVar resultRef
+
+
+type LogChannel = Chan Logger
+
+
+data Logger =
+    Message (WithSeverity String)
+  | Completed Bool
+  | Failed String
+    
+
+makeLogger :: (MonadError String m, MonadIO m, SeverityLog m)
+           => m (LogChannel, m ())
+makeLogger =
+  do
+    logChannel <- liftIO newChan
+    return
+      (
+        logChannel
+      , let
+          loop =
+            do
+              info <- liftIO $ readChan logChannel
+              case info of
+                Message message -> logMessage message >> loop
+                Completed False -> loop
+                Completed True  -> return ()
+                Failed err      -> throwError $ show err
+        in
+          loop
+      )
+
+
+forkLoggerIO :: (MonadError String m, MonadIO m, SeverityLog m)
+             => LogChannel
+             -> SeverityLogT (ExceptT String IO) Bool
+             -> m ThreadId
+forkLoggerIO = forkLogger forkIO
+
+
+forkLoggerOS :: (MonadError String m, MonadIO m, SeverityLog m)
+             => LogChannel
+             -> SeverityLogT (ExceptT String IO) Bool
+             -> m ThreadId
+forkLoggerOS = forkLogger forkOS
+
+
+forkLogger :: (MonadError String m, MonadIO m, SeverityLog m)
+           => (IO () -> IO ThreadId)
+           -> LogChannel
+           -> SeverityLogT (ExceptT String IO) Bool
+           -> m ThreadId
+forkLogger forker logChannel action =
+    liftIO
+      . forker
+      $ writeChan logChannel
+      =<< catch
+          (
+            either Failed Completed
+              <$> runExceptT
+              (runLoggingT action $ liftIO . writeChan logChannel . Message)
+          )
+          (return . Failed . (show :: SomeException -> String))
+  
 
 
 guardIO :: (MonadIO m, MonadError String m)
