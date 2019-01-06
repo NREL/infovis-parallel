@@ -24,8 +24,10 @@ module InfoVis (
 , withLogger
 , LogChannel
 , makeLogger
-, forkLoggerIO
-, forkLoggerOS
+, forkLoggedIO
+, forkLoggedOS
+, LoggerIO
+, logIO
 , guardIO
 , stringVersion
 ) where
@@ -35,7 +37,7 @@ import Control.Concurrent (ThreadId, forkIO, forkOS)
 import Control.Concurrent.Chan (Chan, newChan, readChan, writeChan)
 import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 import Control.Exception (SomeException, catch)
-import Control.Monad (when)
+import Control.Monad (void, when)
 import Control.Monad.Except (ExceptT, MonadError, MonadIO, liftIO, runExceptT, throwError)
 import Control.Monad.Log (MonadLog, LoggingT, Severity(..), WithSeverity(..), logMessage, renderWithSeverity, runLoggingT)
 import Data.String (IsString(..))
@@ -75,15 +77,26 @@ withLogger action =
   do
     resultRef <- liftIO newEmptyMVar
     (logChannel, logger) <- makeLogger
-    forkLoggerIO logChannel
+    void
+      . forkLoggedIO logChannel
       . guardIO
       $ do
-        result <- action $ ((writeChan logChannel . Message) . ) . WithSeverity
+        result <- action $ logIO logChannel
         putMVar resultRef result
         return True
     logger
     liftIO
       $ takeMVar resultRef
+
+
+type LoggerIO =  Severity
+              -> String
+              -> IO ()
+
+
+logIO :: LogChannel
+      -> LoggerIO
+logIO logChannel = ((writeChan logChannel . Message) .) . WithSeverity
 
 
 type LogChannel = Chan Logger
@@ -117,26 +130,26 @@ makeLogger =
       )
 
 
-forkLoggerIO :: (MonadError String m, MonadIO m, SeverityLog m)
+forkLoggedIO :: (MonadError String m, MonadIO m, SeverityLog m)
              => LogChannel
              -> SeverityLogT (ExceptT String IO) Bool
              -> m ThreadId
-forkLoggerIO = forkLogger forkIO
+forkLoggedIO = forkLogged forkIO
 
 
-forkLoggerOS :: (MonadError String m, MonadIO m, SeverityLog m)
+forkLoggedOS :: (MonadError String m, MonadIO m, SeverityLog m)
              => LogChannel
              -> SeverityLogT (ExceptT String IO) Bool
              -> m ThreadId
-forkLoggerOS = forkLogger forkOS
+forkLoggedOS = forkLogged forkOS
 
 
-forkLogger :: (MonadError String m, MonadIO m, SeverityLog m)
+forkLogged :: (MonadError String m, MonadIO m, SeverityLog m)
            => (IO () -> IO ThreadId)
            -> LogChannel
            -> SeverityLogT (ExceptT String IO) Bool
            -> m ThreadId
-forkLogger forker logChannel action =
+forkLogged forker logChannel action =
     liftIO
       . forker
       $ writeChan logChannel

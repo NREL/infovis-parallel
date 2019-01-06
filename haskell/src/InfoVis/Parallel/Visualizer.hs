@@ -8,12 +8,12 @@ module InfoVis.Parallel.Visualizer (
 ) where
 
 
-import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar (MVar, newEmptyMVar, putMVar, readMVar, swapMVar, takeMVar, tryTakeMVar)
 import Control.Lens.Getter ((^.))
 import Control.Monad (join, void, when)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logInfo)
+import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Maybe (isJust)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
@@ -24,7 +24,7 @@ import Graphics.Rendering.OpenGL (($=!))
 import Graphics.UI.GLUT (mainLoop)
 import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
-import InfoVis (SeverityLog, guardIO, withLogger)
+import InfoVis (LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO, makeLogger)
 import InfoVis.Parallel.NewTypes (PositionRotation)
 import InfoVis.Parallel.ProtoBuf (upsert)
 import InfoVis.Parallel.Rendering.Frames (Manager, createManager, draw, insert, prepare)
@@ -76,64 +76,78 @@ visualizeBuffers configurationFile debug bufferFiles =
     toolRef    <- guardIO newEmptyMVar
     lockRef    <- guardIO newEmptyMVar 
 
-    guardIO
-      $ forkIO
+    (logChannel, logger) <- makeLogger
+
+    void
+      . forkLoggedIO logChannel
+      . guardIO
       $ do
-          void $ takeMVar lockRef
+          void
+            $ takeMVar lockRef
           manager <- readMVar managerRef
-          swapMVar managerRef
+          void
+            . swapMVar managerRef
             $ foldl insert manager ((^. upsert) <$> buffers)
           putMVar lockRef ()
+          return False
 
     logInfo "Forking OpenGL . . ."
-    display debug viewer Graphics{..}
+    void
+      . forkLoggedOS logChannel
+      . guardIO
+      $ do
+        display (logIO logChannel) debug viewer Graphics{..}
+        return True
+
+    logger
 
 
-display :: (MonadError String m, MonadIO m, SeverityLog m)
-        => Bool
+display :: LoggerIO
+        -> Bool
         -> Viewer Double
         -> Graphics
-        -> m ()
-display debug viewer Graphics{..} =
-  withLogger
-    $ \logger ->
-      do
+        -> IO ()
+display logger debug viewer Graphics{..} =
+  do
 
-        logger Debug "Initializing OpenGL . . ."
-        dlp <-
-          setup
-            (if debug then Just (logger Debug . show) else Nothing)
-            "InfoVis Parallel"
-            "InfoVis Parallel"
-            (viewer :: Viewer Double)
-    
-        logger Debug "Creating array buffer manager . . ."
-        createManager
-          >>= prepare
-          >>= putMVar managerRef
+    logger Debug "Initializing OpenGL . . ."
+    dlp <-
+      setup
+        (if debug then Just (logger Debug . show) else Nothing)
+        "InfoVis Parallel"
+        "InfoVis Parallel"
+        (viewer :: Viewer Double)
 
-        povRef  `putMVar` (P $ V3 3 2 10 , Quaternion 0 $ V3 0 1 0)
-        toolRef `putMVar` (P $ V3 0 0  0 , Quaternion 1 $ V3 0 0 0)
-        lockRef `putMVar` ()
-           
-        logger Debug "Setting up display . . ."
-        dlpViewerDisplay dlp viewer (readMVar povRef)
-          $ readMVar managerRef >>= draw
-    
-        idleCallback $=! Just (idle Graphics{..})
+    logger Debug "Creating array buffer manager . . ."
+    createManager
+      >>= prepare
+      >>= putMVar managerRef
+
+    angleRef <- newIORef 0
+    povRef  `putMVar` (P $ V3 3 2 10 , Quaternion 0 $ V3 0 1 0)
+    toolRef `putMVar` (P $ V3 0 0  0 , Quaternion 1 $ V3 0 0 0)
+    lockRef `putMVar` ()
+       
+    logger Debug "Setting up display . . ."
+    dlpViewerDisplay dlp viewer (readMVar povRef)
+      $ readMVar managerRef >>= draw
+
+    idleCallback $=! Just (idle angleRef Graphics{..})
 
 #ifdef INFOVIS_SWAP_GROUP
-        logger Debug "Joining swap group . . ."
-        _ <- maybe (return False) joinSwapGroup useSwapGroup
+    logger Debug "Joining swap group . . ."
+    void
+      $  maybe (return False) joinSwapGroup useSwapGroup
 #endif
 
-        logger Debug "Starting main loop . . ."
-        mainLoop
+    logger Debug "Starting main loop . . ."
+    mainLoop
 
 
-idle :: Graphics
+idle :: IORef Double
+     -> Graphics
      -> IdleCallback
-idle Graphics{..} =
+idle angleRef Graphics{..} =
   do
     lock <- tryTakeMVar lockRef
     when (isJust lock)
@@ -143,4 +157,8 @@ idle Graphics{..} =
           >>= prepare
           >>= swapMVar managerRef
         lockRef `putMVar` ()
+    angle <- (0.02 +) <$> readIORef angleRef
+    angleRef `writeIORef` angle
+    void
+      $ povRef  `swapMVar` (P $ V3 (3 + sin angle) (2 + cos angle) 10 , Quaternion 0 $ V3 0 1 0)
     postRedisplay Nothing
