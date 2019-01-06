@@ -8,6 +8,7 @@ module InfoVis.Parallel.Visualizer (
 ) where
 
 
+import Control.Concurrent.Chan (Chan, newChan, readChan, writeChan)
 import Control.Concurrent.MVar (MVar, newEmptyMVar, putMVar, readMVar, swapMVar, takeMVar, tryTakeMVar)
 import Control.Lens.Getter ((^.))
 import Control.Monad (join, void, when)
@@ -24,9 +25,9 @@ import Graphics.Rendering.OpenGL (($=!))
 import Graphics.UI.GLUT (mainLoop)
 import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
-import InfoVis (LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO, makeLogger)
+import InfoVis (LogChannel, LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO, makeLogger)
 import InfoVis.Parallel.NewTypes (PositionRotation)
-import InfoVis.Parallel.ProtoBuf (upsert)
+import InfoVis.Parallel.ProtoBuf (Request, Response, upsert)
 import InfoVis.Parallel.Rendering.Frames (Manager, createManager, draw, insert, prepare)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
@@ -39,6 +40,38 @@ import Graphics.OpenGL.Functions (joinSwapGroup)
 #endif
 
 
+visualizeBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
+                 => FilePath
+                 -> Bool
+                 -> [FilePath]
+                 -> m ()
+visualizeBuffers configurationFile debug bufferFiles =
+  do
+
+    (logChannel, logger) <- makeLogger
+
+    requestChannel  <- guardIO newChan
+    responseChannel <- guardIO newChan
+
+    void
+      . forkLoggedIO logChannel
+      $ do
+        sequence_
+          [
+            do
+              logInfo $ "Reading protocol buffers from " ++ show file ++ " . . ."
+              request <- liftEither =<< guardIO (runGet decodeMessage <$> BS.readFile file)
+              guardIO $ writeChan requestChannel request
+          |
+            file <- bufferFiles
+          ]
+        return False
+
+    visualize configurationFile debug logChannel requestChannel responseChannel
+
+    logger
+
+
 data Graphics =
   Graphics
   {
@@ -49,12 +82,14 @@ data Graphics =
   }
 
 
-visualizeBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
-                 => FilePath
-                 -> Bool
-                 -> [FilePath]
-                 -> m ()
-visualizeBuffers configurationFile debug bufferFiles =
+visualize :: (MonadError String m, MonadIO m, SeverityLog m)
+          => FilePath
+          -> Bool
+          -> LogChannel
+          -> Chan Request
+          -> Chan Response
+          -> m ()
+visualize configurationFile debug logChannel requestChannel _responseChannel =
   do
 
     logInfo $ "Reading configuration from " ++ show configurationFile ++ " . . ."
@@ -64,32 +99,16 @@ visualizeBuffers configurationFile debug bufferFiles =
         . either (Left . show) Right
         <$> guardIO (decodeFileEither configurationFile)
 
-    logInfo "Reading protocol buffers . . ."
-    buffers <-
-      (mapM liftEither =<<)
-        . guardIO
-        $ mapM (fmap (runGet decodeMessage) . BS.readFile)
-          bufferFiles
-
     managerRef <- guardIO newEmptyMVar
     povRef     <- guardIO newEmptyMVar
     toolRef    <- guardIO newEmptyMVar
     lockRef    <- guardIO newEmptyMVar 
 
-    (logChannel, logger) <- makeLogger
-
     void
       . forkLoggedIO logChannel
-      . guardIO
       $ do
-          void
-            $ takeMVar lockRef
-          manager <- readMVar managerRef
-          void
-            . swapMVar managerRef
-            $ foldl insert manager ((^. upsert) <$> buffers)
-          putMVar lockRef ()
-          return False
+        apply Graphics{..} requestChannel
+        return False
 
     logInfo "Forking OpenGL . . ."
     void
@@ -99,7 +118,24 @@ visualizeBuffers configurationFile debug bufferFiles =
         display (logIO logChannel) debug viewer Graphics{..}
         return True
 
-    logger
+
+apply :: (MonadError String m, MonadIO m, SeverityLog m)
+      => Graphics
+      -> Chan Request
+      -> m ()
+apply Graphics{..} requestChannel =
+  let
+    loop =
+      do
+        request <- readChan requestChannel
+        void  $ takeMVar lockRef
+        manager <- readMVar managerRef
+        void
+          . swapMVar managerRef
+          $ insert manager (request ^. upsert)
+        putMVar lockRef ()
+  in
+    guardIO loop
 
 
 display :: LoggerIO
