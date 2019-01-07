@@ -8,12 +8,16 @@ module InfoVis.Parallel.Visualizer (
 ) where
 
 
+import Control.Concurrent (threadDelay)
 import Control.Concurrent.Chan (Chan, newChan, readChan, writeChan)
 import Control.Concurrent.MVar (MVar, newEmptyMVar, newMVar, putMVar, readMVar, swapMVar, takeMVar, tryPutMVar, tryTakeMVar)
 import Control.Lens.Getter ((^.))
-import Control.Monad (join, void, when)
+import Control.Lens.Lens ((&))
+import Control.Lens.Setter ((.~))
+import Control.Monad (forever, join, void, when)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
-import Control.Monad.Log (Severity(..), logInfo)
+import Control.Monad.Log (Severity(..), logDebug, logInfo)
+import Data.Default (def)
 import Data.Maybe (isJust)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
@@ -27,13 +31,13 @@ import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (LogChannel, LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO, makeLogger)
 import InfoVis.Parallel.NewTypes (PositionRotation)
 import InfoVis.Parallel.ProtoBuf (Request, Response, toolSet, viewSet)
-import InfoVis.Parallel.Rendering.Frames (Manager, createManager, delete, draw, insert, prepare, reset, set)
+import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, reset)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
 
 import qualified Data.ByteString as BS (readFile)
-import qualified InfoVis.Parallel.ProtoBuf as P (delete, frameShow, reset, upsert)
+import qualified InfoVis.Parallel.ProtoBuf as P (delete, frameShow, frameShown, reset, upsert)
 
 #ifdef INFOVIS_SWAP_GROUP
 import Graphics.OpenGL.Functions (joinSwapGroup)
@@ -60,11 +64,32 @@ visualizeBuffers configurationFile debug bufferFiles =
           [
             do
               logInfo $ "Reading protocol buffers from " ++ show file ++ " . . ."
-              request <- liftEither =<< guardIO (runGet decodeMessage <$> BS.readFile file)
-              guardIO $ writeChan requestChannel request
+              request <-
+                liftEither
+                  =<< guardIO (runGet decodeMessage <$> BS.readFile file)
+              guardIO
+                $ writeChan requestChannel request
           |
             file <- bufferFiles
           ]
+        void
+          . guardIO
+          . forever
+          $ do
+            threadDelay 1000
+            writeChan requestChannel def 
+        return False
+
+    void
+      . forkLoggedIO logChannel
+      $ do
+        void
+          . forever
+          $ do
+              response <-
+                guardIO
+                  $ readChan responseChannel
+              logDebug $ "Response: " ++ show response
         return False
 
     visualize configurationFile debug logChannel requestChannel responseChannel
@@ -101,7 +126,7 @@ visualize :: (MonadError String m, MonadIO m, SeverityLog m)
           -> Chan Request
           -> Chan Response
           -> m ()
-visualize configurationFile debug logChannel requestChannel _responseChannel =
+visualize configurationFile debug logChannel requestChannel responseChannel =
   do
 
     graphics <- guardIO initialize
@@ -112,7 +137,6 @@ visualize configurationFile debug logChannel requestChannel _responseChannel =
         $ liftEither
         . either (Left . show) Right
         <$> guardIO (decodeFileEither configurationFile)
-
 
     void
       . forkLoggedIO logChannel
@@ -126,7 +150,7 @@ visualize configurationFile debug logChannel requestChannel _responseChannel =
       . forkLoggedOS logChannel
       . guardIO
       $ do
-        display (logIO logChannel) debug viewer graphics
+        display (logIO logChannel) debug viewer graphics responseChannel
         return True
 
 
@@ -138,37 +162,37 @@ apply Graphics{..} requestChannel =
   let
     conditionally f g x = if f x then g x else id
     onlyJust v = maybe (return ()) (void . swapMVar v)
-    loop =
-      do
+  in
+    guardIO
+      . forever
+      $ do
         request <- readChan requestChannel
         void $ takeMVar lockRef
         manager <- readMVar managerRef
         void
           . swapMVar managerRef
-          . delete                             (request ^. P.delete   )
-          . insert                             (request ^. P.upsert   )
-          . conditionally id     (const reset) (request ^. P.reset    )
-          . conditionally (/= 0) set           (request ^. P.frameShow)
+          . delete                                 (request ^. P.delete   )
+          . insert                                 (request ^. P.upsert   )
+          . conditionally id     (const reset)     (request ^. P.reset    )
+          . conditionally (/= 0) (currentFrame .~) (request ^. P.frameShow)
           $ manager
         putMVar lockRef ()
         onlyJust povRef  $ request ^. viewSet
         onlyJust toolRef $ request ^. toolSet
-        loop
-  in
-    guardIO loop
 
 
 display :: LoggerIO
         -> Bool
         -> Viewer Double
         -> Graphics
+        -> Chan Response
         -> IO ()
-display logger debug viewer Graphics{..} =
+display logger debug viewer Graphics{..} responseChannel =
   do
 
     logger Debug "Initializing OpenGL . . ."
     dlp <-
-      setup
+      setup 
         (if debug then Just (logger Debug . show) else Nothing)
         "InfoVis Parallel"
         "InfoVis Parallel"
@@ -184,7 +208,7 @@ display logger debug viewer Graphics{..} =
     dlpViewerDisplay dlp viewer (readMVar povRef)
       $ readMVar managerRef >>= draw
 
-    idleCallback $=! Just (idle Graphics{..})
+    idleCallback $=! Just (idle Graphics{..} responseChannel)
 
 #ifdef INFOVIS_SWAP_GROUP
     logger Debug "Joining swap group . . ."
@@ -197,8 +221,9 @@ display logger debug viewer Graphics{..} =
 
 
 idle :: Graphics
+     -> Chan Response
      -> IdleCallback
-idle Graphics{..} =
+idle Graphics{..} responseChannel =
   do
     void
       $ tryPutMVar startRef ()
@@ -210,4 +235,8 @@ idle Graphics{..} =
           >>= prepare
           >>= swapMVar managerRef
         lockRef `putMVar` ()
+    frame <- (^. currentFrame) <$> readMVar managerRef
+    let
+      response = def & P.frameShown .~ frame
+    writeChan responseChannel response
     postRedisplay Nothing

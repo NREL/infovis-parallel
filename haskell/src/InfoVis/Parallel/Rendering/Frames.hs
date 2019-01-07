@@ -7,7 +7,7 @@ module InfoVis.Parallel.Rendering.Frames (
   Manager
 , createManager
 , destroyManager
-, set
+, currentFrame
 , listFrames
 , insert
 , delete
@@ -18,7 +18,7 @@ module InfoVis.Parallel.Rendering.Frames (
 
 
 import Control.Lens.Lens (Lens', (&), lens)
-import Control.Lens.Setter ((.~), over)
+import Control.Lens.Setter (over)
 import Control.Lens.Traversal (traverseOf)
 import Control.Monad (ap, unless)
 import Data.Bits ((.&.), shift)
@@ -63,14 +63,8 @@ framesLens :: Lens' Manager (M.Map FrameNumber Frame)
 framesLens = lens frames $ \s x -> s {frames = x}
 
 
-currentLens :: Lens' Manager FrameNumber
-currentLens = lens current $ \s x -> s {current = x}
-
-
-set :: FrameNumber
-    -> Manager
-    -> Manager
-set = (currentLens .~)
+currentFrame :: Lens' Manager FrameNumber
+currentFrame = lens current $ \s x -> s {current = x}
 
 
 listFrames :: Manager
@@ -83,7 +77,7 @@ createManager =
   do
     let
       frames = M.empty
-      current = error "The current frame has not been set."
+      current = 0
     program <- prepareShapeProgram
     return Manager{..}
 
@@ -117,7 +111,7 @@ insert' manager@Manager{..} geometry@DeltaGeometry{..} =
           (Just . (`insertFrame` geometry) . fromMaybe (createFrame program))
           frame
       )
-    & over currentLens
+    & over currentFrame
       (
         if M.null frames
           then const frame
