@@ -31,7 +31,9 @@ import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (LogChannel, LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO, makeLogger)
 import InfoVis.Parallel.NewTypes (PositionRotation)
 import InfoVis.Parallel.ProtoBuf (Request, Response, toolSet, viewSet)
-import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, reset)
+import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer)
+import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, program, reset)
+import InfoVis.Parallel.Rendering.Selector (createSelector, drawSelector, prepareSelector)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
@@ -100,22 +102,24 @@ visualizeBuffers configurationFile debug bufferFiles =
 data Graphics =
   Graphics
   {
-    startRef   :: MVar ()
-  , lockRef    :: MVar ()
-  , managerRef :: MVar Manager
-  , povRef     :: MVar PositionRotation
-  , toolRef    :: MVar PositionRotation
+    startRef    :: MVar ()
+  , lockRef     :: MVar ()
+  , managerRef  :: MVar Manager
+  , selectorRef :: MVar ShapeBuffer
+  , povRef      :: MVar PositionRotation
+  , toolRef     :: MVar PositionRotation
   }
 
 
 initialize :: IO Graphics
 initialize =
   do
-    startRef   <- newEmptyMVar
-    lockRef    <- newEmptyMVar 
-    managerRef <- newEmptyMVar
-    povRef     <- newMVar (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
-    toolRef    <- newMVar (P $ V3 0 0  0, Quaternion 1 $ V3 0 0 0)
+    startRef    <- newEmptyMVar
+    lockRef     <- newEmptyMVar 
+    managerRef  <- newEmptyMVar
+    selectorRef <- newEmptyMVar
+    povRef      <- newMVar (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
+    toolRef     <- newMVar (P $ V3 0 0  0, Quaternion 0 $ V3 0 1 0)
     return Graphics{..}
  
 
@@ -202,11 +206,18 @@ display logger debug viewer Graphics{..} responseChannel =
     createManager
       >>= prepare
       >>= putMVar managerRef
+    createSelector
+     .    program
+      <$> readMVar managerRef
+      >>= prepareSelector (P (V3 0 0 0), Quaternion 1 (V3 0 0 0))
+      >>= putMVar selectorRef
     lockRef `putMVar` ()
 
     logger Debug "Setting up display . . ."
     dlpViewerDisplay dlp viewer (readMVar povRef)
-      $ readMVar managerRef >>= draw
+      $ do
+        readMVar managerRef  >>= draw
+        readMVar selectorRef >>= drawSelector
 
     idleCallback $=! Just (idle Graphics{..} responseChannel)
 
@@ -227,6 +238,7 @@ idle Graphics{..} responseChannel =
   do
     void
       $ tryPutMVar startRef ()
+    tool <- readMVar toolRef
     lock <- tryTakeMVar lockRef
     when (isJust lock)
       $ do
@@ -234,6 +246,10 @@ idle Graphics{..} responseChannel =
           $   readMVar managerRef
           >>= prepare
           >>= swapMVar managerRef
+        void
+          $   readMVar selectorRef
+          >>= prepareSelector tool
+          >>= swapMVar selectorRef
         lockRef `putMVar` ()
     frame <- (^. currentFrame) <$> readMVar managerRef
     let

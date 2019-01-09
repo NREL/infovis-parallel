@@ -5,6 +5,7 @@
 
 module InfoVis.Parallel.Rendering.Frames (
   Manager
+, program
 , createManager
 , destroyManager
 , currentFrame

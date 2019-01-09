@@ -23,7 +23,7 @@ import Graphics.Rendering.OpenGL.GL.PerFragment (BlendingFactor(..), ComparisonF
 import Graphics.Rendering.OpenGL.GL.VertexArrays (Capability(Enabled))
 import Graphics.UI.GLUT.Callbacks.Global (IdleCallback)
 import Graphics.UI.GLUT.Callbacks.Window (DisplayCallback, reshapeCallback)
-import Graphics.UI.GLUT.Initialization (DisplayMode(..), initialDisplayMode, initialize)
+import Graphics.UI.GLUT.Initialization (ContextFlag(ForwardCompatibleContext), DisplayMode(..), initialDisplayMode, initialContextFlags, initialize)
 import Graphics.UI.GLUT.Window (createWindow, fullScreen, postRedisplay)
 import Linear.Affine (Point(..), (.+^))
 import Linear.Conjugate (Conjugate)
@@ -56,6 +56,7 @@ setup debug title program Viewer{..} =
           Nothing           -> []
           Just "fullscreen" -> []
           Just geometry'    -> ["-geometry", geometry']
+    initialContextFlags $=! [ForwardCompatibleContext]
     initialDisplayMode $=!
       (if stereo == QuadBuffer then (Stereoscopic :) else id)
         [WithDepthBuffer, DoubleBuffered]

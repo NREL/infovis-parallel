@@ -239,7 +239,7 @@ cone :: Floating a
 cone l d =
   let
     r = d / 2
-    n = 8
+    n = 32
     alpha = 2 * pi / fromIntegral n
   in
     (
