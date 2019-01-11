@@ -3,12 +3,16 @@ module Linear.Util.Graphics (
 , fromVector3
 , toVertex3
 , fromVertex3
+, toPosition
+, toTranslation
 , toRotation
+, toScale
+, toUniformScale
 ) where
 
 
 import Data.Math.Util (acosd)
-import Graphics.Rendering.OpenGL.GL.CoordTrans (MatrixComponent, rotate)
+import Graphics.Rendering.OpenGL.GL.CoordTrans (MatrixComponent, rotate, scale, translate)
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vertex3(..))
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
@@ -37,3 +41,23 @@ fromVertex3 (Vertex3 x y z) = P $ V3 x y z
 
 toRotation :: (Floating a, MatrixComponent a) => Quaternion a -> IO ()
 toRotation (Quaternion w (V3 x y z)) = rotate (2 * acosd w) $ Vector3 x y z
+
+
+{-# INLINE toPosition #-}
+toPosition :: MatrixComponent a => Point V3 a -> IO ()
+toPosition (P v) = toTranslation v
+
+
+{-# INLINE toTranslation #-}
+toTranslation :: MatrixComponent a => V3 a -> IO ()
+toTranslation = translate  . toVector3
+
+
+{-# INLINE toScale #-}
+toScale :: MatrixComponent a => V3 a -> IO ()
+toScale (V3 x y z) = scale x y z
+
+
+{-# INLINE toUniformScale #-}
+toUniformScale :: MatrixComponent a => a -> IO ()
+toUniformScale s = scale s s s

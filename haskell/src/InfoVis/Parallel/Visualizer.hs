@@ -30,16 +30,17 @@ import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (LogChannel, LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO, makeLogger)
 import InfoVis.Parallel.NewTypes (PositionRotation)
-import InfoVis.Parallel.ProtoBuf (Request, Response, toolSet, viewSet)
+import InfoVis.Parallel.ProtoBuf (Request, Response)
 import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer)
 import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, program, reset)
 import InfoVis.Parallel.Rendering.Selector (createSelector, drawSelector, prepareSelector)
+import InfoVis.Parallel.Rendering.Text (drawText)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
 
 import qualified Data.ByteString as BS (readFile)
-import qualified InfoVis.Parallel.ProtoBuf as P (delete, frameShow, frameShown, reset, upsert)
+import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, frameShown, reset, toolSet, upsert, viewSet)
 
 #ifdef INFOVIS_SWAP_GROUP
 import Graphics.OpenGL.Functions (joinSwapGroup)
@@ -108,6 +109,7 @@ data Graphics =
   , selectorRef :: MVar ShapeBuffer
   , povRef      :: MVar PositionRotation
   , toolRef     :: MVar PositionRotation
+  , textRef     :: MVar String
   }
 
 
@@ -120,6 +122,7 @@ initialize =
     selectorRef <- newEmptyMVar
     povRef      <- newMVar (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
     toolRef     <- newMVar (P $ V3 0 0  0, Quaternion 0 $ V3 0 1 0)
+    textRef     <- newMVar ""
     return Graphics{..}
  
 
@@ -181,8 +184,9 @@ apply Graphics{..} requestChannel =
           . conditionally (/= 0) (currentFrame .~) (request ^. P.frameShow)
           $ manager
         putMVar lockRef ()
-        onlyJust povRef  $ request ^. viewSet
-        onlyJust toolRef $ request ^. toolSet
+        onlyJust povRef  $ request ^. P.viewSet
+        onlyJust toolRef $ request ^. P.toolSet
+        onlyJust textRef $ request ^. P.display
 
 
 display :: LoggerIO
@@ -207,7 +211,7 @@ display logger debug viewer Graphics{..} responseChannel =
       >>= prepare
       >>= putMVar managerRef
     createSelector
-     .    program
+      .   program
       <$> readMVar managerRef
       >>= prepareSelector (P (V3 0 0 0), Quaternion 1 (V3 0 0 0))
       >>= putMVar selectorRef
@@ -218,6 +222,7 @@ display logger debug viewer Graphics{..} responseChannel =
       $ do
         readMVar managerRef  >>= draw
         readMVar selectorRef >>= drawSelector
+        readMVar textRef     >>= drawText
 
     idleCallback $=! Just (idle Graphics{..} responseChannel)
 

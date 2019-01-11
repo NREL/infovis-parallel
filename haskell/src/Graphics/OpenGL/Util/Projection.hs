@@ -8,11 +8,12 @@ module Graphics.OpenGL.Util.Projection (
   OffAxisProjection(..)
 , projection
 , fetchProjection
+, setProjection
 ) where
 
 
 import Data.List.Split (chunksOf)
-import Graphics.Rendering.OpenGL.GL (get)
+import Graphics.Rendering.OpenGL.GL (($=!), get)
 import Graphics.Rendering.OpenGL.GL.CoordTrans (GLmatrix, MatrixComponent, MatrixOrder(RowMajor), frustum, getMatrixComponents, matrix, multMatrix, newMatrix, translate)
 import Graphics.OpenGL.Util.Types (Screen(..), upperRight)
 import Linear.Affine (Point, (.-.))
@@ -112,3 +113,12 @@ fetchProjection =
   do
     m <- get $ matrix Nothing :: IO (GLmatrix a)
     chunksOf 4 <$> getMatrixComponents RowMajor m
+
+
+setProjection :: forall a . (MatrixComponent a, RealFloat a)
+              => [[a]]
+              -> IO ()
+setProjection m =
+  do
+    matrx <- newMatrix RowMajor $ concat m
+    matrix Nothing $=! (matrx :: GLmatrix a)
