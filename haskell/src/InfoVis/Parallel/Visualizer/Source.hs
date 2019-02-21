@@ -14,12 +14,14 @@ import Control.Concurrent.Chan (Chan, writeChan)
 import Control.Monad (forever, void)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (logInfo)
+import Data.Bifunctor (first)
 import Data.Default (def)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
 import InfoVis (SeverityLog, guardIO)
 import InfoVis.Parallel.ProtoBuf (Request)
-import Network.UI.Kafka (TopicConnection)
+import Network.Kafka.Protocol (KafkaBytes(..), Message(..), Value(..))
+import Network.UI.Kafka (TopicConnection, rawConsumerLoop)
 
 import qualified Data.ByteString as BS (readFile)
 
@@ -51,8 +53,22 @@ kafkaSource :: (MonadError String m, MonadIO m, SeverityLog m)
             => Chan Request
             -> TopicConnection
             -> m ()
-kafkaSource _requestChannel _topicConnection =
-  return ()
+kafkaSource requestChannel topicConnection =
+  do
+    (_, loop) <-
+      guardIO
+        . rawConsumerLoop topicConnection
+          (
+            \message ->
+              let
+                (_, _, _, _, Value (Just (KBytes bytes)) ) = _messageFields message
+              in
+                either error id . runGet decodeMessage $ bytes
+          )
+        $ writeChan requestChannel
+    liftEither
+      .   first show
+      =<< guardIO loop
 
 
 waitForever :: (MonadError String m, MonadIO m, SeverityLog m)

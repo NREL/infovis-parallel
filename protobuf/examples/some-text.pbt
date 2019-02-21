@@ -1,6 +1,7 @@
 reset: false
 
 upsert {
+  fram: 1
   iden: 501
   type: 4
   mask: 15
@@ -14,7 +15,7 @@ upsert {
   posz: 1.0
   posz: 1.0
   posz: 1.0
-  size: 0.50
+  size: 0.10
   colr: 2155872511
   text: "some text"
 }

@@ -14,4 +14,4 @@ viewer           :
 requests         :
   client         : infovis-parallel
   address        : [localhost, 9092]
-  topic          : infovis-parallel/events
+  topic          : infovis-parallel-requests
