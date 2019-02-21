@@ -8,7 +8,7 @@ license      : MIT
 license-file : LICENSE
 author       : Brian W Bush <brian.bush@nrel.gov>
 maintainer   : Brian W Bush <brian.bush@nrel.gov>
-copyright    : (c) 2015-17 National Renewable Energy Laboratory
+copyright    : (c) 2015-19 National Renewable Energy Laboratory
 category     : Graphics
 build-type   : Simple
 cabal-version: >= 1.10
@@ -46,32 +46,33 @@ executable infovis-parallel
                      Linear.Util.Graphics
                      Linear.Util.Instances
   hs-source-dirs   : src
-  build-depends    : base >= 4.10 && < 4.11
-                   , aeson
-                   , array
-                   , base64-bytestring
-                   , binary
-                   , bytestring
-                   , cereal
-                   , cmdargs
-                   , containers
-                   , data-default
-                   , deepseq
-                   , GLUT
-                   , hashable
-                   , lens
-                   , linear
-                   , logging-effect
-                   , mtl
-                   , OpenGL
-                   , opengl-dlp-stereo
-                   , OpenGLRaw
-                   , protobuf
-                   , split
-                   , text
-                   , vector
-                   , websockets
-                   , yaml
---other-extensions :    
+  build-depends    : base              >= 4.10 && < 5
+                   , aeson             >= 1.3.1
+                   , array             >= 0.5.2
+                   , base64-bytestring >= 1.0.0
+                   , binary            >= 0.8.5
+                   , bytestring        >= 0.10.8
+                   , cereal            >= 0.5.7
+                   , cmdargs           >= 0.10.20
+                   , containers        >= 0.5.10
+                   , data-default      >= 0.7.1
+                   , deepseq           >= 1.4.3
+                   , GLUT              >= 2.7.0
+                   , hashable          >= 1.2.7
+                   , kafka-device      >= 1.0.0
+                   , lens              >= 4.16.1
+                   , linear            >= 1.20.8
+                   , logging-effect    >= 1.3.2
+                   , milena            >= 0.5.2
+                   , mtl               >= 2.2.2
+                   , OpenGL            >= 3.0.2
+                   , opengl-dlp-stereo >= 0.1.5
+                   , OpenGLRaw         >= 3.3.1
+                   , protobuf          >= 0.2.1
+                   , split             >= 0.2.3
+                   , text              >= 1.2.3
+                   , vector            >= 0.12.0
+                   , websockets        >= 0.12.5
+                   , yaml              >= 0.8.32
   ghc-options      : -threaded -Wall
   default-language : Haskell2010

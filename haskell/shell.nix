@@ -41,8 +41,8 @@ in
     # pkgs.glslang
     # pkgs.vulkan-loader
     ];
-    shellHook = old.shellHook + ''
-      export LD_LIBRARY_PATH+=:${pkgs.vulkan-loader}/lib
-      export VK_LAYER_PATH=${pkgs.vulkan-loader}/share/vulkan/explicit_layer.d
-    '';
+#   shellHook = old.shellHook + ''
+#     export LD_LIBRARY_PATH+=:${pkgs.vulkan-loader}/lib
+#     export VK_LAYER_PATH=${pkgs.vulkan-loader}/share/vulkan/explicit_layer.d
+#   '';
 })
