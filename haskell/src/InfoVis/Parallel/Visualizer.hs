@@ -16,7 +16,7 @@ import Control.Lens.Lens ((&))
 import Control.Lens.Setter ((.~))
 import Control.Monad (forever, void, when)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
-import Control.Monad.Log (Severity(..), logDebug, logInfo)
+import Control.Monad.Log (Severity(..), logInfo)
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Default (def)
 import Data.Maybe (isJust)
@@ -35,6 +35,7 @@ import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer)
 import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, program, reset)
 import InfoVis.Parallel.Rendering.Selector (createSelector, drawSelector, prepareSelector)
 import InfoVis.Parallel.Rendering.Text (drawText)
+import InfoVis.Parallel.Visualizer.Sink (deviceSink)
 import InfoVis.Parallel.Visualizer.Source (filesSource, kafkaSource, waitForever)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
@@ -89,13 +90,7 @@ visualizeBuffers configurationFile debug bufferFiles =
     void
       . forkLoggedIO logChannel
       $ do
-        void
-          . forever
-          $ do
-              response <-
-                guardIO
-                  $ readChan responseChannel
-              logDebug $ "Response: " ++ show response
+        deviceSink responseChannel
         return False
 
     visualize viewer debug logChannel requestChannel responseChannel

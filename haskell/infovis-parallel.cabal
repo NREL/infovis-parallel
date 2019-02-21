@@ -42,6 +42,7 @@ executable infovis-parallel
                      InfoVis.Parallel.Rendering.Text
                      InfoVis.Parallel.Sender
                      InfoVis.Parallel.Visualizer
+                     InfoVis.Parallel.Visualizer.Sink
                      InfoVis.Parallel.Visualizer.Source
                      Linear.Util
                      Linear.Util.Graphics
