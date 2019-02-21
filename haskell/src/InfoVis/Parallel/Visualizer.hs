@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP              #-}
+{-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards  #-}
 
@@ -14,14 +15,16 @@ import Control.Concurrent.MVar (MVar, newEmptyMVar, newMVar, putMVar, readMVar, 
 import Control.Lens.Getter ((^.))
 import Control.Lens.Lens ((&))
 import Control.Lens.Setter ((.~))
-import Control.Monad (forever, join, void, when)
+import Control.Monad (forever, void, when)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logDebug, logInfo)
+import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Default (def)
 import Data.Maybe (isJust)
 import Data.ProtocolBuffers (decodeMessage)
 import Data.Serialize (runGet)
 import Data.Yaml (decodeFileEither)
+import GHC.Generics (Generic)
 import Graphics.OpenGL.Util.Setup (dlpViewerDisplay, setup)
 import Graphics.OpenGL.Util.Types (Viewer)
 import Graphics.Rendering.OpenGL (($=!))
@@ -38,6 +41,7 @@ import InfoVis.Parallel.Rendering.Text (drawText)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
+import Network.UI.Kafka (TopicConnection)
 
 import qualified Data.ByteString as BS (readFile)
 import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, frameShown, reset, toolSet, upsert, viewSet)
@@ -45,6 +49,19 @@ import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, fra
 #ifdef INFOVIS_SWAP_GROUP
 import Graphics.OpenGL.Functions (joinSwapGroup)
 #endif
+
+
+data Configuration =
+  Configuration
+  {
+    viewer :: Viewer Double
+  , kafka  :: Maybe TopicConnection
+  }
+    deriving (Eq, Generic, Read, Show)
+
+instance FromJSON Configuration
+
+instance ToJSON Configuration
 
 
 visualizeBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -59,6 +76,11 @@ visualizeBuffers configurationFile debug bufferFiles =
 
     requestChannel  <- guardIO newChan
     responseChannel <- guardIO newChan
+
+    logInfo $ "Reading configuration from " ++ show configurationFile ++ " . . ."
+    Configuration{..} <-
+      liftEither . either (Left . show) Right
+        =<< guardIO (decodeFileEither configurationFile)
 
     void
       . forkLoggedIO logChannel
@@ -95,7 +117,7 @@ visualizeBuffers configurationFile debug bufferFiles =
               logDebug $ "Response: " ++ show response
         return False
 
-    visualize configurationFile debug logChannel requestChannel responseChannel
+    visualize viewer debug logChannel requestChannel responseChannel
 
     logger
 
@@ -127,23 +149,16 @@ initialize =
  
 
 visualize :: (MonadError String m, MonadIO m, SeverityLog m)
-          => FilePath
+          => Viewer Double
           -> Bool
           -> LogChannel
           -> Chan Request
           -> Chan Response
           -> m ()
-visualize configurationFile debug logChannel requestChannel responseChannel =
+visualize viewer' debug logChannel requestChannel responseChannel =
   do
 
     graphics <- guardIO initialize
-
-    logInfo $ "Reading configuration from " ++ show configurationFile ++ " . . ."
-    viewer <-
-      join
-        $ liftEither
-        . either (Left . show) Right
-        <$> guardIO (decodeFileEither configurationFile)
 
     void
       . forkLoggedIO logChannel
@@ -157,7 +172,7 @@ visualize configurationFile debug logChannel requestChannel responseChannel =
       . forkLoggedOS logChannel
       . guardIO
       $ do
-        display (logIO logChannel) debug viewer graphics responseChannel
+        display (logIO logChannel) debug viewer' graphics responseChannel
         return True
 
 
@@ -195,7 +210,7 @@ display :: LoggerIO
         -> Graphics
         -> Chan Response
         -> IO ()
-display logger debug viewer Graphics{..} responseChannel =
+display logger debug viewer' Graphics{..} responseChannel =
   do
 
     logger Debug "Initializing OpenGL . . ."
@@ -204,7 +219,7 @@ display logger debug viewer Graphics{..} responseChannel =
         (if debug then Just (logger Debug . show) else Nothing)
         "InfoVis Parallel"
         "InfoVis Parallel"
-        (viewer :: Viewer Double)
+        viewer'
 
     logger Debug "Creating array buffer manager . . ."
     createManager
@@ -218,7 +233,7 @@ display logger debug viewer Graphics{..} responseChannel =
     lockRef `putMVar` ()
 
     logger Debug "Setting up display . . ."
-    dlpViewerDisplay dlp viewer (readMVar povRef)
+    dlpViewerDisplay dlp viewer' (readMVar povRef)
       $ do
         readMVar managerRef  >>= draw
         readMVar selectorRef >>= drawSelector
