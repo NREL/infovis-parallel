@@ -71,7 +71,7 @@ withSeverityLog severity =
 
 
 withLogger :: (MonadError String m, MonadIO m, SeverityLog m)
-           => ((Severity -> String -> IO ()) -> IO a)
+           => (LoggerIO -> IO a)
            -> m a
 withLogger action =
   do

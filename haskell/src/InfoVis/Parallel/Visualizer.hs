@@ -9,7 +9,6 @@ module InfoVis.Parallel.Visualizer (
 ) where
 
 
-import Control.Concurrent (threadDelay)
 import Control.Concurrent.Chan (Chan, newChan, readChan, writeChan)
 import Control.Concurrent.MVar (MVar, newEmptyMVar, newMVar, putMVar, readMVar, swapMVar, takeMVar, tryPutMVar, tryTakeMVar)
 import Control.Lens.Getter ((^.))
@@ -21,8 +20,6 @@ import Control.Monad.Log (Severity(..), logDebug, logInfo)
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Default (def)
 import Data.Maybe (isJust)
-import Data.ProtocolBuffers (decodeMessage)
-import Data.Serialize (runGet)
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import Graphics.OpenGL.Util.Setup (dlpViewerDisplay, setup)
@@ -38,12 +35,12 @@ import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer)
 import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, program, reset)
 import InfoVis.Parallel.Rendering.Selector (createSelector, drawSelector, prepareSelector)
 import InfoVis.Parallel.Rendering.Text (drawText)
+import InfoVis.Parallel.Visualizer.Source (filesSource, kafkaSource, waitForever)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
 import Network.UI.Kafka (TopicConnection)
 
-import qualified Data.ByteString as BS (readFile)
 import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, frameShown, reset, toolSet, upsert, viewSet)
 
 #ifdef INFOVIS_SWAP_GROUP
@@ -85,24 +82,8 @@ visualizeBuffers configurationFile debug bufferFiles =
     void
       . forkLoggedIO logChannel
       $ do
-        sequence_
-          [
-            do
-              logInfo $ "Reading protocol buffers from " ++ show file ++ " . . ."
-              request <-
-                liftEither
-                  =<< guardIO (runGet decodeMessage <$> BS.readFile file)
-              guardIO
-                $ writeChan requestChannel request
-          |
-            file <- bufferFiles
-          ]
-        void
-          . guardIO
-          . forever
-          $ do
-            threadDelay 1000
-            writeChan requestChannel def 
+        filesSource requestChannel bufferFiles
+        maybe waitForever (flip kafkaSource) kafka requestChannel
         return False
 
     void
