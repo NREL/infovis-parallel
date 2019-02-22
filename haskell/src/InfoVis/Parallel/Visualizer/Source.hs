@@ -56,6 +56,7 @@ kafkaSource :: (MonadError String m, MonadIO m, SeverityLog m)
 kafkaSource requestChannel topicConnection =
   do
     (_, loop) <-
+-- FIXME: switch to withLogger
       guardIO
         . rawConsumerLoop topicConnection
           (

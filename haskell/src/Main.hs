@@ -35,6 +35,7 @@ import System.Console.CmdArgs (Typeable, (&=), args, cmdArgs, details, explicit,
 import System.Exit (die)
 
 import qualified InfoVis.Parallel.Compiler as I (compileBuffers)
+import qualified InfoVis.Parallel.KafkaSender as I (sendKafka)
 import qualified InfoVis.Parallel.Sender as I (sendBuffers)
 import qualified InfoVis.Parallel.Visualizer as I (visualizeBuffers)
 
@@ -50,6 +51,15 @@ data InfoVis =
     , port     :: Int
     , path     :: String
     , sendText :: Bool
+    , buffers  :: [FilePath]
+    }
+  | SendKafka
+    {
+      logging  :: Severity
+    , host     :: String
+    , port     :: Int
+    , client   :: String
+    , topic    :: String
     , buffers  :: [FilePath]
     }
   | Compile
@@ -72,6 +82,7 @@ infovis =
   modes
     [
       sendBuffers
+    , sendKafka
     , compile
     , visualize
     ]
@@ -94,7 +105,7 @@ sendBuffers =
              &= name "host"
              &= typ "ADDRESS"
              &= help "Address of the websocket server"
-  , port      = 8080
+  , port      = 9092
              &= explicit
              &= name "port"
              &= typ "PORT"
@@ -115,6 +126,26 @@ sendBuffers =
     &= explicit
     &= name "send"
     &= help "Send protocol buffers serialized as binary files to client."
+    &= details []
+
+
+sendKafka :: InfoVis
+sendKafka =
+  SendKafka
+  {
+    client  = "infovis-parallel-sender"
+           &= explicit
+           &= name "client"
+           &= typ "NAME"
+           &= help "Name for Kafka client"
+  , topic   = "infovis-parallel-requests"
+           &= explicit
+           &= name "topic"
+           &= help "Name of Kafka topic"
+  }
+    &= explicit
+    &= name "send-kafka"
+    &= help "Send protocol buffers serialized as binary files to Kafka topic."
     &= details []
 
 
@@ -167,5 +198,6 @@ dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          => InfoVis
          -> m ()
 dispatch SendBuffers{..} = I.sendBuffers host port path sendText buffers
+dispatch SendKafka{..} = I.sendKafka (host, port) client topic buffers
 dispatch Compile{..} = I.compileBuffers buffers output
 dispatch Visualize{..} = I.visualizeBuffers config (logging == Debug) buffers
