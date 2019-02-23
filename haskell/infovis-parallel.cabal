@@ -23,6 +23,10 @@ source-repository head
   tag     : multiclient
 
 
+flag SwapGroup
+  description: Join NVIDIA swap group.
+  default    : False
+
 executable infovis-parallel
   main-is          : Main.hs
   other-modules    : Paths_infovis_parallel
@@ -49,6 +53,8 @@ executable infovis-parallel
                      Linear.Util
                      Linear.Util.Graphics
                      Linear.Util.Instances
+  if flag(SwapGroup)
+    other-modules  : Graphics.OpenGL.Functions
   hs-source-dirs   : src
   build-depends    : base              >= 4.10 && < 5
                    , aeson             >= 1.3.1
@@ -78,5 +84,7 @@ executable infovis-parallel
                    , vector            >= 0.12.0
                    , websockets        >= 0.12.5
                    , yaml              >= 0.8.32
+  if flag(SwapGroup)
+    other-modules  : X11
   ghc-options      : -threaded -Wall
   default-language : Haskell2010
