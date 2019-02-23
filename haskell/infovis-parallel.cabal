@@ -36,6 +36,7 @@ executable infovis-parallel
                      Graphics.OpenGL.Util.Types
                      InfoVis
                      InfoVis.Parallel.Compiler
+                     InfoVis.Parallel.KafkaMultiplex
                      InfoVis.Parallel.KafkaSender
                      InfoVis.Parallel.NewTypes
                      InfoVis.Parallel.ProtoBuf

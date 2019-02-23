@@ -12,6 +12,6 @@ viewer           :
       lowerRight : [ 1.940, -0.320, 0]
       upperLeft  : [-0.940,  1.320, 0]
 requests         :
-  client         : infovis-parallel
+  client         : visualizer
   address        : [localhost, 9092]
-  topic          : infovis-parallel-requests
+  topic          : requests

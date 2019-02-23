@@ -31,11 +31,12 @@ import Control.Monad.Except (MonadError, MonadIO, runExceptT)
 import Control.Monad.Log (Severity(..))
 import Data.Data (Data)
 import InfoVis (SeverityLog, stringVersion, withSeverityLog)
-import System.Console.CmdArgs (Typeable, (&=), args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
+import System.Console.CmdArgs (Typeable, (&=), argPos, args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
 import System.Exit (die)
 
 import qualified InfoVis.Parallel.Compiler        as I (compileBuffers)
 import qualified InfoVis.Parallel.KafkaSender     as I (sendKafka)
+import qualified InfoVis.Parallel.KafkaMultiplex  as I (multiplexKafka)
 import qualified InfoVis.Parallel.WebsocketSender as I (sendBuffers)
 import qualified InfoVis.Parallel.Visualizer      as I (visualizeBuffers)
 
@@ -62,6 +63,15 @@ data InfoVis =
     , topic    :: String
     , buffers  :: [FilePath]
     }
+  | MultiplexKafka
+    {
+      logging  :: Severity
+    , host     :: String
+    , port     :: Int
+    , client   :: String
+    , topic    :: String
+    , configs  :: [FilePath]
+    }
   | Compile
     {
       logging  :: Severity
@@ -83,6 +93,7 @@ infovis =
     [
       sendWebsocket
     , sendKafka
+    , multiplexKafka
     , compile
     , visualize
     ]
@@ -124,7 +135,7 @@ sendWebsocket =
              &= args
   }
     &= explicit
-    &= name "send-websocket"
+    &= name "websocket"
     &= help "Send protocol buffers serialized as binary files to client."
     &= details []
 
@@ -133,7 +144,7 @@ sendKafka :: InfoVis
 sendKafka =
   SendKafka
   {
-    client  = "infovis-parallel-sender"
+    client  = "infovis-parallel"
            &= explicit
            &= name "client"
            &= typ "NAME"
@@ -144,8 +155,22 @@ sendKafka =
            &= help "Name of Kafka topic"
   }
     &= explicit
-    &= name "send-kafka"
+    &= name "send"
     &= help "Send protocol buffers serialized as binary files to Kafka topic."
+    &= details []
+
+
+multiplexKafka :: InfoVis
+multiplexKafka =
+  MultiplexKafka
+  {
+    configs  = []
+           &= typ "YAML"
+           &= args
+  }
+    &= explicit
+    &= name "multiplex"
+    &= help "Combine multiple Kafka streams of protocol buffers."
     &= details []
 
 
@@ -170,10 +195,8 @@ visualize =
   Visualize
   {
     config  = "config.yaml"
-           &= explicit
-           &= name "config"
            &= typ "YAML"
-           &= help "Visualization parameters"
+           &= argPos 0
   }
     &= explicit
     &= name "visualize"
@@ -199,5 +222,6 @@ dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          -> m ()
 dispatch SendWebsocket{..} = I.sendBuffers host port path sendText buffers
 dispatch SendKafka{..} = I.sendKafka (host, port) client topic buffers
+dispatch MultiplexKafka{..} = I.multiplexKafka (host, port) client topic configs
 dispatch Compile{..} = I.compileBuffers buffers output
 dispatch Visualize{..} = I.visualizeBuffers config (logging == Debug) buffers

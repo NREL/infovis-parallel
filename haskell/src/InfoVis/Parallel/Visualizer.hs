@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP              #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards  #-}
@@ -22,10 +21,6 @@ import InfoVis.Parallel.ProtoBuf.Sink (deviceSink)
 import InfoVis.Parallel.ProtoBuf.Source (filesSource, kafkaSource, waitForever)
 import InfoVis.Parallel.Visualizer.Graphics (visualize)
 import Network.UI.Kafka (TopicConnection)
-
-#ifdef INFOVIS_SWAP_GROUP
-import Graphics.OpenGL.Functions (joinSwapGroup)
-#endif
 
 
 data Configuration =

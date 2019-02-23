@@ -1,0 +1,5 @@
+device    :
+  client  : keyboard
+  address : [localhost, 9092]
+  topic   : devices
+transforms: []
