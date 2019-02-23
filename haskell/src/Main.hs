@@ -144,12 +144,12 @@ sendKafka :: InfoVis
 sendKafka =
   SendKafka
   {
-    client  = "infovis-parallel"
+    client  = "requester"
            &= explicit
            &= name "client"
            &= typ "NAME"
            &= help "Name for Kafka client"
-  , topic   = "infovis-parallel-requests"
+  , topic   = "requests"
            &= explicit
            &= name "topic"
            &= help "Name of Kafka topic"

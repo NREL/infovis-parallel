@@ -5,10 +5,16 @@
 
 module InfoVis.Parallel.KafkaMultiplex (
   multiplexKafka
+
+
+
+, Device(..)
+, Behavior(..)
 ) where
 
 
 import Control.Concurrent.Chan (Chan, newChan, writeChan)
+import Control.Concurrent.MVar (MVar, newMVar, putMVar, takeMVar)
 import Control.Lens.Lens ((&))
 import Control.Lens.Setter ((?~))
 import Control.Monad (void)
@@ -16,28 +22,27 @@ import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logInfo)
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Bifunctor (first)
-import Data.Default (def)
+import Data.Default (Default(..))
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import InfoVis (LoggerIO, SeverityLog, forkLoggedIO, guardIO, logIO, makeLogger)
 import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.ProtoBuf.Sink (kafkaSink)
-import Network.UI.Kafka (TopicConnection(..), consumerLoop)
+import Network.UI.Kafka (Sensor, TopicConnection(..), consumerLoop)
+import Network.UI.Kafka.Types (Event(..))
 
 import qualified InfoVis.Parallel.ProtoBuf as P (display)
 
 
-data Device =
-  Device
+data Visualization =
+  Visualization
   {
-    device     :: TopicConnection
-  , transforms :: [()]
+    shown :: String
   }
-    deriving (Eq, Generic, Read, Show)
+   deriving (Eq, Ord, Read, Show)
 
-instance FromJSON Device
-
-instance ToJSON Device
+instance Default Visualization where
+  def = Visualization def
 
 
 multiplexKafka :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -49,6 +54,8 @@ multiplexKafka :: (MonadError String m, MonadIO m, SeverityLog m)
 multiplexKafka address client topic configurations =
   do
 
+    visualizationMVar <- guardIO $ newMVar def
+
     (logChannel, logger) <- makeLogger
 
     requestChannel  <- guardIO newChan
@@ -58,7 +65,7 @@ multiplexKafka address client topic configurations =
         void
           . forkLoggedIO logChannel
           $ do
-            createDevice (logIO logChannel) requestChannel configuration
+            createDevice (logIO logChannel) requestChannel visualizationMVar configuration
             return False
       |
         configuration <- configurations
@@ -76,9 +83,10 @@ multiplexKafka address client topic configurations =
 createDevice :: (MonadError String m, MonadIO m, SeverityLog m)
              => LoggerIO
              -> Chan Request
+             -> MVar Visualization
              -> FilePath
              -> m ()
-createDevice logger requestChannel configuration =
+createDevice logger requestChannel visualizationMVar configuration =
   do
     logInfo $ "Reading device configuration from " ++ show configuration ++ " . . ."
     Device{..}  <-
@@ -94,10 +102,65 @@ createDevice logger requestChannel configuration =
         $ \sensor event ->
           do
             logger Debug $ "Received from sensor " ++ sensor ++ ": " ++ show event
-            writeChan requestChannel
-              $ def
-              & P.display ?~ sensor
+            sequence_
+              [
+                do
+                  visualization <- takeMVar visualizationMVar
+                  let
+                    (visualization', request) = behave behavior event visualization
+                  putMVar visualizationMVar visualization'   
+                  writeChan requestChannel request
+              |
+                (sensor', behavior) <- handlers
+              , sensor == sensor'
+              ]
     liftEither
       .   first show
       =<< guardIO loop
     logInfo $ "Closing connection to Kafka topic " ++ topic ++ " on " ++ host ++ ":" ++ show port ++ " . . ."
+
+
+data Device =
+  Device
+  {
+    device  :: TopicConnection
+  , handlers :: [(Sensor, Behavior)]
+  }
+    deriving (Eq, Generic, Read, Show)
+
+instance FromJSON Device
+
+instance ToJSON Device
+
+
+data Behavior =
+    TextBehavior
+  | NullBehavior
+    deriving (Eq, Generic, Read, Show)
+
+instance FromJSON Behavior
+
+instance ToJSON Behavior
+
+
+behave :: Behavior
+       -> Event
+       -> Visualization
+       -> (Visualization, Request)
+
+behave TextBehavior KeyEvent{..} visualization@Visualization{..} =
+  let
+    text =
+      if key == '\n'
+        then ""
+        else shown ++ [key]
+  in
+    (
+      visualization
+      {
+        shown = text
+      }
+    , def & P.display ?~ text
+    )
+
+behave _ _ visualization = (visualization, def)
