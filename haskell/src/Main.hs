@@ -34,17 +34,17 @@ import InfoVis (SeverityLog, stringVersion, withSeverityLog)
 import System.Console.CmdArgs (Typeable, (&=), args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
 import System.Exit (die)
 
-import qualified InfoVis.Parallel.Compiler as I (compileBuffers)
-import qualified InfoVis.Parallel.KafkaSender as I (sendKafka)
-import qualified InfoVis.Parallel.Sender as I (sendBuffers)
-import qualified InfoVis.Parallel.Visualizer as I (visualizeBuffers)
+import qualified InfoVis.Parallel.Compiler        as I (compileBuffers)
+import qualified InfoVis.Parallel.KafkaSender     as I (sendKafka)
+import qualified InfoVis.Parallel.WebsocketSender as I (sendBuffers)
+import qualified InfoVis.Parallel.Visualizer      as I (visualizeBuffers)
 
 
 deriving instance Data Severity
 
 
 data InfoVis =
-    SendBuffers
+    SendWebsocket
     {
       logging  :: Severity
     , host     :: String
@@ -81,7 +81,7 @@ infovis :: InfoVis
 infovis =
   modes
     [
-      sendBuffers
+      sendWebsocket
     , sendKafka
     , compile
     , visualize
@@ -91,9 +91,9 @@ infovis =
       &= help "This tool provides a command-line interface to InfoVis-Parallel."
 
 
-sendBuffers :: InfoVis
-sendBuffers =
-  SendBuffers
+sendWebsocket :: InfoVis
+sendWebsocket =
+  SendWebsocket
   {
     logging   = Informational
              &= explicit
@@ -124,7 +124,7 @@ sendBuffers =
              &= args
   }
     &= explicit
-    &= name "send"
+    &= name "send-websocket"
     &= help "Send protocol buffers serialized as binary files to client."
     &= details []
 
@@ -197,7 +197,7 @@ main =
 dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          => InfoVis
          -> m ()
-dispatch SendBuffers{..} = I.sendBuffers host port path sendText buffers
+dispatch SendWebsocket{..} = I.sendBuffers host port path sendText buffers
 dispatch SendKafka{..} = I.sendKafka (host, port) client topic buffers
 dispatch Compile{..} = I.compileBuffers buffers output
 dispatch Visualize{..} = I.visualizeBuffers config (logging == Debug) buffers

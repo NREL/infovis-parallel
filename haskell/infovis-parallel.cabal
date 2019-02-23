@@ -47,7 +47,7 @@ executable infovis-parallel
                      InfoVis.Parallel.Rendering.Program
                      InfoVis.Parallel.Rendering.Selector
                      InfoVis.Parallel.Rendering.Text
-                     InfoVis.Parallel.Sender
+                     InfoVis.Parallel.WebsocketSender
                      InfoVis.Parallel.Visualizer
                      InfoVis.Parallel.Visualizer.Graphics
                      Linear.Util
@@ -69,7 +69,7 @@ executable infovis-parallel
                    , deepseq           >= 1.4.3
                    , GLUT              >= 2.7.0
                    , hashable          >= 1.2.7
-                   , kafka-device      >= 1.0.1
+                   , kafka-device      >= 1.0.2
                    , lens              >= 4.16.1
                    , linear            >= 1.20.8
                    , logging-effect    >= 1.3.2

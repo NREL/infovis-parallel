@@ -17,7 +17,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 
-module InfoVis.Parallel.Sender (
+module InfoVis.Parallel.WebsocketSender (
   sendBuffers
 ) where
 
