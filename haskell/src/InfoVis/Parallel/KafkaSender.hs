@@ -13,6 +13,7 @@
 -----------------------------------------------------------------------------
 
 
+{-# LANGUAGE ExplicitForAll    #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -23,39 +24,40 @@ module InfoVis.Parallel.KafkaSender (
 ) where
 
 
+import Control.Concurrent.Chan (Chan, newChan)
+import Control.Monad (void)
 import Control.Monad.Except (MonadError, MonadIO)
-import Control.Monad.Log (Severity(..), logInfo)
-import InfoVis (SeverityLog, withLogger)
-import Network.Kafka.Producer (makeMessage)
-import Network.UI.Kafka (TopicConnection(..), rawProducerLoop)
+import InfoVis (SeverityLog, forkLoggedIO, guardIO, logIO, makeLogger)
+import InfoVis.Parallel.ProtoBuf (Request)
+import InfoVis.Parallel.ProtoBuf.Sink (kafkaSink)
+import InfoVis.Parallel.ProtoBuf.Source (filesSource, waitForever)
+import Network.UI.Kafka (TopicConnection(..))
 
-import qualified Data.ByteString as BS (readFile)
 
-
-sendKafka :: (MonadError String m, MonadIO m, SeverityLog m)
+sendKafka :: forall m . (MonadError String m, MonadIO m, SeverityLog m)
             => (String, Int)
             -> String
             -> String
             -> [FilePath]
             -> m ()
-sendKafka address@(host, port) client topic buffers =
+sendKafka address client topic files =
   do
-    logInfo $ "Opening Kafka topic " ++ topic ++ " on " ++ host ++ ":" ++ show port ++ " . . ."
-    withLogger $ \logger ->
-      do
-        (_, loop) <-
-          rawProducerLoop
-            TopicConnection{..}
-            makeMessage
-          $ sequence
-          [
-            do
-              logger Debug $ "Reading " ++ show file ++ " . . ."           
-              bytes <- BS.readFile file
-              logger Informational $ "Sending " ++ show file ++ " . . ."           
-              return bytes
-          |
-            file <- buffers
-          ]
-        loop
-    logInfo $ "Closing connection to Kafka topic " ++ topic ++ " on " ++ host ++ ":" ++ show port ++ " . . ."
+
+    (logChannel, logger) <- makeLogger
+
+    requestChannel  <- guardIO newChan
+
+    void
+      . forkLoggedIO logChannel
+      $ do
+        filesSource requestChannel files
+        waitForever (requestChannel :: Chan Request)
+        return False
+
+    void
+      . forkLoggedIO logChannel
+      $ do
+        kafkaSink (logIO logChannel) requestChannel TopicConnection{..}
+        return True
+
+    logger

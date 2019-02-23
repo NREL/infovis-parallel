@@ -17,10 +17,10 @@ import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import Graphics.OpenGL.Util.Types (Viewer)
-import InfoVis (SeverityLog, guardIO, forkLoggedIO, makeLogger)
+import InfoVis (SeverityLog, guardIO, forkLoggedIO, logIO, makeLogger)
+import InfoVis.Parallel.ProtoBuf.Sink (deviceSink)
+import InfoVis.Parallel.ProtoBuf.Source (filesSource, kafkaSource, waitForever)
 import InfoVis.Parallel.Visualizer.Graphics (visualize)
-import InfoVis.Parallel.Visualizer.Sink (deviceSink)
-import InfoVis.Parallel.Visualizer.Source (filesSource, kafkaSource, waitForever)
 import Network.UI.Kafka (TopicConnection)
 
 #ifdef INFOVIS_SWAP_GROUP
@@ -63,7 +63,7 @@ visualizeBuffers configurationFile debug bufferFiles =
       . forkLoggedIO logChannel
       $ do
         filesSource requestChannel bufferFiles
-        maybe waitForever (flip kafkaSource) requests requestChannel
+        maybe waitForever (flip . kafkaSource $ logIO logChannel) requests requestChannel
         return False
 
     void

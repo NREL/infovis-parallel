@@ -6,7 +6,6 @@ module InfoVis.Parallel.Compiler (
 ) where
 
 
-import Control.Monad (join)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (logInfo)
 import Data.ByteString.Lazy (hPut)
@@ -31,10 +30,8 @@ compileBuffers inputs output =
         do
           logInfo $ "Parsing " ++ show input ++ " . . ."
           result <-
-            join
-              $ liftEither
-              . either (Left . show) Right
-              <$> guardIO (decodeFileEither input)
+            liftEither . either (Left . show) Right
+              =<< guardIO (decodeFileEither input)
           guardIO
             . hPut handle
             . runPutLazy
