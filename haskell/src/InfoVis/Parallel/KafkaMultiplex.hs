@@ -4,19 +4,16 @@
 
 
 module InfoVis.Parallel.KafkaMultiplex (
-  multiplexKafka
-
-
-
-, Device(..)
+  Device(..)
 , Behavior(..)
+, multiplexKafka
 ) where
 
 
 import Control.Concurrent.Chan (Chan, newChan, writeChan)
 import Control.Concurrent.MVar (MVar, newMVar, putMVar, takeMVar)
 import Control.Lens.Lens ((&))
-import Control.Lens.Setter ((?~))
+import Control.Lens.Setter ((.~), (?~))
 import Control.Monad (unless, void)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logInfo)
@@ -26,7 +23,7 @@ import Data.Default (Default(..))
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import InfoVis (LoggerIO, SeverityLog, forkLoggedIO, guardIO, logIO, makeLogger)
-import InfoVis.Parallel.NewTypes (PositionRotation)
+import InfoVis.Parallel.NewTypes (Frame, PositionRotation)
 import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.ProtoBuf.Sink (kafkaSink)
 import Linear.Affine (Point(..), (.+^))
@@ -37,13 +34,14 @@ import Linear.Vector ((*^), zero)
 import Network.UI.Kafka (Sensor, TopicConnection(..), consumerLoop)
 import Network.UI.Kafka.Types (Event(..), Modifiers(..),  SpecialKey(..))
 
-import qualified InfoVis.Parallel.ProtoBuf as P (display, toolSet, viewSet)
+import qualified InfoVis.Parallel.ProtoBuf as P (display, frameShow, toolSet, viewSet)
 
 
 data Visualization =
   Visualization
   {
-    shown  :: String
+    frame  :: Frame
+  , shown  :: String
   , viewer :: PositionRotation
   , tool   :: PositionRotation
   }
@@ -53,7 +51,8 @@ instance Default Visualization where
   def =
     Visualization
     {
-      shown  = ""
+      frame = 1
+    , shown  = ""
     , viewer = (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
     , tool   = (P $ V3 0 0  0, Quaternion 0 $ V3 0 1 0)
     }
@@ -150,6 +149,12 @@ instance ToJSON Device
 
 data Behavior =
     Typing
+  | KeyFrame
+    {
+      nextFrame     :: Either SpecialKey Char
+    , previousFrame :: Either SpecialKey Char
+    , setFrame      :: [(Frame, Either SpecialKey Char)]
+    }
   | KeyMovement
     {
       viewerModifiers        :: Maybe Modifiers
@@ -197,6 +202,11 @@ behave Typing KeyEvent{..} visualization@Visualization{..} =
     , def & P.display ?~ text
     )
 
+behave keyFrame'@KeyFrame{} KeyEvent{..} visualization =
+  keyFrame keyFrame' (Right key) visualization
+behave keyFrame'@KeyFrame{} SpecialKeyEvent{..} visualization =
+  keyFrame keyFrame' (Left specialKey) visualization
+
 behave keyMovement'@KeyMovement{} KeyEvent{..} visualization =
   keyMovement keyMovement' (Right key) modifiers visualization
 behave keyMovement'@KeyMovement{} SpecialKeyEvent{..} visualization =
@@ -212,8 +222,6 @@ keyMovement :: Behavior
             -> (Visualization, Request)
 keyMovement KeyMovement{..} key' modifiers' visualization@Visualization{..} =
   let
-    head' x []      = x
-    head' _ (x : _) = x
     motion =
       head' zero
         $ snd
@@ -257,3 +265,31 @@ keyMovement KeyMovement{..} key' modifiers' visualization@Visualization{..} =
           & P.toolSet ?~ tool'
     )
 keyMovement _ _ _ visualization = (visualization, def)
+
+
+keyFrame :: Behavior
+         -> Either SpecialKey Char
+         -> Visualization
+         -> (Visualization, Request)
+keyFrame KeyFrame{..} key' visualization@Visualization{..} =
+  let
+    frame'
+      | key' == nextFrame     = frame + 1
+      | key' == previousFrame = frame - 1
+      | otherwise             = head' frame $ fst <$> filter ((key' ==) . snd) setFrame
+  in
+    (
+      visualization
+      {
+        frame = frame'
+      }
+    , def & P.frameShow .~ frame'
+    )
+keyFrame _ _ visualization = (visualization, def)
+
+
+head' :: a
+      -> [a]
+      -> a
+head' x []      = x
+head' _ (x : _) = x
