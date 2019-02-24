@@ -10,8 +10,9 @@ let
         packages = pkgs.haskell.packages // {
           "${compiler}" = pkgs.haskell.packages."${compiler}".override {
             overrides = haskellPackagesNew: haskellPackagesOld: rec {
-              infovis-parallel = haskellPackagesNew.callPackage                  ./default.nix { };
-              kafka-device     = haskellPackagesNew.callPackage ../../kafka-device/default.nix { };
+              infovis-parallel  = haskellPackagesNew.callPackage                       ./default.nix { };
+              kafka-device      = haskellPackagesNew.callPackage      ../../kafka-device/default.nix { };
+              kafka-device-glut = haskellPackagesNew.callPackage ../../kafka-device-glut/default.nix { };
             };
           };
         };

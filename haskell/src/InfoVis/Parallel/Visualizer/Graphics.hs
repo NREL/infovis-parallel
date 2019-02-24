@@ -11,12 +11,10 @@ module InfoVis.Parallel.Visualizer.Graphics (
 import Control.Concurrent.Chan (Chan, readChan, writeChan)
 import Control.Concurrent.MVar (MVar, newEmptyMVar, newMVar, putMVar, readMVar, swapMVar, takeMVar, tryPutMVar, tryTakeMVar)
 import Control.Lens.Getter ((^.))
-import Control.Lens.Lens ((&))
 import Control.Lens.Setter ((.~))
 import Control.Monad (forever, void, when)
 import Control.Monad.Except (MonadError, MonadIO)
 import Control.Monad.Log (Severity(..), logInfo)
-import Data.Default (def)
 import Data.Maybe (isJust)
 import Graphics.OpenGL.Util.Setup (dlpViewerDisplay, setup)
 import Graphics.OpenGL.Util.Types (Viewer)
@@ -26,7 +24,7 @@ import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (LogChannel, LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO)
 import InfoVis.Parallel.NewTypes (PositionRotation)
-import InfoVis.Parallel.ProtoBuf (Request, Response)
+import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer)
 import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, program, reset)
 import InfoVis.Parallel.Rendering.Selector (createSelector, drawSelector, prepareSelector)
@@ -34,8 +32,10 @@ import InfoVis.Parallel.Rendering.Text (drawText)
 import Linear.Affine (Point(..))
 import Linear.Quaternion (Quaternion(..))
 import Linear.V3 (V3(..))
+import Network.UI.Kafka.Types (Event)
+import Network.UI.Kafka.GLUT (setCallbacks)
 
-import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, frameShown, reset, toolSet, upsert, viewSet)
+import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, reset, toolSet, upsert, viewSet)
 
 #ifdef INFOVIS_SWAP_GROUP
 import Graphics.OpenGL.Functions (joinSwapGroup)
@@ -73,7 +73,7 @@ visualize :: (MonadError String m, MonadIO m, SeverityLog m)
           -> Bool
           -> LogChannel
           -> Chan Request
-          -> Chan Response
+          -> Chan Event
           -> m ()
 visualize viewer debug logChannel requestChannel responseChannel =
   do
@@ -128,7 +128,7 @@ display :: LoggerIO
         -> Bool
         -> Viewer Double
         -> Graphics
-        -> Chan Response
+        -> Chan Event
         -> IO ()
 display logger debug viewer Graphics{..} responseChannel =
   do
@@ -159,6 +159,9 @@ display logger debug viewer Graphics{..} responseChannel =
         readMVar selectorRef >>= drawSelector
         readMVar textRef     >>= drawText
 
+    setCallbacks [minBound..maxBound]
+      $ writeChan responseChannel
+
     idleCallback $=! Just (idle Graphics{..} responseChannel)
 
 #ifdef INFOVIS_SWAP_GROUP
@@ -172,9 +175,9 @@ display logger debug viewer Graphics{..} responseChannel =
 
 
 idle :: Graphics
-     -> Chan Response
+     -> Chan Event
      -> IdleCallback
-idle Graphics{..} responseChannel =
+idle Graphics{..} _responseChannel =
   do
     void
       $ tryPutMVar startRef ()
@@ -191,8 +194,4 @@ idle Graphics{..} responseChannel =
           >>= prepareSelector tool
           >>= swapMVar selectorRef
         lockRef `putMVar` ()
-    frame <- (^. currentFrame) <$> readMVar managerRef
-    let
-      response = def & P.frameShown .~ frame
-    writeChan responseChannel response
     postRedisplay Nothing
