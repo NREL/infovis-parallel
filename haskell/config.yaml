@@ -1,7 +1,7 @@
 viewer           :
   stereo         : Mono
   nearPlane      : 0.01
-  farPlane       : 20
+  farPlane       : 100
   eyeSeparation  : [0.1,  0,  0]
   display        :
     identifier   : :0.0

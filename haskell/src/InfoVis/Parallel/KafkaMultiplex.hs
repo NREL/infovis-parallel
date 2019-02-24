@@ -17,32 +17,46 @@ import Control.Concurrent.Chan (Chan, newChan, writeChan)
 import Control.Concurrent.MVar (MVar, newMVar, putMVar, takeMVar)
 import Control.Lens.Lens ((&))
 import Control.Lens.Setter ((?~))
-import Control.Monad (void)
+import Control.Monad (unless, void)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logInfo)
 import Data.Aeson.Types (FromJSON, ToJSON)
-import Data.Bifunctor (first)
+import Data.Bifunctor (bimap, first)
 import Data.Default (Default(..))
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import InfoVis (LoggerIO, SeverityLog, forkLoggedIO, guardIO, logIO, makeLogger)
+import InfoVis.Parallel.NewTypes (PositionRotation)
 import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.ProtoBuf.Sink (kafkaSink)
+import Linear.Affine (Point(..), (.+^))
+import Linear.Conjugate (conjugate)
+import Linear.Quaternion (Quaternion(..), axisAngle)
+import Linear.V3 (V3(..))
+import Linear.Vector ((*^), zero)
 import Network.UI.Kafka (Sensor, TopicConnection(..), consumerLoop)
-import Network.UI.Kafka.Types (Event(..))
+import Network.UI.Kafka.Types (Event(..), Modifiers(..),  SpecialKey(..))
 
-import qualified InfoVis.Parallel.ProtoBuf as P (display)
+import qualified InfoVis.Parallel.ProtoBuf as P (display, toolSet, viewSet)
 
 
 data Visualization =
   Visualization
   {
-    shown :: String
+    shown  :: String
+  , viewer :: PositionRotation
+  , tool   :: PositionRotation
   }
    deriving (Eq, Ord, Read, Show)
 
 instance Default Visualization where
-  def = Visualization def
+  def =
+    Visualization
+    {
+      shown  = ""
+    , viewer = (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
+    , tool   = (P $ V3 0 0  0, Quaternion 0 $ V3 0 1 0)
+    }
 
 
 multiplexKafka :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -109,7 +123,8 @@ createDevice logger requestChannel visualizationMVar configuration =
                   let
                     (visualization', request) = behave behavior event visualization
                   putMVar visualizationMVar visualization'   
-                  writeChan requestChannel request
+                  unless (visualization == visualization')
+                    $ writeChan requestChannel request
               |
                 (sensor', behavior) <- handlers
               , sensor == sensor'
@@ -134,8 +149,27 @@ instance ToJSON Device
 
 
 data Behavior =
-    TextBehavior
-  | NullBehavior
+    Typing
+  | KeyMovement
+    {
+      viewerModifiers        :: Maybe Modifiers
+    , toolModifiers          :: Maybe Modifiers
+    , deltaViewerPosition    :: Double
+    , deltaToolPosition      :: Double
+    , deltaRotation          :: Double
+    , moveRightward          :: Either SpecialKey Char
+    , moveLeftward           :: Either SpecialKey Char
+    , moveForward            :: Either SpecialKey Char
+    , moveBackward           :: Either SpecialKey Char
+    , moveUpward             :: Either SpecialKey Char
+    , moveDownward           :: Either SpecialKey Char
+    , rotateForward          :: Either SpecialKey Char
+    , rotateBackward         :: Either SpecialKey Char
+    , rotateClockwise        :: Either SpecialKey Char
+    , rotateCounterclockwise :: Either SpecialKey Char
+    , rotateRightward        :: Either SpecialKey Char
+    , rotateLeftward         :: Either SpecialKey Char
+    }
     deriving (Eq, Generic, Read, Show)
 
 instance FromJSON Behavior
@@ -148,7 +182,7 @@ behave :: Behavior
        -> Visualization
        -> (Visualization, Request)
 
-behave TextBehavior KeyEvent{..} visualization@Visualization{..} =
+behave Typing KeyEvent{..} visualization@Visualization{..} =
   let
     text =
       if key == '\n'
@@ -163,4 +197,63 @@ behave TextBehavior KeyEvent{..} visualization@Visualization{..} =
     , def & P.display ?~ text
     )
 
+behave keyMovement'@KeyMovement{} KeyEvent{..} visualization =
+  keyMovement keyMovement' (Right key) modifiers visualization
+behave keyMovement'@KeyMovement{} SpecialKeyEvent{..} visualization =
+  keyMovement keyMovement' (Left specialKey) modifiers visualization
+
 behave _ _ visualization = (visualization, def)
+
+
+keyMovement :: Behavior
+            -> Either SpecialKey Char
+            -> Maybe Modifiers
+            -> Visualization
+            -> (Visualization, Request)
+keyMovement KeyMovement{..} key' modifiers' visualization@Visualization{..} =
+  let
+    head' x []      = x
+    head' _ (x : _) = x
+    motion =
+      head' zero
+        $ snd
+        <$> filter ((key' ==) . fst)
+        [
+          (moveRightward, V3   1   0   0 )
+        , (moveLeftward , V3 (-1)  0   0 )
+        , (moveForward  , V3   0   0 (-1))
+        , (moveBackward , V3   0   0   1 )
+        , (moveUpward   , V3   0   1   0 )
+        , (moveDownward , V3   0 (-1)  0 )
+        ]
+    rotation =
+      head' (Quaternion 1 zero)
+        $ snd
+        <$> filter ((key' ==) . fst)
+        [
+          (rotateForward         , V3 1 0 0 `axisAngle`   deltaRotation )
+        , (rotateBackward        , V3 1 0 0 `axisAngle` (-deltaRotation))
+        , (rotateClockwise       , V3 0 1 0 `axisAngle`   deltaRotation )
+        , (rotateCounterclockwise, V3 0 1 0 `axisAngle` (-deltaRotation))
+        , (rotateLeftward        , V3 0 0 1 `axisAngle`   deltaRotation )
+        , (rotateRightward       , V3 0 0 1 `axisAngle` (-deltaRotation))
+        ]
+    viewer' =
+      if modifiers' == viewerModifiers
+        then bimap (.+^ (deltaViewerPosition *^ motion)) ((rotation *) . (* conjugate rotation)) viewer
+        else viewer
+    tool' =
+      if modifiers' == toolModifiers
+        then bimap (.+^ (deltaToolPosition *^ motion)) ((rotation *) . (* conjugate rotation)) tool
+        else tool
+  in
+   (
+      visualization
+      {
+        viewer = viewer'
+      , tool   = tool'
+      }
+    , def & P.viewSet ?~ viewer'
+          & P.toolSet ?~ tool'
+    )
+keyMovement _ _ _ visualization = (visualization, def)
