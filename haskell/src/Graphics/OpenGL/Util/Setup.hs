@@ -28,6 +28,7 @@ import Graphics.UI.GLUT.Window (createWindow, fullScreen, postRedisplay)
 import Linear.Affine (Point(..), (.+^))
 import Linear.Conjugate (Conjugate)
 import Linear.Epsilon (Epsilon)
+import Linear.Util.Graphics (toRotation)
 import Linear.Vector ((*^))
 
 import qualified Graphics.Rendering.DLP as D (DlpEncoding(..))
@@ -99,20 +100,23 @@ dlpViewerDisplay dlp Viewer{..} pov displayAction =
       def
       {
         dlpEncoding = dlp
-      , doDisplay = \eye -> do
-                              (eyePosition, eyeOrientation) <- pov
-                              let
-                                offset =
-                                  case eye of
-                                    LeftDlp  -> -0.5
-                                    RightDlp ->  0.5
-                                eyePosition' = eyePosition .+^ eyeOrientation `Q.rotate` (offset *^ eyeSeparation)
-                              matrixMode $=! Projection
-                              loadIdentity
-                              projection VTKOffAxis screen (realToFrac <$> eyePosition') nearPlane farPlane
-                              matrixMode $=! Modelview 0
-                              loadIdentity
-                              displayAction
+      , doDisplay =
+          \eye ->
+            do
+              (eyePosition, eyeOrientation) <- pov
+              let
+                offset =
+                  case eye of
+                    LeftDlp  -> -0.5
+                    RightDlp ->  0.5
+                eyePosition' = eyePosition .+^ eyeOrientation `Q.rotate` (offset *^ eyeSeparation)
+              matrixMode $=! Projection
+              loadIdentity
+              projection VTKOffAxis screen (realToFrac <$> eyePosition') nearPlane farPlane
+              matrixMode $=! Modelview 0
+              loadIdentity
+              toRotation eyeOrientation
+              displayAction
       }
 
 
