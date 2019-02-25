@@ -23,38 +23,29 @@ import Data.Default (Default(..))
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import InfoVis (LoggerIO, SeverityLog, forkLoggedIO, guardIO, logIO, makeLogger)
-import InfoVis.Parallel.NewTypes (Frame, Position)
+import InfoVis.Parallel.NewTypes (Frame, PositionEuler)
 import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.ProtoBuf.Sink (kafkaSink)
-import Linear.Affine (Point(..), (.+^))
+import Linear.Affine ((.+^))
 import Linear.Util (fromEulerd)
 import Linear.V3 (V3(..))
 import Linear.Vector ((^+^), (*^), zero)
 import Network.UI.Kafka (Sensor, TopicConnection(..), consumerLoop)
 import Network.UI.Kafka.Types (Event(..), Modifiers(..),  SpecialKey(..))
 
-import qualified InfoVis.Parallel.ProtoBuf as P (display, frameShow, toolSet, viewSet)
+import qualified InfoVis.Parallel.ProtoBuf as P (display, frameShow, offsetSet, toolSet)
 
 
 data Visualization =
   Visualization
   {
-    frame  :: Frame
-  , shown  :: String
-  , viewer :: (Position, V3 Double)
-  , tool   :: (Position, V3 Double)
+    frame         :: Frame
+  , shown         :: String
+  , viewer        :: PositionEuler
+  , tool          :: PositionEuler
+  , offset        :: PositionEuler
   }
    deriving (Eq, Ord, Read, Show)
-
-instance Default Visualization where
-  def =
-    Visualization
-    {
-      frame = 1
-    , shown  = ""
-    , viewer = (P $ V3 3 2 10, V3 0 1 0)
-    , tool   = (P $ V3 0 0  0, V3 0 1 0)
-    }
 
 
 multiplexKafka :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -66,7 +57,17 @@ multiplexKafka :: (MonadError String m, MonadIO m, SeverityLog m)
 multiplexKafka address client topic configurations =
   do
 
-    visualizationMVar <- guardIO $ newMVar def
+    visualizationMVar <-
+      guardIO
+        . newMVar
+        $ Visualization
+          {
+            frame         = 1
+          , shown         = ""
+          , viewer        = (zero, zero)
+          , tool          = (zero, zero)
+          , offset        = (zero, zero)
+          }
 
     (logChannel, logger) <- makeLogger
 
@@ -89,13 +90,6 @@ multiplexKafka address client topic configurations =
         kafkaSink (logIO logChannel) requestChannel TopicConnection{..}
         return False
 
-    guardIO
-      $ writeChan requestChannel
-      $ def
-      & P.frameShow .~                    frame  def
-      & P.viewSet   ?~ second fromEulerd (viewer def)
-      & P.toolSet   ?~ second fromEulerd (tool   def)
-
     logger
 
 
@@ -111,6 +105,8 @@ createDevice logger requestChannel visualizationMVar configuration =
     Device{..}  <-
       liftEither . either (Left . show) Right
         =<< guardIO (decodeFileEither configuration)
+    guardIO
+      $ mapM_ (flip initializeBehavior visualizationMVar . snd) handlers
     let
       TopicConnection{..} = device
       (host, port) = address
@@ -163,13 +159,11 @@ data Behavior =
     }
   | KeyMovement
     {
-      viewerModifiers        :: Maybe Modifiers
+      offsetModifiers        :: Maybe Modifiers
     , toolModifiers          :: Maybe Modifiers
-    , deltaViewerPosition    :: Double
+    , deltaOffsetPosition    :: Double
     , deltaToolPosition      :: Double
     , deltaRotation          :: Double
-    , resetViewer            :: Either SpecialKey Char
-    , resetTool              :: Either SpecialKey Char
     , moveRightward          :: Either SpecialKey Char
     , moveLeftward           :: Either SpecialKey Char
     , moveForward            :: Either SpecialKey Char
@@ -182,12 +176,40 @@ data Behavior =
     , rotateCounterclockwise :: Either SpecialKey Char
     , rotateRightward        :: Either SpecialKey Char
     , rotateLeftward         :: Either SpecialKey Char
+    , resetOffset            :: Either SpecialKey Char
+    , resetTool              :: Either SpecialKey Char
+    , initialOffset          :: PositionEuler
+    , initialTool            :: PositionEuler
     }
     deriving (Eq, Generic, Read, Show)
 
 instance FromJSON Behavior
 
 instance ToJSON Behavior
+
+
+initializeBehavior :: Behavior
+                   -> MVar Visualization
+                   -> IO ()
+initializeBehavior Typing _ =
+  return ()
+initializeBehavior KeyFrame{} visualizationMVar =
+  do
+    visualization <- takeMVar visualizationMVar
+    putMVar visualizationMVar
+      $ visualization
+        {
+          frame = 1
+        }
+initializeBehavior KeyMovement{..} visualizationMVar =
+  do
+    visualization <- takeMVar visualizationMVar
+    putMVar visualizationMVar
+      $ visualization
+        {
+          tool   = initialTool
+        , offset = initialOffset
+        }
 
 
 behave :: Behavior
@@ -254,29 +276,29 @@ keyMovement KeyMovement{..} key' modifiers' visualization@Visualization{..} =
         , (rotateLeftward        , V3   0   0    1 )
         , (rotateRightward       , V3   0   0  (-1))
         ]
-    viewer'
-      | key'       == resetViewer     = InfoVis.Parallel.KafkaMultiplex.viewer def
-      | modifiers' == viewerModifiers = bimap
-                                          (.+^ (deltaViewerPosition *^ motion))
-                                          (^+^ (deltaRotation *^ rotation))
-                                          viewer
-      | otherwise                     =  viewer
+    offset'
+      | key'       == resetOffset     = initialOffset
+      | modifiers' == offsetModifiers = bimap
+                                          (.+^ (deltaOffsetPosition *^ motion  ))
+                                          (^+^ (deltaRotation       *^ rotation))
+                                          offset
+      | otherwise                     =  offset
     tool'
-      | key'       == resetTool       = InfoVis.Parallel.KafkaMultiplex.tool def
+      | key'       == resetTool       = initialTool
       | modifiers' == toolModifiers   = bimap
-                                          (.+^ (deltaToolPosition *^ motion))
-                                          (^+^ (deltaRotation *^ rotation))
+                                          (.+^ (deltaToolPosition *^ motion  ))
+                                          (^+^ (deltaRotation     *^ rotation))
                                           tool
       | otherwise                     = tool
   in
    (
       visualization
       {
-        viewer = viewer'
+        offset = offset'
       , tool   = tool'
       }
-    , def & P.viewSet ?~ second fromEulerd viewer'
-          & P.toolSet ?~ second fromEulerd tool'
+    , def & P.offsetSet ?~ second fromEulerd offset'
+          & P.toolSet   ?~ second fromEulerd tool'
     )
 keyMovement _ _ _ visualization = (visualization, def)
 

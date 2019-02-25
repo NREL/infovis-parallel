@@ -29,23 +29,24 @@ namespace Infovis.Protobuf {
             "CgR0ZXh0GAsgASgJEgwKBGdseXAYDCABKAUibAoITG9jYXRpb24SDAoEcG9z",
             "eBgBIAEoARIMCgRwb3N5GAIgASgBEgwKBHBvc3oYAyABKAESDAoEcm90dxgE",
             "IAEoARIMCgRyb3R4GAUgASgBEgwKBHJvdHkYBiABKAESDAoEcm90ehgHIAEo",
-            "ASKyAQoHUmVxdWVzdBIMCgRzaG93GAEgASgFEg8KB21lc3NhZ2UYAiABKAkS",
+            "ASLYAQoHUmVxdWVzdBIMCgRzaG93GAEgASgFEg8KB21lc3NhZ2UYAiABKAkS",
             "DQoFcmVzZXQYAyABKAgSIQoGdXBzZXJ0GAQgAygLMhEuSW5mb3Zpcy5HZW9t",
             "ZXRyeRIOCgZkZWxldGUYBSADKAMSIgoHdmlld2xvYxgGIAEoCzIRLkluZm92",
             "aXMuTG9jYXRpb24SIgoHdG9vbGxvYxgHIAEoCzIRLkluZm92aXMuTG9jYXRp",
-            "b24i+gEKCFJlc3BvbnNlEg0KBXNob3duGAEgASgFEg8KB21lc3NhZ2UYAiAB",
-            "KAkSDQoFaG92ZXIYAyADKAMSDwoHdW5ob3ZlchgEIAMoAxIOCgZzZWxlY3QY",
-            "BSADKAMSEAoIZGVzZWxlY3QYBiADKAMSIgoHdmlld2xvYxgHIAEoCzIRLklu",
-            "Zm92aXMuTG9jYXRpb24SIgoHdG9vbGxvYxgIIAEoCzIRLkluZm92aXMuTG9j",
-            "YXRpb24SEQoJZGVwcmVzc2VkGAkgASgHEg8KB3ByZXNzZWQYCiABKAcSEAoI",
-            "cmVsZWFzZWQYCyABKAcSDgoGYW5hbG9nGAwgAygBQhOqAhBJbmZvdmlzLlBy",
-            "b3RvYnVmYgZwcm90bzM="));
+            "b24SJAoJb2Zmc2V0bG9jGAggASgLMhEuSW5mb3Zpcy5Mb2NhdGlvbiL6AQoI",
+            "UmVzcG9uc2USDQoFc2hvd24YASABKAUSDwoHbWVzc2FnZRgCIAEoCRINCgVo",
+            "b3ZlchgDIAMoAxIPCgd1bmhvdmVyGAQgAygDEg4KBnNlbGVjdBgFIAMoAxIQ",
+            "CghkZXNlbGVjdBgGIAMoAxIiCgd2aWV3bG9jGAcgASgLMhEuSW5mb3Zpcy5M",
+            "b2NhdGlvbhIiCgd0b29sbG9jGAggASgLMhEuSW5mb3Zpcy5Mb2NhdGlvbhIR",
+            "CglkZXByZXNzZWQYCSABKAcSDwoHcHJlc3NlZBgKIAEoBxIQCghyZWxlYXNl",
+            "ZBgLIAEoBxIOCgZhbmFsb2cYDCADKAFCE6oCEEluZm92aXMuUHJvdG9idWZi",
+            "BnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Geometry), global::Infovis.Protobuf.Geometry.Parser, new[]{ "Fram", "Iden", "Type", "Mask", "Cnts", "Posx", "Posy", "Posz", "Size", "Colr", "Text", "Glyp" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Location), global::Infovis.Protobuf.Location.Parser, new[]{ "Posx", "Posy", "Posz", "Rotw", "Rotx", "Roty", "Rotz" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Show", "Message", "Reset", "Upsert", "Delete", "Viewloc", "Toolloc" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Request), global::Infovis.Protobuf.Request.Parser, new[]{ "Show", "Message", "Reset", "Upsert", "Delete", "Viewloc", "Toolloc", "Offsetloc" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Infovis.Protobuf.Response), global::Infovis.Protobuf.Response.Parser, new[]{ "Shown", "Message", "Hover", "Unhover", "Select", "Deselect", "Viewloc", "Toolloc", "Depressed", "Pressed", "Released", "Analog" }, null, null, null)
           }));
     }
@@ -793,6 +794,7 @@ namespace Infovis.Protobuf {
       delete_ = other.delete_.Clone();
       Viewloc = other.viewloc_ != null ? other.Viewloc.Clone() : null;
       Toolloc = other.toolloc_ != null ? other.Toolloc.Clone() : null;
+      Offsetloc = other.offsetloc_ != null ? other.Offsetloc.Clone() : null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -878,6 +880,17 @@ namespace Infovis.Protobuf {
       }
     }
 
+    /// <summary>Field number for the "offsetloc" field.</summary>
+    public const int OffsetlocFieldNumber = 8;
+    private global::Infovis.Protobuf.Location offsetloc_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Infovis.Protobuf.Location Offsetloc {
+      get { return offsetloc_; }
+      set {
+        offsetloc_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as Request);
@@ -898,6 +911,7 @@ namespace Infovis.Protobuf {
       if(!delete_.Equals(other.delete_)) return false;
       if (!object.Equals(Viewloc, other.Viewloc)) return false;
       if (!object.Equals(Toolloc, other.Toolloc)) return false;
+      if (!object.Equals(Offsetloc, other.Offsetloc)) return false;
       return true;
     }
 
@@ -911,6 +925,7 @@ namespace Infovis.Protobuf {
       hash ^= delete_.GetHashCode();
       if (viewloc_ != null) hash ^= Viewloc.GetHashCode();
       if (toolloc_ != null) hash ^= Toolloc.GetHashCode();
+      if (offsetloc_ != null) hash ^= Offsetloc.GetHashCode();
       return hash;
     }
 
@@ -943,6 +958,10 @@ namespace Infovis.Protobuf {
         output.WriteRawTag(58);
         output.WriteMessage(Toolloc);
       }
+      if (offsetloc_ != null) {
+        output.WriteRawTag(66);
+        output.WriteMessage(Offsetloc);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -964,6 +983,9 @@ namespace Infovis.Protobuf {
       }
       if (toolloc_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Toolloc);
+      }
+      if (offsetloc_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Offsetloc);
       }
       return size;
     }
@@ -995,6 +1017,12 @@ namespace Infovis.Protobuf {
           toolloc_ = new global::Infovis.Protobuf.Location();
         }
         Toolloc.MergeFrom(other.Toolloc);
+      }
+      if (other.offsetloc_ != null) {
+        if (offsetloc_ == null) {
+          offsetloc_ = new global::Infovis.Protobuf.Location();
+        }
+        Offsetloc.MergeFrom(other.Offsetloc);
       }
     }
 
@@ -1039,6 +1067,13 @@ namespace Infovis.Protobuf {
               toolloc_ = new global::Infovis.Protobuf.Location();
             }
             input.ReadMessage(toolloc_);
+            break;
+          }
+          case 66: {
+            if (offsetloc_ == null) {
+              offsetloc_ = new global::Infovis.Protobuf.Location();
+            }
+            input.ReadMessage(offsetloc_);
             break;
           }
         }

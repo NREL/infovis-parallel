@@ -15,7 +15,8 @@ import Control.Lens.Setter ((.~))
 import Control.Monad (forever, void, when)
 import Control.Monad.Except (MonadError, MonadIO)
 import Control.Monad.Log (Severity(..), logInfo)
-import Data.Maybe (isJust)
+import Data.Bifunctor (second)
+import Data.Maybe (fromMaybe, isJust)
 import Graphics.OpenGL.Util.Setup (dlpViewerDisplay, setup)
 import Graphics.OpenGL.Util.Types (Viewer)
 import Graphics.Rendering.OpenGL (($=!))
@@ -23,19 +24,20 @@ import Graphics.UI.GLUT (mainLoop)
 import Graphics.UI.GLUT.Callbacks.Global (IdleCallback, idleCallback)
 import Graphics.UI.GLUT.Window (postRedisplay)
 import InfoVis (LogChannel, LoggerIO, SeverityLog, guardIO, forkLoggedIO, forkLoggedOS, logIO)
-import InfoVis.Parallel.NewTypes (PositionRotation)
+import InfoVis.Parallel.NewTypes (PositionEuler, PositionRotation)
 import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer)
 import InfoVis.Parallel.Rendering.Frames (Manager, createManager, currentFrame, delete, draw, insert, prepare, program, reset)
 import InfoVis.Parallel.Rendering.Selector (createSelector, drawSelector, prepareSelector)
 import InfoVis.Parallel.Rendering.Text (drawText)
 import Linear.Affine (Point(..))
-import Linear.Quaternion (Quaternion(..))
-import Linear.V3 (V3(..))
+import Linear.Util (fromEulerd)
+import Linear.Util.Graphics (toTranslation, toRotation)
+import Linear.Vector (zero)
 import Network.UI.Kafka.Types (Event)
 import Network.UI.Kafka.GLUT (setCallbacks)
 
-import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, reset, toolSet, upsert, viewSet)
+import qualified InfoVis.Parallel.ProtoBuf as P (delete, display, frameShow, offsetSet, reset, toolSet, upsert, viewSet)
 
 #ifdef INFOVIS_SWAP_GROUP
 import Graphics.OpenGL.Functions (joinSwapGroup)
@@ -52,33 +54,43 @@ data Graphics =
   , povRef      :: MVar PositionRotation
   , toolRef     :: MVar PositionRotation
   , textRef     :: MVar String
+  , offsetRef   :: MVar PositionRotation
   }
 
 
-initialize :: IO Graphics
-initialize =
+initialize :: PositionEuler
+           -> PositionEuler
+           -> IO Graphics
+initialize initialViewer initialTool =
   do
     startRef    <- newEmptyMVar
     lockRef     <- newEmptyMVar 
     managerRef  <- newEmptyMVar
     selectorRef <- newEmptyMVar
-    povRef      <- newMVar (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
-    toolRef     <- newMVar (P $ V3 0 0  0, Quaternion 0 $ V3 0 1 0)
+    povRef      <- newMVar $ second fromEulerd initialViewer
+    toolRef     <- newMVar $ second fromEulerd initialTool
     textRef     <- newMVar ""
+    offsetRef   <- newMVar (zero, fromEulerd zero)
     return Graphics{..}
  
 
 visualize :: (MonadError String m, MonadIO m, SeverityLog m)
           => Viewer Double
+          -> Maybe PositionEuler
+          -> Maybe PositionEuler
           -> Bool
           -> LogChannel
           -> Chan Request
           -> Chan Event
           -> m ()
-visualize viewer debug logChannel requestChannel responseChannel =
+visualize viewer initialViewer initialTool debug logChannel requestChannel responseChannel =
   do
 
-    graphics <- guardIO initialize
+    graphics <-
+      guardIO
+        $ initialize
+          (fromMaybe (zero, zero) initialViewer)
+          (fromMaybe (zero, zero) initialTool  )
 
     void
       . forkLoggedIO logChannel
@@ -119,9 +131,10 @@ apply Graphics{..} requestChannel =
           . conditionally (/= 0) (currentFrame .~) (request ^. P.frameShow)
           $ manager
         putMVar lockRef ()
-        onlyJust povRef  $ request ^. P.viewSet
-        onlyJust toolRef $ request ^. P.toolSet
-        onlyJust textRef $ request ^. P.display
+        onlyJust povRef    $ request ^. P.viewSet
+        onlyJust toolRef   $ request ^. P.toolSet
+        onlyJust textRef   $ request ^. P.display
+        onlyJust offsetRef $ request ^. P.offsetSet
 
 
 display :: LoggerIO
@@ -143,18 +156,21 @@ display logger debug viewer Graphics{..} responseChannel =
 
     logger Debug "Creating array buffer manager . . ."
     createManager
-      >>= prepare
       >>= putMVar managerRef
     createSelector
       .   program
       <$> readMVar managerRef
-      >>= prepareSelector (P (V3 0 0 0), Quaternion 1 (V3 0 0 0))
       >>= putMVar selectorRef
     lockRef `putMVar` ()
+
+    idle Graphics{..} responseChannel
 
     logger Debug "Setting up display . . ."
     dlpViewerDisplay dlp viewer (readMVar povRef)
       $ do
+        (P translation, rotation) <- readMVar offsetRef
+        toTranslation translation
+        toRotation    rotation
         readMVar managerRef  >>= draw
         readMVar selectorRef >>= drawSelector
         readMVar textRef     >>= drawText

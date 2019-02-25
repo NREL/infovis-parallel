@@ -28,7 +28,6 @@ import Graphics.UI.GLUT.Window (createWindow, fullScreen, postRedisplay)
 import Linear.Affine (Point(..), (.+^))
 import Linear.Conjugate (Conjugate)
 import Linear.Epsilon (Epsilon)
-import Linear.Util.Graphics (toRotation)
 import Linear.Vector ((*^))
 
 import qualified Graphics.Rendering.DLP as D (DlpEncoding(..))
@@ -115,7 +114,6 @@ dlpViewerDisplay dlp Viewer{..} pov displayAction =
               projection VTKOffAxis screen (realToFrac <$> eyePosition') nearPlane farPlane
               matrixMode $=! Modelview 0
               loadIdentity
-              toRotation eyeOrientation
               displayAction
       }
 

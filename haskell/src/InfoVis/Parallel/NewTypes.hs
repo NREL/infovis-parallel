@@ -10,7 +10,9 @@ module InfoVis.Parallel.NewTypes (
 , Position
 , Displacement
 , Rotation
+, Euler
 , PositionRotation
+, PositionEuler
 , Color
 , Buttons
 , Geometry(..)
@@ -47,7 +49,13 @@ type Displacement = V3 Double
 type Rotation = Quaternion Double
 
 
+type Euler = V3 Double
+
+
 type PositionRotation = PointOfView Double
+
+
+type PositionEuler = (Position, Euler)
 
 
 type Color = Word32

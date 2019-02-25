@@ -17,6 +17,7 @@ import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import Graphics.OpenGL.Util.Types (Viewer)
 import InfoVis (SeverityLog, guardIO, forkLoggedIO, logIO, makeLogger)
+import InfoVis.Parallel.NewTypes (PositionEuler)
 import InfoVis.Parallel.ProtoBuf.Sink (deviceSink, kafkaSink')
 import InfoVis.Parallel.ProtoBuf.Source (filesSource, kafkaSource, waitForever)
 import InfoVis.Parallel.Visualizer.Graphics (visualize)
@@ -26,9 +27,11 @@ import Network.UI.Kafka (TopicConnection)
 data Configuration =
   Configuration
   {
-    viewer    :: Viewer Double
-  , requests  :: Maybe TopicConnection
-  , responses :: Maybe TopicConnection
+    viewer        :: Viewer Double
+  , initialViewer :: Maybe PositionEuler
+  , initialTool   :: Maybe PositionEuler
+  , requests      :: Maybe TopicConnection
+  , responses     :: Maybe TopicConnection
   }
     deriving (Eq, Generic, Read, Show)
 
@@ -55,7 +58,7 @@ visualizeBuffers configurationFile debug bufferFiles =
       liftEither . either (Left . show) Right
         =<< guardIO (decodeFileEither configurationFile)
 
-    visualize viewer debug logChannel requestChannel responseChannel
+    visualize viewer initialViewer initialTool debug logChannel requestChannel responseChannel
 
     void
       . forkLoggedIO logChannel

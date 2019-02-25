@@ -14,6 +14,7 @@ module InfoVis.Parallel.ProtoBuf (
 , delete
 , viewSet
 , toolSet
+, offsetSet
 , Response
 , frameShown
 , message
@@ -59,13 +60,14 @@ import qualified Data.Text.Lazy as T (unpack)
 data Request =
   Request
   {
-    show'    :: Optional 1 (Value   Frame     )
-  , display' :: Optional 2 (Value   String    )
-  , reset'   :: Optional 3 (Value   Bool      )
-  , upsert'  :: Repeated 4 (Message GeometryPB)
-  , delete'  :: Packed   5 (Value   Identifier)
-  , viewloc' :: Optional 6 (Message LocationPB)
-  , toolloc' :: Optional 7 (Message LocationPB)
+    show'      :: Optional 1 (Value   Frame     )
+  , display'   :: Optional 2 (Value   String    )
+  , reset'     :: Optional 3 (Value   Bool      )
+  , upsert'    :: Repeated 4 (Message GeometryPB)
+  , delete'    :: Packed   5 (Value   Identifier)
+  , viewloc'   :: Optional 6 (Message LocationPB)
+  , toolloc'   :: Optional 7 (Message LocationPB)
+  , offsetloc' :: Optional 8 (Message LocationPB)
   }
     deriving (Generic, Show)
 
@@ -73,13 +75,14 @@ instance Default Request where
   def =
     Request
     {
-      show'    = putField def
-    , display' = putField def
-    , reset'   = putField def
-    , upsert'  = putField def
-    , delete'  = putField def
-    , viewloc' = putField def
-    , toolloc' = putField def
+      show'      = putField def
+    , display'   = putField def
+    , reset'     = putField def
+    , upsert'    = putField def
+    , delete'    = putField def
+    , viewloc'   = putField def
+    , toolloc'   = putField def
+    , offsetloc' = putField def
     }
 
 instance FromJSON Request where
@@ -87,25 +90,27 @@ instance FromJSON Request where
     withObject "Request"
       $ \v ->
       do
-        show'    <- putField                                             <$> v .:? "frame"
-        display' <- putField                                             <$> v .:? "message"
-        reset'   <- putField                                             <$> v .:? "reset"
-        upsert'  <- putField . fmap fromGeometry         . fromMaybe def <$> v .:? "upsert"
-        delete'  <- putField .                             fromMaybe def <$> v .:? "delete"
-        viewloc' <- putField . fmap fromPositionRotation                 <$> v .:? "viewloc"
-        toolloc' <- putField . fmap fromPositionRotation                 <$> v .:? "toolloc"
+        show'      <- putField                                             <$> v .:? "frame"
+        display'   <- putField                                             <$> v .:? "message"
+        reset'     <- putField                                             <$> v .:? "reset"
+        upsert'    <- putField . fmap fromGeometry         . fromMaybe def <$> v .:? "upsert"
+        delete'    <- putField .                             fromMaybe def <$> v .:? "delete"
+        viewloc'   <- putField . fmap fromPositionRotation                 <$> v .:? "viewloc"
+        toolloc'   <- putField . fmap fromPositionRotation                 <$> v .:? "toolloc"
+        offsetloc' <- putField . fmap fromPositionRotation                 <$> v .:? "offsetloc"
         return Request{..}
 
 instance ToJSON Request where
   toJSON Request{..} =
     object
-     . maybe id ((:) . ("frame"   .=)) (                       getField show'   )
-     . maybe id ((:) . ("message" .=)) (                       getField display')
-     . maybe id ((:) . ("reset"   .=)) (                       getField reset'  )
-     . option           "upsert"       (toGeometry         <$> getField upsert' )
-     . option           "delete"       (                       getField delete' )
-     . maybe id ((:) . ("viewloc" .=)) (toPositionRotation <$> getField viewloc')
-     $ maybe id ((:) . ("toolloc" .=)) (toPositionRotation <$> getField toolloc')
+     . maybe id ((:) . ("frame"     .=)) (                       getField show'     )
+     . maybe id ((:) . ("message"   .=)) (                       getField display'  )
+     . maybe id ((:) . ("reset"     .=)) (                       getField reset'    )
+     . option           "upsert"         (toGeometry         <$> getField upsert'   )
+     . option           "delete"         (                       getField delete'   )
+     . maybe id ((:) . ("viewloc"   .=)) (toPositionRotation <$> getField viewloc'  )
+     . maybe id ((:) . ("toolloc"   .=)) (toPositionRotation <$> getField toolloc'  )
+     $ maybe id ((:) . ("offsetloc" .=)) (toPositionRotation <$> getField offsetloc')
        []
     where
       option s v = if null v then id else ((s .= v) :)
@@ -168,6 +173,13 @@ toolSet =
   lens
     (fmap toPositionRotation . getField . (toolloc' :: Request -> Optional 7 (Message LocationPB)))
     (\s x -> (s :: Request) {toolloc' = putField $ fromPositionRotation <$> x})
+
+
+offsetSet :: Lens' Request (Maybe PositionRotation)
+offsetSet =
+  lens
+    (fmap toPositionRotation . getField . (offsetloc' :: Request -> Optional 8 (Message LocationPB)))
+    (\s x -> (s :: Request) {offsetloc' = putField $ fromPositionRotation <$> x})
 
 
 data Response =
