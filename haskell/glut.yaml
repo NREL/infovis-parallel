@@ -12,9 +12,11 @@ handlers                    :
     - tag                   : KeyMovement
       viewerModifiers       : {shiftModifier: false, altModifier: false, ctrlModifier: false}
       toolModifiers         : {shiftModifier: false, altModifier: true , ctrlModifier: false}
-      deltaViewerPosition   : 0.05
-      deltaToolPosition     : 0.001
-      deltaRotation         : 0.05
+      deltaViewerPosition   : 0.1
+      deltaToolPosition     : 0.01
+      deltaRotation         : 0.1
+      resetViewer           : {Right: '.'               }
+      resetTool             : {Right: ','               }
       moveRightward         : {Left : {tag: KeyRight   }}
       moveLeftward          : {Left : {tag: KeyLeft    }}
       moveForward           : {Left : {tag: KeyUp      }}

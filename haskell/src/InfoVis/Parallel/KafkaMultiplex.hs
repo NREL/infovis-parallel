@@ -18,19 +18,18 @@ import Control.Monad (unless, void)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logInfo)
 import Data.Aeson.Types (FromJSON, ToJSON)
-import Data.Bifunctor (bimap, first)
+import Data.Bifunctor (bimap, first, second)
 import Data.Default (Default(..))
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import InfoVis (LoggerIO, SeverityLog, forkLoggedIO, guardIO, logIO, makeLogger)
-import InfoVis.Parallel.NewTypes (Frame, PositionRotation)
+import InfoVis.Parallel.NewTypes (Frame, Position)
 import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.ProtoBuf.Sink (kafkaSink)
 import Linear.Affine (Point(..), (.+^))
-import Linear.Conjugate (conjugate)
-import Linear.Quaternion (Quaternion(..), axisAngle)
+import Linear.Util (fromEulerd)
 import Linear.V3 (V3(..))
-import Linear.Vector ((*^), zero)
+import Linear.Vector ((^+^), (*^), zero)
 import Network.UI.Kafka (Sensor, TopicConnection(..), consumerLoop)
 import Network.UI.Kafka.Types (Event(..), Modifiers(..),  SpecialKey(..))
 
@@ -42,8 +41,8 @@ data Visualization =
   {
     frame  :: Frame
   , shown  :: String
-  , viewer :: PositionRotation
-  , tool   :: PositionRotation
+  , viewer :: (Position, V3 Double)
+  , tool   :: (Position, V3 Double)
   }
    deriving (Eq, Ord, Read, Show)
 
@@ -53,8 +52,8 @@ instance Default Visualization where
     {
       frame = 1
     , shown  = ""
-    , viewer = (P $ V3 3 2 10, Quaternion 0 $ V3 0 1 0)
-    , tool   = (P $ V3 0 0  0, Quaternion 0 $ V3 0 1 0)
+    , viewer = (P $ V3 3 2 10, V3 0 1 0)
+    , tool   = (P $ V3 0 0  0, V3 0 1 0)
     }
 
 
@@ -89,6 +88,13 @@ multiplexKafka address client topic configurations =
       $ do
         kafkaSink (logIO logChannel) requestChannel TopicConnection{..}
         return False
+
+    guardIO
+      $ writeChan requestChannel
+      $ def
+      & P.frameShow .~                    frame  def
+      & P.viewSet   ?~ second fromEulerd (viewer def)
+      & P.toolSet   ?~ second fromEulerd (tool   def)
 
     logger
 
@@ -162,6 +168,8 @@ data Behavior =
     , deltaViewerPosition    :: Double
     , deltaToolPosition      :: Double
     , deltaRotation          :: Double
+    , resetViewer            :: Either SpecialKey Char
+    , resetTool              :: Either SpecialKey Char
     , moveRightward          :: Either SpecialKey Char
     , moveLeftward           :: Either SpecialKey Char
     , moveForward            :: Either SpecialKey Char
@@ -235,25 +243,31 @@ keyMovement KeyMovement{..} key' modifiers' visualization@Visualization{..} =
         , (moveDownward , V3   0 (-1)  0 )
         ]
     rotation =
-      head' (Quaternion 1 zero)
+      head' zero
         $ snd
         <$> filter ((key' ==) . fst)
         [
-          (rotateForward         , V3 1 0 0 `axisAngle`   deltaRotation )
-        , (rotateBackward        , V3 1 0 0 `axisAngle` (-deltaRotation))
-        , (rotateClockwise       , V3 0 1 0 `axisAngle`   deltaRotation )
-        , (rotateCounterclockwise, V3 0 1 0 `axisAngle` (-deltaRotation))
-        , (rotateLeftward        , V3 0 0 1 `axisAngle`   deltaRotation )
-        , (rotateRightward       , V3 0 0 1 `axisAngle` (-deltaRotation))
+          (rotateForward         , V3   1   0    0 )
+        , (rotateBackward        , V3 (-1)  0    0 )
+        , (rotateClockwise       , V3   0   1    0 )
+        , (rotateCounterclockwise, V3   0 (-1)   0 )
+        , (rotateLeftward        , V3   0   0    1 )
+        , (rotateRightward       , V3   0   0  (-1))
         ]
-    viewer' =
-      if modifiers' == viewerModifiers
-        then bimap (.+^ (deltaViewerPosition *^ motion)) ((rotation *) . (* conjugate rotation)) viewer
-        else viewer
-    tool' =
-      if modifiers' == toolModifiers
-        then bimap (.+^ (deltaToolPosition *^ motion)) ((rotation *) . (* conjugate rotation)) tool
-        else tool
+    viewer'
+      | key'       == resetViewer     = InfoVis.Parallel.KafkaMultiplex.viewer def
+      | modifiers' == viewerModifiers = bimap
+                                          (.+^ (deltaViewerPosition *^ motion))
+                                          (^+^ (deltaRotation *^ rotation))
+                                          viewer
+      | otherwise                     =  viewer
+    tool'
+      | key'       == resetTool       = InfoVis.Parallel.KafkaMultiplex.tool def
+      | modifiers' == toolModifiers   = bimap
+                                          (.+^ (deltaToolPosition *^ motion))
+                                          (^+^ (deltaRotation *^ rotation))
+                                          tool
+      | otherwise                     = tool
   in
    (
       visualization
@@ -261,8 +275,8 @@ keyMovement KeyMovement{..} key' modifiers' visualization@Visualization{..} =
         viewer = viewer'
       , tool   = tool'
       }
-    , def & P.viewSet ?~ viewer'
-          & P.toolSet ?~ tool'
+    , def & P.viewSet ?~ second fromEulerd viewer'
+          & P.toolSet ?~ second fromEulerd tool'
     )
 keyMovement _ _ _ visualization = (visualization, def)
 
