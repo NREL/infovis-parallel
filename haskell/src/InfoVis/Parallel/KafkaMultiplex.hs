@@ -182,9 +182,9 @@ data Behavior =
     Typing
   | KeyFrame
     {
-      nextFrame     :: Either SpecialKey Char
-    , previousFrame :: Either SpecialKey Char
-    , setFrame      :: [(Frame, Either SpecialKey Char)]
+      nextKey     :: Either SpecialKey Char
+    , previousKey :: Either SpecialKey Char
+    , setKey      :: [(Frame, Either SpecialKey Char)]
     }
   | KeyMovement
     {
@@ -212,18 +212,24 @@ data Behavior =
     }
   | ViewerLocation
     {
-      resetButton   :: Maybe Int
+      resetButton   :: Button
     , initialViewer :: PositionEuler
     }
   | OffsetLocation
     {
-      resetButton   :: Maybe Int
+      resetButton   :: Button
     , initialOffset :: PositionEuler
     }
   | ToolLocation
     {
-      resetButton   :: Maybe Int
+      resetButton   :: Button
     , initialTool   :: PositionEuler
+    }
+  | ButtonFrame
+    {
+      nextButton     :: Button
+    , previousButton :: Button
+    , setButton      :: [(Frame, Button)]
     }
     deriving (Eq, Generic, Read, Show)
 
@@ -260,6 +266,10 @@ initializeBehavior ToolLocation{..} visualizationMVar =
   modifyMVar' visualizationMVar
     $ viewer .~ initialTool
 
+initializeBehavior ButtonFrame{..} visualizationMVar =
+  modifyMVar' visualizationMVar
+    $ frame .~ 1
+
 
 behave :: Behavior
        -> Event
@@ -294,6 +304,9 @@ behave OffsetLocation{..} locationEvent visualization =
   relocation resetButton initialOffset offset P.offsetSet locationEvent visualization
 behave ToolLocation{..} locationEvent visualization =
   relocation resetButton initialTool tool P.toolSet locationEvent visualization
+
+behave buttonFrame'@ButtonFrame{} (ButtonEvent (button, _)) visualization =
+  buttonFrame buttonFrame' button visualization
 
 behave _ _ visualization = (visualization, def)
 
@@ -361,9 +374,9 @@ keyFrame :: Behavior
 keyFrame KeyFrame{..} key' visualization =
   let
     frame'
-      | key' == nextFrame     = visualization ^. frame + 1
-      | key' == previousFrame = visualization ^. frame - 1
-      | otherwise             = head' (visualization ^. frame) $ fst <$> filter ((key' ==) . snd) setFrame
+      | key' == nextKey     = visualization ^. frame + 1
+      | key' == previousKey = visualization ^. frame - 1
+      | otherwise             = head' (visualization ^. frame) $ fst <$> filter ((key' ==) . snd) setKey
   in
     (
       visualization & frame .~ frame'
@@ -372,7 +385,7 @@ keyFrame KeyFrame{..} key' visualization =
 keyFrame _ _ visualization = (visualization, def)
 
 
-relocation :: Maybe Int
+relocation :: Button
            -> PositionEuler
            -> Lens' Visualization PositionEuler
            -> Lens' Request (Maybe PositionRotation)
@@ -395,10 +408,28 @@ relocation _ _ field set OrientationEvent{..} visualization =
       visualization & field .~ positionEuler
     , def & set ?~ second fromEulerd positionEuler
     )
-relocation (Just i) initial field set (ButtonEvent (IndexButton j, Down)) visualization
-  | i == j    = (visualization & field .~ initial, def & set ?~ second fromEulerd initial)
+relocation b initial field set (ButtonEvent (b', Down)) visualization
+  | b == b'   = (visualization & field .~ initial, def & set ?~ second fromEulerd initial)
   | otherwise = (visualization, def)
 relocation _ _ _ _ _ visualization = (visualization, def)
+
+
+buttonFrame :: Behavior
+            -> Button
+            -> Visualization
+            -> (Visualization, Request)
+buttonFrame ButtonFrame{..} button' visualization =
+  let
+    frame'
+      | button' == nextButton     = visualization ^. frame + 1
+      | button' == previousButton = visualization ^. frame - 1
+      | otherwise                 = head' (visualization ^. frame) $ fst <$> filter ((button' ==) . snd) setButton
+  in
+    (
+      visualization & frame .~ frame'
+    , def & P.frameShow .~ frame'
+    )
+buttonFrame _ _ visualization = (visualization, def)
 
 
 

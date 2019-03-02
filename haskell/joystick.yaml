@@ -1,0 +1,10 @@
+device                         :
+  client            : multiplex-joystick
+  address           : [localhost, 9092]
+  topic             : devices
+handlers            :
+  - - joystick
+    - tag           : ButtonFrame
+      nextButton    : {tag: IndexButton, contents: 7}
+      previousButton: {tag: IndexButton, contents: 6}
+      setButton     : [[1, {tag: IndexButton, contents: 11}]]

@@ -5,9 +5,9 @@ device                      :
 handlers                    :
   - - glut
     - tag                   : KeyFrame
-      nextFrame             : {Right: '+'}
-      previousFrame         : {Right: '-'}
-      setFrame              : [[1, {Right: '1'}], [2, {Right: '2'}], [3, {Right: '3'}]]
+      nextKey               : {Right: '+'}
+      previousKey           : {Right: '-'}
+      setKey                : [[1, {Right: '1'}], [2, {Right: '2'}], [3, {Right: '3'}]]
   - - glut
     - tag                   : KeyMovement
       offsetModifiers       : {shiftModifier: false, altModifier: false, ctrlModifier: false}
