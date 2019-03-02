@@ -1,5 +1,5 @@
 device                      :
-  client                    : glut
+  client                    : multiplex-glut
   address                   : [localhost, 9092]
   topic                     : devices
 handlers                    :

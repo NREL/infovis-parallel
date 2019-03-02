@@ -1,5 +1,5 @@
 device                      :
-  client                    : keyboard
+  client                    : multiplex-keyboard
   address                   : [localhost, 9092]
   topic                     : devices
 handlers                    :

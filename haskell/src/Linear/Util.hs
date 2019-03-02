@@ -6,14 +6,19 @@ module Linear.Util (
 , rotationFromPlane
 , fromEuler
 , fromEulerd
+, toEuler
+, toEulerd
 , distanceToPoint
 , distanceToSegment
 , distanceToRectangle
 , distanceToBox
+, toPoint
+, toVector3
+, toQuaternion
 ) where
 
 
-import Data.Math.Util (fromDegrees)
+import Data.Math.Util (fromDegrees, toDegrees)
 import Linear.Affine (Point(..), (.-.))
 import Linear.Conjugate (Conjugate, conjugate)
 import Linear.Epsilon (Epsilon(nearZero))
@@ -104,6 +109,20 @@ fromEulerd :: (Epsilon a, Num a, RealFloat a) => V3 a -> Quaternion a
 fromEulerd = fromEuler . fmap fromDegrees
 
 
+toEuler :: (Num a, RealFloat a) => Quaternion a -> V3 a
+toEuler (Quaternion w (V3 x y z)) =
+  let
+    phi = atan2 (2 * (w * x  + y * z)) (1 - 2 * (x * x + y * y))
+    theta = asin (2 * (w * y - z * x))
+    psi = atan2 (2 * (w * z + x * y)) (1 - 2 * (y * y + z * z))
+  in
+    V3 phi theta psi
+
+
+toEulerd :: (Num a, RealFloat a) => Quaternion a -> V3 a
+toEulerd = fmap toDegrees . toEuler
+
+
 distanceToPoint :: (Epsilon a, Floating a) => Point V3 a -> Point V3 a -> a
 distanceToPoint po ps = norm $ ps .-. po
 
@@ -165,3 +184,18 @@ boxCoordinates po pu pv pw ps =
       mi !* (dot s <$> V3 uh vh wh)
     , V3 (norm u) (maybe 0 (const $ norm v) pv) (maybe 0 (const $ norm w) pw)
     )
+
+
+toPoint :: (a, a, a)
+        -> Point V3 a
+toPoint = P . toVector3
+
+
+toVector3 :: (a, a, a)
+          -> V3 a
+toVector3 (x, y, z) = V3 x y z
+
+
+toQuaternion :: (a, a, a, a)
+             -> Quaternion a
+toQuaternion (w, x, y, z) = Quaternion w $ V3 x y z

@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE Rank2Types       #-}
 {-# LANGUAGE RecordWildCards  #-}
 
 
@@ -11,8 +12,9 @@ module InfoVis.Parallel.KafkaMultiplex (
 
 
 import Control.Concurrent.Chan (Chan, newChan, writeChan)
-import Control.Concurrent.MVar (MVar, newMVar, putMVar, takeMVar)
-import Control.Lens.Lens ((&))
+import Control.Concurrent.MVar (MVar, newMVar, modifyMVar_, putMVar, takeMVar)
+import Control.Lens.Lens (Lens', lens, (&))
+import Control.Lens.Getter ((^.))
 import Control.Lens.Setter ((.~), (?~))
 import Control.Monad (unless, void)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
@@ -23,29 +25,66 @@ import Data.Default (Default(..))
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import InfoVis (LoggerIO, SeverityLog, forkLoggedIO, guardIO, logIO, makeLogger)
-import InfoVis.Parallel.NewTypes (Frame, PositionEuler)
+import InfoVis.Parallel.NewTypes (Frame, PositionEuler, PositionRotation)
 import InfoVis.Parallel.ProtoBuf (Request)
 import InfoVis.Parallel.ProtoBuf.Sink (kafkaSink)
 import Linear.Affine ((.+^))
-import Linear.Util (fromEulerd)
+import Linear.Util (fromEulerd, toEulerd, toQuaternion, toPoint)
 import Linear.V3 (V3(..))
 import Linear.Vector ((^+^), (*^), zero)
 import Network.UI.Kafka (Sensor, TopicConnection(..), consumerLoop)
-import Network.UI.Kafka.Types (Event(..), Modifiers(..),  SpecialKey(..))
+import Network.UI.Kafka.Types (Button(..), Event(..), Modifiers(..),  SpecialKey(..), Toggle(..))
 
-import qualified InfoVis.Parallel.ProtoBuf as P (display, frameShow, offsetSet, toolSet)
+import qualified InfoVis.Parallel.ProtoBuf as P (display, frameShow, offsetSet, toolSet, viewSet)
+
+
+modifyMVar' :: MVar a
+            -> (a -> a)
+            -> IO ()
+modifyMVar' = (. (return .)) . modifyMVar_
 
 
 data Visualization =
   Visualization
   {
-    frame         :: Frame
-  , shown         :: String
-  , viewer        :: PositionEuler
-  , tool          :: PositionEuler
-  , offset        :: PositionEuler
+    _frame  :: Frame
+  , _shown  :: String
+  , _viewer :: PositionEuler
+  , _tool   :: PositionEuler
+  , _offset :: PositionEuler
   }
    deriving (Eq, Ord, Read, Show)
+
+instance Default Visualization where
+  def =
+    Visualization
+      {
+        _frame  = 1
+      , _shown  = ""
+      , _viewer = (zero, zero)
+      , _tool   = (zero, zero)
+      , _offset = (zero, zero)
+      }
+
+
+frame :: Lens' Visualization Frame
+frame = lens _frame $ \s x -> s {_frame = x}
+
+
+shown :: Lens' Visualization String
+shown = lens _shown $ \s x -> s {_shown = x}
+
+
+viewer :: Lens' Visualization PositionEuler
+viewer = lens _viewer $ \s x -> s {_viewer = x}
+
+
+tool :: Lens' Visualization PositionEuler
+tool = lens _tool $ \s x -> s {_tool = x}
+
+
+offset :: Lens' Visualization PositionEuler
+offset = lens _offset $ \s x -> s {_offset = x}
 
 
 multiplexKafka :: (MonadError String m, MonadIO m, SeverityLog m)
@@ -57,17 +96,7 @@ multiplexKafka :: (MonadError String m, MonadIO m, SeverityLog m)
 multiplexKafka address client topic configurations =
   do
 
-    visualizationMVar <-
-      guardIO
-        . newMVar
-        $ Visualization
-          {
-            frame         = 1
-          , shown         = ""
-          , viewer        = (zero, zero)
-          , tool          = (zero, zero)
-          , offset        = (zero, zero)
-          }
+    visualizationMVar <- guardIO $ newMVar def
 
     (logChannel, logger) <- makeLogger
 
@@ -181,6 +210,21 @@ data Behavior =
     , initialOffset          :: PositionEuler
     , initialTool            :: PositionEuler
     }
+  | ViewerLocation
+    {
+      resetButton   :: Maybe Int
+    , initialViewer :: PositionEuler
+    }
+  | OffsetLocation
+    {
+      resetButton   :: Maybe Int
+    , initialOffset :: PositionEuler
+    }
+  | ToolLocation
+    {
+      resetButton   :: Maybe Int
+    , initialTool   :: PositionEuler
+    }
     deriving (Eq, Generic, Read, Show)
 
 instance FromJSON Behavior
@@ -191,25 +235,30 @@ instance ToJSON Behavior
 initializeBehavior :: Behavior
                    -> MVar Visualization
                    -> IO ()
+
 initializeBehavior Typing _ =
   return ()
+
 initializeBehavior KeyFrame{} visualizationMVar =
-  do
-    visualization <- takeMVar visualizationMVar
-    putMVar visualizationMVar
-      $ visualization
-        {
-          frame = 1
-        }
+  modifyMVar' visualizationMVar
+    $ frame .~ 1
+
 initializeBehavior KeyMovement{..} visualizationMVar =
-  do
-    visualization <- takeMVar visualizationMVar
-    putMVar visualizationMVar
-      $ visualization
-        {
-          tool   = initialTool
-        , offset = initialOffset
-        }
+  modifyMVar' visualizationMVar
+    $ (tool   .~ initialTool)
+    . (offset .~ initialOffset)
+
+initializeBehavior ViewerLocation{..} visualizationMVar =
+  modifyMVar' visualizationMVar
+    $ viewer .~ initialViewer
+
+initializeBehavior OffsetLocation{..} visualizationMVar =
+  modifyMVar' visualizationMVar
+    $ viewer .~ initialOffset
+
+initializeBehavior ToolLocation{..} visualizationMVar =
+  modifyMVar' visualizationMVar
+    $ viewer .~ initialTool
 
 
 behave :: Behavior
@@ -217,18 +266,15 @@ behave :: Behavior
        -> Visualization
        -> (Visualization, Request)
 
-behave Typing KeyEvent{..} visualization@Visualization{..} =
+behave Typing KeyEvent{..} visualization =
   let
     text =
       if key == '\n'
         then ""
-        else shown ++ [key]
+        else visualization ^. shown ++ [key]
   in
     (
-      visualization
-      {
-        shown = text
-      }
+      visualization & shown .~ text
     , def & P.display ?~ text
     )
 
@@ -241,6 +287,13 @@ behave keyMovement'@KeyMovement{} KeyEvent{..} visualization =
   keyMovement keyMovement' (Right key) modifiers visualization
 behave keyMovement'@KeyMovement{} SpecialKeyEvent{..} visualization =
   keyMovement keyMovement' (Left specialKey) modifiers visualization
+
+behave ViewerLocation{..} locationEvent visualization =
+  relocation resetButton initialViewer viewer P.viewSet locationEvent visualization
+behave OffsetLocation{..} locationEvent visualization =
+  relocation resetButton initialOffset offset P.offsetSet locationEvent visualization
+behave ToolLocation{..} locationEvent visualization =
+  relocation resetButton initialTool tool P.toolSet locationEvent visualization
 
 behave _ _ visualization = (visualization, def)
 
@@ -281,22 +334,20 @@ keyMovement KeyMovement{..} key' modifiers' visualization@Visualization{..} =
       | modifiers' == offsetModifiers = bimap
                                           (.+^ (deltaOffsetPosition *^ motion  ))
                                           (^+^ (deltaRotation       *^ rotation))
-                                          offset
-      | otherwise                     =  offset
+                                          $ visualization ^. offset
+      | otherwise                     =  visualization ^. offset
     tool'
       | key'       == resetTool       = initialTool
       | modifiers' == toolModifiers   = bimap
                                           (.+^ (deltaToolPosition *^ motion  ))
                                           (^+^ (deltaRotation     *^ rotation))
-                                          tool
-      | otherwise                     = tool
+                                          $ visualization ^. tool
+      | otherwise                     = visualization ^. tool
   in
    (
       visualization
-      {
-        offset = offset'
-      , tool   = tool'
-      }
+        & offset .~ offset'
+        & tool   .~ tool'  
     , def & P.offsetSet ?~ second fromEulerd offset'
           & P.toolSet   ?~ second fromEulerd tool'
     )
@@ -307,21 +358,48 @@ keyFrame :: Behavior
          -> Either SpecialKey Char
          -> Visualization
          -> (Visualization, Request)
-keyFrame KeyFrame{..} key' visualization@Visualization{..} =
+keyFrame KeyFrame{..} key' visualization =
   let
     frame'
-      | key' == nextFrame     = frame + 1
-      | key' == previousFrame = frame - 1
-      | otherwise             = head' frame $ fst <$> filter ((key' ==) . snd) setFrame
+      | key' == nextFrame     = visualization ^. frame + 1
+      | key' == previousFrame = visualization ^. frame - 1
+      | otherwise             = head' (visualization ^. frame) $ fst <$> filter ((key' ==) . snd) setFrame
   in
     (
-      visualization
-      {
-        frame = frame'
-      }
+      visualization & frame .~ frame'
     , def & P.frameShow .~ frame'
     )
 keyFrame _ _ visualization = (visualization, def)
+
+
+relocation :: Maybe Int
+           -> PositionEuler
+           -> Lens' Visualization PositionEuler
+           -> Lens' Request (Maybe PositionRotation)
+           -> Event
+           -> Visualization
+           -> (Visualization, Request)
+relocation _ _ field set LocationEvent{..} visualization =
+  let
+    positionEuler = first (const $ toPoint location) $ visualization ^. field
+  in
+    (
+      visualization & field .~ positionEuler
+    , def & set ?~ second fromEulerd positionEuler
+    )
+relocation _ _ field set OrientationEvent{..} visualization =
+  let
+    positionEuler = second (const . toEulerd $ toQuaternion orientation) $ visualization ^. field
+  in
+    (
+      visualization & field .~ positionEuler
+    , def & set ?~ second fromEulerd positionEuler
+    )
+relocation (Just i) initial field set (ButtonEvent (IndexButton j, Down)) visualization
+  | i == j    = (visualization & field .~ initial, def & set ?~ second fromEulerd initial)
+  | otherwise = (visualization, def)
+relocation _ _ _ _ _ visualization = (visualization, def)
+
 
 
 head' :: a
