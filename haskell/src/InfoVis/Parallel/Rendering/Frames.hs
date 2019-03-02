@@ -41,7 +41,7 @@ import Linear.Util (rotationFromPlane, rotationFromVectorPair)
 import Linear.V3 (V3(..))
 import Linear.Vector (zero)
 
-import qualified Data.Map.Strict as M (Map, (!), alter, delete, elems, empty, findWithDefault, fromList, keys, insert, lookup, map, mapWithKey, null)
+import qualified Data.Map.Strict as M (Map, (!), alter, delete, elems, empty, findWithDefault, fromList, keys, insert, lookup, map, mapWithKey, member, null)
 import qualified Graphics.Rendering.OpenGL.GL.CoordTrans as G (scale, translate)
 import qualified Graphics.Rendering.OpenGL.GL.VertexSpec as G (color)
 import qualified InfoVis.Parallel.NewTypes as I (Frame)
@@ -65,7 +65,7 @@ framesLens = lens frames $ \s x -> s {frames = x}
 
 
 currentFrame :: Lens' Manager FrameNumber
-currentFrame = lens current $ \s x -> s {current = x}
+currentFrame = lens current $ \s x -> if x `M.member` frames s then s {current = x} else s
 
 
 listFrames :: Manager
