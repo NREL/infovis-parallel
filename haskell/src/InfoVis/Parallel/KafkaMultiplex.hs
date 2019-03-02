@@ -154,7 +154,9 @@ createDevice logger requestChannel visualizationMVar configuration =
                     (visualization', request) = behave behavior event visualization
                   putMVar visualizationMVar visualization'   
                   unless (visualization == visualization')
-                    $ writeChan requestChannel request
+                    $ do
+                      print request
+                      writeChan requestChannel request
               |
                 (sensor', behavior) <- handlers
               , sensor == sensor'
@@ -288,9 +290,13 @@ behave Typing KeyEvent{..} visualization =
     , def & P.display ?~ text
     )
 
-behave keyFrame'@KeyFrame{} KeyEvent{..} visualization =
+behave keyFrame'@KeyFrame{} (KeyEvent key Nothing _ _) visualization =
   keyFrame keyFrame' (Right key) visualization
-behave keyFrame'@KeyFrame{} SpecialKeyEvent{..} visualization =
+behave keyFrame'@KeyFrame{} (KeyEvent key (Just Down) _ _) visualization =
+  keyFrame keyFrame' (Right key) visualization
+behave keyFrame'@KeyFrame{} (SpecialKeyEvent specialKey Nothing _ _) visualization =
+  keyFrame keyFrame' (Left specialKey) visualization
+behave keyFrame'@KeyFrame{} (SpecialKeyEvent specialKey (Just Down) _ _) visualization =
   keyFrame keyFrame' (Left specialKey) visualization
 
 behave keyMovement'@KeyMovement{} KeyEvent{..} visualization =
@@ -305,7 +311,7 @@ behave OffsetLocation{..} locationEvent visualization =
 behave ToolLocation{..} locationEvent visualization =
   relocation resetButton initialTool tool P.toolSet locationEvent visualization
 
-behave buttonFrame'@ButtonFrame{} (ButtonEvent (button, _)) visualization =
+behave buttonFrame'@ButtonFrame{} (ButtonEvent (button, Down)) visualization =
   buttonFrame buttonFrame' button visualization
 
 behave _ _ visualization = (visualization, def)
