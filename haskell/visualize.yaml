@@ -17,7 +17,7 @@ requests         :
   client         : visualizer
   address        : [localhost, 9092]
   topic          : requests
-responses        :
+events           :
   client         : glut
   address        : [localhost, 9092]
   topic          : devices

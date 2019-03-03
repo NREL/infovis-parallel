@@ -36,7 +36,7 @@ import System.Exit (die)
 
 import qualified InfoVis.Parallel.Compiler        as I (compileBuffers)
 import qualified InfoVis.Parallel.KafkaSender     as I (sendKafka)
-import qualified InfoVis.Parallel.KafkaMultiplex  as I (multiplexKafka)
+import qualified InfoVis.Parallel.Events          as I (forwardEvents)
 import qualified InfoVis.Parallel.WebsocketSender as I (sendBuffers)
 import qualified InfoVis.Parallel.Visualizer      as I (visualizeBuffers)
 
@@ -63,7 +63,7 @@ data InfoVis =
     , topic    :: String
     , buffers  :: [FilePath]
     }
-  | MultiplexKafka
+  | ForwardKafka
     {
       logging  :: Severity
     , host     :: String
@@ -93,7 +93,7 @@ infovis =
     [
       sendWebsocket
     , sendKafka
-    , multiplexKafka
+    , forwardEvents
     , compile
     , visualize
     ]
@@ -160,17 +160,17 @@ sendKafka =
     &= details []
 
 
-multiplexKafka :: InfoVis
-multiplexKafka =
-  MultiplexKafka
+forwardEvents :: InfoVis
+forwardEvents =
+  ForwardKafka
   {
     configs  = []
            &= typ "YAML"
            &= args
   }
     &= explicit
-    &= name "multiplex"
-    &= help "Combine multiple Kafka streams of protocol buffers."
+    &= name "events"
+    &= help "Combine multiple Kafka event streams of protocol buffers."
     &= details []
 
 
@@ -222,6 +222,6 @@ dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          -> m ()
 dispatch SendWebsocket{..} = I.sendBuffers host port path sendText buffers
 dispatch SendKafka{..} = I.sendKafka (host, port) client topic buffers
-dispatch MultiplexKafka{..} = I.multiplexKafka (host, port) client topic configs
+dispatch ForwardKafka{..} = I.forwardEvents (host, port) client topic configs
 dispatch Compile{..} = I.compileBuffers buffers output
 dispatch Visualize{..} = I.visualizeBuffers config (logging == Debug) buffers

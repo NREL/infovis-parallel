@@ -1,33 +1,35 @@
-device                      :
-  client                    : multiplex-glut
-  address                   : [localhost, 9092]
-  topic                     : devices
-handlers                    :
+device                         :
+  client                       : forward-glut
+  address                      : [localhost, 9092]
+  topic                        : devices
+handlers                       :
   - - glut
-    - tag                   : KeyFrame
-      nextKey               : {Right: '+'}
-      previousKey           : {Right: '-'}
-      setKey                : [[1, {Right: '1'}], [2, {Right: '2'}], [3, {Right: '3'}]]
+    - tag                      : KeyFrame
+      contents                 :
+        nextKey                : {Right: '+'}
+        previousKey            : {Right: '-'}
+        setKey                 : [[1, {Right: '1'}], [2, {Right: '2'}], [3, {Right: '3'}]]
   - - glut
-    - tag                   : KeyMovement
-      offsetModifiers       : {shiftModifier: false, altModifier: false, ctrlModifier: false}
-      toolModifiers         : {shiftModifier: false, altModifier: true , ctrlModifier: false}
-      deltaOffsetPosition   : 0.02
-      deltaToolPosition     : 0.01
-      deltaRotation         : 0.5
-      moveRightward         : {Left : {tag: KeyRight   }}
-      moveLeftward          : {Left : {tag: KeyLeft    }}
-      moveForward           : {Left : {tag: KeyUp      }}
-      moveBackward          : {Left : {tag: KeyDown    }}
-      moveUpward            : {Left : {tag: KeyPageUp  }}
-      moveDownward          : {Left : {tag: KeyPageDown}}
-      rotateForward         : {Right: 'k'               }
-      rotateBackward        : {Right: 'j'               } 
-      rotateClockwise       : {Right: 'u'               }
-      rotateCounterclockwise: {Right: 'n'               }
-      rotateLeftward        : {Right: 'h'               }
-      rotateRightward       : {Right: 'l'               }
-      resetOffset           : {Right: '.'               }
-      resetTool             : {Right: ','               }
-      initialOffset         : [[ 0  , 0  , 0  ], [0,   0, 0]]
-      initialTool           : [[-0.1, 0.5, 0.5], [0, -90, 0]]
+    - tag                      : KeyMovement
+      contents                 :
+        offsetModifiers        : {shiftModifier: false, altModifier: false, ctrlModifier: false}
+        toolModifiers          : {shiftModifier: false, altModifier: true , ctrlModifier: false}
+        deltaOffsetPosition    : 0.02
+        deltaToolPosition      : 0.01
+        deltaRotation          : 0.5
+        moveRightward          : {Left : {tag: KeyRight   }}
+        moveLeftward           : {Left : {tag: KeyLeft    }}
+        moveForward            : {Left : {tag: KeyUp      }}
+        moveBackward           : {Left : {tag: KeyDown    }}
+        moveUpward             : {Left : {tag: KeyPageUp  }}
+        moveDownward           : {Left : {tag: KeyPageDown}}
+        rotateForward          : {Right: 'k'               }
+        rotateBackward         : {Right: 'j'               } 
+        rotateClockwise        : {Right: 'u'               }
+        rotateCounterclockwise : {Right: 'n'               }
+        rotateLeftward         : {Right: 'h'               }
+        rotateRightward        : {Right: 'l'               }
+        resetOffset            : {Right: '.'               }
+        resetTool              : {Right: ','               }
+        initialOffset          : [[ 0  , 0  , 0  ], [0,   0, 0]]
+        initialTool            : [[-0.1, 0.5, 0.5], [0, -90, 0]]

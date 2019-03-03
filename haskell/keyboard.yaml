@@ -1,7 +1,8 @@
-device                      :
-  client                    : multiplex-keyboard
-  address                   : [localhost, 9092]
-  topic                     : devices
-handlers                    :
+device         :
+  client       : forward-keyboard
+  address      : [localhost, 9092]
+  topic        : devices
+handlers       :
   - - keyboard
-    - tag                   : Typing
+    - tag      : Typing
+      contents : []

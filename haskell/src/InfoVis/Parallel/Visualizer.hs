@@ -31,7 +31,7 @@ data Configuration =
   , initialViewer :: Maybe PositionEuler
   , initialTool   :: Maybe PositionEuler
   , requests      :: Maybe TopicConnection
-  , responses     :: Maybe TopicConnection
+  , events        :: Maybe TopicConnection
   }
     deriving (Eq, Generic, Read, Show)
 
@@ -70,7 +70,7 @@ visualizeBuffers configurationFile debug bufferFiles =
     void
       . forkLoggedIO logChannel
       $ do
-        maybe deviceSink (flip . kafkaSink' $ logIO logChannel) responses responseChannel
+        maybe deviceSink (flip . kafkaSink' $ logIO logChannel) events responseChannel
         return False
 
     logger

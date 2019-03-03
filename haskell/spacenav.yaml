@@ -1,11 +1,12 @@
-device                      :
-  client          : multiplex-spacenav
-  address         : [localhost, 9092]
-  topic           : devices
-handlers          :
+device                        :
+  client            : forward-spacenav
+  address           : [localhost, 9092]
+  topic             : devices
+handlers            :
   - - spacenav
-    - tag         : ToolLocation
-      resetButton :
-        tag       : IndexButton
-        contents  : 1
-      initialTool : [[-0.1, 0.5, 0.5], [0, -90, 0]]
+    - tag           : ToolLocation
+      contents      :
+        resetTool   :
+          tag       : IndexButton
+          contents  : 1
+        initialTool : [[-0.1, 0.5, 0.5], [0, -90, 0]]
