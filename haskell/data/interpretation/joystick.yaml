@@ -1,0 +1,28 @@
+kafka       :
+  client    : joystick-interpretation
+  address   : [localhost, 9092]
+  topic     : devices
+sensor      : joystick
+device      : /dev/input/js0
+xAxis       :
+  axisNumber: 0
+  increment : 0.020
+yAxis       :
+  axisNumber: 1
+  increment : 0.020
+zAxis       :
+  axisNumber: 2
+  increment : 0.020
+phiAxis     :
+  axisNumber: 3
+  increment : 0.020
+thetaAxis   :
+  axisNumber: 4
+  increment : 0.020
+psiAxis     :
+  axisNumber: 5
+  increment : 0.020
+location    : [0, 0.5, 0]
+orientation : [0, 0, 0]
+flying      : false
+resetButton : 1
