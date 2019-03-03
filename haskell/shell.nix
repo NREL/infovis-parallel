@@ -21,7 +21,9 @@ let
 
   pkgs = nixpkgs1 { };
 
-  infovis-parallel = ((import ./release.nix) {nixpkgs = nixpkgs1; compiler = compiler;}).infovis-parallel;
+  release = (import ./release.nix) {nixpkgs = nixpkgs1; compiler = compiler;};
+
+  infovis-parallel = release.infovis-parallel;
 
   haskellPackages = pkgs.haskell.packages."${compiler}";
 
@@ -29,6 +31,8 @@ in
 
   pkgs.lib.overrideDerivation infovis-parallel.env (old: {
     buildInputs = old.buildInputs ++ [
+      release.kafka-device-joystick
+      release.kafka-device-spacenav
       haskellPackages.cabal-install
     # haskellPackages.ghc-mod
       haskellPackages.ghcid
