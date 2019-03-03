@@ -15,7 +15,7 @@ import Data.Default (Default(..))
 import Data.List.Util (headWith)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Events.Types (Behave(..), frame, Visualization)
-import InfoVis.Parallel.NewTypes (Frame)
+import InfoVis.Parallel.Types (Frame)
 import InfoVis.Parallel.ProtoBuf (Request)
 import Network.UI.Kafka.Types (Event(..), SpecialKey(..), Toggle(..))
 

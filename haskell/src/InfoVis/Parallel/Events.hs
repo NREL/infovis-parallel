@@ -10,7 +10,8 @@ module InfoVis.Parallel.Events (
 
 
 import Control.Concurrent.Chan (Chan, newChan, writeChan)
-import Control.Concurrent.MVar (MVar, newMVar, modifyMVar_, putMVar, takeMVar)
+import Control.Concurrent.MVar (MVar, newMVar, putMVar, takeMVar)
+import Control.Concurrent.MVar.Util (modifyMVar')
 import Control.Monad (unless, void)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
 import Control.Monad.Log (Severity(..), logInfo)
@@ -76,12 +77,6 @@ instance Behave Behavior where
   behave (Typing         behavior) = behave behavior
   behave (ViewerLocation behavior) = behave behavior
   behave (OffsetLocation behavior) = behave behavior
-
-
-modifyMVar' :: MVar a
-            -> (a -> a)
-            -> IO ()
-modifyMVar' = (. (return .)) . modifyMVar_
 
 
 forwardEvents :: (MonadError String m, MonadIO m, SeverityLog m)

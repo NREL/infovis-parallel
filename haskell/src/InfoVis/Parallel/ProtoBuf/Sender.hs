@@ -19,7 +19,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 
 
-module InfoVis.Parallel.KafkaSender (
+module InfoVis.Parallel.ProtoBuf.Sender (
   sendKafka
 ) where
 
@@ -35,11 +35,11 @@ import Network.UI.Kafka (TopicConnection(..))
 
 
 sendKafka :: forall m . (MonadError String m, MonadIO m, SeverityLog m)
-            => (String, Int)
-            -> String
-            -> String
-            -> [FilePath]
-            -> m ()
+          => (String, Int)
+          -> String
+          -> String
+          -> [FilePath]
+          -> m ()
 sendKafka address client topic files =
   do
 

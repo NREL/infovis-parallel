@@ -31,7 +31,7 @@ import Graphics.Rendering.OpenGL.GL.BufferObjects (BufferAccess(WriteOnly), Buff
 import Graphics.Rendering.OpenGL.GL.PrimitiveMode (PrimitiveMode(..))
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
 import Graphics.Rendering.OpenGL.GL.VertexArrays (NumArrayIndices, NumInstances, drawArraysInstanced)
-import InfoVis.Parallel.NewTypes (Identifier)
+import InfoVis.Parallel.Types (Identifier)
 import InfoVis.Parallel.Rendering.Program (ShapeProgram, bindColors, bindMesh, bindPositions, bindRotations, bindScales, selectShapeProgram, syncProjectionModelView)
 
 import qualified Data.IntMap.Lazy as IM (IntMap, empty, findMin, fromList, insert, null, toList, union)

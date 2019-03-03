@@ -30,13 +30,13 @@ flag SwapGroup
 executable infovis-parallel
   main-is          : Main.hs
   other-modules    : Paths_infovis_parallel
+                     Control.Concurrent.MVar.Util
                      Data.List.Util
                      Data.Math.Util
                      Graphics.OpenGL.Util.Projection
                      Graphics.OpenGL.Util.Setup
                      Graphics.OpenGL.Util.Types
                      InfoVis
-                     InfoVis.Parallel.Compiler
                      InfoVis.Parallel.Events
                      InfoVis.Parallel.Events.ButtonFrame
                      InfoVis.Parallel.Events.KeyFrame
@@ -44,9 +44,10 @@ executable infovis-parallel
                      InfoVis.Parallel.Events.Location
                      InfoVis.Parallel.Events.Types
                      InfoVis.Parallel.Events.Typing
-                     InfoVis.Parallel.KafkaSender
-                     InfoVis.Parallel.NewTypes
+                     InfoVis.Parallel.Types
                      InfoVis.Parallel.ProtoBuf
+                     InfoVis.Parallel.ProtoBuf.Compiler
+                     InfoVis.Parallel.ProtoBuf.Sender
                      InfoVis.Parallel.ProtoBuf.Sink
                      InfoVis.Parallel.ProtoBuf.Source
                      InfoVis.Parallel.Rendering.Buffers

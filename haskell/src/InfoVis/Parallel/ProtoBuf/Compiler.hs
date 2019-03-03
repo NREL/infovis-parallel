@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 
-module InfoVis.Parallel.Compiler (
+module InfoVis.Parallel.ProtoBuf.Compiler (
   compileBuffers
 ) where
 

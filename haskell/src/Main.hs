@@ -34,11 +34,11 @@ import InfoVis (SeverityLog, stringVersion, withSeverityLog)
 import System.Console.CmdArgs (Typeable, (&=), argPos, args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
 import System.Exit (die)
 
-import qualified InfoVis.Parallel.Compiler        as I (compileBuffers)
-import qualified InfoVis.Parallel.KafkaSender     as I (sendKafka)
-import qualified InfoVis.Parallel.Events          as I (forwardEvents)
-import qualified InfoVis.Parallel.WebsocketSender as I (sendBuffers)
-import qualified InfoVis.Parallel.Visualizer      as I (visualizeBuffers)
+import qualified InfoVis.Parallel.Events            as I (forwardEvents)
+import qualified InfoVis.Parallel.ProtoBuf.Compiler as I (compileBuffers)
+import qualified InfoVis.Parallel.ProtoBuf.Sender   as I (sendKafka)
+import qualified InfoVis.Parallel.Visualizer        as I (visualizeBuffers)
+import qualified InfoVis.Parallel.WebsocketSender   as I (sendBuffers)
 
 
 deriving instance Data Severity

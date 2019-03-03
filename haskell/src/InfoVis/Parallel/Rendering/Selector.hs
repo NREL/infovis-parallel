@@ -6,7 +6,7 @@ module InfoVis.Parallel.Rendering.Selector (
 
 
 import Graphics.Rendering.OpenGL.GL.Tensor (Vector3(..), Vector4(..), Vertex3(..))
-import InfoVis.Parallel.NewTypes (PositionRotation)
+import InfoVis.Parallel.Types (PositionRotation)
 import InfoVis.Parallel.Rendering.Buffers (ShapeBuffer, createShapeBuffer, drawInstances, insertPositions, prepareShapeBuffer, updateColor, updateScales, updatePositions, updateRotations)
 import InfoVis.Parallel.Rendering.NewShapes (cone)
 import InfoVis.Parallel.Rendering.Program (ShapeProgram)
