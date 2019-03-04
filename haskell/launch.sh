@@ -3,11 +3,13 @@
 
 IVP=dist/build/infovis-parallel/infovis-parallel
 
-kafka-device-joystick data/interpretation/spacenav.yaml &
+kafka-device-joystick data/interpretation/joystick.yaml &
 
-kafka-device-spacenav data/interpretation/joystick.yaml &
+kafka-device-spacenav data/interpretation/spacenav.yaml &
 
 $IVP visualize data/visualize/laptop.yaml &
+
+sleep 5s
 
 $IVP events data/forward/{glut,spacenav,joystick,keyboard}.yaml &
 
