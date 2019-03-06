@@ -52,9 +52,9 @@ executable infovis-parallel
                      InfoVis.Parallel.ProtoBuf.Source
                      InfoVis.Parallel.Rendering.Buffers
                      InfoVis.Parallel.Rendering.Frames
-                     InfoVis.Parallel.Rendering.NewShapes
                      InfoVis.Parallel.Rendering.Program
                      InfoVis.Parallel.Rendering.Selector
+                     InfoVis.Parallel.Rendering.Shapes
                      InfoVis.Parallel.Rendering.Text
                      InfoVis.Parallel.WebsocketSender
                      InfoVis.Parallel.Visualizer

@@ -1,4 +1,4 @@
-module InfoVis.Parallel.Rendering.NewShapes (
+module InfoVis.Parallel.Rendering.Shapes (
   Mesh
 , box
 , cube
