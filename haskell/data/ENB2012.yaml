@@ -1,5 +1,5 @@
 dataset            :
-  datasetIdentifier: ENB2012.tsv
+  datasetIdentifier: data/ENB2012.tsv
 # maxRecords       : 50
   variables        :
   - variableAlias  : Relative Compactness

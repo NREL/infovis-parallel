@@ -35,6 +35,7 @@ import System.Console.CmdArgs (Typeable, (&=), argPos, args, cmdArgs, details, e
 import System.Exit (die)
 
 import qualified InfoVis.Parallel.Events            as I (forwardEvents)
+import qualified InfoVis.Parallel.Presenter         as I (presentDataset)
 import qualified InfoVis.Parallel.ProtoBuf.Compiler as I (compileBuffers)
 import qualified InfoVis.Parallel.ProtoBuf.Sender   as I (sendKafka)
 import qualified InfoVis.Parallel.Visualizer        as I (visualizeBuffers)
@@ -84,6 +85,11 @@ data InfoVis =
     , config   :: FilePath
     , buffers  :: [FilePath]
     }
+  | Present
+    {
+      logging :: Severity
+    , configs :: [FilePath]
+    }
     deriving (Data, Show, Typeable)
 
 
@@ -96,6 +102,7 @@ infovis =
     , forwardEvents
     , compile
     , visualize
+    , present
     ]
       &= summary ("InfoVis-Parallel command line, Version " ++ stringVersion ++ " by National Renewable Energy Laboratory")
       &= program "infovis-parallel"
@@ -204,6 +211,17 @@ visualize =
     &= details []
 
 
+present :: InfoVis
+present =
+  Present
+  {
+  }
+    &= explicit
+    &= name "present"
+    &= help "Present a dataset to the visualizer"
+    &= details []
+
+
 main :: IO ()
 main =
   do
@@ -221,7 +239,8 @@ dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          => InfoVis
          -> m ()
 dispatch SendWebsocket{..} = I.sendBuffers host port path sendText buffers
-dispatch SendKafka{..} = I.sendKafka (host, port) client topic buffers
-dispatch ForwardKafka{..} = I.forwardEvents (host, port) client topic configs
-dispatch Compile{..} = I.compileBuffers buffers output
-dispatch Visualize{..} = I.visualizeBuffers config (logging == Debug) buffers
+dispatch SendKafka    {..} = I.sendKafka (host, port) client topic buffers
+dispatch ForwardKafka {..} = I.forwardEvents (host, port) client topic configs
+dispatch Compile      {..} = I.compileBuffers buffers output
+dispatch Visualize    {..} = I.visualizeBuffers config (logging == Debug) buffers
+dispatch Present      {..} = I.presentDataset configs

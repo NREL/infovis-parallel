@@ -37,6 +37,7 @@ executable infovis-parallel
                      Graphics.OpenGL.Util.Setup
                      Graphics.OpenGL.Util.Types
                      InfoVis
+                     InfoVis.Parallel.Dataset
                      InfoVis.Parallel.Events
                      InfoVis.Parallel.Events.ButtonFrame
                      InfoVis.Parallel.Events.KeyFrame
@@ -45,6 +46,7 @@ executable infovis-parallel
                      InfoVis.Parallel.Events.Types
                      InfoVis.Parallel.Events.Typing
                      InfoVis.Parallel.Types
+                     InfoVis.Parallel.Presenter
                      InfoVis.Parallel.ProtoBuf
                      InfoVis.Parallel.ProtoBuf.Compiler
                      InfoVis.Parallel.ProtoBuf.Sender
