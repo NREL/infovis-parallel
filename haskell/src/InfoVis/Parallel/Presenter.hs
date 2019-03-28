@@ -14,7 +14,7 @@ import Data.Yaml.Config (loadYamlSettings, ignoreEnv)
 import GHC.Generics (Generic)
 import InfoVis (SeverityLog, guardIO)
 import InfoVis.Parallel.Dataset (Dataset, readDataset)
-import InfoVis.Parallel.Presenter.Types (Presentation)
+import InfoVis.Parallel.Presenter.Presentation (Presentation)
 
 
 data Configuration =
@@ -36,6 +36,6 @@ presentDataset :: (MonadError String m, MonadIO m, SeverityLog m)
 presentDataset configurationFiles =
   do
     Configuration{..} <- guardIO $ loadYamlSettings configurationFiles [] ignoreEnv
-    records <- readDataset dataset
+    _records <- readDataset dataset
     guardIO $ print presentation
     return ()
