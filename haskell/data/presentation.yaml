@@ -32,15 +32,15 @@ presentation               :
         divisions          : 10
         lineCharacteristics:
         - tag              : ColorSet
-          normalColor      : [0.2, 0.2, 0.2, 0.2]
-          selectColor      : [0.4, 0.4, 0.0, 0.8]
-          highlightColor   : [0.4, 0.0, 0.0, 0.8]
+          normalColor      : 0x333333FF
+          selectColor      : 0x666600CC
+          highlightColor   : 0x660000CC
         faceCharacteristics:
         - tag              : ColorSet
-          normalColor      : [0.2, 0.2, 0.2, 0.0]
-          selectColor      : [0.4, 0.4, 0.0, 0.8]
-          highlightColor   : [0.4, 0.0, 0.0, 0.8]
-        labelColor         : [0.1, 0.6, 0.2, 1.0]
+          normalColor      : 0x33333300
+          selectColor      : 0x666600CC
+          highlightColor   : 0x660000CC
+        labelColor         : 0x1A9933FF
         labelSize          : 5
     - tag                  : Singleton
       extent               :
@@ -59,15 +59,15 @@ presentation               :
         divisions          : 0
         lineCharacteristics:
         - tag              : ColorSet
-          normalColor      : [0.4, 0.4, 0.4, 0.8]
-          selectColor      : [0.4, 0.4, 0.0, 0.8]
-          highlightColor   : [0.4, 0.0, 0.0, 0.8]
+          normalColor      : 0x666666CC
+          selectColor      : 0x666600CC
+          highlightColor   : 0x660000CC
         faceCharacteristics:
         - tag              : ColorSet
-          normalColor      : [0.2, 0.2, 0.2, 0.0]
-          selectColor      : [0.4, 0.4, 0.0, 0.8]
-          highlightColor   : [0.4, 0.0, 0.0, 0.8]
-        labelColor         : [0.1, 0.6, 0.2, 1.0]
+          normalColor      : 0x33333300
+          selectColor      : 0x666600CC
+          highlightColor   : 0x660000CC
+        labelColor         : 0x1A9933FF
         labelSize          : 5
   - tag                    : Array
     extents                :
@@ -100,15 +100,15 @@ presentation               :
       divisions            : 5
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
       faceCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.2, 0.2, 0.2, 0.6]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x33333399
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : RectangleGrid
       gridAlias            : plane2
@@ -118,15 +118,15 @@ presentation               :
       divisions            : 5
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
       faceCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.2, 0.2, 0.2, 0.6]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x33333399
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : RectangleGrid
       gridAlias            : plane3
@@ -136,15 +136,15 @@ presentation               :
       divisions            : 5
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
       faceCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.2, 0.2, 0.2, 0.6]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x33333399
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : RectangleGrid
       gridAlias            : plane4
@@ -154,15 +154,15 @@ presentation               :
       divisions            : 5
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
       faceCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.2, 0.2, 0.2, 0.6]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x33333399
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : RectangleGrid
       gridAlias            : plane5
@@ -172,15 +172,15 @@ presentation               :
       divisions            : 5
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
       faceCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.2, 0.2, 0.2, 0.6]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x33333399
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
   - tag                    : Array
     extents                :
@@ -222,10 +222,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line2
@@ -234,10 +234,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line3
@@ -246,10 +246,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line4
@@ -258,10 +258,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line5
@@ -270,10 +270,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line6
@@ -282,10 +282,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line7
@@ -294,10 +294,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line8
@@ -306,10 +306,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line9
@@ -318,10 +318,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
     - tag                  : LineGrid
       gridAlias            : line10
@@ -330,10 +330,10 @@ presentation               :
       divisions            : 10
       lineCharacteristics  :
       - tag                : ColorSet
-        normalColor        : [0.4, 0.4, 0.4, 0.8]
-        selectColor        : [0.4, 0.4, 0.0, 0.8]
-        highlightColor     : [0.4, 0.0, 0.0, 0.8]
-      labelColor           : [0.1, 0.6, 0.2, 1.0]
+        normalColor        : 0x666666CC
+        selectColor        : 0x666600CC
+        highlightColor     : 0x660000CC
+      labelColor           : 0x1A9933FF
       labelSize            : 5
   links                    :
     - tag                  : Point
@@ -341,100 +341,100 @@ presentation               :
       linkedGrid           : heatingBox
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.8]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FFCC
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Point
       linkAlias            : coolingScatterplot
       linkedGrid           : coolingBox
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.8]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FFCC
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelPlanes
       linkedGrids          : [plane1,plane2,plane3,plane4,plane5]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest1
       linkedGrids          : [line1,line9]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest2
       linkedGrids          : [line2,line9]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest3
       linkedGrids          : [line3,line9]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest4
       linkedGrids          : [line4,line9]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest5
       linkedGrids          : [line5,line10]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest6
       linkedGrids          : [line6,line10]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest7
       linkedGrids          : [line7,line10]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest8
       linkedGrids          : [line8,line10]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
     - tag                  : Polyline
       linkAlias            : parallelForest9
       linkedGrids          : [line9,line10]
       characteristics      :
       - tag                : ColorSet
-        normalColor        : [0.0, 0.0, 1.0, 0.2]
-        selectColor        : [0.8, 0.8, 0.8, 1.0]
-        highlightColor     : [1.0, 0.0, 0.0, 1.0]
-  selectorColor            : [0.5, 0.3, 0.2, 1.0]
+        normalColor        : 0x0000FF33
+        selectColor        : 0xCCCCCCFF
+        highlightColor     : 0xFF0000FF
+  selectorColor            : 0x804D33FF
   selectorSize             : 5
-  statusColor              : [0.6, 0.1, 0.2, 1.0]
+  statusColor              : 0xCC1A33FF
   statusSize               : 15
   statusOrigin             : [0.05, 1.00, 0.50]
   statusWidth              : [0.10, 1.00, 0.50]

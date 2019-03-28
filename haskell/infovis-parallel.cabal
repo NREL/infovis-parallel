@@ -47,6 +47,7 @@ executable infovis-parallel
                      InfoVis.Parallel.Events.Typing
                      InfoVis.Parallel.Types
                      InfoVis.Parallel.Presenter
+                     InfoVis.Parallel.Presenter.Types
                      InfoVis.Parallel.ProtoBuf
                      InfoVis.Parallel.ProtoBuf.Compiler
                      InfoVis.Parallel.ProtoBuf.Sender

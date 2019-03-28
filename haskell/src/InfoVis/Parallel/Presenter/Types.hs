@@ -2,14 +2,14 @@
 {-# LANGUAGE DeriveGeneric  #-}
 
 
-module InfoVis.Parallel.Types.Presentation (
+module InfoVis.Parallel.Presenter.Types (
   Axis(..)
 , Axes1D
 , Axes2D
 , Axes3D
 , GridAlias
 , Grid(..)
-, GriddedLocation
+, GriddedPosition
 , Extent(..)
 , Container(..)
 , LinkAlias
@@ -20,13 +20,11 @@ module InfoVis.Parallel.Types.Presentation (
 ) where
 
 
-import Control.DeepSeq (NFData)
 import Data.Aeson.Types (FromJSON(..), ToJSON(..))
 import Data.Binary (Binary)
 import GHC.Generics (Generic)
-import Graphics.OpenGL.Util.Instances ()
-import InfoVis.Parallel.Types (Color, Location)
-import InfoVis.Parallel.Types.Dataset (VariableAlias)
+import InfoVis.Parallel.Types (Color, Position)
+import InfoVis.Parallel.Dataset (VariableAlias)
 import Linear.Util.Instances ()
 import Linear.V1 (V1)
 import Linear.V2 (V2)
@@ -89,27 +87,27 @@ data Grid =
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
-type GriddedLocation = (GridAlias, Location)
+type GriddedPosition = (GridAlias, Position)
 
 
 data Extent =
     Extent1D
     {
-      origin  :: Location
-    , cornerX :: Location
+      origin  :: Position
+    , cornerX :: Position
     }
   | Extent2D
     {
-      origin  :: Location
-    , cornerX :: Location
-    , cornerY :: Location
+      origin  :: Position
+    , cornerX :: Position
+    , cornerY :: Position
     }
   | Extent3D
     {
-      origin  :: Location
-    , cornerX :: Location
-    , cornerY :: Location
-    , cornerZ :: Location
+      origin  :: Position
+    , cornerX :: Position
+    , cornerY :: Position
+    , cornerZ :: Position
     }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
@@ -162,7 +160,7 @@ data Characteristic =
     , selectColor     :: Color
     , highlightColor  :: Color
     }
-    deriving (Binary, Eq, FromJSON, Generic, NFData, Ord, Read, Show, ToJSON)
+    deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
 data Presentation =
@@ -176,8 +174,8 @@ data Presentation =
   , selectorSize  :: Double
   , statusColor   :: Color
   , statusSize    :: Double
-  , statusOrigin  :: Location
-  , statusWidth   :: Location
-  , statusHeight  :: Location
+  , statusOrigin  :: Position
+  , statusWidth   :: Position
+  , statusHeight  :: Position
   }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)

@@ -14,12 +14,14 @@ import Data.Yaml.Config (loadYamlSettings, ignoreEnv)
 import GHC.Generics (Generic)
 import InfoVis (SeverityLog, guardIO)
 import InfoVis.Parallel.Dataset (Dataset, readDataset)
+import InfoVis.Parallel.Presenter.Types (Presentation)
 
 
 data Configuration =
   Configuration
   {
-    dataset :: Dataset
+    dataset      :: Dataset
+  , presentation :: Presentation
   }
     deriving (Eq, Generic, Read, Show)
 
@@ -35,4 +37,5 @@ presentDataset configurationFiles =
   do
     Configuration{..} <- guardIO $ loadYamlSettings configurationFiles [] ignoreEnv
     records <- readDataset dataset
+    guardIO $ print presentation
     return ()
