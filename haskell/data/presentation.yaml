@@ -1,441 +1,398 @@
-presentation               :
-# animationKey             : Orientation
-# uniqueKey                : Glazing Area Distribution
-  containers               :
-  - tag                    : Collection
-    extents                :
-    - tag                  : Extent3D
-      origin               : [0.05, 0.05, 0.55]
-      cornerX              : [0.45, 0.05, 0.55]
-      cornerY              : [0.05, 0.05, 0.95]
-      cornerZ              : [0.05, 0.95, 0.55]
-    - tag                  : Extent3D
-      origin               : [0.55, 0.05, 0.55]
-      cornerX              : [0.95, 0.05, 0.55]
-      cornerY              : [0.55, 0.05, 0.95]
-      cornerZ              : [0.55, 0.95, 0.55]
-    containeds             :
-    - tag                  : Singleton
-      extent               :
-        tag                : Extent3D
-        origin             : [0, 0, 0]
-        cornerX            : [1, 0, 0]
-        cornerY            : [0, 1, 0]
-        cornerZ            : [0, 0, 1]
-      grid                 :
-        tag                : BoxGrid
-        gridAlias          : heatingBox
-        axes3D             :
-        - axisVariable     : Wall Area
-        - axisVariable     : Roof Area
-        - axisVariable     : Heating Load
-        divisions          : 10
-        lineCharacteristics:
-        - tag              : ColorSet
-          normalColor      : 0x333333FF
-          selectColor      : 0x666600CC
-          highlightColor   : 0x660000CC
-        faceCharacteristics:
-        - tag              : ColorSet
-          normalColor      : 0x33333300
-          selectColor      : 0x666600CC
-          highlightColor   : 0x660000CC
-        labelColor         : 0x1A9933FF
-        labelSize          : 5
-    - tag                  : Singleton
-      extent               :
-        tag                : Extent3D
-        origin             : [0, 0, 0]
-        cornerX            : [1, 0, 0]
-        cornerY            : [0, 1, 0]
-        cornerZ            : [0, 0, 1]
-      grid                 :
-        tag                : BoxGrid
-        gridAlias          : coolingBox
-        axes3D             :
-        - axisVariable     : Wall Area
-        - axisVariable     : Roof Area
-        - axisVariable     : Cooling Load
-        divisions          : 0
-        lineCharacteristics:
-        - tag              : ColorSet
-          normalColor      : 0x666666CC
-          selectColor      : 0x666600CC
-          highlightColor   : 0x660000CC
-        faceCharacteristics:
-        - tag              : ColorSet
-          normalColor      : 0x33333300
-          selectColor      : 0x666600CC
-          highlightColor   : 0x660000CC
-        labelColor         : 0x1A9933FF
-        labelSize          : 5
-  - tag                    : Array
-    extents                :
-    - tag                  : Extent2D
-      origin               : [0.1, 0.1, 0.1]
-      cornerX              : [0.1, 0.9, 0.1]
-      cornerY              : [0.1, 0.1, 0.4]
-    - tag                  : Extent2D
-      origin               : [0.2, 0.1, 0.1]
-      cornerX              : [0.2, 0.9, 0.1]
-      cornerY              : [0.2, 0.1, 0.4]
-    - tag                  : Extent2D
-      origin               : [0.3, 0.1, 0.1]
-      cornerX              : [0.3, 0.9, 0.1]
-      cornerY              : [0.3, 0.1, 0.4]
-    - tag                  : Extent2D
-      origin               : [0.4, 0.1, 0.1]
-      cornerX              : [0.4, 0.9, 0.1]
-      cornerY              : [0.4, 0.1, 0.4]
-    - tag                  : Extent2D
-      origin               : [0.5, 0.1, 0.1]
-      cornerX              : [0.5, 0.9, 0.1]
-      cornerY              : [0.5, 0.1, 0.4]
-    grids                  :
-    - tag                  : RectangleGrid
-      gridAlias            : plane1
-      axes2D               :
-      - axisVariable       : Relative Compactness
-      - axisVariable       : Surface Area
-      divisions            : 5
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      faceCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x33333399
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : RectangleGrid
-      gridAlias            : plane2
-      axes2D               :
-      - axisVariable       : Wall Area
-      - axisVariable       : Roof Area
-      divisions            : 5
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      faceCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x33333399
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : RectangleGrid
-      gridAlias            : plane3
-      axes2D               :
-      - axisVariable       : Overall Height
-      - axisVariable       : Orientation
-      divisions            : 5
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      faceCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x33333399
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : RectangleGrid
-      gridAlias            : plane4
-      axes2D               :
-      - axisVariable       : Glazing Area
-      - axisVariable       : Glazing Area Distribution
-      divisions            : 5
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      faceCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x33333399
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : RectangleGrid
-      gridAlias            : plane5
-      axes2D               :
-      - axisVariable       : Heating Load
-      - axisVariable       : Cooling Load
-      divisions            : 5
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      faceCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x33333399
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-  - tag                    : Array
-    extents                :
-    - tag                  : Extent1D
-      origin               : [0.7, 0.2, 0.1]
-      cornerX              : [0.7, 0.2, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.7, 0.4, 0.1]
-      cornerX              : [0.7, 0.4, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.7, 0.6, 0.1]
-      cornerX              : [0.7, 0.6, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.7, 0.8, 0.1]
-      cornerX              : [0.7, 0.8, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.9, 0.2, 0.1]
-      cornerX              : [0.9, 0.2, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.9, 0.4, 0.1]
-      cornerX              : [0.9, 0.4, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.9, 0.6, 0.1]
-      cornerX              : [0.9, 0.6, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.9, 0.8, 0.1]
-      cornerX              : [0.9, 0.8, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.8, 0.4, 0.1]
-      cornerX              : [0.8, 0.4, 0.4]
-    - tag                  : Extent1D
-      origin               : [0.8, 0.6, 0.1]
-      cornerX              : [0.8, 0.6, 0.4]
-    grids                  :
-    - tag                  : LineGrid
-      gridAlias            : line1
-      axes1D               :
-        axisVariable       : Relative Compactness
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line2
-      axes1D               :
-        axisVariable       : Surface Area
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line3
-      axes1D               :
-        axisVariable       : Wall Area
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line4
-      axes1D               :
-        axisVariable       : Roof Area
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line5
-      axes1D               :
-        axisVariable       : Overall Height
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line6
-      axes1D               :
-        axisVariable       : Orientation
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line7
-      axes1D               :
-        axisVariable       : Glazing Area
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line8
-      axes1D               :
-        axisVariable       : Glazing Area Distribution
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line9
-      axes1D               :
-        axisVariable       : Heating Load
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-    - tag                  : LineGrid
-      gridAlias            : line10
-      axes1D               :
-        axisVariable       : Cooling Load
-      divisions            : 10
-      lineCharacteristics  :
-      - tag                : ColorSet
-        normalColor        : 0x666666CC
-        selectColor        : 0x666600CC
-        highlightColor     : 0x660000CC
-      labelColor           : 0x1A9933FF
-      labelSize            : 5
-  links                    :
-    - tag                  : Point
-      linkAlias            : heatingScatterplot
-      linkedGrid           : heatingBox
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FFCC
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Point
-      linkAlias            : coolingScatterplot
-      linkedGrid           : coolingBox
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FFCC
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelPlanes
-      linkedGrids          : [plane1,plane2,plane3,plane4,plane5]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest1
-      linkedGrids          : [line1,line9]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest2
-      linkedGrids          : [line2,line9]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest3
-      linkedGrids          : [line3,line9]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest4
-      linkedGrids          : [line4,line9]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest5
-      linkedGrids          : [line5,line10]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest6
-      linkedGrids          : [line6,line10]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest7
-      linkedGrids          : [line7,line10]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest8
-      linkedGrids          : [line8,line10]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-    - tag                  : Polyline
-      linkAlias            : parallelForest9
-      linkedGrids          : [line9,line10]
-      characteristics      :
-      - tag                : ColorSet
-        normalColor        : 0x0000FF33
-        selectColor        : 0xCCCCCCFF
-        highlightColor     : 0xFF0000FF
-  selectorColor            : 0x804D33FF
-  selectorSize             : 5
-  statusColor              : 0xCC1A33FF
-  statusSize               : 15
-  statusOrigin             : [0.05, 1.00, 0.50]
-  statusWidth              : [0.10, 1.00, 0.50]
-  statusHeight             : [0.05, 1.00, 0.40]
+presentation             :
+# animationKey           : Orientation
+# uniqueKey              : Glazing Area Distribution
+  containers             :
+  - tag                  : Collection
+    extents              :
+    - tag                : Extent3D
+      origin             : [0.05, 0.05, 0.55]
+      cornerX            : [0.45, 0.05, 0.55]
+      cornerY            : [0.05, 0.05, 0.95]
+      cornerZ            : [0.05, 0.95, 0.55]
+    - tag                : Extent3D
+      origin             : [0.55, 0.05, 0.55]
+      cornerX            : [0.95, 0.05, 0.55]
+      cornerY            : [0.55, 0.05, 0.95]
+      cornerZ            : [0.55, 0.95, 0.55]
+    containeds           :
+    - tag                : Singleton
+      extent             :
+        tag              : Extent3D
+        origin           : [0, 0, 0]
+        cornerX          : [1, 0, 0]
+        cornerY          : [0, 1, 0]
+        cornerZ          : [0, 0, 1]
+      grid               :
+        tag              : BoxGrid
+        gridAlias        : heatingBox
+        axes3D           :
+        - axisVariable   : Wall Area
+        - axisVariable   : Roof Area
+        - axisVariable   : Heating Load
+        divisions        : 10
+        lineStyling      :
+          normalColor    : 0x333333FF
+          selectColor    : 0x666600CC
+          highlightColor : 0x660000CC
+        faceStyling      :
+          normalColor    : 0x33333300
+          selectColor    : 0x666600CC
+          highlightColor : 0x660000CC
+        labelColor       : 0x1A9933FF
+        labelSize        : 5
+    - tag                : Singleton
+      extent             :
+        tag              : Extent3D
+        origin           : [0, 0, 0]
+        cornerX          : [1, 0, 0]
+        cornerY          : [0, 1, 0]
+        cornerZ          : [0, 0, 1]
+      grid               :
+        tag              : BoxGrid
+        gridAlias        : coolingBox
+        axes3D           :
+        - axisVariable   : Wall Area
+        - axisVariable   : Roof Area
+        - axisVariable   : Cooling Load
+        divisions        : 0
+        lineStyling      :
+          normalColor    : 0x666666CC
+          selectColor    : 0x666600CC
+          highlightColor : 0x660000CC
+        faceStyling      :
+          normalColor    : 0x33333300
+          selectColor    : 0x666600CC
+          highlightColor : 0x660000CC
+        labelColor       : 0x1A9933FF
+        labelSize        : 5
+  - tag                  : Array
+    extents              :
+    - tag                : Extent2D
+      origin             : [0.1, 0.1, 0.1]
+      cornerX            : [0.1, 0.9, 0.1]
+      cornerY            : [0.1, 0.1, 0.4]
+    - tag                : Extent2D
+      origin             : [0.2, 0.1, 0.1]
+      cornerX            : [0.2, 0.9, 0.1]
+      cornerY            : [0.2, 0.1, 0.4]
+    - tag                : Extent2D
+      origin             : [0.3, 0.1, 0.1]
+      cornerX            : [0.3, 0.9, 0.1]
+      cornerY            : [0.3, 0.1, 0.4]
+    - tag                : Extent2D
+      origin             : [0.4, 0.1, 0.1]
+      cornerX            : [0.4, 0.9, 0.1]
+      cornerY            : [0.4, 0.1, 0.4]
+    - tag                : Extent2D
+      origin             : [0.5, 0.1, 0.1]
+      cornerX            : [0.5, 0.9, 0.1]
+      cornerY            : [0.5, 0.1, 0.4]
+    grids                :
+    - tag                : RectangleGrid
+      gridAlias          : plane1
+      axes2D             :
+      - axisVariable     : Relative Compactness
+      - axisVariable     : Surface Area
+      divisions          : 5
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      faceStyling        :
+        normalColor      : 0x33333399
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : RectangleGrid
+      gridAlias          : plane2
+      axes2D             :
+      - axisVariable     : Wall Area
+      - axisVariable     : Roof Area
+      divisions          : 5
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      faceStyling        :
+        normalColor      : 0x33333399
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : RectangleGrid
+      gridAlias          : plane3
+      axes2D             :
+      - axisVariable     : Overall Height
+      - axisVariable     : Orientation
+      divisions          : 5
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      faceStyling        :
+        normalColor      : 0x33333399
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : RectangleGrid
+      gridAlias          : plane4
+      axes2D             :
+      - axisVariable     : Glazing Area
+      - axisVariable     : Glazing Area Distribution
+      divisions          : 5
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      faceStyling        :
+        normalColor      : 0x33333399
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : RectangleGrid
+      gridAlias          : plane5
+      axes2D             :
+      - axisVariable     : Heating Load
+      - axisVariable     : Cooling Load
+      divisions          : 5
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      faceStyling        :
+        normalColor      : 0x33333399
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+  - tag                  : Array
+    extents              :
+    - tag                : Extent1D
+      origin             : [0.7, 0.2, 0.1]
+      cornerX            : [0.7, 0.2, 0.4]
+    - tag                : Extent1D
+      origin             : [0.7, 0.4, 0.1]
+      cornerX            : [0.7, 0.4, 0.4]
+    - tag                : Extent1D
+      origin             : [0.7, 0.6, 0.1]
+      cornerX            : [0.7, 0.6, 0.4]
+    - tag                : Extent1D
+      origin             : [0.7, 0.8, 0.1]
+      cornerX            : [0.7, 0.8, 0.4]
+    - tag                : Extent1D
+      origin             : [0.9, 0.2, 0.1]
+      cornerX            : [0.9, 0.2, 0.4]
+    - tag                : Extent1D
+      origin             : [0.9, 0.4, 0.1]
+      cornerX            : [0.9, 0.4, 0.4]
+    - tag                : Extent1D
+      origin             : [0.9, 0.6, 0.1]
+      cornerX            : [0.9, 0.6, 0.4]
+    - tag                : Extent1D
+      origin             : [0.9, 0.8, 0.1]
+      cornerX            : [0.9, 0.8, 0.4]
+    - tag                : Extent1D
+      origin             : [0.8, 0.4, 0.1]
+      cornerX            : [0.8, 0.4, 0.4]
+    - tag                : Extent1D
+      origin             : [0.8, 0.6, 0.1]
+      cornerX            : [0.8, 0.6, 0.4]
+    grids                :
+    - tag                : LineGrid
+      gridAlias          : line1
+      axes1D             :
+        axisVariable     : Relative Compactness
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line2
+      axes1D             :
+        axisVariable     : Surface Area
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line3
+      axes1D             :
+        axisVariable     : Wall Area
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line4
+      axes1D             :
+        axisVariable     : Roof Area
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line5
+      axes1D             :
+        axisVariable     : Overall Height
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line6
+      axes1D             :
+        axisVariable     : Orientation
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line7
+      axes1D             :
+        axisVariable     : Glazing Area
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line8
+      axes1D             :
+        axisVariable     : Glazing Area Distribution
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line9
+      axes1D             :
+        axisVariable     : Heating Load
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+    - tag                : LineGrid
+      gridAlias          : line10
+      axes1D             :
+        axisVariable     : Cooling Load
+      divisions          : 10
+      lineStyling        :
+        normalColor      : 0x666666CC
+        selectColor      : 0x666600CC
+        highlightColor   : 0x660000CC
+      labelColor         : 0x1A9933FF
+      labelSize          : 5
+  links                  :
+    - tag                : Point
+      linkAlias          : heatingScatterplot
+      linkedGrid         : heatingBox
+      styling            :
+        normalColor      : 0x0000FFCC
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Point
+      linkAlias          : coolingScatterplot
+      linkedGrid         : coolingBox
+      styling            :
+        normalColor      : 0x0000FFCC
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelPlanes
+      linkedGrids        : [plane1,plane2,plane3,plane4,plane5]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest1
+      linkedGrids        : [line1,line9]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest2
+      linkedGrids        : [line2,line9]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest3
+      linkedGrids        : [line3,line9]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest4
+      linkedGrids        : [line4,line9]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest5
+      linkedGrids        : [line5,line10]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest6
+      linkedGrids        : [line6,line10]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest7
+      linkedGrids        : [line7,line10]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest8
+      linkedGrids        : [line8,line10]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF
+    - tag                : Polyline
+      linkAlias          : parallelForest9
+      linkedGrids        : [line9,line10]
+      styling            :
+        normalColor      : 0x0000FF33
+        selectColor      : 0xCCCCCCFF
+        highlightColor   : 0xFF0000FF

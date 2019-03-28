@@ -15,7 +15,7 @@ module InfoVis.Parallel.Presenter.Types (
 , LinkAlias
 , Link(..)
 , TimeAlias
-, Characteristic(..)
+, Styling(..)
 , Presentation(..)
 ) where
 
@@ -57,32 +57,32 @@ type Axes3D = V3 Axis
 data Grid =
     LineGrid
     {
-      gridAlias           :: GridAlias
-    , axes1D              :: Axes1D
-    , divisions           :: Int
-    , lineCharacteristics :: [Characteristic]
-    , labelColor          :: Color
-    , labelSize           :: Double
+      gridAlias   :: GridAlias
+    , axes1D      :: Axes1D
+    , divisions   :: Int
+    , lineStyling :: Styling
+    , labelColor  :: Color
+    , labelSize   :: Double
     }
   | RectangleGrid
     {
-      gridAlias           :: GridAlias
-    , axes2D              :: Axes2D
-    , divisions           :: Int
-    , lineCharacteristics :: [Characteristic]
-    , faceCharacteristics :: [Characteristic]
-    , labelColor          :: Color
-    , labelSize           :: Double
+      gridAlias   :: GridAlias
+    , axes2D      :: Axes2D
+    , divisions   :: Int
+    , lineStyling :: Styling
+    , faceStyling :: Styling
+    , labelColor  :: Color
+    , labelSize   :: Double
     }
   | BoxGrid
     {
-      gridAlias           :: GridAlias
-    , axes3D              :: Axes3D
-    , divisions           :: Int
-    , lineCharacteristics :: [Characteristic]
-    , faceCharacteristics :: [Characteristic]
-    , labelColor          :: Color
-    , labelSize           :: Double
+      gridAlias   :: GridAlias
+    , axes3D      :: Axes3D
+    , divisions   :: Int
+    , lineStyling :: Styling
+    , faceStyling :: Styling
+    , labelColor  :: Color
+    , labelSize   :: Double
     }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
@@ -137,15 +137,15 @@ type LinkAlias = String
 data Link =
     Point
     {
-      linkAlias       :: LinkAlias
-    , linkedGrid      :: GridAlias
-    , characteristics :: [Characteristic]
+      linkAlias  :: LinkAlias
+    , linkedGrid :: GridAlias
+    , styling    :: Styling
     }
   | Polyline
     {
-      linkAlias       :: LinkAlias
-    , linkedGrids     :: [GridAlias]
-    , characteristics :: [Characteristic]
+      linkAlias   :: LinkAlias
+    , linkedGrids :: [GridAlias]
+    , styling     :: Styling
     }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
@@ -153,12 +153,12 @@ data Link =
 type TimeAlias = String
 
 
-data Characteristic =
-    ColorSet
+data Styling =
+    Styling
     {
-      normalColor     :: Color
-    , selectColor     :: Color
-    , highlightColor  :: Color
+      normalColor    :: Color
+    , selectColor    :: Color
+    , highlightColor :: Color
     }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
@@ -166,16 +166,9 @@ data Characteristic =
 data Presentation =
   Presentation
   {
-    containers    :: [Container]
-  , links         :: [Link]
-  , animationKey  :: Maybe VariableAlias
-  , uniqueKey     :: Maybe VariableAlias
-  , selectorColor :: Color
-  , selectorSize  :: Double
-  , statusColor   :: Color
-  , statusSize    :: Double
-  , statusOrigin  :: Position
-  , statusWidth   :: Position
-  , statusHeight  :: Position
+    containers   :: [Container]
+  , links        :: [Link]
+  , animationKey :: Maybe VariableAlias
+  , uniqueKey    :: Maybe VariableAlias
   }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
