@@ -83,9 +83,7 @@ presentGrid LineGrid{..} =
       ]
     deltaX = ex / (1 + fromIntegral divisions)
     edges =
-      arrayed divisions deltaX (makeLine normalColor 0.005 deltaX) zero
-        where
-          Styling{..} = lineStyling
+      arrayed divisions deltaX (makeLine lineStyling deltaX) zero
   in
     number gridAlias $ axes ++ edges
 
@@ -102,9 +100,8 @@ presentGrid RectangleGrid{..} =
       arrayed divisions deltaX
         (
           arrayed divisions deltaY
-            $ makeRectangle normalColor 0.005 deltaX deltaY
+            $ makeRectangle faceStyling deltaX deltaY
         ) zero
-         where Styling{..} = faceStyling
     edges = 
          set deltaX deltaY
       ++ set deltaY deltaX
@@ -113,9 +110,8 @@ presentGrid RectangleGrid{..} =
             arrayed (divisions + 1) u
               (
                 arrayed divisions v
-                  $ makeLine normalColor 0.005 v
+                  $ makeLine lineStyling v
               ) zero
-          Styling{..} = lineStyling
   in
     number gridAlias $ axes ++ faces ++ edges
 
@@ -141,10 +137,9 @@ presentGrid BoxGrid{..} =
                 arrayed divisions v
                   (
                     arrayed divisions w
-                      $ makeRectangle normalColor 0.005 v w
+                      $ makeRectangle faceStyling v w
                   )
               ) zero
-          Styling{..} = faceStyling
     edges = 
          set deltaX deltaY deltaZ
       ++ set deltaY deltaZ deltaX
@@ -156,10 +151,9 @@ presentGrid BoxGrid{..} =
                 arrayed (divisions + 1) v
                   (
                     arrayed divisions w
-                      $ makeLine normalColor 0.005 w
+                      $ makeLine lineStyling w
                   )
               ) zero
-          Styling{..} = lineStyling
   in
     number gridAlias $ axes ++ faces ++ edges
 
@@ -186,35 +180,33 @@ arrayed divisions deltaX f origin =
     [0..divisions]
 
 
-makeLine :: Color
-         -> Double
+makeLine :: Styling
          -> V3 Double
          -> Point V3 Double
          -> [Geometry]
-makeLine color' size' deltaX origin =
+makeLine Styling{..} deltaX origin =
   [
     def
     {
       shape = Polylines [[origin, origin .+^ deltaX]]
-    , color = color'
-    , size  = size'
+    , color = normalColor
+    , size  = thickness
     }
   ]
 
 
-makeRectangle :: Color
-              -> Double
+makeRectangle :: Styling
               -> V3 Double
               -> V3 Double
               -> Point V3 Double
               -> [Geometry]
-makeRectangle color' size' deltaX deltaY origin =
+makeRectangle Styling{..} deltaX deltaY origin =
   [
     def
     {
       shape = Rectangles [(origin, origin .+^ deltaX, origin .+^ deltaY)]
-    , color = color'
-    , size  = size'
+    , color = normalColor
+    , size  = thickness
     }
   ]
 

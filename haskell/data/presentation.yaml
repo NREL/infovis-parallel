@@ -34,10 +34,12 @@ presentation             :
           normalColor    : 0x333333FF
           selectColor    : 0x666600CC
           highlightColor : 0x660000CC
+          thickness      : 0.005
         faceStyling      :
           normalColor    : 0x33333300
           selectColor    : 0x666600CC
           highlightColor : 0x660000CC
+          thickness      : 0.005
         labelColor       : 0x1A9933FF
         labelSize        : 5
     - tag                : Singleton
@@ -59,10 +61,12 @@ presentation             :
           normalColor    : 0x666666CC
           selectColor    : 0x666600CC
           highlightColor : 0x660000CC
+          thickness      : 0.005
         faceStyling      :
           normalColor    : 0x33333300
           selectColor    : 0x666600CC
           highlightColor : 0x660000CC
+          thickness      : 0.005
         labelColor       : 0x1A9933FF
         labelSize        : 5
   - tag                  : Array
@@ -98,10 +102,12 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       faceStyling        :
         normalColor      : 0x33333399
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : RectangleGrid
@@ -114,10 +120,12 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       faceStyling        :
         normalColor      : 0x33333399
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : RectangleGrid
@@ -130,10 +138,12 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       faceStyling        :
         normalColor      : 0x33333399
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : RectangleGrid
@@ -146,10 +156,12 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       faceStyling        :
         normalColor      : 0x33333399
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : RectangleGrid
@@ -162,10 +174,12 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       faceStyling        :
         normalColor      : 0x33333399
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
   - tag                  : Array
@@ -210,6 +224,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -221,6 +236,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -232,6 +248,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -243,6 +260,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -254,6 +272,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -265,6 +284,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -276,6 +296,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -287,6 +308,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -298,6 +320,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
     - tag                : LineGrid
@@ -309,6 +332,7 @@ presentation             :
         normalColor      : 0x666666CC
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
+        thickness        : 0.005
       labelColor         : 0x1A9933FF
       labelSize          : 5
   links                  :
@@ -319,6 +343,7 @@ presentation             :
         normalColor      : 0x0000FFCC
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Point
       linkAlias          : coolingScatterplot
       linkedGrid         : coolingBox
@@ -326,6 +351,7 @@ presentation             :
         normalColor      : 0x0000FFCC
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelPlanes
       linkedGrids        : [plane1,plane2,plane3,plane4,plane5]
@@ -333,6 +359,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest1
       linkedGrids        : [line1,line9]
@@ -340,6 +367,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest2
       linkedGrids        : [line2,line9]
@@ -347,6 +375,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest3
       linkedGrids        : [line3,line9]
@@ -354,6 +383,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest4
       linkedGrids        : [line4,line9]
@@ -361,6 +391,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest5
       linkedGrids        : [line5,line10]
@@ -368,6 +399,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest6
       linkedGrids        : [line6,line10]
@@ -375,6 +407,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest7
       linkedGrids        : [line7,line10]
@@ -382,6 +415,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest8
       linkedGrids        : [line8,line10]
@@ -389,6 +423,7 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005
     - tag                : Polyline
       linkAlias          : parallelForest9
       linkedGrids        : [line9,line10]
@@ -396,3 +431,4 @@ presentation             :
         normalColor      : 0x0000FF33
         selectColor      : 0xCCCCCCFF
         highlightColor   : 0xFF0000FF
+        thickness        : 0.005

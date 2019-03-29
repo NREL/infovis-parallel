@@ -52,5 +52,6 @@ data Styling =
     normalColor    :: Color
   , selectColor    :: Color
   , highlightColor :: Color
+  , thickness      :: Double
   }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
