@@ -41,7 +41,7 @@ presentation             :
           highlightColor : 0x660000CC
           thickness      : 0.005
         labelColor       : 0x1A9933FF
-        labelSize        : 5
+        labelSize        : 0.05
     - tag                : Singleton
       extent             :
         tag              : Extent3D
@@ -68,7 +68,7 @@ presentation             :
           highlightColor : 0x660000CC
           thickness      : 0.005
         labelColor       : 0x1A9933FF
-        labelSize        : 5
+        labelSize        : 0.05
   - tag                  : Array
     extents              :
     - tag                : Extent2D
@@ -109,7 +109,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : RectangleGrid
       gridAlias          : plane2
       axes2D             :
@@ -127,7 +127,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : RectangleGrid
       gridAlias          : plane3
       axes2D             :
@@ -145,7 +145,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : RectangleGrid
       gridAlias          : plane4
       axes2D             :
@@ -163,7 +163,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : RectangleGrid
       gridAlias          : plane5
       axes2D             :
@@ -181,7 +181,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
   - tag                  : Array
     extents              :
     - tag                : Extent1D
@@ -226,7 +226,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line2
       axes1D             :
@@ -238,7 +238,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line3
       axes1D             :
@@ -250,7 +250,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line4
       axes1D             :
@@ -262,7 +262,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line5
       axes1D             :
@@ -274,7 +274,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line6
       axes1D             :
@@ -286,7 +286,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line7
       axes1D             :
@@ -298,7 +298,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line8
       axes1D             :
@@ -310,7 +310,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line9
       axes1D             :
@@ -322,7 +322,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
     - tag                : LineGrid
       gridAlias          : line10
       axes1D             :
@@ -334,7 +334,7 @@ presentation             :
         highlightColor   : 0x660000CC
         thickness        : 0.005
       labelColor         : 0x1A9933FF
-      labelSize          : 5
+      labelSize          : 0.05
   links                  :
     - tag                : Point
       linkAlias          : heatingScatterplot

@@ -45,7 +45,6 @@ import Data.List.Split (splitPlaces)
 import Data.Maybe (fromMaybe)
 import Data.ProtocolBuffers (Decode, Encode, Fixed, Message, Optional, Packed, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
 import Data.Serialize (runGetLazy, runPutLazy)
-import Debug.Trace (trace)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Types (Buttons, Color, DeltaGeometry(..), Frame, Identifier, PositionRotation, Shape(..))
 import Linear.Affine (Point(..))
@@ -421,7 +420,7 @@ toGeometry GeometryPB{..} =
 
 
 fromGeometry :: DeltaGeometry -> GeometryPB
-fromGeometry dg@DeltaGeometry{..} =
+fromGeometry DeltaGeometry{..} =
   let
     mask =
         maybe id (const (shapeBit .|.)) deltaShape
@@ -432,7 +431,7 @@ fromGeometry dg@DeltaGeometry{..} =
       $ 0
     shape' = fromShape <$> deltaShape
   in
-    trace (show (mask, dg)) $ GeometryPB
+    GeometryPB
     {
       fram' = putField $ Just frame
     , iden' = putField $ Just identifier

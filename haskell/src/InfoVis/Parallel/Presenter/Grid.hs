@@ -226,5 +226,6 @@ axis Axis{..} origin deltaX deltaY color' size' =
   {
     shape = Label (origin, origin .+^ deltaX, origin .-^ size' *^ deltaY)
   , color = color'
+  , size  = size'
   , text  = axisVariable
   }

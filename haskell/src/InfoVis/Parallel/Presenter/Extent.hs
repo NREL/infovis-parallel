@@ -88,4 +88,4 @@ scaling :: Position
         -> Position
         -> Position
         -> Position
-scaling o u v w p = o .+^ transpose (V3 (u .-. o) (v .-. o) (w .-. o)) !* (p .-. o)
+scaling o u v w p = o .+^ transpose (V3 (u .-. o) (v .-. o) (w .-. o)) !* (p .-. zero)
