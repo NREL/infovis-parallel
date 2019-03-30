@@ -28,8 +28,6 @@ module InfoVis.Parallel.ProtoBuf (
 , pressed
 , released
 , analog
-, DeltaGeometry(..)
-, Shape(..)
 ) where
 
 
@@ -47,6 +45,7 @@ import Data.List.Split (splitPlaces)
 import Data.Maybe (fromMaybe)
 import Data.ProtocolBuffers (Decode, Encode, Fixed, Message, Optional, Packed, Repeated, Value, decodeMessage, encodeMessage, getField, putField)
 import Data.Serialize (runGetLazy, runPutLazy)
+import Debug.Trace (trace)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Types (Buttons, Color, DeltaGeometry(..), Frame, Identifier, PositionRotation, Shape(..))
 import Linear.Affine (Point(..))
@@ -422,18 +421,18 @@ toGeometry GeometryPB{..} =
 
 
 fromGeometry :: DeltaGeometry -> GeometryPB
-fromGeometry DeltaGeometry{..} =
+fromGeometry dg@DeltaGeometry{..} =
   let
     mask =
-        maybe (shapeBit .|.) (const id) deltaShape
-      . maybe (sizeBit  .|.) (const id) deltaSize
-      . maybe (colorBit .|.) (const id) deltaColor
-      . maybe (textBit  .|.) (const id) deltaText
-      . maybe (glyphBit .|.) (const id) deltaGlyph
+        maybe id (const (shapeBit .|.)) deltaShape
+      . maybe id (const (sizeBit  .|.)) deltaSize
+      . maybe id (const (colorBit .|.)) deltaColor
+      . maybe id (const (textBit  .|.)) deltaText
+      . maybe id (const (glyphBit .|.)) deltaGlyph
       $ 0
     shape' = fromShape <$> deltaShape
   in
-    GeometryPB
+    trace (show (mask, dg)) $ GeometryPB
     {
       fram' = putField $ Just frame
     , iden' = putField $ Just identifier
