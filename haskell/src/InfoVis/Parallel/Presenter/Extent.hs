@@ -11,8 +11,10 @@ module InfoVis.Parallel.Presenter.Extent (
 
 
 import Data.Aeson.Types (FromJSON(..), ToJSON(..))
+import Data.Bifunctor (second)
 import Data.Binary (Binary)
 import GHC.Generics (Generic)
+import InfoVis.Parallel.Presenter.Grid (GridDisplay)
 import InfoVis.Parallel.Types (Geometry(..), Position, Shape(..))
 import Linear.Affine ((.-.), (.+^))
 import Linear.Matrix ((!*), transpose)
@@ -50,6 +52,10 @@ instance Scalable Position where
   scale Extent1D{..} = scaling origin cornerX zero    zero
   scale Extent2D{..} = scaling origin cornerX cornerY zero
   scale Extent3D{..} = scaling origin cornerX cornerY cornerZ
+
+
+instance Scalable GridDisplay where
+  scale = fmap . second . scale
 
 
 instance Scalable Geometry where

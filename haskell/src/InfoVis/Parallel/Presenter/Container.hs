@@ -11,8 +11,8 @@ module InfoVis.Parallel.Presenter.Container (
 import Data.Aeson.Types (FromJSON(..), ToJSON(..))
 import Data.Binary (Binary)
 import GHC.Generics (Generic)
-import InfoVis.Parallel.Presenter.Extent (Extent)
-import InfoVis.Parallel.Presenter.Grid (Grid, Presentable(..))
+import InfoVis.Parallel.Presenter.Extent (Extent, Scalable(..))
+import InfoVis.Parallel.Presenter.Grid (Grid, GridDisplay, Presentable(..))
 
 
 data Container = -- FIXME: The dimensionality between extents and grids is not enforced to be consistent.  Can this be easily done at the type level?
@@ -36,8 +36,13 @@ data Container = -- FIXME: The dimensionality between extents and grids is not e
 
 instance Presentable Container where
 
-  present Singleton{..} = undefined
+  present Singleton{..}  =                  scalePresent extent  grid
+  present Array{..}      = concat $ zipWith scalePresent extents grids
+  present Collection{..} = concat $ zipWith scalePresent extents containeds
 
-  present Array{..} = undefined
 
-  present Collection{..} = undefined
+scalePresent :: Presentable a
+             => Extent
+             -> a
+             -> GridDisplay
+scalePresent = (. present) . scale
