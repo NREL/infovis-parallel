@@ -4,11 +4,11 @@
 
 
 module InfoVis.Parallel.Presenter.Grid (
-  GridIdentifier
+  Presentable(..)
+, GridIdentifier
 , GridDisplay
 , GridAlias
 , Grid(..)
-, presentGrid
 ) where
 
 
@@ -24,6 +24,10 @@ import Linear.V1 (R1(..))
 import Linear.V2 (R2(..))
 import Linear.V3 (R3(..), V3(..))
 import Linear.Vector ((*^), basis, zero)
+
+
+class Presentable a where
+  present :: a -> GridDisplay
 
 
 ex, ey, ez :: V3 Double
@@ -72,90 +76,89 @@ data Grid =
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
 
 
-presentGrid :: Grid
-            -> GridDisplay
+instance Presentable Grid where
 
-presentGrid LineGrid{..} =
-  let
-    axes =
-      [
-        axis (axes1D ^. _x) zero ex ey labelColor labelSize
-      ]
-    deltaX = ex / (1 + fromIntegral divisions)
-    edges =
-      arrayed divisions deltaX (makeLine lineStyling deltaX) zero
-  in
-    number gridAlias $ axes ++ edges
-
-presentGrid RectangleGrid{..} =
-  let
-    axes =
-      [
-        axis (axes2D ^. _x) zero ex ey labelColor labelSize
-      , axis (axes2D ^. _y) zero ey ex labelColor labelSize
-      ]
-    deltaX = ex / (1 + fromIntegral divisions)
-    deltaY = ex / (1 + fromIntegral divisions)
-    faces =
-      arrayed divisions deltaX
-        (
-          arrayed divisions deltaY
-            $ makeRectangle faceStyling deltaX deltaY
-        ) zero
-    edges = 
-         set deltaX deltaY
-      ++ set deltaY deltaX
-        where
-          set u v =
-            arrayed (divisions + 1) u
-              (
-                arrayed divisions v
-                  $ makeLine lineStyling v
-              ) zero
-  in
-    number gridAlias $ axes ++ faces ++ edges
-
-presentGrid BoxGrid{..} =
-  let
-    axes =
-      [
-        axis (axes3D ^. _x) zero ex ((ey + ez) / sqrt 2) labelColor labelSize
-      , axis (axes3D ^. _y) zero ey ((ez + ex) / sqrt 2) labelColor labelSize
-      , axis (axes3D ^. _z) zero ey ((ex + ey) / sqrt 2) labelColor labelSize
-      ]
-    deltaX = ex / (1 + fromIntegral divisions)
-    deltaY = ex / (1 + fromIntegral divisions)
-    deltaZ = ex / (1 + fromIntegral divisions)
-    faces =
-         set deltaX deltaY deltaZ
-      ++ set deltaY deltaZ deltaX
-      ++ set deltaZ deltaX deltaY
-        where
-          set u v w =
-            arrayed (divisions + 1) u
-              (
-                arrayed divisions v
-                  (
-                    arrayed divisions w
-                      $ makeRectangle faceStyling v w
-                  )
-              ) zero
-    edges = 
-         set deltaX deltaY deltaZ
-      ++ set deltaY deltaZ deltaX
-      ++ set deltaZ deltaX deltaY
-        where
-          set u v w =
-            arrayed (divisions + 1) u
-              (
-                arrayed (divisions + 1) v
-                  (
-                    arrayed divisions w
-                      $ makeLine lineStyling w
-                  )
-              ) zero
-  in
-    number gridAlias $ axes ++ faces ++ edges
+  present LineGrid{..} =
+    let
+      axes =
+        [
+          axis (axes1D ^. _x) zero ex ey labelColor labelSize
+        ]
+      deltaX = ex / (1 + fromIntegral divisions)
+      edges =
+        arrayed divisions deltaX (makeLine lineStyling deltaX) zero
+    in
+      number gridAlias $ axes ++ edges
+  
+  present RectangleGrid{..} =
+    let
+      axes =
+        [
+          axis (axes2D ^. _x) zero ex ey labelColor labelSize
+        , axis (axes2D ^. _y) zero ey ex labelColor labelSize
+        ]
+      deltaX = ex / (1 + fromIntegral divisions)
+      deltaY = ex / (1 + fromIntegral divisions)
+      faces =
+        arrayed divisions deltaX
+          (
+            arrayed divisions deltaY
+              $ makeRectangle faceStyling deltaX deltaY
+          ) zero
+      edges = 
+           set deltaX deltaY
+        ++ set deltaY deltaX
+          where
+            set u v =
+              arrayed (divisions + 1) u
+                (
+                  arrayed divisions v
+                    $ makeLine lineStyling v
+                ) zero
+    in
+      number gridAlias $ axes ++ faces ++ edges
+  
+  present BoxGrid{..} =
+    let
+      axes =
+        [
+          axis (axes3D ^. _x) zero ex ((ey + ez) / sqrt 2) labelColor labelSize
+        , axis (axes3D ^. _y) zero ey ((ez + ex) / sqrt 2) labelColor labelSize
+        , axis (axes3D ^. _z) zero ey ((ex + ey) / sqrt 2) labelColor labelSize
+        ]
+      deltaX = ex / (1 + fromIntegral divisions)
+      deltaY = ex / (1 + fromIntegral divisions)
+      deltaZ = ex / (1 + fromIntegral divisions)
+      faces =
+           set deltaX deltaY deltaZ
+        ++ set deltaY deltaZ deltaX
+        ++ set deltaZ deltaX deltaY
+          where
+            set u v w =
+              arrayed (divisions + 1) u
+                (
+                  arrayed divisions v
+                    (
+                      arrayed divisions w
+                        $ makeRectangle faceStyling v w
+                    )
+                ) zero
+      edges = 
+           set deltaX deltaY deltaZ
+        ++ set deltaY deltaZ deltaX
+        ++ set deltaZ deltaX deltaY
+          where
+            set u v w =
+              arrayed (divisions + 1) u
+                (
+                  arrayed (divisions + 1) v
+                    (
+                      arrayed divisions w
+                        $ makeLine lineStyling w
+                    )
+                ) zero
+    in
+      number gridAlias $ axes ++ faces ++ edges
 
 
 number :: GridAlias
@@ -221,12 +224,7 @@ axis :: Axis
 axis Axis{..} origin deltaX deltaY color' size' =
   def
   {
-    shape = Label
-              (
-                origin
-              , origin .+^ deltaX
-              , origin .-^ size' *^ deltaY
-              )
+    shape = Label (origin, origin .+^ deltaX, origin .-^ size' *^ deltaY)
   , color = color'
   , text  = axisVariable
   }

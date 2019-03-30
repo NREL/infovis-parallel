@@ -1,5 +1,6 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE DeriveAnyClass  #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE RecordWildCards #-}
 
 
 module InfoVis.Parallel.Presenter.Container (
@@ -11,7 +12,7 @@ import Data.Aeson.Types (FromJSON(..), ToJSON(..))
 import Data.Binary (Binary)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Presenter.Extent (Extent)
-import InfoVis.Parallel.Presenter.Grid (Grid)
+import InfoVis.Parallel.Presenter.Grid (Grid, Presentable(..))
 
 
 data Container = -- FIXME: The dimensionality between extents and grids is not enforced to be consistent.  Can this be easily done at the type level?
@@ -31,3 +32,12 @@ data Container = -- FIXME: The dimensionality between extents and grids is not e
     , containeds :: [Container]
     }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+
+instance Presentable Container where
+
+  present Singleton{..} = undefined
+
+  present Array{..} = undefined
+
+  present Collection{..} = undefined
