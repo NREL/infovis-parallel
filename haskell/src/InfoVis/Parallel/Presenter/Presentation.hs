@@ -1,5 +1,6 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE DeriveAnyClass  #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE RecordWildCards #-}
 
 
 module InfoVis.Parallel.Presenter.Presentation (
@@ -12,6 +13,7 @@ import Data.Binary (Binary)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Dataset (VariableAlias)
 import InfoVis.Parallel.Presenter.Container (Container)
+import InfoVis.Parallel.Presenter.Grid (Presentable(..))
 import InfoVis.Parallel.Presenter.Link (Link)
 
 
@@ -24,3 +26,6 @@ data Presentation =
   , uniqueKey    :: Maybe VariableAlias
   }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+instance Presentable Presentation where
+  present Presentation{..} = concat $ present <$> containers

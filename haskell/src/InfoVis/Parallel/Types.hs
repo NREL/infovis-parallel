@@ -1,5 +1,6 @@
-{-# LANGUAGE DeriveAnyClass        #-}
-{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DeriveAnyClass  #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE RecordWildCards #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -19,6 +20,7 @@ module InfoVis.Parallel.Types (
 , Shape(..)
 , Glyph(..)
 , DeltaGeometry(..)
+, deltaGeometry
 ) where
 
 
@@ -113,3 +115,20 @@ data DeltaGeometry =
   , deltaGlyph :: Maybe Glyph
   }
     deriving (Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+
+deltaGeometry :: Frame
+              -> Identifier
+              -> Geometry
+              -> DeltaGeometry
+deltaGeometry frame identifier Geometry{..} =
+  let
+    deltaShape = Just shape
+    deltaSize  = Just size
+    deltaColor = Just color
+    deltaText  = Just text
+    deltaGlyph = case shape of
+                   Points glyph _ -> Just glyph
+                   _              -> Nothing
+  in
+    DeltaGeometry{..}
