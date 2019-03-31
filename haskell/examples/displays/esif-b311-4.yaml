@@ -1,0 +1,21 @@
+viewer           :
+  stereo         : QuadBuffer
+  nearPlane      : 0.1
+  farPlane       : 100
+  eyeSeparation  : [0.08, 0.00,  0.00]
+  display        :
+    identifier   : :0.4
+    geometry     : fullscreen
+    screen       :
+      lowerLeft  : [ 2.495 ,  0.035, 0    ]
+      lowerRight : [-0.2795,  0.035, 0    ]
+      upperLeft  : [ 2.495 , -1.565, 0    ]
+initialTool      : [[-0.1, 0.5,  0.5], [0, -90, 0]]
+requests         :
+  client         : visualizer
+  address        : [localhost, 9092]
+  topic          : requests
+events           :
+  client         : glut
+  address        : [localhost, 9092]
+  topic          : devices

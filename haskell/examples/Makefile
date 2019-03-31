@@ -15,6 +15,24 @@ laptop:
 	sed -e "s/localhost/$(KAFKA)/g" displays/laptop.yaml > tmp/display.yaml
 	$(IVP) visualize --logging=$(LOGGING) tmp/display.yaml
 
+esif-b311:
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-0.yaml > tmp/esif-b311-0.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-1.yaml > tmp/esif-b311-1.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-2.yaml > tmp/esif-b311-2.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-3.yaml > tmp/esif-b311-3.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-4.yaml > tmp/esif-b311-4.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-5.yaml > tmp/esif-b311-5.yaml
+	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-0.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-1.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-2.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-3.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-4.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-5.yaml &
+	kafka-device-vrpn Head0@10.60.6.100          vrpn-client localhost 50371 devices esif-head      &
+	kafka-device-vrpn Joystick0@10.60.6.100      vrpn-client localhost 50371 devices esif-joystick0 &
+	kafka-device-vrpn JoystickA@10.60.6.100:3884 vrpn-client localhost 50371 devices esif-joystickA &
+	wait
+
 events:
 	sed -e "s/localhost/$(KAFKA)/g" forward/glut.yaml     > tmp/glut.yaml
 	sed -e "s/localhost/$(KAFKA)/g" forward/spacenav.yaml > tmp/spacenav.yaml
@@ -27,7 +45,7 @@ spacenav:
 	kafka-device-spacenav tmp/ispacenav.yaml
 
 joystick:
-	sed -e "s/localhost/$(KAFKA)/g" interpretations/spacenav.yaml > tmp/ispacenav.yaml
+	sed -e "s/localhost/$(KAFKA)/g" interpretations/joystick.yaml > tmp/ijoystick.yaml
 	kafka-device-joystick tmp/ijoystick.yaml
 
 keyboard:
@@ -45,4 +63,4 @@ example:
 
 .SUFFIXES:
 
-.PHONY: laptop events joystick spacenav keyboard example
+.PHONY: laptop esif-b311 events joystick spacenav keyboard complex example
