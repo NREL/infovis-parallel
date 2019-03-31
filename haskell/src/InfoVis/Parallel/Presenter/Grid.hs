@@ -251,7 +251,7 @@ axis :: Axis
 axis Axis{..} origin deltaX color' size' =
   def
   {
-    shape = S.Axis (origin, origin .+^ 1.05 *^ deltaX)
+    shape = S.Axis (origin, origin .+^ 1.10 *^ deltaX)
   , color = color'
   , size  = size'
   , text  = axisVariable
