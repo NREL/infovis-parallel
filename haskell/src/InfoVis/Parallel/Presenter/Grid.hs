@@ -104,14 +104,14 @@ instance Presentable Grid where
     let
       axes =
         [
-          label (axes1D ^. _x) zero ex ey axisColor  axisSize
-        , axis  (axes1D ^. _x) zero ex    labelColor labelSize
+          label (axes1D ^. _x) zero ex ey labelColor labelSize
+        , axis  (axes1D ^. _x) zero ex    axisColor  axisSize
         ]
       deltaX = ex / (1 + fromIntegral divisions)
       edges =
         arrayed divisions deltaX (makeLine lineStyling deltaX) zero
     in
-      number gridAlias $ axes ++ edges
+      number gridAlias $ edges ++ axes
   
   present RectangleGrid{..} =
     let
@@ -123,7 +123,7 @@ instance Presentable Grid where
         , axis  (axes2D ^. _y) zero ey    axisColor  axisSize
         ]
       deltaX = ex / (1 + fromIntegral divisions)
-      deltaY = ex / (1 + fromIntegral divisions)
+      deltaY = ey / (1 + fromIntegral divisions)
       faces =
         arrayed divisions deltaX
           (
@@ -141,7 +141,7 @@ instance Presentable Grid where
                     $ makeLine lineStyling v
                 ) zero
     in
-      number gridAlias $ axes ++ faces ++ edges
+      number gridAlias $ faces ++ edges ++ axes
   
   present BoxGrid{..} =
     let
@@ -155,8 +155,8 @@ instance Presentable Grid where
         , axis  (axes3D ^. _z) zero ez                      axisColor  axisSize
         ]
       deltaX = ex / (1 + fromIntegral divisions)
-      deltaY = ex / (1 + fromIntegral divisions)
-      deltaZ = ex / (1 + fromIntegral divisions)
+      deltaY = ey / (1 + fromIntegral divisions)
+      deltaZ = ez / (1 + fromIntegral divisions)
       faces =
            set deltaX deltaY deltaZ
         ++ set deltaY deltaZ deltaX
@@ -186,7 +186,7 @@ instance Presentable Grid where
                     )
                 ) zero
     in
-      number gridAlias $ axes ++ faces ++ edges
+      number gridAlias $ faces ++ edges ++ axes
 
 
 number :: GridAlias
@@ -251,7 +251,7 @@ axis :: Axis
 axis Axis{..} origin deltaX color' size' =
   def
   {
-    shape = S.Axis (origin, origin .+^ deltaX)
+    shape = S.Axis (origin, origin .+^ 1.05 *^ deltaX)
   , color = color'
   , size  = size'
   , text  = axisVariable
