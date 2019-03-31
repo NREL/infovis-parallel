@@ -22,12 +22,14 @@ import Data.Default (def)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Dataset (Record, Variable)
 import InfoVis.Parallel.Presenter.Axes (Axis(..), Axes1D, Axes2D, Axes3D, AxesProjectable(..))
-import InfoVis.Parallel.Types (Color, Geometry(..), Position, Shape(Polylines, Rectangles, Label))
+import InfoVis.Parallel.Types (Color, Geometry(..), Position)
 import Linear.Affine (Point(..), (.+^), (.-^))
 import Linear.V1 (R1(..))
 import Linear.V2 (R2(..))
 import Linear.V3 (R3(..), V3(..))
 import Linear.Vector ((*^), basis, zero)
+
+import qualified InfoVis.Parallel.Types as S (Shape(Axis, Polylines, Rectangles, Label))
 
 
 class Projectable a where
@@ -57,6 +59,8 @@ data Grid =
       gridAlias   :: GridAlias
     , axes1D      :: Axes1D
     , divisions   :: Int
+    , axisColor   :: Color
+    , axisSize    :: Double
     , lineStyling :: Styling
     , labelColor  :: Color
     , labelSize   :: Double
@@ -66,6 +70,8 @@ data Grid =
       gridAlias   :: GridAlias
     , axes2D      :: Axes2D
     , divisions   :: Int
+    , axisColor   :: Color
+    , axisSize    :: Double
     , lineStyling :: Styling
     , faceStyling :: Styling
     , labelColor  :: Color
@@ -76,6 +82,8 @@ data Grid =
       gridAlias   :: GridAlias
     , axes3D      :: Axes3D
     , divisions   :: Int
+    , axisColor   :: Color
+    , axisSize    :: Double
     , lineStyling :: Styling
     , faceStyling :: Styling
     , labelColor  :: Color
@@ -96,7 +104,8 @@ instance Presentable Grid where
     let
       axes =
         [
-          axis (axes1D ^. _x) zero ex ey labelColor labelSize
+          label (axes1D ^. _x) zero ex ey axisColor  axisSize
+        , axis  (axes1D ^. _x) zero ex    labelColor labelSize
         ]
       deltaX = ex / (1 + fromIntegral divisions)
       edges =
@@ -108,8 +117,10 @@ instance Presentable Grid where
     let
       axes =
         [
-          axis (axes2D ^. _x) zero ex ey labelColor labelSize
-        , axis (axes2D ^. _y) zero ey ex labelColor labelSize
+          label (axes2D ^. _x) zero ex ey labelColor labelSize
+        , axis  (axes2D ^. _x) zero ex    axisColor  axisSize
+        , label (axes2D ^. _y) zero ey ex labelColor labelSize
+        , axis  (axes2D ^. _y) zero ey    axisColor  axisSize
         ]
       deltaX = ex / (1 + fromIntegral divisions)
       deltaY = ex / (1 + fromIntegral divisions)
@@ -136,9 +147,12 @@ instance Presentable Grid where
     let
       axes =
         [
-          axis (axes3D ^. _x) zero ex ((ey + ez) / sqrt 2) labelColor labelSize
-        , axis (axes3D ^. _y) zero ey ((ez + ex) / sqrt 2) labelColor labelSize
-        , axis (axes3D ^. _z) zero ez ((ex + ey) / sqrt 2) labelColor labelSize
+          label (axes3D ^. _x) zero ex ((ey + ez) / sqrt 2) labelColor labelSize
+        , axis  (axes3D ^. _x) zero ex                      axisColor  axisSize
+        , label (axes3D ^. _y) zero ey ((ez + ex) / sqrt 2) labelColor labelSize
+        , axis  (axes3D ^. _y) zero ey                      axisColor  axisSize
+        , label (axes3D ^. _z) zero ez ((ex + ey) / sqrt 2) labelColor labelSize
+        , axis  (axes3D ^. _z) zero ez                      axisColor  axisSize
         ]
       deltaX = ex / (1 + fromIntegral divisions)
       deltaY = ex / (1 + fromIntegral divisions)
@@ -205,7 +219,7 @@ makeLine Styling{..} deltaX origin =
   [
     def
     {
-      shape = Polylines [[origin, origin .+^ deltaX]]
+      shape = S.Polylines [[origin, origin .+^ deltaX]]
     , color = normalColor
     , size  = thickness
     }
@@ -221,7 +235,7 @@ makeRectangle Styling{..} deltaX deltaY origin =
   [
     def
     {
-      shape = Rectangles [(origin, origin .+^ deltaX, origin .+^ deltaY)]
+      shape = S.Rectangles [(origin, origin .+^ deltaX, origin .+^ deltaY)]
     , color = normalColor
     , size  = thickness
     }
@@ -231,16 +245,37 @@ makeRectangle Styling{..} deltaX deltaY origin =
 axis :: Axis
      -> Point V3 Double
      -> V3 Double
-     -> V3 Double
      -> Color
      -> Double
      -> Geometry
-axis Axis{..} origin deltaX deltaY color' size' =
+axis Axis{..} origin deltaX color' size' =
   def
   {
-    shape = Label (origin, origin .+^ deltaX, origin .-^ size' *^ deltaY)
+    shape = S.Axis (origin, origin .+^ deltaX)
   , color = color'
   , size  = size'
+  , text  = axisVariable
+  }
+
+
+label :: Axis
+      -> Point V3 Double
+      -> V3 Double
+      -> V3 Double
+      -> Color
+      -> Double
+      -> Geometry
+label Axis{..} origin deltaX deltaY color' size' =
+  Geometry
+  {
+    shape = let
+              origin' = origin .-^ abs size' *^ deltaY
+            in
+              if size' > 0
+              then S.Label (origin', origin' .+^ deltaX, origin )
+              else S.Label (origin , origin  .+^ deltaX, origin')
+  , color = color'
+  , size  = abs size'
   , text  = axisVariable
   }
 
