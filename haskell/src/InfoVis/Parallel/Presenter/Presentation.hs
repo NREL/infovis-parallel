@@ -15,6 +15,7 @@ import InfoVis.Parallel.Dataset (VariableAlias)
 import InfoVis.Parallel.Presenter.Container (Container)
 import InfoVis.Parallel.Presenter.Grid (Presentable(..))
 import InfoVis.Parallel.Presenter.Link (Link)
+import InfoVis.Parallel.Presenter.Types (Projectable(..))
 
 
 data Presentation =
@@ -26,6 +27,9 @@ data Presentation =
   , uniqueKey    :: Maybe VariableAlias
   }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+instance Projectable Presentation where
+  project Presentation{..} variables = (containers >>=) . flip (`project` variables)
 
 instance Presentable Presentation where
   present Presentation{..} = concat $ present <$> containers

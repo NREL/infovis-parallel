@@ -18,7 +18,7 @@ import Data.Binary (Binary)
 import Data.Default (def)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Types (Color, Geometry(..), Shape(Polylines, Rectangles, Label))
-import InfoVis.Parallel.Presenter.Types (Axis(..), Axes1D, Axes2D, Axes3D, Styling(..))
+import InfoVis.Parallel.Presenter.Types (Axis(..), Axes1D, Axes2D, Axes3D, Projectable(..), Styling(..))
 import Linear.Affine (Point(..), (.+^), (.-^))
 import Linear.V1 (R1(..))
 import Linear.V2 (R2(..))
@@ -74,6 +74,12 @@ data Grid =
     , labelSize   :: Double
     }
     deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)
+
+
+instance Projectable Grid where
+  project LineGrid{..}      = project axes1D
+  project RectangleGrid{..} = project axes2D
+  project BoxGrid{..}       = project axes3D
 
 
 instance Presentable Grid where

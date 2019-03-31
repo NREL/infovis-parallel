@@ -1,7 +1,8 @@
-{-# LANGUAGE DeriveAnyClass   #-}
-{-# LANGUAGE DeriveGeneric    #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE RecordWildCards  #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 
 module InfoVis.Parallel.Dataset (
@@ -11,6 +12,7 @@ module InfoVis.Parallel.Dataset (
 , RecordIdentifier
 , Record
 , readDataset
+, quantify
 ) where
 
 
@@ -19,6 +21,7 @@ import Control.Monad.Except (MonadError, MonadIO)
 import Control.Monad.Log (logCritical, logDebug, logInfo)
 import Data.Aeson.Types (FromJSON(..), ToJSON(..))
 import Data.Binary (Binary)
+import Data.List (findIndex)
 import Data.List.Split (splitOn)
 import Data.List.Util (elemPermutation)
 import Data.Maybe (fromJust, isNothing)
@@ -51,6 +54,25 @@ data Variable =
 
 
 type VariableAlias = String
+
+
+quantify :: VariableAlias -> [Variable] -> Record -> Double
+quantify alias variables =
+    let
+      Just i = findIndex ((== alias) . variableAlias) variables
+    in
+      rescale (variables !! i) . (!! i)
+
+
+rescale :: Variable -> Double -> Double
+rescale ContinuousVariable{..} = rescale' lowerBound upperBound
+
+
+rescale' :: Maybe Double -> Maybe Double -> Double -> Double
+rescale' Nothing      Nothing      value = value
+rescale' (Just lower) Nothing      value = value - lower
+rescale' Nothing      (Just upper) value = value - upper + 1
+rescale' (Just lower) (Just upper) value = (value - lower) / (upper - lower)
 
 
 type RecordIdentifier = Int
