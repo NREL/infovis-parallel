@@ -1,0 +1,40 @@
+presentation             :
+# animationKey           : Orientation
+# uniqueKey              : Glazing Area Distribution
+  containers             :
+  - tag                : Singleton
+    extent             :
+      tag              : Extent3D
+      origin           : [0, 0, 1]
+      cornerX          : [1, 0, 1]
+      cornerY          : [0, 0, 0]
+      cornerZ          : [0, 1, 1]
+    grid               :
+      tag              : LineGrid
+      gridAlias        : heatingBox
+      axes1D           :
+        axisVariable   : Wall Area
+      divisions        : 5
+      lineStyling      :
+        normalColor    : 0x333333FF
+        selectColor    : 0x666600CC
+        highlightColor : 0x660000CC
+        thickness      : 0.010
+      faceStyling      :
+        normalColor    : 0x33333300
+        selectColor    : 0x666600CC
+        highlightColor : 0x660000CC
+        thickness      : 0.010
+      axisColor        : 0x1A993340
+      axisSize         : 0.010
+      labelColor       : 0x1A9933FF
+      labelSize        : 0.050
+  links                :
+  - tag                : Point
+    linkAlias          : heatingScatterplot
+    linkedGrid         : heatingBox
+    styling            :
+      normalColor      : 0x0000FFCC
+      selectColor      : 0xCCCCCCFF
+      highlightColor   : 0xFF0000FF
+      thickness        : 0.005

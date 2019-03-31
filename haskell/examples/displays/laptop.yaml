@@ -5,8 +5,8 @@ viewer           :
   eyeSeparation  : [0.1,  0,  0]
   display        :
     identifier   : :0.0
-  # geometry     : fullscreen
-    geometry     : 1200x800+700+0
+    geometry     : fullscreen
+  # geometry     : 1200x800+700+0
     screen       :
       lowerLeft  : [-0.940, -0.320, 0]
       lowerRight : [ 1.940, -0.320, 0]

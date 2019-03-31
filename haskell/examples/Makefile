@@ -10,7 +10,7 @@ LOGGING=Info
 
 
 laptop:
-	$(IVP) visualize --logging=$(LOGGING) visualize/laptop.yaml
+	$(IVP) visualize --logging=$(LOGGING) displays/laptop.yaml
 
 events:
 	$(IVP) events --logging=$(LOGGING) forward/{glut,spacenav,joystick,keyboard}.yaml

@@ -1,0 +1,19 @@
+dataset            :
+  datasetIdentifier: datasets/test.tsv
+# maxRecords       : 50
+  variables        :
+  - variableAlias  : Wall Area
+    variableName   : Wall Area
+    units          : m²
+    lowerBound     :   1
+    upperBound     :  10
+  - variableAlias  : Roof Area
+    variableName   : Roof Area
+    units          : m²
+    lowerBound     : 100
+    upperBound     : 200
+  - variableAlias  : Heating Load
+    variableName   : Heating Load
+    units          : kWh/m²
+    lowerBound     :  10
+    upperBound     :  20

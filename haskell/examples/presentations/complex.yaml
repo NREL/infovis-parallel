@@ -5,15 +5,15 @@ presentation             :
   - tag                  : Collection
     extents              :
     - tag                : Extent3D
-      origin             : [0.05, 0.05, 0.55]
-      cornerX            : [0.45, 0.05, 0.55]
-      cornerY            : [0.05, 0.05, 0.95]
-      cornerZ            : [0.05, 0.95, 0.55]
+      origin             : [0.05, 0.55, 0.05]
+      cornerX            : [0.45, 0.55, 0.05]
+      cornerY            : [0.05, 0.95, 0.05]
+      cornerZ            : [0.05, 0.55, 0.95]
     - tag                : Extent3D
-      origin             : [0.55, 0.05, 0.55]
-      cornerX            : [0.95, 0.05, 0.55]
-      cornerY            : [0.55, 0.05, 0.95]
-      cornerZ            : [0.55, 0.95, 0.55]
+      origin             : [0.55, 0.55, 0.05]
+      cornerX            : [0.95, 0.55, 0.05]
+      cornerY            : [0.55, 0.95, 0.05]
+      cornerZ            : [0.55, 0.55, 0.95]
     containeds           :
     - tag                : Singleton
       extent             :
@@ -40,8 +40,10 @@ presentation             :
           selectColor    : 0x666600CC
           highlightColor : 0x660000CC
           thickness      : 0.005
+        axisColor        : 0x1A993340
+        axisSize         : 0.010
         labelColor       : 0x1A9933FF
-        labelSize        : 0.05
+        labelSize        : 0.01
     - tag                : Singleton
       extent             :
         tag              : Extent3D
@@ -67,30 +69,32 @@ presentation             :
           selectColor    : 0x666600CC
           highlightColor : 0x660000CC
           thickness      : 0.005
+        axisColor        : 0x1A993340
+        axisSize         : 0.010
         labelColor       : 0x1A9933FF
-        labelSize        : 0.05
+        labelSize        : 0.01
   - tag                  : Array
     extents              :
     - tag                : Extent2D
       origin             : [0.1, 0.1, 0.1]
-      cornerX            : [0.1, 0.9, 0.1]
-      cornerY            : [0.1, 0.1, 0.4]
+      cornerX            : [0.1, 0.1, 0.9]
+      cornerY            : [0.1, 0.4, 0.1]
     - tag                : Extent2D
       origin             : [0.2, 0.1, 0.1]
-      cornerX            : [0.2, 0.9, 0.1]
-      cornerY            : [0.2, 0.1, 0.4]
+      cornerX            : [0.2, 0.1, 0.9]
+      cornerY            : [0.2, 0.4, 0.1]
     - tag                : Extent2D
       origin             : [0.3, 0.1, 0.1]
-      cornerX            : [0.3, 0.9, 0.1]
-      cornerY            : [0.3, 0.1, 0.4]
+      cornerX            : [0.3, 0.1, 0.9]
+      cornerY            : [0.3, 0.4, 0.1]
     - tag                : Extent2D
       origin             : [0.4, 0.1, 0.1]
-      cornerX            : [0.4, 0.9, 0.1]
-      cornerY            : [0.4, 0.1, 0.4]
+      cornerX            : [0.4, 0.1, 0.9]
+      cornerY            : [0.4, 0.4, 0.1]
     - tag                : Extent2D
       origin             : [0.5, 0.1, 0.1]
-      cornerX            : [0.5, 0.9, 0.1]
-      cornerY            : [0.5, 0.1, 0.4]
+      cornerX            : [0.5, 0.1, 0.9]
+      cornerY            : [0.5, 0.4, 0.1]
     grids                :
     - tag                : RectangleGrid
       gridAlias          : plane1
@@ -108,8 +112,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : RectangleGrid
       gridAlias          : plane2
       axes2D             :
@@ -126,8 +132,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : RectangleGrid
       gridAlias          : plane3
       axes2D             :
@@ -144,8 +152,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : RectangleGrid
       gridAlias          : plane4
       axes2D             :
@@ -162,8 +172,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : RectangleGrid
       gridAlias          : plane5
       axes2D             :
@@ -180,40 +192,42 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
   - tag                  : Array
     extents              :
     - tag                : Extent1D
-      origin             : [0.7, 0.2, 0.1]
-      cornerX            : [0.7, 0.2, 0.4]
+      origin             : [0.7, 0.1, 0.2]
+      cornerX            : [0.7, 0.4, 0.2]
     - tag                : Extent1D
-      origin             : [0.7, 0.4, 0.1]
+      origin             : [0.7, 0.1, 0.4]
       cornerX            : [0.7, 0.4, 0.4]
     - tag                : Extent1D
-      origin             : [0.7, 0.6, 0.1]
-      cornerX            : [0.7, 0.6, 0.4]
+      origin             : [0.7, 0.1, 0.6]
+      cornerX            : [0.7, 0.4, 0.6]
     - tag                : Extent1D
-      origin             : [0.7, 0.8, 0.1]
-      cornerX            : [0.7, 0.8, 0.4]
+      origin             : [0.7, 0.1, 0.8]
+      cornerX            : [0.7, 0.4, 0.8]
     - tag                : Extent1D
-      origin             : [0.9, 0.2, 0.1]
-      cornerX            : [0.9, 0.2, 0.4]
+      origin             : [0.9, 0.1, 0.2]
+      cornerX            : [0.9, 0.4, 0.2]
     - tag                : Extent1D
-      origin             : [0.9, 0.4, 0.1]
+      origin             : [0.9, 0.1, 0.4]
       cornerX            : [0.9, 0.4, 0.4]
     - tag                : Extent1D
-      origin             : [0.9, 0.6, 0.1]
-      cornerX            : [0.9, 0.6, 0.4]
+      origin             : [0.9, 0.1, 0.6]
+      cornerX            : [0.9, 0.4, 0.6]
     - tag                : Extent1D
-      origin             : [0.9, 0.8, 0.1]
-      cornerX            : [0.9, 0.8, 0.4]
+      origin             : [0.9, 0.1, 0.8]
+      cornerX            : [0.9, 0.4, 0.8]
     - tag                : Extent1D
-      origin             : [0.8, 0.4, 0.1]
+      origin             : [0.8, 0.1, 0.4]
       cornerX            : [0.8, 0.4, 0.4]
     - tag                : Extent1D
-      origin             : [0.8, 0.6, 0.1]
-      cornerX            : [0.8, 0.6, 0.4]
+      origin             : [0.8, 0.1, 0.6]
+      cornerX            : [0.8, 0.4, 0.6]
     grids                :
     - tag                : LineGrid
       gridAlias          : line1
@@ -225,8 +239,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line2
       axes1D             :
@@ -237,8 +253,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line3
       axes1D             :
@@ -249,8 +267,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line4
       axes1D             :
@@ -261,8 +281,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line5
       axes1D             :
@@ -273,8 +295,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line6
       axes1D             :
@@ -285,8 +309,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line7
       axes1D             :
@@ -297,8 +323,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line8
       axes1D             :
@@ -309,8 +337,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line9
       axes1D             :
@@ -321,8 +351,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
     - tag                : LineGrid
       gridAlias          : line10
       axes1D             :
@@ -333,8 +365,10 @@ presentation             :
         selectColor      : 0x666600CC
         highlightColor   : 0x660000CC
         thickness        : 0.005
+      axisColor          : 0x1A993340
+      axisSize           : 0.010
       labelColor         : 0x1A9933FF
-      labelSize          : 0.05
+      labelSize          : 0.01
   links                  :
     - tag                : Point
       linkAlias          : heatingScatterplot
