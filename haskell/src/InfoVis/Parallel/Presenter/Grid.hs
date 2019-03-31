@@ -138,7 +138,7 @@ instance Presentable Grid where
         [
           axis (axes3D ^. _x) zero ex ((ey + ez) / sqrt 2) labelColor labelSize
         , axis (axes3D ^. _y) zero ey ((ez + ex) / sqrt 2) labelColor labelSize
-        , axis (axes3D ^. _z) zero ey ((ex + ey) / sqrt 2) labelColor labelSize
+        , axis (axes3D ^. _z) zero ez ((ex + ey) / sqrt 2) labelColor labelSize
         ]
       deltaX = ex / (1 + fromIntegral divisions)
       deltaY = ex / (1 + fromIntegral divisions)
