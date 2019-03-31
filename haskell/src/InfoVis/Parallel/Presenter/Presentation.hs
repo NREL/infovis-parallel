@@ -13,9 +13,8 @@ import Data.Binary (Binary)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Dataset (VariableAlias)
 import InfoVis.Parallel.Presenter.Container (Container)
-import InfoVis.Parallel.Presenter.Grid (Presentable(..))
+import InfoVis.Parallel.Presenter.Grid (Presentable(..), Projectable(..))
 import InfoVis.Parallel.Presenter.Link (Link)
-import InfoVis.Parallel.Presenter.Types (Projectable(..))
 
 
 data Presentation =

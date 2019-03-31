@@ -9,12 +9,12 @@ module InfoVis.Parallel.Presenter.Container (
 
 
 import Data.Aeson.Types (FromJSON(..), ToJSON(..))
+import Data.Bifunctor (second)
 import Data.Binary (Binary)
 import GHC.Generics (Generic)
 import InfoVis.Parallel.Dataset (Record, Variable)
 import InfoVis.Parallel.Presenter.Extent (Extent, Scalable(..))
-import InfoVis.Parallel.Presenter.Grid (Grid, GridDisplay, Presentable(..))
-import InfoVis.Parallel.Presenter.Types (Projectable(..))
+import InfoVis.Parallel.Presenter.Grid (Grid, GridAlias, GridDisplay, Presentable(..), Projectable(..))
 import InfoVis.Parallel.Types (Position)
 
 
@@ -48,8 +48,8 @@ scaleProject :: Projectable a
              -> Record
              -> Extent
              -> a
-             -> [Position]
-scaleProject variables record extent' grid' = scale extent' <$> project grid' variables record
+             -> [(GridAlias, Position)]
+scaleProject variables record extent' grid' = second (scale extent') <$> project grid' variables record
 
 
 instance Presentable Container where

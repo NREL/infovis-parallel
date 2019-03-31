@@ -1,14 +1,17 @@
 {-# LANGUAGE DeriveAnyClass  #-}
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections   #-}
 
 
 module InfoVis.Parallel.Presenter.Grid (
-  Presentable(..)
+  Projectable(..)
+, Presentable(..)
 , GridIdentifier
 , GridDisplay
 , GridAlias
 , Grid(..)
+, Styling(..)
 ) where
 
 
@@ -17,13 +20,18 @@ import Data.Aeson.Types (FromJSON(..), ToJSON(..))
 import Data.Binary (Binary)
 import Data.Default (def)
 import GHC.Generics (Generic)
-import InfoVis.Parallel.Types (Color, Geometry(..), Shape(Polylines, Rectangles, Label))
-import InfoVis.Parallel.Presenter.Types (Axis(..), Axes1D, Axes2D, Axes3D, Projectable(..), Styling(..))
+import InfoVis.Parallel.Dataset (Record, Variable)
+import InfoVis.Parallel.Presenter.Axes (Axis(..), Axes1D, Axes2D, Axes3D, AxesProjectable(..))
+import InfoVis.Parallel.Types (Color, Geometry(..), Position, Shape(Polylines, Rectangles, Label))
 import Linear.Affine (Point(..), (.+^), (.-^))
 import Linear.V1 (R1(..))
 import Linear.V2 (R2(..))
 import Linear.V3 (R3(..), V3(..))
 import Linear.Vector ((*^), basis, zero)
+
+
+class Projectable a where
+  project :: a -> [Variable] -> Record -> [(GridAlias, Position)]
 
 
 class Presentable a where
@@ -77,9 +85,9 @@ data Grid =
 
 
 instance Projectable Grid where
-  project LineGrid{..}      = project axes1D
-  project RectangleGrid{..} = project axes2D
-  project BoxGrid{..}       = project axes3D
+  project LineGrid{..}      variables = (: []) . (gridAlias, ) . projectAxes axes1D variables
+  project RectangleGrid{..} variables = (: []) . (gridAlias, ) . projectAxes axes2D variables
+  project BoxGrid{..}       variables = (: []) . (gridAlias, ) . projectAxes axes3D variables
 
 
 instance Presentable Grid where
@@ -235,3 +243,14 @@ axis Axis{..} origin deltaX deltaY color' size' =
   , size  = size'
   , text  = axisVariable
   }
+
+
+data Styling =
+  Styling
+  {
+    normalColor    :: Color
+  , selectColor    :: Color
+  , highlightColor :: Color
+  , thickness      :: Double
+  }
+    deriving (Binary, Eq, FromJSON, Generic, Ord, Read, Show, ToJSON)

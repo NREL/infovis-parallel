@@ -11,8 +11,7 @@ module InfoVis.Parallel.Presenter.Link (
 import Data.Aeson.Types (FromJSON(..), ToJSON(..))
 import Data.Binary (Binary)
 import GHC.Generics (Generic)
-import InfoVis.Parallel.Presenter.Grid (GridAlias)
-import InfoVis.Parallel.Presenter.Types (Styling)
+import InfoVis.Parallel.Presenter.Grid (GridAlias, Styling)
 
 
 type LinkAlias = String
