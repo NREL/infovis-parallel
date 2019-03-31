@@ -19,9 +19,10 @@ import Data.Serialize (runPut)
 import Data.Yaml.Config (loadYamlSettings, ignoreEnv)
 import GHC.Generics (Generic)
 import InfoVis (SeverityLog, guardIO)
-import InfoVis.Parallel.Dataset (Dataset, readDataset)
-import InfoVis.Parallel.Presenter.Grid (GridIdentifier, Presentable(..))
-import InfoVis.Parallel.Presenter.Presentation (Presentation)
+import InfoVis.Parallel.Dataset (Dataset(..), readDataset)
+import InfoVis.Parallel.Presenter.Grid (GridIdentifier, Presentable(..), Projectable(..))
+import InfoVis.Parallel.Presenter.Link (link)
+import InfoVis.Parallel.Presenter.Presentation (Presentation(..))
 import InfoVis.Parallel.ProtoBuf (Request, upsert)
 import InfoVis.Parallel.Types (DeltaGeometry, Geometry, Identifier, deltaGeometry)
 
@@ -47,7 +48,16 @@ presentDataset :: (MonadError String m, MonadIO m, SeverityLog m)
 presentDataset configurationFiles =
   do
     Configuration{..} <- guardIO $ loadYamlSettings configurationFiles [] ignoreEnv
-    _records <- readDataset dataset
+    records <- readDataset dataset
+    let
+      projector = project presentation $ variables dataset
+      linkDisplay = zip [1..] $ concat [link (links presentation) $ projector record | record <- records]
+      linkGeometry = (deltaGeometry 1 . fst) `ap` (snd . snd) <$> linkDisplay
+      dataRequest = def & upsert .~ linkGeometry :: Request
+    guardIO
+      $ BS.writeFile "data.pbb" 
+      $ runPut
+      $ encodeMessage dataRequest
     let
       nGrid = 1000000000000
       gridDisplay = zip [nGrid..] $ present presentation :: [(Identifier, (GridIdentifier, Geometry))]
@@ -55,7 +65,7 @@ presentDataset configurationFiles =
       gridGeometry = (deltaGeometry 1 . fst) `ap` (snd . snd) <$> gridDisplay :: [DeltaGeometry]
       request = def & upsert .~ gridGeometry :: Request
     guardIO
-      $ BS.writeFile "test.pbb" 
+      $ BS.writeFile "grid.pbb" 
       $ runPut
       $ encodeMessage request
     return ()
