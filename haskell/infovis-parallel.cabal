@@ -103,6 +103,6 @@ executable infovis-parallel
                    , websockets        >= 0.12.5
                    , yaml              >= 0.8.32
   if flag(SwapGroup)
-    other-modules  : X11
+    build-depends  : X11
   ghc-options      : -threaded -Wall
   default-language : Haskell2010
