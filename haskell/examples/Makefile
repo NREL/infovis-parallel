@@ -60,7 +60,12 @@ complex:
 example:
 	$(IVP) send --logging=$(LOGGING) ../../protobuf/examples/{axes,corner-points,helices,rectangles}.pbb
 
+topics:
+	kafka-topics.sh --zookeeper localhost:2181 --topic devices   --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper localhost:2181 --topic requests  --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper localhost:2181 --topic responses --create --partitions 1 --replication-factor 1
+
 
 .SUFFIXES:
 
-.PHONY: laptop esif-b311 events joystick spacenav keyboard complex example
+.PHONY: laptop esif-b311 events joystick spacenav keyboard complex example topics
