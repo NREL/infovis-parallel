@@ -15,6 +15,10 @@ laptop:
 	sed -e "s/localhost/$(KAFKA)/g" displays/laptop.yaml > tmp/display.yaml
 	$(IVP) visualize --logging=$(LOGGING) tmp/display.yaml
 
+asus-vg278:
+	sed -e "s/localhost/$(KAFKA)/g" displays/asus-vg278.yaml > tmp/display.yaml
+	$(IVP) visualize --logging=$(LOGGING) tmp/display.yaml
+
 esif-b311:
 	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-0.yaml > tmp/esif-b311-0.yaml
 	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-1.yaml > tmp/esif-b311-1.yaml
@@ -68,4 +72,4 @@ topics:
 
 .SUFFIXES:
 
-.PHONY: laptop esif-b311 events joystick spacenav keyboard complex example topics
+.PHONY: laptop desktop esif-b311 events joystick spacenav keyboard complex example topics
