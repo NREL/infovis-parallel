@@ -117,7 +117,7 @@ namespace Infovis {
     private void Handle(Request request) {
 
       if (request.Message != "")
-        Display(request.Message, 3f);
+        Display(request.Message, 999999f);
 
       if (request.Reset) {
 
@@ -183,12 +183,12 @@ namespace Infovis {
       }
 
       if (tool != null && request.Toolloc != null) {
-        tool.transform.position = new Vector3((float) request.Toolloc.Posx, (float) request.Toolloc.Posy, (float) request.Toolloc.Posz);
+        tool.transform.position = new Vector3((float) request.Toolloc.Posx, (float) request.Toolloc.Posy, 1 - (float) request.Toolloc.Posz);
         tool.transform.rotation = new Quaternion((float) request.Toolloc.Rotx, (float) request.Toolloc.Roty, (float) request.Toolloc.Rotz, (float) request.Toolloc.Rotw);
       }
 
       if (camera != null && request.Viewloc != null) {
-        camera.transform.position = new Vector3((float) request.Viewloc.Posx, (float) request.Viewloc.Posy, (float) request.Viewloc.Posz);
+        camera.transform.position = new Vector3((float) request.Viewloc.Posx, (float) request.Viewloc.Posy, 1 - (float) request.Viewloc.Posz);
         camera.transform.rotation = new Quaternion((float) request.Viewloc.Rotx, (float) request.Viewloc.Roty, (float) request.Viewloc.Rotz, (float) request.Viewloc.Rotw);
       }
 
