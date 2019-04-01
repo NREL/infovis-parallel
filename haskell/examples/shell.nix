@@ -36,5 +36,6 @@ in
 #     release.infovis-parallel
       release.kafka-device-joystick
       release.kafka-device-spacenav
+#     release.kafka-device-vrpn
     ];
   }

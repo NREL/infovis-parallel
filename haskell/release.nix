@@ -15,6 +15,7 @@ let
               kafka-device-glut     = haskellPackagesNew.callPackage     ../../kafka-device-glut/default.nix { };
               kafka-device-joystick = haskellPackagesNew.callPackage ../../kafka-device-joystick/default.nix { };
               kafka-device-spacenav = haskellPackagesNew.callPackage ../../kafka-device-spacenav/default.nix { };
+              kafka-device-vrpn     = haskellPackagesNew.callPackage     ../../kafka-device-vrpn/default.nix { };
             };
           };
         };
@@ -28,4 +29,5 @@ in
     kafka-device          = pkgs.haskell.packages."${compiler}".kafka-device         ;
     kafka-device-joystick = pkgs.haskell.packages."${compiler}".kafka-device-joystick;
     kafka-device-spacenav = pkgs.haskell.packages."${compiler}".kafka-device-spacenav;
+#   kafka-device-vrpn     = pkgs.haskell.packages."${compiler}".kafka-device-vrpn    ;
   }
