@@ -4,9 +4,9 @@
 
 SHELL=bash
 
-IVP=../dist/build/infovis-parallel/infovis-parallel
+IVP=infovis-parallel
 
-KAFKA=localhost
+KAFKA=127.0.0.1
 
 LOGGING=Info
 
@@ -28,9 +28,9 @@ esif-b311:
 	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-3.yaml &
 	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-4.yaml &
 	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-5.yaml &
-	kafka-device-vrpn Head0@10.60.6.100          vrpn-client localhost 50371 devices esif-head      &
-	kafka-device-vrpn Joystick0@10.60.6.100      vrpn-client localhost 50371 devices esif-joystick0 &
-	kafka-device-vrpn JoystickA@10.60.6.100:3884 vrpn-client localhost 50371 devices esif-joystickA &
+	kafka-device-vrpn Head0@10.60.6.100          vrpn-client $(KAFKA) 9092 devices esif-head      &
+	kafka-device-vrpn Joystick0@10.60.6.100      vrpn-client $(KAFKA) 9092 devices esif-joystick0 &
+	kafka-device-vrpn JoystickA@10.60.6.100:3884 vrpn-client $(KAFKA) 9092 devices esif-joystickA &
 	wait
 
 events:
@@ -61,9 +61,9 @@ example:
 	$(IVP) send --logging=$(LOGGING) ../../protobuf/examples/{axes,corner-points,helices,rectangles}.pbb
 
 topics:
-	kafka-topics.sh --zookeeper localhost:2181 --topic devices   --create --partitions 1 --replication-factor 1
-	kafka-topics.sh --zookeeper localhost:2181 --topic requests  --create --partitions 1 --replication-factor 1
-	kafka-topics.sh --zookeeper localhost:2181 --topic responses --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper $(KAFKA):2181 --topic devices   --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper $(KAFKA):2181 --topic requests  --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper $(KAFKA):2181 --topic responses --create --partitions 1 --replication-factor 1
 
 
 .SUFFIXES:
