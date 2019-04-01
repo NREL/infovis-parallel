@@ -11,8 +11,8 @@ KAFKA=127.0.0.1
 LOGGING=Info
 
 
-laptop:
-	sed -e "s/localhost/$(KAFKA)/g" displays/laptop.yaml > tmp/display.yaml
+lemur:
+	sed -e "s/localhost/$(KAFKA)/g" displays/lemur.yaml > tmp/display.yaml
 	$(IVP) visualize --logging=$(LOGGING) tmp/display.yaml
 
 asus-vg278:
