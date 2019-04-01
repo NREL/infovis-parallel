@@ -224,7 +224,7 @@ namespace Infovis {
           GameObject point = GameObject.CreatePrimitive(useBoxes ? PrimitiveType.Cube : PrimitiveType.Sphere);
 //        AddTrigger(point); // FIXME: Why isn't this necessary?
           point.transform.parent = obj.transform;
-          point.transform.localPosition = new Vector3((float) geometry.Posx[i], (float) geometry.Posy[i], (float) geometry.Posz[i]);
+          point.transform.localPosition = new Vector3((float) geometry.Posx[i], (float) geometry.Posy[i], 1 - (float) geometry.Posz[i]);
         }
 
       }
@@ -276,8 +276,8 @@ namespace Infovis {
           line.transform.parent = obj.transform;
 
           Vector3[] locations = new Vector3[]{
-            new Vector3((float) geometry.Posx[i  ], (float) geometry.Posy[i  ], (float) geometry.Posz[i  ]),
-            new Vector3((float) geometry.Posx[i+1], (float) geometry.Posy[i+1], (float) geometry.Posz[i+1])
+            new Vector3((float) geometry.Posx[i  ], (float) geometry.Posy[i  ], 1 - (float) geometry.Posz[i  ]),
+            new Vector3((float) geometry.Posx[i+1], (float) geometry.Posy[i+1], 1 - (float) geometry.Posz[i+1])
           };
           Vector3 midpoint = (locations[0] + locations[1]) / 2;
           Vector3 displacement = locations[1] - locations[0];
@@ -332,9 +332,9 @@ namespace Infovis {
 //        AddTrigger(rectangle); // FIXME: Why isn't this necessary?
           rectangle.transform.parent = obj.transform;
 
-          Vector3 origin     = new Vector3((float) geometry.Posx[i+0], (float) geometry.Posy[i+0], (float) geometry.Posz[i+0]);
-          Vector3 horizontal = new Vector3((float) geometry.Posx[i+1], (float) geometry.Posy[i+1], (float) geometry.Posz[i+1]);
-          Vector3 vertical   = new Vector3((float) geometry.Posx[i+2], (float) geometry.Posy[i+2], (float) geometry.Posz[i+2]);
+          Vector3 origin     = new Vector3((float) geometry.Posx[i+0], (float) geometry.Posy[i+0], 1 - (float) geometry.Posz[i+0]);
+          Vector3 horizontal = new Vector3((float) geometry.Posx[i+1], (float) geometry.Posy[i+1], 1 - (float) geometry.Posz[i+1]);
+          Vector3 vertical   = new Vector3((float) geometry.Posx[i+2], (float) geometry.Posy[i+2], 1 - (float) geometry.Posz[i+2]);
           Quaternion q = Math.RotationFromPlane(Vector3.right, Vector3.up, origin, horizontal, vertical);
           float width = (horizontal - origin).magnitude;
           float height = (vertical - origin).magnitude;
@@ -406,9 +406,9 @@ namespace Infovis {
         Debug.Assert(geometry.Posy.Count == 3, "Label must have three y positions: "   + obj.name);
         Debug.Assert(geometry.Posz.Count == 3, "Label must have three z positions: "   + obj.name);
 
-        Vector3 origin     = new Vector3((float) geometry.Posx[0], (float) geometry.Posy[0], (float) geometry.Posz[0]);
-        Vector3 horizontal = new Vector3((float) geometry.Posx[1], (float) geometry.Posy[1], (float) geometry.Posz[1]);
-        Vector3 vertical   = new Vector3((float) geometry.Posx[2], (float) geometry.Posy[2], (float) geometry.Posz[2]);
+        Vector3 origin     = new Vector3((float) geometry.Posx[0], (float) geometry.Posy[0], 1 - (float) geometry.Posz[0]);
+        Vector3 horizontal = new Vector3((float) geometry.Posx[1], (float) geometry.Posy[1], 1 - (float) geometry.Posz[1]);
+        Vector3 vertical   = new Vector3((float) geometry.Posx[2], (float) geometry.Posy[2], 1 - (float) geometry.Posz[2]);
         Quaternion q = Math.RotationFromPlane(Vector3.right, Vector3.up, origin, horizontal, vertical);
 
         TextMesh textComponent = obj.GetComponent<TextMesh>();
@@ -453,8 +453,8 @@ namespace Infovis {
         Debug.Assert(geometry.Posz.Count == 2, "Arrow must have two z positions: "     + obj.name);
 
         Vector3[] locations = new Vector3[]{
-          new Vector3((float) geometry.Posx[0], (float) geometry.Posy[0], (float) geometry.Posz[0]),
-          new Vector3((float) geometry.Posx[1], (float) geometry.Posy[1], (float) geometry.Posz[1])
+          new Vector3((float) geometry.Posx[0], (float) geometry.Posy[0], 1 - (float) geometry.Posz[0]),
+          new Vector3((float) geometry.Posx[1], (float) geometry.Posy[1], 1 - (float) geometry.Posz[1])
         };
         Vector3 midpoint = (locations[0] + locations[1]) / 2;
         Vector3 displacement = locations[1] - locations[0];
