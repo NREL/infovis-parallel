@@ -2,14 +2,14 @@ viewer           :
   stereo         : QuadBuffer
   nearPlane      : 0.1
   farPlane       : 100
-  eyeSeparation  : [0.08, 0.00,  0.00]
+  eyeSeparation  : [0.063, 0.00,  0.00]
   display        :
     identifier   : :0.0
     geometry     : fullscreen
     screen       :
-      lowerLeft  : [ 2.495 , -1.565, 0.93 ]
-      lowerRight : [-0.2795, -1.565, 0.93 ]
-      upperLeft  : [ 2.495 , -1.565, 2.52 ]
+      lowerLeft  : [-2.495 ,  0.68 , -0.315]
+      lowerRight : [ 0.2795,  0.68 , -0.315]
+      upperLeft  : [-2.495 ,  2.27 , -0.315]
 initialTool      : [[-0.1, 0.5,  0.5], [0, -90, 0]]
 requests         :
   client         : visualizer
