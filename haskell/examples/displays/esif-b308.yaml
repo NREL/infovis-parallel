@@ -1,17 +1,16 @@
 viewer           :
-  stereo         : QuadBuffer
+  stereo         : Mono
   nearPlane      : 0.01
   farPlane       : 100
-  eyeSeparation  : [0.10, 0, 0]
+  eyeSeparation  : [0.008, 0, 0]
   display        :
     identifier   : :0.0
     geometry     : fullscreen
-  # geometry     : 1200x800+700+0
     screen       :
-      lowerLeft  :  [-0.50, -0.25, 0  ]
-      lowerRight :  [ 1.50, -0.25, 0  ]
-      upperLeft  :  [-0.50,  1.25, 0  ]
-initialViewer    : [[ 0.50,  0.50, 3  ], [0, -90, 0]]
+      lowerLeft  :  [-0.333, 1.5, -0.5]
+      lowerRight :  [ 1.333, 1.5, -0.5]
+      upperLeft  :  [-0.333, 4  , -0.5]
+initialViewer    : [[ 0    , 1.5,  2  ], [0, -90, 0]]
 initialTool      : [[-0.1 ,  0.5 , 0.5], [0, -90, 0]]
 requests         :
   client         : visualizer
