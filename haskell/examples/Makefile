@@ -20,18 +20,18 @@ asus-vg278:
 	$(IVP) visualize --logging=$(LOGGING) tmp/display.yaml
 
 esif-b311:
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-0.yaml > tmp/esif-b311-0.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-1.yaml > tmp/esif-b311-1.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-2.yaml > tmp/esif-b311-2.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-3.yaml > tmp/esif-b311-3.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-4.yaml > tmp/esif-b311-4.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-5.yaml > tmp/esif-b311-5.yaml
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-0.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-1.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-2.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-3.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-4.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-5.yaml &
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-0.yaml > tmp/display-0.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-1.yaml > tmp/display-1.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-2.yaml > tmp/display-2.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-3.yaml > tmp/display-3.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-4.yaml > tmp/display-4.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-5.yaml > tmp/display-5.yaml
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-0.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-1.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-2.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-3.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-4.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-5.yaml &
 	kafka-device-vrpn Head0@10.60.6.100          vrpn-client $(KAFKA) 9092 devices esif-head      &
 	kafka-device-vrpn Joystick0@10.60.6.100      vrpn-client $(KAFKA) 9092 devices esif-joystick0 &
 	kafka-device-vrpn JoystickA@10.60.6.100:3884 vrpn-client $(KAFKA) 9092 devices esif-joystickA &
