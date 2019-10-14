@@ -33,7 +33,7 @@ in
       pkgs.zookeeper
       pkgs.apacheKafka011
       pkgs.kafkacat
-#     release.infovis-parallel
+      release.infovis-parallel
       release.kafka-device-joystick
       release.kafka-device-spacenav
 #     release.kafka-device-vrpn

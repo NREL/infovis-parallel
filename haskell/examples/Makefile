@@ -4,33 +4,37 @@
 
 SHELL=bash
 
-IVP=../dist/build/infovis-parallel/infovis-parallel
+IVP=infovis-parallel
 
-KAFKA=localhost
+KAFKA=127.0.0.1
 
 LOGGING=Info
 
 
-laptop:
-	sed -e "s/localhost/$(KAFKA)/g" displays/laptop.yaml > tmp/display.yaml
+lemur:
+	sed -e "s/localhost/$(KAFKA)/g" displays/lemur.yaml > tmp/display.yaml
+	$(IVP) visualize --logging=$(LOGGING) tmp/display.yaml
+
+asus-vg278:
+	sed -e "s/localhost/$(KAFKA)/g" displays/asus-vg278.yaml > tmp/display.yaml
 	$(IVP) visualize --logging=$(LOGGING) tmp/display.yaml
 
 esif-b311:
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-0.yaml > tmp/esif-b311-0.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-1.yaml > tmp/esif-b311-1.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-2.yaml > tmp/esif-b311-2.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-3.yaml > tmp/esif-b311-3.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-4.yaml > tmp/esif-b311-4.yaml
-	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-5.yaml > tmp/esif-b311-5.yaml
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-0.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-1.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-2.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-3.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-4.yaml &
-	$(IVP) visualize --logging=$(LOGGING) tmp/esif-b311-5.yaml &
-	kafka-device-vrpn Head0@10.60.6.100          vrpn-client localhost 50371 devices esif-head      &
-	kafka-device-vrpn Joystick0@10.60.6.100      vrpn-client localhost 50371 devices esif-joystick0 &
-	kafka-device-vrpn JoystickA@10.60.6.100:3884 vrpn-client localhost 50371 devices esif-joystickA &
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-0.yaml > tmp/display-0.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-1.yaml > tmp/display-1.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-2.yaml > tmp/display-2.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-3.yaml > tmp/display-3.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-4.yaml > tmp/display-4.yaml
+	sed -e "s/localhost/$(KAFKA)/g" displays/esif-b311-5.yaml > tmp/display-5.yaml
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-0.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-1.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-2.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-3.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-4.yaml &
+	$(IVP) visualize --logging=$(LOGGING) tmp/display-5.yaml &
+	kafka-device-vrpn Head0@10.60.6.100          vrpn-client $(KAFKA) 9092 devices esif-head      &
+	kafka-device-vrpn Joystick0@10.60.6.100      vrpn-client $(KAFKA) 9092 devices esif-joystick0 &
+	kafka-device-vrpn JoystickA@10.60.6.100:3884 vrpn-client $(KAFKA) 9092 devices esif-joystickA &
 	wait
 
 events:
@@ -61,11 +65,11 @@ example:
 	$(IVP) send --logging=$(LOGGING) ../../protobuf/examples/{axes,corner-points,helices,rectangles}.pbb
 
 topics:
-	kafka-topics.sh --zookeeper localhost:2181 --topic devices   --create --partitions 1 --replication-factor 1
-	kafka-topics.sh --zookeeper localhost:2181 --topic requests  --create --partitions 1 --replication-factor 1
-	kafka-topics.sh --zookeeper localhost:2181 --topic responses --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper $(KAFKA):2181 --topic devices   --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper $(KAFKA):2181 --topic requests  --create --partitions 1 --replication-factor 1
+	kafka-topics.sh --zookeeper $(KAFKA):2181 --topic responses --create --partitions 1 --replication-factor 1
 
 
 .SUFFIXES:
 
-.PHONY: laptop esif-b311 events joystick spacenav keyboard complex example topics
+.PHONY: laptop desktop esif-b311 events joystick spacenav keyboard complex example topics
