@@ -1,0 +1,4 @@
+infovis-oculus.apk filter=lfs diff=lfs merge=lfs -text
+infovis-tango.apk filter=lfs diff=lfs merge=lfs -text
+infovis-linux.tar.gz filter=lfs diff=lfs merge=lfs -text
+infovis-macosx.tar.gz filter=lfs diff=lfs merge=lfs -text
