@@ -7,7 +7,13 @@
     <title>InfoVis Parallel</title>
   </head>
   <body onload="infovis.startup()">
-    <h1>InfoVis Parallel</h1>
+      <span>
+        Server:
+        <button id="connectButton" type="button" onclick="reconnect()">connect</button>
+        <button id="disconnectButton" type="button" onclick="disconnect()" disabled>disconnect</button>
+        <input id="connection" type="text" value="ws://127.0.0.1:50379"/>
+        <br/>
+      </span>
     <canvas id="glCanvas" width="640" height="480"></canvas>
   </body>
 </html>
