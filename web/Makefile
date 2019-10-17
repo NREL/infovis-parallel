@@ -5,6 +5,9 @@
 controller.js: src/controller.js
 	npx webpack
 
+clean:
+	rm controller.js
+
 install:
 	npm install webpack webpack-cli
 
