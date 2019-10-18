@@ -7,13 +7,97 @@
     <title>InfoVis Parallel</title>
   </head>
   <body onload="infovis.startup()">
-      <span>
-        Server:
-        <button id="connectButton" type="button" onclick="infovis.reconnect()">connect</button>
-        <button id="disconnectButton" type="button" onclick="infovis.unconnect()" disabled>disconnect</button>
-        <input id="connection" type="text" value="ws://127.0.0.1:42042"/>
-        <br/>
-      </span>
-    <canvas id="glCanvas" width="640" height="480"></canvas>
+    <div id="connector">
+      <h1>InfoVis Parallel</h1>
+      <table>
+        <tr>
+          <th colspan="4">Server</th>
+        </tr>
+        <tr>
+          <td><button id="connectButton" type="button" onclick="infovis.reconnect()">connect</button></td>
+          <td colspan="3"><input id="connection" type="text" value="ws://127.0.0.1:42042"/></td>
+        </tr>
+        <tr>
+          <th colspan="4">View</th>
+        </tr>
+        <tr>
+            <td>Stereo?</td>
+            <td><input type="checkbox"/></td>
+            <td colspan="2"/>
+        </tr>
+        <tr>
+          <td>Eye&nbsp;separation:</td>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <td>Near&nbsp;plane:</td>
+          <td colspan="3"><input/></td>
+        </tr>
+        <tr>
+          <td>Far&nbsp;plane:</td>
+          <td colspan="3"><input/></td>
+        </tr>
+        <tr>
+          <td>Lower&nbsp;left:</td>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <td>Lower&nbsp;right:</td>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <td>Upper&nbsp;left:</td>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <th colspan="4">Initialization</th>
+        </tr>
+        <tr>
+          <td rowspan="2">View&nbsp;point:</td>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <td rowspan="2">Tool&nbsp;point:</td>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <td><input/></td>
+          <td><input/></td>
+          <td><input/></td>
+        </tr>
+        <tr>
+          <th colspan="4">Persistence</th>
+        </tr>
+        <tr>
+          <td/>
+          <td><button type="button">load</button></td>
+          <td><button type="button">save</button></td>
+          <td><button type="button">reset</button></td>
+        </tr>
+      </table>
+    </div>
+    <div id="visualize">
+        <div id="disconnector">
+          <button id="disconnectButton" type="button" onclick="infovis.unconnect()">disconnect</button>
+        </div>
+        <canvas id="glCanvas" width="640" height="480"></canvas>
+    </div>
   </body>
 </html>

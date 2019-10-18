@@ -1,5 +1,40 @@
 
-#connection {
+#connector table {
+  width: 100%
+}
+
+th {
+  padding-top: 25px
+; text-align: left
+}
+
+td button {
+  width: 100%
+}
+
+td input {
+  width: 100%
+}
+
+#connector {
+  position: absolute
+; left    : 0
+; top     : 0
+; width   : 400px
+; height  : 100%
+}
+
+#disconnector {
+  position: absolute
+; left    : 0
+; top     : 0
+}
+
+#visualize {
+  visibility: hidden
+; position  : absolute
+; left      : 0
+; top       : 0
 }
 
 #glCanvas {

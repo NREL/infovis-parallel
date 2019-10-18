@@ -32,8 +32,8 @@ var cxn = null
 
 
 function updateConnectButtons() {
-  connectButton.disabled    = cxn != null
-  disconnectButton.disabled = cxn == null
+  connector.style.visibility = cxn == null ? "visible" : "hidden"
+  visualize.style.visibility = cxn != null ? "visible" : "hidden"
 }
 
 function disconnected() {
