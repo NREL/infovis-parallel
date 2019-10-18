@@ -4,6 +4,7 @@ const Connection    = require("./connection"   )
 
 const Rendering = {
   Program : require("./rendering/program")
+, Shapes  : require("./rendering/shapes" )
 }
 
 
@@ -32,6 +33,7 @@ function startup() {
 module.exports = {
   Configuration : Configuration
 , Connection    : Connection
+, Rendering     : Rendering
 , handler       : echoHandler
 , startup       : startup
 }
