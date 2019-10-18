@@ -1,40 +1,10 @@
 const Configuration = require("./configuration")
-const WebSocket     = require("./websocket"    )
+const Connection    = require("./connection"   )
 
 
 function echoHandler(connection, request) {
   console.log("Request: ", request)
   window.request = request
-}
-
-
-var theConnection = null
-
-
-function updateConnectButtons() {
-  uiConnector.style.visibility = theConnection == null ? "visible" : "hidden"
-  uiVisualize.style.visibility = theConnection != null ? "visible" : "hidden"
-}
-
-function disconnected() {
-  console.log("Disconnected")
-  theConnection = null
-  updateConnectButtons()
-}
-
-function reconnect() {
-  configuration = Configuration.update()
-  var url = configuration.server.address
-  console.log("Connect:", url)
-  theConnection = WebSocket.connect(url, echoHandler, disconnected)
-  updateConnectButtons()
-}
-
-function unconnect() {
-  console.log("Disconnect")
-  WebSocket.disconnect(theConnection)
-  theConnection = null
-  updateConnectButtons()
 }
 
 
@@ -50,14 +20,13 @@ function startup() {
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   Configuration.reset()
-  updateConnectButtons()
+  Connection.updateButtons()
 }
 
 // Export functions.
 module.exports = {
   Configuration : Configuration
-, WebSocket     : WebSocket
-, reconnect     : reconnect
+, Connection    : Connection
+, handler       : echoHandler
 , startup       : startup
-, unconnect     : unconnect
 }
