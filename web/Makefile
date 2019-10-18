@@ -2,7 +2,12 @@
 #!nix-shell -i "make -f" -p nodejs
 
 
-controller.js: src/controller.js
+SRCS=$(wildcard src/*.js)
+
+
+all: controller.js
+
+controller.js: $(SRCS)
 	npx webpack
 
 clean:
@@ -14,4 +19,4 @@ install:
 
 .SUFFIXES:
 
-.PHONY: install
+.PHONY: all clean install

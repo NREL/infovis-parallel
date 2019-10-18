@@ -6,98 +6,98 @@
     <script src="controller.js" type="application/javascript"> </script>
     <title>InfoVis Parallel</title>
   </head>
-  <body onload="infovis.startup()">
-    <div id="connector">
+  <body onload="Controller.startup()">
+    <div id="uiConnector">
       <h1>InfoVis Parallel</h1>
       <table>
         <tr>
           <th colspan="4">Server</th>
         </tr>
         <tr>
-          <td><button id="connectButton" type="button" onclick="infovis.reconnect()">connect</button></td>
-          <td colspan="3"><input id="connection" type="text" value="ws://127.0.0.1:42042"/></td>
+          <td><button id="uiConnect" type="button" onclick="Controller.reconnect()">connect</button></td>
+          <td colspan="3"><input id="uiAddress" type="text" value="ws://127.0.0.1"/></td>
         </tr>
         <tr>
-          <th colspan="4">View</th>
+          <th colspan="4">Display</th>
         </tr>
         <tr>
             <td>Stereo?</td>
-            <td><input type="checkbox"/></td>
+            <td><input id="uiStereo" type="checkbox"/></td>
             <td colspan="2"/>
         </tr>
         <tr>
           <td>Eye&nbsp;separation:</td>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiEyeSeparationX" type="number"/></td>
+          <td><input id="uiEyeSeparationY" type="number"/></td>
+          <td><input id="uiEyeSeparationZ" type="number"/></td>
         </tr>
         <tr>
           <td>Near&nbsp;plane:</td>
-          <td colspan="3"><input/></td>
+          <td colspan="3"><input id="uiNearPlane" type="number"/></td>
         </tr>
         <tr>
           <td>Far&nbsp;plane:</td>
-          <td colspan="3"><input/></td>
+          <td colspan="3"><input id="uiFarPlane" type="number"/></td>
         </tr>
         <tr>
           <td>Lower&nbsp;left:</td>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiLowerLeftX" type="number"/></td>
+          <td><input id="uiLowerLeftY" type="number"/></td>
+          <td><input id="uiLowerLeftZ" type="number"/></td>
         </tr>
         <tr>
           <td>Lower&nbsp;right:</td>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiLowerRightX" type="number"/></td>
+          <td><input id="uiLowerRightY" type="number"/></td>
+          <td><input id="uiLowerRightZ" type="number"/></td>
         </tr>
         <tr>
           <td>Upper&nbsp;left:</td>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiUpperLeftX" type="number"/></td>
+          <td><input id="uiUpperLeftY" type="number"/></td>
+          <td><input id="uiUpperLeftZ" type="number"/></td>
         </tr>
         <tr>
           <th colspan="4">Initialization</th>
         </tr>
         <tr>
           <td rowspan="2">View&nbsp;point:</td>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiViewPositionX" type="number"/></td>
+          <td><input id="uiViewPositionY" type="number"/></td>
+          <td><input id="uiViewPositionZ" type="number"/></td>
         </tr>
         <tr>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiViewOrientationX" type="number"/></td>
+          <td><input id="uiViewOrientationY" type="number"/></td>
+          <td><input id="uiViewOrientationZ" type="number"/></td>
         </tr>
         <tr>
           <td rowspan="2">Tool&nbsp;point:</td>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiToolPositionX" type="number"/></td>
+          <td><input id="uiToolPositionY" type="number"/></td>
+          <td><input id="uiToolPositionZ" type="number"/></td>
         </tr>
         <tr>
-          <td><input/></td>
-          <td><input/></td>
-          <td><input/></td>
+          <td><input id="uiToolOrientationX" type="number"/></td>
+          <td><input id="uiToolOrientationY" type="number"/></td>
+          <td><input id="uiToolOrientationZ" type="number"/></td>
         </tr>
         <tr>
           <th colspan="4">Persistence</th>
         </tr>
         <tr>
           <td>Configuration:</td>
-          <td><button type="button">load</button></td>
-          <td><button type="button">save</button></td>
-          <td><button type="button">reset</button></td>
+          <td><button id="uiLoad"  type="button" onclick="Controller.Configuration.load()" >load</button></td>
+          <td><button id="uiSave"  type="button" onclick="Controller.Configuration.save()" >save</button></td>
+          <td><button id="uiReset" type="button" onclick="Controller.Configuration.reset()">reset</button></td>
         </tr>
       </table>
     </div>
-    <div id="visualize">
-        <div id="disconnector">
-          <button id="disconnectButton" type="button" onclick="infovis.unconnect()">disconnect</button>
+    <div id="uiVisualize">
+        <div id="uiDisconnector">
+          <button id="uiDisconnect" type="button" onclick="Controller.unconnect()">disconnect</button>
         </div>
-        <canvas id="glCanvas" width="640" height="480"></canvas>
+        <canvas id="uiCanvas" width="640" height="480"></canvas>
     </div>
   </body>
 </html>

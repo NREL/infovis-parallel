@@ -7,6 +7,6 @@ module.exports = {
     filename      : 'controller.js'
   , path          : path.resolve(__dirname, '.')
   , libraryTarget : "var"
-  , library       : "infovis"
+  , library       : "Controller"
   }
 }

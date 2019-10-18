@@ -1,6 +1,8 @@
 // Use protocol buffers.
 require("./infovis.proto3_pb")
 
+const Configuration = require("./configuration"    )
+
 
 function connect(url, handler, closer) {
   var connection = new WebSocket(url)
@@ -28,31 +30,32 @@ function echoHandler(connection, request) {
 }
 
 
-var cxn = null
+var theConnection = null
 
 
 function updateConnectButtons() {
-  connector.style.visibility = cxn == null ? "visible" : "hidden"
-  visualize.style.visibility = cxn != null ? "visible" : "hidden"
+  uiConnector.style.visibility = theConnection == null ? "visible" : "hidden"
+  uiVisualize.style.visibility = theConnection != null ? "visible" : "hidden"
 }
 
 function disconnected() {
   console.log("Disconnected")
-  cxn = null
+  theConnection = null
   updateConnectButtons()
 }
 
 function reconnect() {
-  var url = connection.value
+  configuration = Configuration.update()
+  var url = configuration.server.address
   console.log("Connect:", url)
-  cxn = connect(url, echoHandler, disconnected)
+  theConnection = connect(url, echoHandler, disconnected)
   updateConnectButtons()
 }
 
 function unconnect() {
   console.log("Disconnect")
-  disconnect(cxn)
-  cxn = null
+  disconnect(theConnection)
+  theConnection = null
   updateConnectButtons()
 }
 
@@ -60,7 +63,7 @@ function unconnect() {
 // Set up the document.
 function startup() {
 
-  var gl = glCanvas.getContext("webgl")
+  var gl = uiCanvas.getContext("webgl")
 
   gl.canvas.width  = window.innerWidth
   gl.canvas.height = window.innerHeight
@@ -68,12 +71,14 @@ function startup() {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
+  Configuration.reset()
   updateConnectButtons()
 }
 
 // Export functions.
 module.exports = {
-  startup   : startup
-, reconnect : reconnect
-, unconnect : unconnect
+  Configuration : Configuration
+, startup       : startup
+, reconnect     : reconnect
+, unconnect     : unconnect
 }
