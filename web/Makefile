@@ -2,7 +2,7 @@
 #!nix-shell -i "make -f" -p nodejs
 
 
-SRCS=$(wildcard src/*.js)
+SRCS=$(wildcard src/*.js src/*/*.js)
 
 
 all: controller.js

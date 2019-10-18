@@ -1,5 +1,10 @@
+
 const Configuration = require("./configuration")
 const Connection    = require("./connection"   )
+
+const Rendering = {
+  Program : require("./rendering/program")
+}
 
 
 function echoHandler(connection, request) {
