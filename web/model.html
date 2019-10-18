@@ -9,9 +9,9 @@
   <body onload="infovis.startup()">
       <span>
         Server:
-        <button id="connectButton" type="button" onclick="reconnect()">connect</button>
-        <button id="disconnectButton" type="button" onclick="disconnect()" disabled>disconnect</button>
-        <input id="connection" type="text" value="ws://127.0.0.1:50379"/>
+        <button id="connectButton" type="button" onclick="infovis.reconnect()">connect</button>
+        <button id="disconnectButton" type="button" onclick="infovis.unconnect()" disabled>disconnect</button>
+        <input id="connection" type="text" value="ws://127.0.0.1:42042"/>
         <br/>
       </span>
     <canvas id="glCanvas" width="640" height="480"></canvas>

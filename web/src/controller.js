@@ -2,21 +2,7 @@
 require("./infovis.proto3_pb")
 
 
-// Set up the document.
-function startup() {
-
-  var gl = glCanvas.getContext("webgl")
-
-  gl.canvas.width  = window.innerWidth
-  gl.canvas.height = window.innerHeight
-
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-
-}
-
-
-function connect(url, handler) {
+function connect(url, handler, closer) {
   var connection = new WebSocket(url)
   connection.binaryType = "arraybuffer"
   handlers = new Object()
@@ -26,6 +12,7 @@ function connect(url, handler) {
       var request = proto.Infovis.Request.deserializeBinary(buffer)
       handler(connection, request)
     }
+  connection.onclose = closer
   return connection
 }
 
@@ -37,13 +24,56 @@ function disconnect(connection) {
 
 function echoHandler(connection, request) {
   console.log("Request: ", request)
+  window.request = request
 }
 
 
+var cxn = null
+
+
+function updateConnectButtons() {
+  connectButton.disabled    = cxn != null
+  disconnectButton.disabled = cxn == null
+}
+
+function disconnected() {
+  console.log("Disconnected")
+  cxn = null
+  updateConnectButtons()
+}
+
+function reconnect() {
+  var url = connection.value
+  console.log("Connect:", url)
+  cxn = connect(url, echoHandler, disconnected)
+  updateConnectButtons()
+}
+
+function unconnect() {
+  console.log("Disconnect")
+  disconnect(cxn)
+  cxn = null
+  updateConnectButtons()
+}
+
+
+// Set up the document.
+function startup() {
+
+  var gl = glCanvas.getContext("webgl")
+
+  gl.canvas.width  = window.innerWidth
+  gl.canvas.height = window.innerHeight
+
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  updateConnectButtons()
+}
+
 // Export functions.
 module.exports = {
-  startup     : startup
-, connect     : connect
-, disconnect  : disconnect
-, echoHandler : echoHandler
+  startup   : startup
+, reconnect : reconnect
+, unconnect : unconnect
 }
