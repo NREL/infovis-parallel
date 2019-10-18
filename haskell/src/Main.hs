@@ -34,6 +34,7 @@ import InfoVis (SeverityLog, stringVersion, withSeverityLog)
 import System.Console.CmdArgs (Typeable, (&=), argPos, args, cmdArgs, details, explicit, help, modes, name, program, summary, typ, typFile)
 import System.Exit (die)
 
+import qualified InfoVis.Parallel.Bridge            as I (bridgeKafka)
 import qualified InfoVis.Parallel.Events            as I (forwardEvents)
 import qualified InfoVis.Parallel.Presenter         as I (presentDataset)
 import qualified InfoVis.Parallel.ProtoBuf.Compiler as I (compileBuffers)
@@ -53,6 +54,13 @@ data InfoVis =
     , port     :: Int
     , path     :: String
     , sendText :: Bool
+    , buffers  :: [FilePath]
+    }
+  | BridgeWebsocket
+    {
+      logging  :: Severity
+    , host     :: String
+    , port     :: Int
     , buffers  :: [FilePath]
     }
   | SendKafka
@@ -98,6 +106,7 @@ infovis =
   modes
     [
       sendWebsocket
+    , bridgeWebsocket
     , sendKafka
     , forwardEvents
     , compile
@@ -141,9 +150,20 @@ sendWebsocket =
              &= typFile
              &= args
   }
+   &= explicit
+   &= name "websocket"
+   &= help "Send protocol buffers serialized as binary files to client."
+   &= details []
+
+
+bridgeWebsocket :: InfoVis
+bridgeWebsocket =
+  BridgeWebsocket
+  {
+  }
     &= explicit
-    &= name "websocket"
-    &= help "Send protocol buffers serialized as binary files to client."
+    &= name "bridge"
+    &= help "Bridge WebSockets and Kafka streams."
     &= details []
 
 
@@ -238,9 +258,10 @@ main =
 dispatch :: (MonadError String m, MonadIO m, SeverityLog m)
          => InfoVis
          -> m ()
-dispatch SendWebsocket{..} = I.sendBuffers host port path sendText buffers
-dispatch SendKafka    {..} = I.sendKafka (host, port) client topic buffers
-dispatch ForwardKafka {..} = I.forwardEvents (host, port) client topic configs
-dispatch Compile      {..} = I.compileBuffers buffers output
-dispatch Visualize    {..} = I.visualizeBuffers config (logging == Debug) buffers
-dispatch Present      {..} = I.presentDataset configs
+dispatch SendWebsocket  {..} = I.sendBuffers host port path sendText buffers
+dispatch BridgeWebsocket{..} = I.bridgeKafka host port buffers
+dispatch SendKafka      {..} = I.sendKafka (host, port) client topic buffers
+dispatch ForwardKafka   {..} = I.forwardEvents (host, port) client topic configs
+dispatch Compile        {..} = I.compileBuffers buffers output
+dispatch Visualize      {..} = I.visualizeBuffers config (logging == Debug) buffers
+dispatch Present        {..} = I.presentDataset configs

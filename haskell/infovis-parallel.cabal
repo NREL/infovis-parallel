@@ -37,6 +37,7 @@ executable infovis-parallel
                      Graphics.OpenGL.Util.Setup
                      Graphics.OpenGL.Util.Types
                      InfoVis
+                     InfoVis.Parallel.Bridge
                      InfoVis.Parallel.Dataset
                      InfoVis.Parallel.Events
                      InfoVis.Parallel.Events.ButtonFrame
