@@ -22,6 +22,7 @@ module InfoVis.Parallel.Bridge (
 ) where
 
 
+import Control.Concurrent (threadDelay)
 import Control.Monad.Except (MonadError, MonadIO)
 import Control.Monad.Log (Severity(..), logInfo)
 import InfoVis (SeverityLog, withLogger)
@@ -53,3 +54,4 @@ bridgeKafka host port buffers =
             |
               file <- buffers
             ]
+          threadDelay maxBound
