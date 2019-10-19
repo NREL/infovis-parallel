@@ -4,6 +4,7 @@ const Connection    = require("./connection"   )
 
 const Rendering = {
   Buffers : require("./rendering/buffers")
+  Frames  : require("./rendering/frames" )
 , Program : require("./rendering/program")
 , Shapes  : require("./rendering/shapes" )
 }
