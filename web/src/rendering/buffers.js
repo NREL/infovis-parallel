@@ -1,43 +1,36 @@
 const GlMatrix = require("../gl-matrix")
 
 
-const Vector3 = GlMatrix.vec3.fromValues
+const zeroPosition = GlMatrix.vec3.fromValues(0, 0, 0)
 
-const Vector4 = GlMatrix.veck.fromValues
+const zeroRotation = GlMatrix.vec4.fromValues(0, 0, 0, 1)
 
-const Vertex3 = GlMatrix.vec3.fromValues
+const zeroScale = GlMatrix.vec3.fromValues(0, 0, 0)
 
-
-const zeroPosition = Vertex3(0, 0, 0)
-
-const zeroRotation = Vector4(0, 0, 0, 1)
-
-const zeroScale = Vector3(0, 0, 0)
-
-const zeroColor = 0
+const zeroColor = 0.0
 
 
 const positionsLens = {
   get : (shapeBuffer                  ) => shapeBuffer.pendingPositions
-, set : (shapeBuffer, pendingPositions) => shapeBuffer.pendingPositions = pendingPositions)
+, set : (shapeBuffer, pendingPositions) => shapeBuffer.pendingPositions = pendingPositions
 }
 
 
 const rotationsLens = {
   get : (shapeBuffer                  ) => shapeBuffer.pendingRotations
-, set : (shapeBuffer, pendingRotations) => shapeBuffer.pendingRotations = pendingRotations)
+, set : (shapeBuffer, pendingRotations) => shapeBuffer.pendingRotations = pendingRotations
 }
 
 
 const scalesLens = {
   get : (shapeBuffer               ) => shapeBuffer.pendingScales
-, set : (shapeBuffer, pendingScales) => shapeBuffer.pendingScales = pendingScales)
+, set : (shapeBuffer, pendingScales) => shapeBuffer.pendingScales = pendingScales
 }
 
 
 const colorsLens = {
   get : (shapeBuffer               ) => shapeBuffer.pendingColors
-, set : (shapeBuffer, pendingColors) => shapeBuffer.pendingColors = pendingColors)
+, set : (shapeBuffer, pendingColors) => shapeBuffer.pendingColors = pendingColors
 }
 
 
@@ -50,7 +43,7 @@ function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
   return {
     shapeProgram     : shapeProgram
   , primitiveMode    : primitiveMode
-  , mesh             : {left : gl1 => buildBuffer(gl1, primitives)}
+  , mesh             : buildBuffer(gl, primitives)
   , vertexCount      : primitives.length
   , instanceCount    : 0
   , positions        : null
@@ -70,11 +63,15 @@ function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
 
 
 function destroyShapeBuffer(gl, shapeBuffer) {
+  gl.deleteBuffer(shapeBuffer.mesh)
   if (shapeBuffer.size == 0)
     return
-  deleteObjecttNames([shapeBuffer.positions, shapeBuffer.rotations, shapeBuffer.scales, shapeBuffer.colors])
-  if ("right" in shapeBuffer.mesh)
-    deleteObjectNames([shapeBuffer.mesh.right])
+  [
+    shapeBuffer.positions
+  , shapeBuffer.rotations
+  , shapeBuffer.scales
+  , shapeBuffer.colors
+  ].forEach(gl.deleteBuffer)
 }
 
 
@@ -138,7 +135,7 @@ function updateColor(identifier, color, shapeBuffer) {
 }
 
 
-function updateAttribute(field, identifier, value shapeBuffer) {
+function updateAttribute(field, identifier, value, shapeBuffer) {
   if (identifier in shapeBuffer.locationses) {
     var locations = shapeBuffer.locationses[identifier]
     var revision = field.get(shapeBuffer)
@@ -210,13 +207,10 @@ function expandShapeBuffer(gl, shapeBuffer) {
     return Array.from({length: pendingSize}, (v, k) => value)
   }
 
-  if ("left" in shapeBuffer.mesh)
-    shapeBuffer.mesh = shapeBuffer.mesh.left(gl)
-
-  shapeBuffer.positions = size == 0 ? buildBuffer(gl, replicate(zeroPosition)) ? expandBuffer(gl, zeroPosition, size, pendingSize, shapeBuffer.positions)
-  shapeBuffer.rotations = size == 0 ? buildBuffer(gl, replicate(zeroRotation)) ? expandBuffer(gl, zeroRotation, size, pendingSize, shapeBuffer.rotations)
-  shapeBuffer.scales    = size == 0 ? buildBuffer(gl, replicate(zeroScale   )) ? expandBuffer(gl, zeroScale   , size, pendingSize, shapeBuffer.scales   )
-  shapeBuffer.colors    = size == 0 ? buildBuffer(gl, replicate(zeroColor   )) ? expandBuffer(gl, zeroColor   , size, pendingSize, shapeBuffer.colors   )
+  shapeBuffer.positions = size == 0 ? buildBuffer(gl, replicate(zeroPosition)) : expandBuffer(gl, zeroPosition, size, pendingSize, shapeBuffer.positions)
+  shapeBuffer.rotations = size == 0 ? buildBuffer(gl, replicate(zeroRotation)) : expandBuffer(gl, zeroRotation, size, pendingSize, shapeBuffer.rotations)
+  shapeBuffer.scales    = size == 0 ? buildBuffer(gl, replicate(zeroScale   )) : expandBuffer(gl, zeroScale   , size, pendingSize, shapeBuffer.scales   )
+  shapeBuffer.colors    = size == 0 ? buildBuffer(gl, replicate(zeroColor   )) : expandBuffer(gl, zeroColor   , size, pendingSize, shapeBuffer.colors   )
 
 }
 
@@ -238,81 +232,47 @@ function drawInstances(gl, shapeBuffer) {
   bindScales   (gl, shapeProgram, shapeBuffer.scales    )
   bindColors   (gl, shapeProgram, shapeBuffer.colors    )
 
-  ext = gl.getExtension("ANGLE_instanced_arrays")
-  ext.drawArraysInstances(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)
+  gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)
 
-  // FIXME: Is this necessary?
   selectShapeProgram(gl, null)
 
 }
 
 
-buildBuffer :: Storable a
-            => [a]
-            -> IO BufferObject
-buildBuffer primitives =
-  do
-    let
-      stride = sizeOf $ head primitives
-      size = length primitives
-    bufferObject <- genObjectName
-    bindBuffer ArrayBuffer $=! Just bufferObject
-    values <- newListArray (0, size) primitives
-    withStorableArray values
-      $ \ptr ->
-        bufferData ArrayBuffer $=! (fromIntegral $ size * stride, ptr, DynamicDraw)
-    bindBuffer ArrayBuffer $=! Nothing
-    return bufferObject
+function buildBuffer(gl, primitives) {
+  var bufferObject = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferObject)
+  gl.bufferData(gl.ARRAY_BUFFER, primitives, gl.DYNAMIC_DRAW)
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
+  return bufferObject
+}
 
 
-updateBuffer :: Storable a
-             => IM.IntMap a
-             -> BufferObject
-             -> IO ()
-updateBuffer updates bufferObject =
-  unless (IM.null updates)
-    $ do
-      let
-        stride = sizeOf . snd $ IM.findMin updates
-      bindBuffer ArrayBuffer $=! Just bufferObject
-      withMappedBuffer ArrayBuffer WriteOnly
-        (
-          \ptr ->
-            sequence_
-              [
-                ptr `plusPtr` (location * stride) `poke` value
-              |
-                (location, value) <- IM.toList updates
-              ]
-        )
-        $ fail . show
-      bindBuffer ArrayBuffer $=! Nothing
+function updateBuffer(gl, updates, bufferObject) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferObject)
+  updates.forEach(function(location, value) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, stride * location, value)
+  })
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
+}
 
 
-expandBuffer :: Storable a
-             => a
-             -> Int
-             -> Int
-             -> BufferObject
-             -> IO BufferObject
-expandBuffer exemplar oldSize newSize oldBufferObject =
-  do
-    let
-      stride = sizeOf exemplar
-    bindBuffer ArrayBuffer $=! Just oldBufferObject
-    oldValues <- newArray (0, oldSize) exemplar
-    touchStorableArray oldValues
-    withStorableArray oldValues
-      $ bufferSubData ArrayBuffer ReadFromBuffer 0 (fromIntegral $ oldSize * stride)
-    newValues <- getElems oldValues >>= newListArray (0, newSize) . (++ repeat exemplar)
-    deleteObjectName oldBufferObject
-    newBufferObject <- genObjectName
-    bindBuffer ArrayBuffer $=! Just newBufferObject
-    withStorableArray newValues
-      $ \ptr ->
-        bufferData ArrayBuffer $=! (fromIntegral $ newSize * stride, ptr, DynamicDraw)
-    bindBuffer ArrayBuffer $=! Nothing
-    return newBufferObject
+function expandBuffer(gl, stride, oldSize, newSize, oldBufferObject) {
+
+  var newBufferObject = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, newBufferObject)
+  gl.bufferData(newBufferObject, stride * newSize, gl.DYNAMIC_DRAW)
+
+  gl.bindBuffer(gl.COPY_READ_BUFFER, oldBufferObject)
+  gl.copyBufferSubData(gl.COPY_READY_BUFFER, gl.ARRAY_BUFFER, 0, 0, stride * oldSize)
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
+
+  gl.bindBuffer(gl.COPY_READY_BUFFER, null)
+  gl.deleteBuffer(oldBufferObject)
+
+  return newBufferObject
+
+}
 
 
 module.exports = {

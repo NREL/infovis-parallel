@@ -99,21 +99,25 @@ function bindColors(gl, shapeProgram, bufferObject) {
 }
 
 
-function bindAttributes(gl, instanced, index, description, buffer) {
+function bindAttributes(gl, instanced, location, description, buffer) {
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.vertexAttribPointer(
-    index
+    location
   , description.numComponents
   , gl.FLOAT
   , !description.isFloat
   , description.stride
   , 0
   )
-  if (instanced) {
-    ext = gl.getExtension("ANGLE_instanced_arrays")
-    ext.vertexAttribDivisorANGLE(index, 1)
-  }
-  gl.enableVertexAttribArray(index)
+  if (instanced)
+    gl.vertexAttribDivisor(location, 1)
+  gl.enableVertexAttribArray(location)
+  // FIXME: Do we need to unbind?
+//gl.bindBuffer(gl.ARRAY_BUFFER, null)
+}
+
+function unbindAttributes(gl, location) {
+  gl.disableVertexAttribArray(location)
 }
 
 

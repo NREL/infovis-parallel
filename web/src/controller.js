@@ -15,10 +15,14 @@ function echoHandler(connection, request) {
 }
 
 
+var theContext = null
+
+
 // Set up the document.
 function startup() {
 
-  var gl = uiCanvas.getContext("webgl")
+  theContexr = uiCanvas.getContext("webgl2")
+  gl = theContext
 
   gl.canvas.width  = window.innerWidth
   gl.canvas.height = window.innerHeight
@@ -35,6 +39,7 @@ module.exports = {
   Configuration : Configuration
 , Connection    : Connection
 , Rendering     : Rendering
+, context       : () => theContext
 , handler       : echoHandler
 , startup       : startup
 }
