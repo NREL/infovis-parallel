@@ -57,7 +57,7 @@ function prepareShapeProgram(gl) {
 
 
 function selectShapeProgram(gl, shapeProgram) {
-  gl.useProgram(shapeProgram.program)
+  gl.useProgram(shapeProgram == null ? null : shapeProgram.program)
 }
 
 

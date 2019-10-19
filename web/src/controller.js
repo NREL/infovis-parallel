@@ -3,7 +3,8 @@ const Configuration = require("./configuration")
 const Connection    = require("./connection"   )
 
 const Rendering = {
-  Program : require("./rendering/program")
+  Buffers : require("./rendering/buffers")
+, Program : require("./rendering/program")
 , Shapes  : require("./rendering/shapes" )
 }
 

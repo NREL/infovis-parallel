@@ -199,7 +199,7 @@ function cone(l, d) {
   alpha = 2 * pi / n
 
   // Triangles.
-  return Array.from({length: n}, (v,k) => k + 1).map(i =>
+  return Array.from({length: n}, (v, k) => k + 1).map(i =>
     [
       Vertex3(0, 0                       , 0                       )
     , Vertex3(l, r * cos(alpha *  i     ), r * sin(alpha *  i     ))
