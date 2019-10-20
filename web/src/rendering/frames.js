@@ -143,7 +143,6 @@ function resetDisplay(display) {
 
 function createDisplay(shapeProgram, shapeMesh) {
   var display = {
-    labelDisplay : shapeMesh == MESH_Label
   , geometries   : {}
   ]
   if (!display.labelDisplay)

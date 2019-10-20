@@ -15,7 +15,7 @@
           <th colspan="4">Server</th>
         </tr>
         <tr>
-          <td><button id="uiConnect" type="button" onclick="Controller.Connection.reconnect(Controller.Configuration.update(), Controller.handler)">connect</button></td>
+          <td><button id="uiConnect" type="button" onclick="Controller.startVisualizing()">connect</button></td>
           <td colspan="3"><input id="uiAddress" type="text" value="ws://127.0.0.1"/></td>
         </tr>
         <tr>
@@ -96,7 +96,7 @@
     </div>
     <div id="uiVisualize">
         <div id="uiDisconnector">
-          <button id="uiDisconnect" type="button" onclick="Controller.Connection.unconnect()">disconnect</button>
+          <button id="uiDisconnect" type="button" onclick="Controller.stopVisualizing()">disconnect</button>
         </div>
         <canvas id="uiCanvas" width="640" height="480"></canvas>
     </div>
