@@ -1,4 +1,8 @@
 
+const Geometry = require("./geometry")
+const Linear   = require("./linear"  )
+
+
 function listFrames(manager) {
   return Object.keys(manager.frames)
 }
@@ -80,16 +84,24 @@ function mesh(shapeMesh) {
 }
 
 
-findShapeMesh :: Shape
-              -> ShapeMesh
-findShapeMesh shape =
-  case shape of
-    Points     Cube   _ -> CubeMesh
-    Points     Sphere _ -> SphereMesh
-    Polylines         _ -> PolylineMesh
-    Rectangles        _ -> RectangleMesh
-    Label             _ -> LabelMesh
-    Axis              _ -> AxisMesh
+function findShapeMesh(deltaGeometry) {
+  switch (deltaGeometry.getType() {
+    case Geometry.GEOMETRY_Points:
+      if (deltaGlyph(deltaGeometry))
+        return deltaGeometry.getGlyp() == Geometry.GLYPH_Sphere ? MESH_Sphere : MESH_Cube
+      else
+        return 0
+    case Geometry.GEOMETRY_Polylines:
+      return MESH_Polyline
+    case Geometry.GEOMETRY_Rectangles:
+      return MESH_Rectangle
+    case Geometry.GEOMETRY_Label:
+      return MESH_Label
+    case Geometry.GEOMETRY_Axis:
+      return MESH_Axis
+  }
+  return 0
+}
 
 
 function createFrame(shapeProgram) {
@@ -171,160 +183,149 @@ function drawDisplay(gl, display) {
 }
 
 
-merge :: Geometry
-      -> DeltaGeometry
-      -> Geometry
-merge Geometry{..} DeltaGeometry{..} =
-  Geometry
-  {
-    shape = case (deltaShape, deltaGlyph) of
-              (Just (Points _ pps), Just g') -> Points g' pps
-              (Just shape'        , _      ) -> shape'
-              _                              -> shape
-  , size  = fromMaybe size  deltaSize
-  , color = fromMaybe color deltaColor
-  , text  = fromMaybe text  deltaText
-  }
-
-
 const REVISION_Insertion  = 1
 const REVISION_Deletion   = 2
 const REVISION_Recoloring = 3
 const REVISION_None       = 4
 
 
-revision :: ShapeMesh
-         -> DeltaGeometry
-         -> M.Map Identifier Geometry
-         -> Revision
-revision shapeMesh DeltaGeometry{..} geometries' =
-  let
-    old = identifier `M.lookup` geometries'
-    Just shapeMesh' = findShapeMesh <$> deltaShape
-    CubeMesh   `morph` SphereMesh = True
-    SphereMesh `morph` CubeMesh   = True
-    _          `morph` _          = False
-  in
-    case (old, deltaShape, deltaSize, deltaColor, shapeMesh == shapeMesh', shapeMesh `morph` shapeMesh') of
-      (Nothing, Just _, _     , _     , True , _    ) -> Insertion
-      (Nothing, _     , _     , _     , _    , _    ) -> None
-      (_      , Just _, _     , _     , False, True ) -> Deletion
-      (_      , Just _, _     , _     , False, _    ) -> None
-      (_      , Just _, _     , _     , _    , _    ) -> Insertion
-      (_      , _     , Just _, _     , _    , _    ) -> Insertion
-      (_      , _     , _     , Just _, _    , _    ) -> Recoloring
-      (_      , _     , _     , _     , _    , _    ) -> None
+function revision(shapeMesh, deltaGeometry, geometries) {
+
+  const shapeMesh1 = findShapeMesh(deltaGeometry)
+
+  const old   = deltaGeometry.getIden() in geometries
+  const shape = Geometry.deltaPosition(deltaGeometry)
+  const size  = Geometry.deltaSize    (deltaGeometry)
+  const color = Geometry.deltaColor   (deltaGeometry)
+  const mesh  = shapeMesh1 != 0 && shapeMesh1 != shapeMesh
+  const morph = shapeMesh == MESH_Cube   && shapeMesh1 == MESH_Sphere ||
+                shapeMesh == MESH_Sphere && shapeMesh1 == MESH_Cube
+
+  if (!old && shape)
+    return REVISION_Insertion
+  if (!old)
+    return REVISION_None
+  if (shape && !mesh && morph)
+    return REVISION_Deletion
+  if (shape && !mesh)
+    return REVISION_None
+  if (shape || size)
+    return REVISION_Insertion
+  if (color)
+    return REVISION_Recoloring
+  return REVISION_None
+
+}
 
 
 function deleteDisplay(display, identifiers) {
-  
-deleteDisplay :: Display
-              -> [Identifier]
-              -> Display
-deleteDisplay display@LabelDisplay{..} identifiers =
-  display
-    & over geometriesLens
-      (flip (foldl (flip M.delete)) identifiers)
-deleteDisplay display@ShapeDisplay{..} identifiers =
-  display
-    & over geometriesLens
-      (flip (foldl (flip M.delete)) identifiers)
-    & over bufferLens
-      (flip (foldl deleteInstance) identifiers)
+  identifiers.forEach(identifier => delete display.geometries[identifier)
+  if ("buffer" in display)
+    identifiers.forEach(identifier => display.buffer.deleteInstance(identifier))
+}
 
 
-insertDisplay :: DeltaGeometry
-              -> ShapeMesh
-              -> Display
-              -> Display
-insertDisplay deltaGeometry@DeltaGeometry{..} shapeMesh display@LabelDisplay{..} =
-  let
-    old = M.findWithDefault def identifier geometries
-    new = old `merge` deltaGeometry
-  in
-    case revision shapeMesh deltaGeometry geometries of
-      None      -> display
-      Deletion  -> display
-                     & over geometriesLens (M.delete identifier)
-      _         -> display
-                     & over geometriesLens (M.insert identifier new)
-insertDisplay deltaGeometry@DeltaGeometry{..} shapeMesh display@ShapeDisplay{..} =
-  let
-    old = M.findWithDefault def identifier geometries
-    new = old `merge` deltaGeometry
-  in
-    case revision shapeMesh deltaGeometry geometries of
-      None      -> display
-      Deletion  -> display
-                     & over geometriesLens (M.delete identifier)
-                     & over bufferLens     (`deleteInstance` identifier)
-      Insertion -> display
-                     & over geometriesLens (M.insert identifier new)
-                     & over bufferLens     (updateDisplay (identifier, new) . flip deleteInstance identifier)
-      Recoloring-> display
-                     & over geometriesLens (M.insert identifier new)
-                     & over bufferLens     (updateColor (identifier, color new))
-    
+function insertDisplay(deltaGeometry, shapeMesh, display) {
+  const hasBuffer = "buffer" in display
+  const old = (identifier in display.geometries) ? display.geometries[identifier] : Geometry.defaultGeometry
+  const new1 = Geometry.merge(old, deltaGeometry)
+  switch (revision(shapeMesh, deltaGeometry, geometries) {
+    case REVISION_None:
+      break
+    case REVISION_Deletion:
+      {
+        delete display.geometries[identifier]
+        if (hasBuffer)
+          deleteInstance(identifier, display.buffer)
+        break
+      }
+    case REVISION_Insertion
+      {
+        display.geometries[identifier] = new1
+        if (hasBuffer) {
+          deleteInstance(identifier, display.buffer)
+          updateDisplay(identifier, new1, display.buffer)
+        }
+        break
+      }
+    case REVISION_Recoloring:
+      {
+        display.geometries[identifier] = new1
+        if (hasBuffer)
+          updateColor(identifier, new1.color, display.buffer)
+        break
+      }
+  }
+}
 
-updateDisplay :: (Identifier, Geometry)
-              -> ShapeBuffer
-              -> ShapeBuffer
-updateDisplay (identifier, Geometry{..}) =
-  let
-    noRotation = Quaternion 1 $ V3 0 0 0
-    right = V3 1 0 0
-    back = V3 0 0 1
-    toPosition (P (V3 x y z)) = realToFrac <$> Vertex3 x y z
-    toRotation (Quaternion w (V3 x y z)) = realToFrac <$> Vector4 x y z w
-    toScale (V3 x y z) = realToFrac <$> Vector3 x y z
-    (positions, rotations, scales) =
-      unzip3 $ case shape of
-        Points _   pss -> let
-                            make p = (p, noRotation, V3 size size size)
-                          in
-                            make <$> concat pss
-        Polylines  pps -> let
-                            make u0 u1 =
-                              let
-                                ud = u1 .-. u0
-                                uc = u0 .+^ ud / 2
-                              in
-                                (
-                                  uc
-                                , rotationFromVectorPair right ud
-                                , V3 (norm ud) size size
-                                )
-                          in
-                            zipWith make (concatMap init pps) (concatMap tail pps)
-        Rectangles pps -> let
-                            make (o, u, v) =
-                              let
-                                w = norm $ u .-. o
-                                h = norm $ v .-. o
-                                q = rotationFromPlane right back o u v
-                              in
-                                (
-                                  o .+^ q `rotate` V3 (w / 2) 0 (h / 2)
-                                , q
-                                , V3 w size h
-                                )
-                          in
-                            make <$> pps
-        Label      _   -> undefined
-        Axis  (u0, u1) -> let
-                            ud = u1 .-. u0
-                            uc = u0 .+^ ud / 2
-                          in
-                            [(
-                              uc
-                            , rotationFromVectorPair right ud
-                            , V3 (norm ud) size size
-                            )]
-  in
-      updateColor     (identifier,                color    )
-    . updateScales    (identifier, toScale    <$> scales   )
-    . updateRotations (identifier, toRotation <$> rotations)
-    . insertPositions (identifier, toPosition <$> positions)
+
+function updateDisplay(identifier, geometry, shapeBuffer) {
+
+  const positions = []
+  const rotations = []
+  const scales    = [] 
+
+  const noRotation = Vector4(0, 0, 0, 1)
+  const unitSize = Vector3(1, 1, 1)
+  const right = Vector3(1, 0, 0)
+  const back  = Vector3(0, 0, 1)
+
+  if ("points" in geometry) {
+
+    positions.push.apply(positions, geometry.points.flat())
+    rotations.push.apply(rotations, positions.map(point => noRotation)
+    scales.push.apply(scales, positions.map(point => vec3.fromValues(geometry.size, geometry.size, geometry.size))
+
+  } else if ("polylines" in geometry) {
+
+    geometry.polylines.map(polyline => [
+      polyline.slice(0, polyline.length - 1)
+    , polyline.slice(1, polyline.length    )
+    ]).flat().forEach(function(u0, u1) {
+      const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
+      const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
+      positions.push(uc)
+      rotations.push(Linear.rotationFromVectorPair(right, ud))
+      scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size))
+    })
+
+
+  } else if ("rectangles" in geometry) {
+
+    geometry.rectangles.forEach(function([o, u, v]) {
+      const w = vec3.length(vec3.scaleAndAdd(vec3.create(), u, o, -1))
+      const h = vec3.length(vec3.scaleAndAdd(vec3.create(), v, o, -1))
+      const q = Linear.rotationFromPlane(right, back, o, u, v)
+      positions.push(vec3.add(
+        vec3.create()
+      , o
+      , vec3.transformQuat(vec3.create(), vec3.fromValues(w / 2, 0, h / 2), q)
+      )
+      rotations.push(q)
+      scales.push(vec3.fromValues(w, geometry.size, h))
+    })
+
+  } else if ("label" in geometry) {
+
+    undefined
+
+  } else if ("axis" in geometry) {
+
+    const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
+    const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
+
+    positions.push(uc)
+    rotations.push(Linear.rotationFromVectorPair(right, ud))
+    scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size)
+
+  }
+
+  shapeBuffer.insertPositions(identifier, positions)
+  shapeBuffer.updateRotations(identifier, rotations)
+  shapeBuffer.updateScales   (identifier, scales   )
+  shapeBuffer.updateColor    (identifier, color    )
+
+}
 
 
 module.exports = {
