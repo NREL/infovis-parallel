@@ -1,4 +1,5 @@
-const Transport     = require("./transport"    )
+
+const Transport = require("./transport")
 
 
 var theConnection = null
@@ -9,18 +10,21 @@ function updateButtons() {
   uiVisualize.style.visibility = theConnection != null ? "visible" : "hidden"
 }
 
+
 function disconnected() {
   console.log("Disconnected")
   theConnection = null
   updateButtons()
 }
 
+
 function reconnect(configuration, handler) {
-  var url = configuration.server.address
+  const url = configuration.server.address
   console.log("Connect:", url)
   theConnection = Transport.connect(url, handler, disconnected)
   updateButtons()
 }
+
 
 function unconnect() {
   console.log("Disconnect")

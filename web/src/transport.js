@@ -1,14 +1,15 @@
+
 require("./infovis.proto3_pb")
 
 
 function connect(url, handler, closer) {
-  var connection = new WebSocket(url)
+  const connection = new WebSocket(url)
   connection.binaryType = "arraybuffer"
   handlers = new Object()
   connection.onmessage =
     function(event) {
-      var buffer = new Uint8Array(event.data);
-      var request = proto.Infovis.Request.deserializeBinary(buffer)
+      const buffer = new Uint8Array(event.data);
+      const request = proto.Infovis.Request.deserializeBinary(buffer)
       handler(connection, request)
     }
   connection.onclose = closer

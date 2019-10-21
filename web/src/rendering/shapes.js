@@ -1,8 +1,8 @@
 
-const glMatrix = require("../gl-matrix")
+require("../gl-matrix")
 
 
-const Vertex3 = glMatrix.vec3.fromValues
+const vec3 = glMatrix.vec3
 
 
 function box(x, y, z) {
@@ -10,14 +10,14 @@ function box(x, y, z) {
   x1 = x / 2
   y1 = y / 2
   z1 = z / 2
-  p1 = Vertex3( x1,  y1,  z1)
-  p2 = Vertex3( x1,  y1, -z1)
-  p3 = Vertex3( x1, -y1,  z1)
-  p4 = Vertex3( x1, -y1, -z1)
-  p5 = Vertex3(-x1,  y1,  z1)
-  p6 = Vertex3(-x1,  y1, -z1)
-  p7 = Vertex3(-x1, -y1,  z1)
-  p8 = Vertex3(-x1, -y1, -z1)
+  p1 = vec3.fromValues( x1,  y1,  z1)
+  p2 = vec3.fromValues( x1,  y1, -z1)
+  p3 = vec3.fromValues( x1, -y1,  z1)
+  p4 = vec3.fromValues( x1, -y1, -z1)
+  p5 = vec3.fromValues(-x1,  y1,  z1)
+  p6 = vec3.fromValues(-x1,  y1, -z1)
+  p7 = vec3.fromValues(-x1, -y1,  z1)
+  p8 = vec3.fromValues(-x1, -y1, -z1)
 
   // Quads.
   return [
@@ -43,22 +43,22 @@ function tube(l, d) {
   u = s / 2
   v = u + s * Math.sqrt(2)
   h = l / 2
-  p1 = Vertex3(-h,  u,  v)
-  p2 = Vertex3(-h,  v,  u)
-  p3 = Vertex3(-h,  v, -u)
-  p4 = Vertex3(-h,  u, -v)
-  p5 = Vertex3(-h, -u, -v)
-  p6 = Vertex3(-h, -v, -u)
-  p7 = Vertex3(-h, -v,  u)
-  p8 = Vertex3(-h, -u,  v)
-  q1 = Vertex3( h,  u,  v)
-  q2 = Vertex3( h,  v,  u)
-  q3 = Vertex3( h,  v, -u)
-  q4 = Vertex3( h,  u, -v)
-  q5 = Vertex3( h, -u, -v)
-  q6 = Vertex3( h, -v, -u)
-  q7 = Vertex3( h, -v,  u)
-  q8 = Vertex3( h, -u,  v)
+  p1 = vec3.fromValues(-h,  u,  v)
+  p2 = vec3.fromValues(-h,  v,  u)
+  p3 = vec3.fromValues(-h,  v, -u)
+  p4 = vec3.fromValues(-h,  u, -v)
+  p5 = vec3.fromValues(-h, -u, -v)
+  p6 = vec3.fromValues(-h, -v, -u)
+  p7 = vec3.fromValues(-h, -v,  u)
+  p8 = vec3.fromValues(-h, -u,  v)
+  q1 = vec3.fromValues( h,  u,  v)
+  q2 = vec3.fromValues( h,  v,  u)
+  q3 = vec3.fromValues( h,  v, -u)
+  q4 = vec3.fromValues( h,  u, -v)
+  q5 = vec3.fromValues( h, -u, -v)
+  q6 = vec3.fromValues( h, -v, -u)
+  q7 = vec3.fromValues( h, -v,  u)
+  q8 = vec3.fromValues( h, -u,  v)
 
   // Quads.
   return [
@@ -87,18 +87,18 @@ function icosahedron(d) {
   x = d / 2 / Math.sqrt(1 + phi * phi)
   z = phi * x
   n = 0
-  p00 = Vertex3(-x,  n,  z)
-  p01 = Vertex3( x,  n,  z)
-  p02 = Vertex3(-x,  n, -z)
-  p03 = Vertex3( x,  n, -z)
-  p04 = Vertex3( n,  z,  x)
-  p05 = Vertex3( n,  z, -x)
-  p06 = Vertex3( n, -z,  x)
-  p07 = Vertex3( n, -z, -x)
-  p08 = Vertex3( z,  x,  n)
-  p09 = Vertex3(-z,  x,  n)
-  p10 = Vertex3( z, -x,  n)
-  p11 = Vertex3(-z, -x,  n)
+  p00 = vec3.fromValues(-x,  n,  z)
+  p01 = vec3.fromValues( x,  n,  z)
+  p02 = vec3.fromValues(-x,  n, -z)
+  p03 = vec3.fromValues( x,  n, -z)
+  p04 = vec3.fromValues( n,  z,  x)
+  p05 = vec3.fromValues( n,  z, -x)
+  p06 = vec3.fromValues( n, -z,  x)
+  p07 = vec3.fromValues( n, -z, -x)
+  p08 = vec3.fromValues( z,  x,  n)
+  p09 = vec3.fromValues(-z,  x,  n)
+  p10 = vec3.fromValues( z, -x,  n)
+  p11 = vec3.fromValues(-z, -x,  n)
 
   // Triangles.
   return [
@@ -131,10 +131,10 @@ function rectangle(h, w) {
 
   h2 = h / 2
   w2 = w / 2
-  p1 = Vertex3( h2, 0,  w2)
-  p2 = Vertex3( h2, 0, -w2)
-  p3 = Vertex3(-h2, 0,  w2)
-  p4 = Vertex3(-h2, 0, -w2)
+  p1 = vec3.fromValues( h2, 0,  w2)
+  p2 = vec3.fromValues( h2, 0, -w2)
+  p3 = vec3.fromValues(-h2, 0,  w2)
+  p4 = vec3.fromValues(-h2, 0, -w2)
 
   // Quads.
   return [
@@ -152,8 +152,8 @@ function square(w) {
 
 function arrow(l, d, f, o) {
 
-  t = tube(l, d).map(v => Vertex3(v[0] > 0 ? (1 - f) * v[0] : v[0], v[1], v[2]))
-  q0 = Vertex3(l / 2, 0, 0)
+  t = tube(l, d).map(v => vec3.fromValues(v[0] > 0 ? (1 - f) * v[0] : v[0], v[1], v[2]))
+  q0 = vec3.fromValues(l / 2, 0, 0)
   q1 = t[ 1]
   q2 = t[ 2]
   q3 = t[ 6]
@@ -163,10 +163,10 @@ function arrow(l, d, f, o) {
   q7 = t[22]
   q8 = t[26]
   function out(v) {
-    return Vertex3(v[0], o * v[1], o * v[2])
+    return vec3.fromValues(v[0], o * v[1], o * v[2])
   }
   function mid(u, v) {
-    return Vertex3((u[0] + v[0]) / 2, o * (u[1] + v[1]) / 2, o * (u[2] + v[2]) / 2)
+    return vec3.fromValues((u[0] + v[0]) / 2, o * (u[1] + v[1]) / 2, o * (u[2] + v[2]) / 2)
   }
 
   // Quads.
@@ -201,12 +201,12 @@ function cone(l, d) {
   // Triangles.
   return Array.from({length: n}, (v, k) => k + 1).map(i =>
     [
-      Vertex3(0, 0                       , 0                       )
-    , Vertex3(l, r * cos(alpha *  i     ), r * sin(alpha *  i     ))
-    , Vertex3(l, r * cos(alpha * (i + 1)), r * sin(alpha * (i + 1)))
-    , Vertex3(l, r * cos(alpha * (i + 1)), r * sin(alpha * (i + 1)))
-    , Vertex3(l, r * cos(alpha *  i     ), r * sin(alpha *  i     ))
-    , Vertex3(l, 0                       , 0                       )
+      vec3.fromValues(0, 0                       , 0                       )
+    , vec3.fromValues(l, r * cos(alpha *  i     ), r * sin(alpha *  i     ))
+    , vec3.fromValues(l, r * cos(alpha * (i + 1)), r * sin(alpha * (i + 1)))
+    , vec3.fromValues(l, r * cos(alpha * (i + 1)), r * sin(alpha * (i + 1)))
+    , vec3.fromValues(l, r * cos(alpha *  i     ), r * sin(alpha *  i     ))
+    , vec3.fromValues(l, 0                       , 0                       )
     ]
   ).flat()
 

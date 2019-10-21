@@ -1,11 +1,12 @@
-const GlMatrix = require("../gl-matrix")
+
+require("../gl-matrix")
 
 
-const zeroPosition = GlMatrix.vec3.fromValues(0, 0, 0)
+const zeroPosition = glMatrix.vec3.fromValues(0, 0, 0)
 
-const zeroRotation = GlMatrix.vec4.fromValues(0, 0, 0, 1)
+const zeroRotation = glMatrix.quat.fromValues(0, 0, 0, 1)
 
-const zeroScale = GlMatrix.vec3.fromValues(0, 0, 0)
+const zeroScale = glMatrix.vec3.fromValues(0, 0, 0)
 
 const zeroColor = 0.0
 
@@ -83,14 +84,14 @@ function insertPositions(identifier, positions, shapeBuffer) {
 
 function insertPosition(shapeBuffer, identifier, vertex) {
 
-  var empties1 = shapeBuffer.empties
-  var pendindSize1 = shapeBuffer.pendingSize
+  let empties1 = shapeBuffer.empties
+  let pendindSize1 = shapeBuffer.pendingSize
   if (empties1.length == 0) {
     empties1 = Array.from({length: pendingSize % 2 + 1}, (v, k) => pendingSize1 + k)
     pendingSize1 = pendingSize1 + empties1.length
   }
 
-  var location = null
+  let location = null
   empties1.forEach(function(x) {location = Math.min(location, x)})
   empties1.delete(location)
 
@@ -121,9 +122,9 @@ function updateScales(identifier, scales, shapeBuffer) {
 
 function updateAttributes(field, identifier, values, shapeBuffer) {
   if (identifier in shapeBuffer.locationses) {
-    var locations = shapeBuffer.locationses[identifier]
-    var revision = field.get(shapeBuffer)
-    for (var i = 0; i <= Math.min(locations.length, values.length); ++i)
+    const locations = shapeBuffer.locationses[identifier]
+    const revision = field.get(shapeBuffer)
+    for (let i = 0; i <= Math.min(locations.length, values.length); ++i)
       revisions[locations[i]] = values[i]
     field.set(shapeBuffer, revision)
   }
@@ -137,9 +138,9 @@ function updateColor(identifier, color, shapeBuffer) {
 
 function updateAttribute(field, identifier, value, shapeBuffer) {
   if (identifier in shapeBuffer.locationses) {
-    var locations = shapeBuffer.locationses[identifier]
-    var revision = field.get(shapeBuffer)
-    for (var i = 0; i <= locations.length; ++i)
+    const locations = shapeBuffer.locationses[identifier]
+    const revision = field.get(shapeBuffer)
+    for (let i = 0; i <= locations.length; ++i)
       revisions[locations[i]] = value
     field.set(shapeBuffer, revision)
   }
@@ -148,7 +149,7 @@ function updateAttribute(field, identifier, value, shapeBuffer) {
 
 function deleteInstance(shapeBuffer, identifier) {
   if (identifier in shapeBuffer.locationses) {
-    var locations = shapeBuffer.locationses
+    const locations = shapeBuffer.locationses
     locations.forEach(function(location) {
       shapeBuffer.empties.add(location)
       shapeBuffer.pendingScales[location] = zeroScale
@@ -177,7 +178,7 @@ function updateShapeBuffer(gl, shapeBuffer) {
   updateBuffer(gl, shapeBuffer.pendingScales   , shapeBuffer.scales   )
   updateBuffer(gl, shapeBuffer.pendingColors   , shapeBuffer.colors   )
 
-  var location = null
+  let location = null
   Object.values(shapeBuffer.locationses).forEach(xs =>
     xs.forEach(
       function(x) {
@@ -197,8 +198,8 @@ function updateShapeBuffer(gl, shapeBuffer) {
 
 function expandShapeBuffer(gl, shapeBuffer) {
 
-  var size        = shapeBuffer.size
-  var pendingSize = shapeBuffer.pendingSize
+  const size        = shapeBuffer.size
+  const pendingSize = shapeBuffer.pendingSize
 
   if (pendingSize <= size)
     return
@@ -220,7 +221,7 @@ function drawInstances(gl, shapeBuffer) {
   if (shapeBuffer.size == 0)
     return
 
-  shapeProgram = shapeBuffer.shapeProgram
+  const shapeProgram = shapeBuffer.shapeProgram
 
   selectShapeProgram(gl, shapeProgram)
 
@@ -240,7 +241,7 @@ function drawInstances(gl, shapeBuffer) {
 
 
 function buildBuffer(gl, primitives) {
-  var bufferObject = gl.createBuffer()
+  const bufferObject = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferObject)
   gl.bufferData(gl.ARRAY_BUFFER, primitives, gl.DYNAMIC_DRAW)
   gl.bindBuffer(gl.ARRAY_BUFFER, null)
@@ -259,7 +260,7 @@ function updateBuffer(gl, updates, bufferObject) {
 
 function expandBuffer(gl, stride, oldSize, newSize, oldBufferObject) {
 
-  var newBufferObject = gl.createBuffer()
+  const newBufferObject = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, newBufferObject)
   gl.bufferData(newBufferObject, stride * newSize, gl.DYNAMIC_DRAW)
 

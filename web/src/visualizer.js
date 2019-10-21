@@ -25,7 +25,7 @@ function setup(gl) {
 
 
 function visualizeBuffers(gl, configuration) {
-  var graphics = Graphics.initialize(
+  const graphics = Graphics.initialize(
     gl
   , [configuration.initial.view.position, configuration.initial.view.orientation]
   , [configuration.initial.tool.position, configuration.initial.tool.orientation]

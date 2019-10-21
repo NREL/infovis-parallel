@@ -1,9 +1,10 @@
 
-const GlMatrix = require("../gl-matrix")
+require("../gl-matrix")
 
-const vec3 = GlMatrix.vec3
-const quat = GlMatrix.quat
-const mat3 = GlMatrix.mat4
+
+const mat3 = glMatrix.mat4
+const quat = glMatrix.quat
+const vec3 = glMatrix.vec3
 
 
 function quatFromPair(v, s) {
@@ -12,6 +13,7 @@ function quatFromPair(v, s) {
 
 
 const zero = vec3.create()
+
 
 const basis = [
   vec3.fromValues(1, 0, 0)
@@ -130,7 +132,7 @@ function distanceOnSegment(un, alpha) {
 function boxCoordinates(po, pu, pv, pw, ps) {
   const s = vec3.scaleAndAdd(vec3.create(), ps, po, -1)
   const u = vec3.scaleAndAdd(vec3.create(), pu, po, -1)
-  var e = basis[0]
+  let e = basis[0]
   basis.forEach(function(e1) {
     if (!GlMatrix.equals(vec3.dot(u, e1))) {
       e = ee

@@ -105,7 +105,7 @@ function findShapeMesh(deltaGeometry) {
 
 
 function createFrame(shapeProgram) {
-  var frame = {}
+  const frame = {}
   [
     MESH_Cube
   , MESH_Sphere
@@ -154,9 +154,9 @@ function resetDisplay(display) {
 
 
 function createDisplay(shapeProgram, shapeMesh) {
-  var display = {
+  const display = {
   , geometries   : {}
-  ]
+  }
   if (!display.labelDisplay)
     display.buffer = createShapeBuffer(program, mesh(shapeMesh))
   return display
@@ -265,10 +265,9 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
   const rotations = []
   const scales    = [] 
 
-  const noRotation = Vector4(0, 0, 0, 1)
-  const unitSize = Vector3(1, 1, 1)
-  const right = Vector3(1, 0, 0)
-  const back  = Vector3(0, 0, 1)
+  const noRotation = quat.fromValues(0, 0, 0, 1)
+  const right = vec3.fromValues(1, 0, 0)
+  const back  = vec3.fromValues(0, 0, 1)
 
   if ("points" in geometry) {
 

@@ -1,4 +1,8 @@
-const GlMatrix = require("../gl-matrix")
+
+require("../gl-matrix")
+
+
+const mat4 = glMatrix.mat4
 
 
 vertexShaderSource = `
@@ -30,9 +34,9 @@ void main() {
 
 function prepareShapeProgram(gl) {
 
-  var program = gl.createProgram()
+  const program = gl.createProgram()
 
-  vertexShader = gl.createShader(gl.VERTEX_SHADER)
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER)
   gl.shaderSource(vertexShader, vertexShaderSource)
   gl.compileShader(vertexShader)
   gl.attachShader(program, vertexShader)
@@ -62,15 +66,13 @@ function selectShapeProgram(gl, shapeProgram) {
 
 
 function setProjectionModelView(gl, shapeProgram, projection, modelView) {
-  matrx = makeMatrix(projection, modelView)
+  const matrx = makeMatrix(projection, modelView)
   gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, matrx)
 }
 
 
 function makeMatrix(gl, projection, modelView) {
-  result = GlMatrix.mat4.create()
-  GlMatrix.mat4.multiply(result, projection, modelView)
-  return result
+  return mat4.multiply(mat4.create(), projection, modelView)
 }
 
 

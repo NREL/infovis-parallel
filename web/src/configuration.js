@@ -1,3 +1,4 @@
+
 const CONFIGURATION_KEY = "configuration"
 
 
@@ -33,7 +34,7 @@ var theConfiguration = defaultConfiguration
 
 function get() {
 
-  configuration = defaultConfiguration
+  const configuration = defaultConfiguration
 
   configuration.server.address = uiAddress.value
 
@@ -78,43 +79,41 @@ function get() {
 
 function put() {
 
-  configuration = theConfiguration
+  uiAddress.value = theConfiguration.server.address
 
-  uiAddress.value = configuration.server.address
+  uiStereo.checked  = theConfiguration.display.stereo
+  uiNearPlane.value = theConfiguration.display.nearPlane
+  uiFarPlane.value  = theConfiguration.display.farPlane
 
-  uiStereo.checked  = configuration.display.stereo
-  uiNearPlane.value = configuration.display.nearPlane
-  uiFarPlane.value  = configuration.display.farPlane
+  uiEyeSeparationX.value = theConfiguration.display.eyeSeparation[0]
+  uiEyeSeparationY.value = theConfiguration.display.eyeSeparation[1]
+  uiEyeSeparationZ.value = theConfiguration.display.eyeSeparation[2]
 
-  uiEyeSeparationX.value = configuration.display.eyeSeparation[0]
-  uiEyeSeparationY.value = configuration.display.eyeSeparation[1]
-  uiEyeSeparationZ.value = configuration.display.eyeSeparation[2]
+  uiLowerLeftX.value = theConfiguration.display.lowerLeft[0]
+  uiLowerLeftY.value = theConfiguration.display.lowerLeft[1]
+  uiLowerLeftZ.value = theConfiguration.display.lowerLeft[2]
 
-  uiLowerLeftX.value = configuration.display.lowerLeft[0]
-  uiLowerLeftY.value = configuration.display.lowerLeft[1]
-  uiLowerLeftZ.value = configuration.display.lowerLeft[2]
+  uiLowerRightX.value = theConfiguration.display.lowerRight[0]
+  uiLowerRightY.value = theConfiguration.display.lowerRight[1]
+  uiLowerRightZ.value = theConfiguration.display.lowerRight[2]
 
-  uiLowerRightX.value = configuration.display.lowerRight[0]
-  uiLowerRightY.value = configuration.display.lowerRight[1]
-  uiLowerRightZ.value = configuration.display.lowerRight[2]
+  uiUpperLeftX.value = theConfiguration.display.upperLeft[0]
+  uiUpperLeftY.value = theConfiguration.display.upperLeft[1]
+  uiUpperLeftZ.value = theConfiguration.display.upperLeft[2]
 
-  uiUpperLeftX.value = configuration.display.upperLeft[0]
-  uiUpperLeftY.value = configuration.display.upperLeft[1]
-  uiUpperLeftZ.value = configuration.display.upperLeft[2]
+  uiViewPositionX.value    = theConfiguration.initial.view.position[0]
+  uiViewPositionY.value    = theConfiguration.initial.view.position[1]
+  uiViewPositionZ.value    = theConfiguration.initial.view.position[2]
+  uiViewOrientationX.value = theConfiguration.initial.view.orientation[0]
+  uiViewOrientationY.value = theConfiguration.initial.view.orientation[1]
+  uiViewOrientationZ.value = theConfiguration.initial.view.orientation[2]
 
-  uiViewPositionX.value    = configuration.initial.view.position[0]
-  uiViewPositionY.value    = configuration.initial.view.position[1]
-  uiViewPositionZ.value    = configuration.initial.view.position[2]
-  uiViewOrientationX.value = configuration.initial.view.orientation[0]
-  uiViewOrientationY.value = configuration.initial.view.orientation[1]
-  uiViewOrientationZ.value = configuration.initial.view.orientation[2]
-
-  uiToolPositionX.value    = configuration.initial.tool.position[0]
-  uiToolPositionY.value    = configuration.initial.tool.position[1]
-  uiToolPositionZ.value    = configuration.initial.tool.position[2]
-  uiToolOrientationX.value = configuration.initial.tool.orientation[0]
-  uiToolOrientationY.value = configuration.initial.tool.orientation[1]
-  uiToolOrientationZ.value = configuration.initial.tool.orientation[2]
+  uiToolPositionX.value    = theConfiguration.initial.tool.position[0]
+  uiToolPositionY.value    = theConfiguration.initial.tool.position[1]
+  uiToolPositionZ.value    = theConfiguration.initial.tool.position[2]
+  uiToolOrientationX.value = theConfiguration.initial.tool.orientation[0]
+  uiToolOrientationY.value = theConfiguration.initial.tool.orientation[1]
+  uiToolOrientationZ.value = theConfiguration.initial.tool.orientation[2]
 
 }
 
@@ -126,23 +125,20 @@ function store() {
 
 
 function retrieve() {
-  configuration = JSON.parse(localStorage.getItem(CONFIGURATION_KEY))
-  if (configuration == null)
-    configuration = defaultConfiguration
-  theConfiguration = configuration
+  theConfiguration = localStorage.getItem(CONFIGURATION_KEY) == null ? defaultConfiguration : JSON.parse(localStorage.getItem(CONFIGURATION_KEY))
   put()
 }
 
 
 function load() {
-  var input = document.createElement("input")
+  const input = document.createElement("input")
   input.type = "file"
   input.onchange = e => {
-    var file = e.target.files[0]
-    var reader = new FileReader()
+    const file = e.target.files[0]
+    const reader = new FileReader()
     reader.readAsText(file, "UTF-8")
     reader.onload = readerEvent => {
-      var content = readerEvent.target.result
+      const content = readerEvent.target.result
       theConfiguration = JSON.parse(content)
       put()
     }

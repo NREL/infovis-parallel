@@ -6,7 +6,7 @@ const Visualizer    = require("./visualizer"   )
 
 function echoHandler(connection, request) {
   console.log("Echo request: ", request)
-  window.request = request
+  window.lastRequest = request
 }
 
 
@@ -30,7 +30,7 @@ function startup() {
 
 
 function startVisualizing() {
-  var configuration = Configuration.update()
+  const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler)
   Visualizer.visualizeBuffers(theContext, configuration)
 }
