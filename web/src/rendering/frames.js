@@ -1,6 +1,8 @@
 
+const Buffers  = require("./buffers" )
 const Geometry = require("./geometry")
 const Linear   = require("./linear"  )
+const Program  = require("./program" )
 
 
 function listFrames(manager) {
@@ -10,7 +12,7 @@ function listFrames(manager) {
 
 function createManager(gl) {
   return {
-    program : prepareShapeProgram(gl)
+    program : Program.prepareShapeProgram(gl)
   , frames  : {}
   , current : 0
   }
@@ -85,7 +87,7 @@ function mesh(shapeMesh) {
 
 
 function findShapeMesh(deltaGeometry) {
-  switch (deltaGeometry.getType() {
+  switch (deltaGeometry.getType()) {
     case Geometry.GEOMETRY_Points:
       if (deltaGlyph(deltaGeometry))
         return deltaGeometry.getGlyp() == Geometry.GLYPH_Sphere ? MESH_Sphere : MESH_Cube
@@ -139,7 +141,7 @@ function deleteFrame(frame, identifiers) {
 
 
 function prepareFrame(gl, frame) {
-  Object.values(frame).forEach(display => prepareDisplay(gl, display)
+  Object.values(frame).forEach(display => prepareDisplay(gl, display))
 }
 
 
@@ -155,29 +157,29 @@ function resetDisplay(display) {
 
 function createDisplay(shapeProgram, shapeMesh) {
   const display = {
-  , geometries   : {}
+    geometries   : {}
   }
   if (!display.labelDisplay)
-    display.buffer = createShapeBuffer(program, mesh(shapeMesh))
+    display.buffer = Buffers.createShapeBuffer(program, mesh(shapeMesh))
   return display
 }
 
 
 function destoryDisplay(gl, display) {
   if ("buffer" in display)
-    destroyShapeBuffer(gl, display.buffer)
+    Buffers.destroyShapeBuffer(gl, display.buffer)
 }
 
 
 function prepareDisplay(gl, display) {
   if ("buffer" in display)
-    prepareShapeBuffer(gl, display.buffer)
+    Buffers.prepareShapeBuffer(gl, display.buffer)
 }
 
 
 function drawDisplay(gl, display) {
   if ("buffer" in display)
-    drawInstances(gl, display.buffer)
+    Buffers.drawInstances(gl, display.buffer)
   else
     ; // FIXME: Daw labels.
 }
@@ -219,9 +221,9 @@ function revision(shapeMesh, deltaGeometry, geometries) {
 
 
 function deleteDisplay(display, identifiers) {
-  identifiers.forEach(identifier => delete display.geometries[identifier)
+  identifiers.forEach(identifier => delete display.geometries[identifier])
   if ("buffer" in display)
-    identifiers.forEach(identifier => display.buffer.deleteInstance(identifier))
+    identifiers.forEach(identifier => Buffers.deleteInstance(display.buffer, identifier))
 }
 
 
@@ -229,21 +231,21 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
   const hasBuffer = "buffer" in display
   const old = (identifier in display.geometries) ? display.geometries[identifier] : Geometry.defaultGeometry
   const new1 = Geometry.merge(old, deltaGeometry)
-  switch (revision(shapeMesh, deltaGeometry, geometries) {
+  switch (revision(shapeMesh, deltaGeometry, geometries)) {
     case REVISION_None:
       break
     case REVISION_Deletion:
       {
         delete display.geometries[identifier]
         if (hasBuffer)
-          deleteInstance(identifier, display.buffer)
+          Buffers.deleteInstance(identifier, display.buffer)
         break
       }
-    case REVISION_Insertion
+    case REVISION_Insertion:
       {
         display.geometries[identifier] = new1
         if (hasBuffer) {
-          deleteInstance(identifier, display.buffer)
+          Buffers.deleteInstance(identifier, display.buffer)
           updateDisplay(identifier, new1, display.buffer)
         }
         break
@@ -252,7 +254,7 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
       {
         display.geometries[identifier] = new1
         if (hasBuffer)
-          updateColor(identifier, new1.color, display.buffer)
+          Buffers.updateColor(identifier, new1.color, display.buffer)
         break
       }
   }
@@ -272,8 +274,8 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
   if ("points" in geometry) {
 
     positions.push.apply(positions, geometry.points.flat())
-    rotations.push.apply(rotations, positions.map(point => noRotation)
-    scales.push.apply(scales, positions.map(point => vec3.fromValues(geometry.size, geometry.size, geometry.size))
+    rotations.push.apply(rotations, positions.map(point => noRotation))
+    scales.push.apply(scales, positions.map(point => vec3.fromValues(geometry.size, geometry.size, geometry.size)))
 
   } else if ("polylines" in geometry) {
 
@@ -299,7 +301,7 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
         vec3.create()
       , o
       , vec3.transformQuat(vec3.create(), vec3.fromValues(w / 2, 0, h / 2), q)
-      )
+      ))
       rotations.push(q)
       scales.push(vec3.fromValues(w, geometry.size, h))
     })
@@ -315,14 +317,14 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 
     positions.push(uc)
     rotations.push(Linear.rotationFromVectorPair(right, ud))
-    scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size)
+    scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size))
 
   }
 
-  shapeBuffer.insertPositions(identifier, positions)
-  shapeBuffer.updateRotations(identifier, rotations)
-  shapeBuffer.updateScales   (identifier, scales   )
-  shapeBuffer.updateColor    (identifier, color    )
+  Buffers.insertPositions(shapeBuffer, identifier, positions)
+  Buffers.updateRotations(shapeBuffer, identifier, rotations)
+  Buffers.updateScales   (shapeBuffer, identifier, scales   )
+  Buffers.updateColor    (shapeBuffer, identifier, color    )
 
 }
 

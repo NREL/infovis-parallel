@@ -208,10 +208,18 @@ function expandShapeBuffer(gl, shapeBuffer) {
     return Array.from({length: pendingSize}, (v, k) => value)
   }
 
-  shapeBuffer.positions = size == 0 ? buildBuffer(gl, replicate(zeroPosition)) : expandBuffer(gl, zeroPosition, size, pendingSize, shapeBuffer.positions)
-  shapeBuffer.rotations = size == 0 ? buildBuffer(gl, replicate(zeroRotation)) : expandBuffer(gl, zeroRotation, size, pendingSize, shapeBuffer.rotations)
-  shapeBuffer.scales    = size == 0 ? buildBuffer(gl, replicate(zeroScale   )) : expandBuffer(gl, zeroScale   , size, pendingSize, shapeBuffer.scales   )
-  shapeBuffer.colors    = size == 0 ? buildBuffer(gl, replicate(zeroColor   )) : expandBuffer(gl, zeroColor   , size, pendingSize, shapeBuffer.colors   )
+  shapeBuffer.positions = size == 0                                          ?
+    buildBuffer(gl, replicate(zeroPosition))                                 :
+    expandBuffer(gl, zeroPosition, size, pendingSize, shapeBuffer.positions)
+  shapeBuffer.rotations = size == 0                                          ?
+    buildBuffer(gl, replicate(zeroRotation))                                 :
+    expandBuffer(gl, zeroRotation, size, pendingSize, shapeBuffer.rotations)
+  shapeBuffer.scales    = size == 0                                          ?
+    buildBuffer(gl, replicate(zeroScale   ))                                 :
+    expandBuffer(gl, zeroScale   , size, pendingSize, shapeBuffer.scales   )
+  shapeBuffer.colors    = size == 0                                          ?
+    buildBuffer(gl, replicate(zeroColor   ))                                 :
+    expandBuffer(gl, zeroColor   , size, pendingSize, shapeBuffer.colors   )
 
 }
 
@@ -223,19 +231,19 @@ function drawInstances(gl, shapeBuffer) {
 
   const shapeProgram = shapeBuffer.shapeProgram
 
-  selectShapeProgram(gl, shapeProgram)
+  Program.selectShapeProgram(gl, shapeProgram)
 
 //FIXME: SYnc projection model view.
 
-  bindMesh     (gl, shapeProgram, shapeBuffer.mesh.right)
-  bindPositions(gl, shapeProgram, shapeBuffer.positions )
-  bindRotations(gl, shapeProgram, shapeBuffer.rotations )
-  bindScales   (gl, shapeProgram, shapeBuffer.scales    )
-  bindColors   (gl, shapeProgram, shapeBuffer.colors    )
+  Program.bindMesh     (gl, shapeProgram, shapeBuffer.mesh.right)
+  Program.bindPositions(gl, shapeProgram, shapeBuffer.positions )
+  Program.bindRotations(gl, shapeProgram, shapeBuffer.rotations )
+  Program.bindScales   (gl, shapeProgram, shapeBuffer.scales    )
+  Program.bindColors   (gl, shapeProgram, shapeBuffer.colors    )
 
   gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)
 
-  selectShapeProgram(gl, null)
+  Program.selectShapeProgram(gl, null)
 
 }
 

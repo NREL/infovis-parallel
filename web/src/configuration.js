@@ -125,7 +125,9 @@ function store() {
 
 
 function retrieve() {
-  theConfiguration = localStorage.getItem(CONFIGURATION_KEY) == null ? defaultConfiguration : JSON.parse(localStorage.getItem(CONFIGURATION_KEY))
+  theConfiguration = localStorage.getItem(CONFIGURATION_KEY) == null ?
+    defaultConfiguration                                             :
+    JSON.parse(localStorage.getItem(CONFIGURATION_KEY))
   put()
 }
 

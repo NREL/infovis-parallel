@@ -1,8 +1,8 @@
 
-////const Rendering = {
-////  Frames   : require("../rendering/frames"  )
-////, Selector : require("../rendering/selector")
-////}
+const Rendering = {
+  Frames   : require("../rendering/frames"  )
+, Selector : require("../rendering/selector")
+}
 
 
 function initialize(gl, initialViewer, initialTool) {
@@ -145,7 +145,6 @@ function visualize(gl, viewer, initialViewer, initialTool, debug, logChannel, re
 ////          >>= swapMVar selectorRef
 ////        lockRef `putMVar` ()
 ////    postRedisplay Nothing
-}
 
 
 module.exports = {
