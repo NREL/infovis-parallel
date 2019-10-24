@@ -64,7 +64,7 @@ function prepareShapeProgram(gl) {
   gl.attachShader(program, vertexShader  )
   gl.attachShader(program, fragmentShader)
   gl.linkProgram(program)
-  const programSuccess = gl.getProgramParameter(program, gl.LINK_STATUS);
+  const programSuccess = gl.getProgramParameter(program, gl.LINK_STATUS)
   if (!programSuccess)
     throw "Could not link program: " + gl.getProgramInfoLog(program)
 

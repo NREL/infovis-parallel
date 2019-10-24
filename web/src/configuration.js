@@ -58,16 +58,16 @@ function get() {
   configuration.display.upperLeft[1] = uiUpperLeftY.value
   configuration.display.upperLeft[2] = uiUpperLeftZ.value
 
-  configuration.initial.view.position[0]    = uiViewPositionX.value
-  configuration.initial.view.position[1]    = uiViewPositionY.value
-  configuration.initial.view.position[2]    = uiViewPositionZ.value
+  configuration.initial.view.position   [0] = uiViewPositionX.value
+  configuration.initial.view.position   [1] = uiViewPositionY.value
+  configuration.initial.view.position   [2] = uiViewPositionZ.value
   configuration.initial.view.orientation[0] = uiViewOrientationX.value
   configuration.initial.view.orientation[1] = uiViewOrientationY.value
   configuration.initial.view.orientation[2] = uiViewOrientationZ.value
 
-  configuration.initial.tool.position[0]    = uiToolPositionX.value
-  configuration.initial.tool.position[1]    = uiToolPositionY.value
-  configuration.initial.tool.position[2]    = uiToolPositionZ.value
+  configuration.initial.tool.position   [0] = uiToolPositionX.value
+  configuration.initial.tool.position   [1] = uiToolPositionY.value
+  configuration.initial.tool.position   [2] = uiToolPositionZ.value
   configuration.initial.tool.orientation[0] = uiToolOrientationX.value
   configuration.initial.tool.orientation[1] = uiToolOrientationY.value
   configuration.initial.tool.orientation[2] = uiToolOrientationZ.value
@@ -101,16 +101,16 @@ function put() {
   uiUpperLeftY.value = theConfiguration.display.upperLeft[1]
   uiUpperLeftZ.value = theConfiguration.display.upperLeft[2]
 
-  uiViewPositionX.value    = theConfiguration.initial.view.position[0]
-  uiViewPositionY.value    = theConfiguration.initial.view.position[1]
-  uiViewPositionZ.value    = theConfiguration.initial.view.position[2]
+  uiViewPositionX.value    = theConfiguration.initial.view.position   [0]
+  uiViewPositionY.value    = theConfiguration.initial.view.position   [1]
+  uiViewPositionZ.value    = theConfiguration.initial.view.position   [2]
   uiViewOrientationX.value = theConfiguration.initial.view.orientation[0]
   uiViewOrientationY.value = theConfiguration.initial.view.orientation[1]
   uiViewOrientationZ.value = theConfiguration.initial.view.orientation[2]
 
-  uiToolPositionX.value    = theConfiguration.initial.tool.position[0]
-  uiToolPositionY.value    = theConfiguration.initial.tool.position[1]
-  uiToolPositionZ.value    = theConfiguration.initial.tool.position[2]
+  uiToolPositionX.value    = theConfiguration.initial.tool.position   [0]
+  uiToolPositionY.value    = theConfiguration.initial.tool.position   [1]
+  uiToolPositionZ.value    = theConfiguration.initial.tool.position   [2]
   uiToolOrientationX.value = theConfiguration.initial.tool.orientation[0]
   uiToolOrientationY.value = theConfiguration.initial.tool.orientation[1]
   uiToolOrientationZ.value = theConfiguration.initial.tool.orientation[2]

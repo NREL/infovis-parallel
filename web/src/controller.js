@@ -17,7 +17,7 @@ var theContext = null
 function startup() {
 
   theContext = uiCanvas.getContext("webgl2")
-  gl = theContext
+  const gl = theContext
 
   gl.canvas.width  = window.innerWidth
   gl.canvas.height = window.innerHeight
