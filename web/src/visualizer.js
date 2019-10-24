@@ -13,11 +13,6 @@ function setup(gl) {
   // FIXME: Experiment to see if this works well with alpha.
   gl.enable(gl.CULL_FACE)
 
-  // FIXME: In WebGL, this needs to be implemented in a fragment shader.
-/*
-   gl.alphaFunc(gl.GREATER, 0)
-*/
-
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
   gl.clearColor(0.0, 0.0, 0.0, 1.0)

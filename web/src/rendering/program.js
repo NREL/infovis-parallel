@@ -40,6 +40,8 @@ in  vec4 vColor  ;
 out vec4 outColor;
 
 void main(void) {
+  if (vColor.a <= 0.)
+    discard;
   outColor = vColor;
 }`
 
