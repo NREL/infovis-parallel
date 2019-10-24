@@ -5,8 +5,7 @@ require("../gl-matrix")
 const mat4 = glMatrix.mat4
 
 
-vertexShaderSource = `
-#version 130
+vertexShaderSource = `#version 300 es
 
 uniform mat4 projection_modelview;
 
@@ -17,30 +16,57 @@ in vec3 instance_scale   ;
 in vec4 instance_rotation;
 in uint instance_color   ;
 
+out vec4 vColor;
+
 vec3 rotate(vec3 p, vec4 q) {
-  return p + 2 * cross(q.xyz, cross(q.xyz, p) + q.w * p);
+  return p + 2. * cross(q.xyz, cross(q.xyz, p) + q.w * p);
 }
 
 void main() {
   vec4 position = vec4(rotate(mesh_position * instance_scale, instance_rotation) + instance_position, 1);
-  vec4 color = vec4(float((0xFF000000u & instance_color) >> 24) / 255,
-                    float((0x00FF0000u & instance_color) >> 16) / 255,
-                    float((0x0000FF00u & instance_color) >>  8) / 255,
-                    float( 0x000000FFu & instance_color       ) / 255);
   gl_Position = projection_modelview * position;
-  gl_FrontColor = color;
-}
-`
+  vColor = vec4(float((0xFF000000u & instance_color) >> 24) / 255.,
+                float((0x00FF0000u & instance_color) >> 16) / 255.,
+                float((0x0000FF00u & instance_color) >>  8) / 255.,
+                float( 0x000000FFu & instance_color       ) / 255.);
+}`
+
+
+fragmentShaderSource = `#version 300 es
+
+precision mediump float;
+
+in  vec4 vColor  ;
+out vec4 outColor;
+
+void main(void) {
+  outColor = vColor;
+}`
+
 
 function prepareShapeProgram(gl) {
-
-  const program = gl.createProgram()
 
   const vertexShader = gl.createShader(gl.VERTEX_SHADER)
   gl.shaderSource(vertexShader, vertexShaderSource)
   gl.compileShader(vertexShader)
-  gl.attachShader(program, vertexShader)
+  const vertexSuccess = gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)
+  if (!vertexSuccess)
+    throw "Could not compile vertex shader:" + gl.getShaderInfoLog(vertexShader)
+
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
+  gl.shaderSource(fragmentShader, fragmentShaderSource)
+  gl.compileShader(fragmentShader)
+  const fragmentSuccess = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)
+  if (!fragmentSuccess)
+    throw "Could not compile fragment shader: " + gl.getShaderInfoLog(fragmentShader)
+
+  const program = gl.createProgram()
+  gl.attachShader(program, vertexShader  )
+  gl.attachShader(program, fragmentShader)
   gl.linkProgram(program)
+  const programSuccess = gl.getProgramParameter(program, gl.LINK_STATUS);
+  if (!programSuccess)
+    throw "Could not link program: " + gl.getProgramInfoLog(program)
 
   return {
     program              : program
