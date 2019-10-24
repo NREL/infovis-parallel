@@ -13,10 +13,13 @@ controller.js: $(SRCS)
 clean:
 	rm controller.js
 
+lint:
+	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*,visualizer/*}.js
+
 install:
 	npm install webpack webpack-cli
 
 
 .SUFFIXES:
 
-.PHONY: all clean install
+.PHONY: all clean install lint

@@ -8,11 +8,11 @@ const vec3 = glMatrix.vec3
 
 function projectionKooimaOffAxis(display, eye) {
 
-  const nearPlane  = display.nearPlane
-  const farPlan    = display.farPlane
+  const near       = display.nearPlane
+  const far        = display.farPlane
   const lowerLeft  = display.lowerLeft
   const lowerRight = display.lowerRight
-  const upperLeft  = dislay.upperLeft
+  const upperLeft  = display.upperLeft
 
   // Orthonormal basis for screen.
   const vr = vec3.normalize(vec3.create(), vec3.scaleAndAdd(vec3.create(), lowerRight, lowerLeft, -1))
@@ -43,26 +43,26 @@ function projectionKooimaOffAxis(display, eye) {
   )
 
   // Frustum matrix.
-  frustum = mat4.fromValues(
+  const frustum = mat4.fromValues(
     2 * near / (right - left),                         0,   (right + left  ) / (right - left  ),                               0
-  ,                         0, 2 * near / (top - bottum),   (top   + bottom) / (top   - bottom),                               0
+  ,                         0, 2 * near / (top - bottom),   (top   + bottom) / (top   - bottom),                               0
   ,                         0,                         0, - (far   + near  ) / (far   - near  ), - 2 * far * near / (far - near)
   ,                         0,                         0,                                    -1,                               0
   )
 
   // Translation matrix.
-  translate = mat4.fromValues(
+  const translate = mat4.fromValues(
     1, 0, 0, eye[0]
   , 0, 1, 0, eye[1]
   , 0, 0, 1, eye[2]
   , 0, 0, 0,      1
   )
 
-  return mat4.multiply(mat4.create(), frustrum, mat4.multiply(mat4.create(), m, translate))
+  return mat4.multiply(mat4.create(), frustum, mat4.multiply(mat4.create(), m, translate))
 
 }
 
 
 module.exports = {
-  projection      : projection
+  projection      : projectionKooimaOffAxis
 }

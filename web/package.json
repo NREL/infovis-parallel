@@ -6,9 +6,12 @@
   "license": "MIT",
   "private": true,
   "main": "src/controller.js",
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9"
+    "webpack-cli": "^3.3.9",
+    "eslint": "^6.5.1",
+    "eslint-config-google": "^0.14.0"
   }
 }

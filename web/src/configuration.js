@@ -29,7 +29,7 @@ const defaultConfiguration =
   }
 
 
-var theConfiguration = defaultConfiguration
+let theConfiguration = defaultConfiguration
 
 
 function get() {
@@ -135,11 +135,11 @@ function retrieve() {
 function load() {
   const input = document.createElement("input")
   input.type = "file"
-  input.onchange = e => {
+  input.onchange = (e) => {
     const file = e.target.files[0]
     const reader = new FileReader()
     reader.readAsText(file, "UTF-8")
-    reader.onload = readerEvent => {
+    reader.onload = (readerEvent) => {
       const content = readerEvent.target.result
       theConfiguration = JSON.parse(content)
       put()

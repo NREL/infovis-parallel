@@ -2,7 +2,7 @@
 const Transport = require("./transport")
 
 
-var theConnection = null
+let theConnection = null
 
 
 function updateButtons() {

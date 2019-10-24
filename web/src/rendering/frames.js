@@ -3,6 +3,13 @@ const Buffers  = require("./buffers" )
 const Geometry = require("./geometry")
 const Linear   = require("./linear"  )
 const Program  = require("./program" )
+const Shapes   = require("./shapes"  )
+
+require("../gl-matrix")
+
+
+const quat = glMatrix.quat
+const vec3 = glMatrix.vec3
 
 
 function listFrames(manager) {
@@ -21,23 +28,24 @@ function createManager(gl) {
 
 function destroyManager(gl, manager) {
   // FIXME: Destroy the shape program.
-  Object.values(manager.frames).forEach(frame => destroyFrame(gl, frame))
+  Object.values(manager.frames).forEach((frame) => destroyFrame(gl, frame))
 }
 
 
 function reset(manager) {
-  Object.values(manager.frames).forEach(resetFrame)  
+  Object.values(manager.frames).forEach(resetFrame)
 }
 
 
 function insert(deltaGeometries, manager) {
-  deltaGeometries.forEach(deltaGeometry => insert1(manager, deltaGeometry))
+  deltaGeometries.forEach((deltaGeometry) => insert1(manager, deltaGeometry))
 }
 
 
 function insert1(manager, geometry) {
+  const frame = geometry.frame
   if (Object.keys(manager.frames).length == 0)
-    manager.currentFrame = geometry.frame
+    manager.currentFrame = frame
   if (!(frame in manager.frames))
     manager.frames[frame] = createFrame(manager.program)
   insertFrame(manager.frames[frame], geometry)
@@ -45,12 +53,12 @@ function insert1(manager, geometry) {
 
 
 function delete0(identifiers, manager) {
-  Object.values(manager.frames).forEach(frame => deleteFrame(identifier, frame))
-}  
+  Object.values(manager.frames).forEach((frame) => deleteFrame(identifiers, frame))
+}
 
 
 function prepare(gl, manager) {
-  Object.values(manager.frames).forEach(frame => prepareFrame(gl, frame))
+  Object.values(manager.frames).forEach((frame) => prepareFrame(gl, frame))
 }
 
 
@@ -71,17 +79,17 @@ const MESH_Axis      = 6
 function mesh(shapeMesh) {
   switch (shapeMesh) {
     case MESH_Cube:
-      return cube(1)
+      return Shapes.cube(1)
     case MESH_Sphere:
-      return icosahedron(1)
+      return Shapes.icosahedron(1)
     case MESH_Polyline:
-      return tube(1, 1)
+      return Shapes.tube(1, 1)
     case MESH_Rectangle:
-      return square(1)
+      return Shapes.square(1)
     case MESH_Label:
       return undefined
     case MESH_Axis:
-      return arrow(1, 1, 0.1, 2)
+      return Shapes.arrow(1, 1, 0.1, 2)
   }
 }
 
@@ -89,7 +97,7 @@ function mesh(shapeMesh) {
 function findShapeMesh(deltaGeometry) {
   switch (deltaGeometry.getType()) {
     case Geometry.GEOMETRY_Points:
-      if (deltaGlyph(deltaGeometry))
+      if (Geometry.deltaGlyph(deltaGeometry))
         return deltaGeometry.getGlyp() == Geometry.GLYPH_Sphere ? MESH_Sphere : MESH_Cube
       else
         return 0
@@ -115,13 +123,13 @@ function createFrame(shapeProgram) {
   , MESH_Rectangle
   , MESH_Label
   , MESH_Axis
-  ].forEach(shapeMesh => frame[shapeMesh] = createDisplay(program, shapeMesh))
+  ].forEach((shapeMesh) => frame[shapeMesh] = createDisplay(shapeProgram, shapeMesh))
   return frame
 }
 
 
 function destroyFrame(gl, frame) {
-  Object.values(frame).forEach(display => destroyDisplay(gl, display))
+  Object.values(frame).forEach((display) => destroyDisplay(gl, display))
 }
 
 
@@ -136,17 +144,17 @@ function insertFrame(frame, deltaGeometry) {
 
 
 function deleteFrame(frame, identifiers) {
-  Object.values(frame).forEach(display => deleteDisplay(display, identifier))
+  Object.values(frame).forEach((display) => deleteDisplay(display, identifiers))
 }
 
 
 function prepareFrame(gl, frame) {
-  Object.values(frame).forEach(display => prepareDisplay(gl, display))
+  Object.values(frame).forEach((display) => prepareDisplay(gl, display))
 }
 
 
 function drawFrame(gl, frame) {
-  Object.values(frame).forEach(display => drawDisplay(gl, display))
+  Object.values(frame).forEach((display) => drawDisplay(gl, display))
 }
 
 
@@ -160,12 +168,12 @@ function createDisplay(shapeProgram, shapeMesh) {
     geometries   : {}
   }
   if (!display.labelDisplay)
-    display.buffer = Buffers.createShapeBuffer(program, mesh(shapeMesh))
+    display.buffer = Buffers.createShapeBuffer(shapeProgram, mesh(shapeMesh))
   return display
 }
 
 
-function destoryDisplay(gl, display) {
+function destroyDisplay(gl, display) {
   if ("buffer" in display)
     Buffers.destroyShapeBuffer(gl, display.buffer)
 }
@@ -221,17 +229,18 @@ function revision(shapeMesh, deltaGeometry, geometries) {
 
 
 function deleteDisplay(display, identifiers) {
-  identifiers.forEach(identifier => delete display.geometries[identifier])
+  identifiers.forEach((identifier) => delete display.geometries[identifier])
   if ("buffer" in display)
-    identifiers.forEach(identifier => Buffers.deleteInstance(display.buffer, identifier))
+    identifiers.forEach((identifier) => Buffers.deleteInstance(display.buffer, identifier))
 }
 
 
 function insertDisplay(deltaGeometry, shapeMesh, display) {
   const hasBuffer = "buffer" in display
+  const identifier = deltaGeometry.identifier
   const old = (identifier in display.geometries) ? display.geometries[identifier] : Geometry.defaultGeometry
   const new1 = Geometry.merge(old, deltaGeometry)
-  switch (revision(shapeMesh, deltaGeometry, geometries)) {
+  switch (revision(shapeMesh, deltaGeometry, display.geometries)) {
     case REVISION_None:
       break
     case REVISION_Deletion:
@@ -265,7 +274,8 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 
   const positions = []
   const rotations = []
-  const scales    = [] 
+  const scales    = []
+  const color     = geometry.color
 
   const noRotation = quat.fromValues(0, 0, 0, 1)
   const right = vec3.fromValues(1, 0, 0)
@@ -273,13 +283,13 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 
   if ("points" in geometry) {
 
-    positions.push.apply(positions, geometry.points.flat())
-    rotations.push.apply(rotations, positions.map(point => noRotation))
-    scales.push.apply(scales, positions.map(point => vec3.fromValues(geometry.size, geometry.size, geometry.size)))
+    positions.push(...geometry.points.flat())
+    rotations.push(...positions.map((point) => noRotation))
+    scales.push(...positions.map((point) => vec3.fromValues(geometry.size, geometry.size, geometry.size)))
 
   } else if ("polylines" in geometry) {
 
-    geometry.polylines.map(polyline => [
+    geometry.polylines.map((polyline) => [
       polyline.slice(0, polyline.length - 1)
     , polyline.slice(1, polyline.length    )
     ]).flat().forEach(function(u0, u1) {
@@ -312,6 +322,8 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 
   } else if ("axis" in geometry) {
 
+    const u0 = geometry.axis[0]
+    const u1 = geometry.axis[1]
     const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
     const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
 
@@ -332,7 +344,7 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 module.exports = {
   createManager  : createManager
 , destroyManager : destroyManager
-, currentFrame   : manager => manager.current
+, currentFrame   : (manager) => manager.current
 , listFrames     : listFrames
 , insert         : insert
 , delete0        : delete0

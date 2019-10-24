@@ -77,7 +77,7 @@ function merge(geometry, deltaGeometry) {
           const pointses = []
           let i = 0
           deltaGeometry.getCntsList().forEach(function(n) {
-            const points = []           
+            const points = []
             for (let j = 0; j < n; ++j)
               points.push(vec3.fromValues(posx[i], posy[i], posz[i++]))
             pointses.push(points)
@@ -94,10 +94,10 @@ function merge(geometry, deltaGeometry) {
           const polylines = []
           let i = 0
           deltaGeometry.getCntsList().forEach(function(n) {
-            const polyline = []           
+            const polyline = []
             for (let j = 0; j < n; ++j)
               polyline.push(vec3.fromValues(posx[i], posy[i], posz[i++]))
-            polylines.push(point)
+            polylines.push(polyline)
           })
           geometry.shape = {
             polylines: polylines
@@ -115,7 +115,7 @@ function merge(geometry, deltaGeometry) {
               vec3.fromValues(posx[i], posy[i], posz[i++])
             , vec3.fromValues(posx[i], posy[i], posz[i++])
             , vec3.fromValues(posx[i], posy[i], posz[i++])
-            ])           
+            ])
           })
           geometry.shape = {
             rectangles: rectangles
@@ -130,7 +130,7 @@ function merge(geometry, deltaGeometry) {
               vec3.fromValues(posx[0], posy[0], posz[0])
             , vec3.fromValues(posx[1], posy[1], posz[1])
             , vec3.fromValues(posx[2], posy[2], posz[2])
-            ]           
+            ]
           }
           break
         }
@@ -141,7 +141,7 @@ function merge(geometry, deltaGeometry) {
             axis: [
               vec3.fromValues(posx[0], posy[0], posz[0])
             , vec3.fromValues(posx[1], posy[1], posz[1])
-            ]           
+            ]
           }
           break
         }
@@ -167,15 +167,15 @@ function merge(geometry, deltaGeometry) {
 
 module.exports = {
 
-  GEOMETRY_Points     : GEOMETRY_Points     
-, GEOMETRY_Polylines  : GEOMETRY_Polylines  
-, GEOMETRY_Rectangles : GEOMETRY_Rectangles 
-, GEOMETRY_Label      : GEOMETRY_Label      
-, GEOMETRY_Axis       : GEOMETRY_Axis       
+  GEOMETRY_Points     : GEOMETRY_Points
+, GEOMETRY_Polylines  : GEOMETRY_Polylines
+, GEOMETRY_Rectangles : GEOMETRY_Rectangles
+, GEOMETRY_Label      : GEOMETRY_Label
+, GEOMETRY_Axis       : GEOMETRY_Axis
 
 , GLYPH_Cube          : GLYPH_Cube
 , GLYPH_Sphere        : GLYPH_Sphere
-, GLYPH_Box           : GLYPH_Box  
+, GLYPH_Box           : GLYPH_Box
 , GLYPH_Cylinder      : GLYPH_Cylinder
 
 , defaultGeometry     : defaultGeometry

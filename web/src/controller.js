@@ -10,7 +10,7 @@ function echoHandler(connection, request) {
 }
 
 
-var theContext = null
+let theContext = null
 
 
 // Set up the document.

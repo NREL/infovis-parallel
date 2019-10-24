@@ -7,17 +7,17 @@ const vec3 = glMatrix.vec3
 
 function box(x, y, z) {
 
-  x1 = x / 2
-  y1 = y / 2
-  z1 = z / 2
-  p1 = vec3.fromValues( x1,  y1,  z1)
-  p2 = vec3.fromValues( x1,  y1, -z1)
-  p3 = vec3.fromValues( x1, -y1,  z1)
-  p4 = vec3.fromValues( x1, -y1, -z1)
-  p5 = vec3.fromValues(-x1,  y1,  z1)
-  p6 = vec3.fromValues(-x1,  y1, -z1)
-  p7 = vec3.fromValues(-x1, -y1,  z1)
-  p8 = vec3.fromValues(-x1, -y1, -z1)
+  const x1 = x / 2
+  const y1 = y / 2
+  const z1 = z / 2
+  const p1 = vec3.fromValues( x1,  y1,  z1)
+  const p2 = vec3.fromValues( x1,  y1, -z1)
+  const p3 = vec3.fromValues( x1, -y1,  z1)
+  const p4 = vec3.fromValues( x1, -y1, -z1)
+  const p5 = vec3.fromValues(-x1,  y1,  z1)
+  const p6 = vec3.fromValues(-x1,  y1, -z1)
+  const p7 = vec3.fromValues(-x1, -y1,  z1)
+  const p8 = vec3.fromValues(-x1, -y1, -z1)
 
   // Quads.
   return [
@@ -39,26 +39,26 @@ function cube(d) {
 
 function tube(l, d) {
 
-  s = d / (1 + 2 * Math.sqrt(2))
-  u = s / 2
-  v = u + s * Math.sqrt(2)
-  h = l / 2
-  p1 = vec3.fromValues(-h,  u,  v)
-  p2 = vec3.fromValues(-h,  v,  u)
-  p3 = vec3.fromValues(-h,  v, -u)
-  p4 = vec3.fromValues(-h,  u, -v)
-  p5 = vec3.fromValues(-h, -u, -v)
-  p6 = vec3.fromValues(-h, -v, -u)
-  p7 = vec3.fromValues(-h, -v,  u)
-  p8 = vec3.fromValues(-h, -u,  v)
-  q1 = vec3.fromValues( h,  u,  v)
-  q2 = vec3.fromValues( h,  v,  u)
-  q3 = vec3.fromValues( h,  v, -u)
-  q4 = vec3.fromValues( h,  u, -v)
-  q5 = vec3.fromValues( h, -u, -v)
-  q6 = vec3.fromValues( h, -v, -u)
-  q7 = vec3.fromValues( h, -v,  u)
-  q8 = vec3.fromValues( h, -u,  v)
+  const s = d / (1 + 2 * Math.sqrt(2))
+  const u = s / 2
+  const v = u + s * Math.sqrt(2)
+  const h = l / 2
+  const p1 = vec3.fromValues(-h,  u,  v)
+  const p2 = vec3.fromValues(-h,  v,  u)
+  const p3 = vec3.fromValues(-h,  v, -u)
+  const p4 = vec3.fromValues(-h,  u, -v)
+  const p5 = vec3.fromValues(-h, -u, -v)
+  const p6 = vec3.fromValues(-h, -v, -u)
+  const p7 = vec3.fromValues(-h, -v,  u)
+  const p8 = vec3.fromValues(-h, -u,  v)
+  const q1 = vec3.fromValues( h,  u,  v)
+  const q2 = vec3.fromValues( h,  v,  u)
+  const q3 = vec3.fromValues( h,  v, -u)
+  const q4 = vec3.fromValues( h,  u, -v)
+  const q5 = vec3.fromValues( h, -u, -v)
+  const q6 = vec3.fromValues( h, -v, -u)
+  const q7 = vec3.fromValues( h, -v,  u)
+  const q8 = vec3.fromValues( h, -u,  v)
 
   // Quads.
   return [
@@ -83,22 +83,22 @@ function tube(l, d) {
 
 function icosahedron(d) {
 
-  phi = (1 + Math.sqrt(5)) / 2
-  x = d / 2 / Math.sqrt(1 + phi * phi)
-  z = phi * x
-  n = 0
-  p00 = vec3.fromValues(-x,  n,  z)
-  p01 = vec3.fromValues( x,  n,  z)
-  p02 = vec3.fromValues(-x,  n, -z)
-  p03 = vec3.fromValues( x,  n, -z)
-  p04 = vec3.fromValues( n,  z,  x)
-  p05 = vec3.fromValues( n,  z, -x)
-  p06 = vec3.fromValues( n, -z,  x)
-  p07 = vec3.fromValues( n, -z, -x)
-  p08 = vec3.fromValues( z,  x,  n)
-  p09 = vec3.fromValues(-z,  x,  n)
-  p10 = vec3.fromValues( z, -x,  n)
-  p11 = vec3.fromValues(-z, -x,  n)
+  const phi = (1 + Math.sqrt(5)) / 2
+  const x = d / 2 / Math.sqrt(1 + phi * phi)
+  const z = phi * x
+  const n = 0
+  const p00 = vec3.fromValues(-x,  n,  z)
+  const p01 = vec3.fromValues( x,  n,  z)
+  const p02 = vec3.fromValues(-x,  n, -z)
+  const p03 = vec3.fromValues( x,  n, -z)
+  const p04 = vec3.fromValues( n,  z,  x)
+  const p05 = vec3.fromValues( n,  z, -x)
+  const p06 = vec3.fromValues( n, -z,  x)
+  const p07 = vec3.fromValues( n, -z, -x)
+  const p08 = vec3.fromValues( z,  x,  n)
+  const p09 = vec3.fromValues(-z,  x,  n)
+  const p10 = vec3.fromValues( z, -x,  n)
+  const p11 = vec3.fromValues(-z, -x,  n)
 
   // Triangles.
   return [
@@ -129,12 +129,12 @@ function icosahedron(d) {
 
 function rectangle(h, w) {
 
-  h2 = h / 2
-  w2 = w / 2
-  p1 = vec3.fromValues( h2, 0,  w2)
-  p2 = vec3.fromValues( h2, 0, -w2)
-  p3 = vec3.fromValues(-h2, 0,  w2)
-  p4 = vec3.fromValues(-h2, 0, -w2)
+  const h2 = h / 2
+  const w2 = w / 2
+  const p1 = vec3.fromValues( h2, 0,  w2)
+  const p2 = vec3.fromValues( h2, 0, -w2)
+  const p3 = vec3.fromValues(-h2, 0,  w2)
+  const p4 = vec3.fromValues(-h2, 0, -w2)
 
   // Quads.
   return [
@@ -146,22 +146,23 @@ function rectangle(h, w) {
 
 
 function square(w) {
-  rectangle(w, w)
+  return rectangle(w, w)
 }
 
 
 function arrow(l, d, f, o) {
 
-  t = tube(l, d).map(v => vec3.fromValues(v[0] > 0 ? (1 - f) * v[0] : v[0], v[1], v[2]))
-  q0 = vec3.fromValues(l / 2, 0, 0)
-  q1 = t[ 1]
-  q2 = t[ 2]
-  q3 = t[ 6]
-  q4 = t[10]
-  q5 = t[14]
-  q6 = t[18]
-  q7 = t[22]
-  q8 = t[26]
+  const t = tube(l, d).map((v) => vec3.fromValues(v[0] > 0 ? (1 - f) * v[0] : v[0], v[1], v[2]))
+  const q0 = vec3.fromValues(l / 2, 0, 0)
+  const q1 = t[ 1]
+  const q2 = t[ 2]
+  const q3 = t[ 6]
+  const q4 = t[10]
+  const q5 = t[14]
+  const q6 = t[18]
+  const q7 = t[22]
+  const q8 = t[26]
+
   function out(v) {
     return vec3.fromValues(v[0], o * v[1], o * v[2])
   }
@@ -194,12 +195,12 @@ function arrow(l, d, f, o) {
 
 function cone(l, d) {
 
-  r = d / 2
-  n = 32
-  alpha = 2 * Math.PI / n
+  const r = d / 2
+  const n = 32
+  const alpha = 2 * Math.PI / n
 
   // Triangles.
-  return Array.from({length: n}, (v, k) => k + 1).map(i =>
+  return Array.from({length: n}, (v, k) => k + 1).map((i) =>
     [
       vec3.fromValues(0, 0                            , 0                            )
     , vec3.fromValues(l, r * Math.cos(alpha *  i     ), r * Math.sin(alpha *  i     ))
@@ -214,7 +215,7 @@ function cone(l, d) {
 
 
 function fromQuads(vs) {
-  return Array.from({length: vs.length / 4}, (v, k) => 4 * k).map(i =>
+  return Array.from({length: vs.length / 4}, (v, k) => 4 * k).map((i) =>
     [
       vs[i  ], vs[i+1], vs[i+2]
     , vs[i+2], vs[i+3], vs[i  ]

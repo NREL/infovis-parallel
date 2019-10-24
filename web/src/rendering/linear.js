@@ -61,7 +61,7 @@ function rotationFromVectorPairs(u0, v0, u2, v2) {
 
 
 function rotationFromPlane(xAxis, yAxis, origin, xPoint, yPoint) {
-  return rotateFromVectorPairs(
+  return rotationFromVectorPairs(
     xAxis
   , yAxis
   , vec3.scalarAndAdd(vec3.create(), xPoint, origin, -1)
@@ -103,19 +103,19 @@ function distanceToPoint(po, ps) {
 
 
 function distanceToSegment(po, pu, ps) {
-  const [abg, uvw] = boxCoordiantes(po, pu, null, null, ps)
+  const [abg, uvw] = boxCoordinates(po, pu, null, null, ps)
   return vec3.length(distanceOnSegment(uvw, abg))
 }
 
 
 function distanceToRectangle(po, pu, pv, ps) {
-  const [abg, uvw] = boxCoordinates10(po, pu, pv, null, ps)
+  const [abg, uvw] = boxCoordinates(po, pu, pv, null, ps)
   return vec3.length(distanceOnSegment(uvw, abg))
 }
 
 
 function distanceToBox(po, pu, pv, pw, ps) {
-  const [abg, uvw] = boxCoordinates10(po, pu, pv, pw, ps)
+  const [abg, uvw] = boxCoordinates(po, pu, pv, pw, ps)
   return vec3.length(distanceOnSegment(uvw, abg))
 }
 
@@ -134,8 +134,8 @@ function boxCoordinates(po, pu, pv, pw, ps) {
   const u = vec3.scaleAndAdd(vec3.create(), pu, po, -1)
   let e = basis[0]
   basis.forEach(function(e1) {
-    if (!GlMatrix.equals(vec3.dot(u, e1), 0))
-      e = ee
+    if (!glMatrix.equals(vec3.dot(u, e1), 0))
+      e = e1
   })
   const v = pv == null ? vec3.cross(vec3.create(), u, e) : vec3.scaleAndAdd(vec3.create(), pv, po, -1)
   const w = pw == null ? vec3.cross(vec3.create(), u, v) : vec3.scaleAndAdd(vec3.create(), pw, po, -1)

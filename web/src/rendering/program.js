@@ -5,7 +5,7 @@ require("../gl-matrix")
 const mat4 = glMatrix.mat4
 
 
-vertexShaderSource = `#version 300 es
+const vertexShaderSource = `#version 300 es
 
 uniform mat4 projection_modelview;
 
@@ -32,7 +32,7 @@ void main() {
 }`
 
 
-fragmentShaderSource = `#version 300 es
+const fragmentShaderSource = `#version 300 es
 
 precision mediump float;
 
@@ -51,14 +51,14 @@ function prepareShapeProgram(gl) {
   gl.compileShader(vertexShader)
   const vertexSuccess = gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)
   if (!vertexSuccess)
-    throw "Could not compile vertex shader:" + gl.getShaderInfoLog(vertexShader)
+    throw new Error("Could not compile vertex shader:" + gl.getShaderInfoLog(vertexShader))
 
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
   gl.shaderSource(fragmentShader, fragmentShaderSource)
   gl.compileShader(fragmentShader)
   const fragmentSuccess = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)
   if (!fragmentSuccess)
-    throw "Could not compile fragment shader: " + gl.getShaderInfoLog(fragmentShader)
+    throw new Error("Could not compile fragment shader: " + gl.getShaderInfoLog(fragmentShader))
 
   const program = gl.createProgram()
   gl.attachShader(program, vertexShader  )
@@ -66,7 +66,7 @@ function prepareShapeProgram(gl) {
   gl.linkProgram(program)
   const programSuccess = gl.getProgramParameter(program, gl.LINK_STATUS)
   if (!programSuccess)
-    throw "Could not link program: " + gl.getProgramInfoLog(program)
+    throw new Error("Could not link program: " + gl.getProgramInfoLog(program))
 
   return {
     program              : program
