@@ -4,8 +4,12 @@ const Connection    = require("./connection"   )
 const Visualizer    = require("./visualizer"   )
 
 
+const requestQueue = []
+
+
 function echoHandler(connection, request) {
-  console.log("Echo request: ", request)
+  console.log("Recieved request: ", request)
+  requestQueue.unshift(request)
   window.lastRequest = request
 }
 
@@ -22,7 +26,7 @@ function startup() {
   gl.canvas.width  = window.innerWidth
   gl.canvas.height = window.innerHeight
 
-  Visualizer.setup(gl)
+  Visualizer.setupCanvas(gl)
 
   Configuration.reset()
   Connection.updateButtons()
@@ -32,7 +36,7 @@ function startup() {
 function startVisualizing() {
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler)
-  Visualizer.visualizeBuffers(theContext, configuration)
+  Visualizer.visualizeBuffers(theContext, configuration, requestQueue)
 }
 
 

@@ -14,7 +14,7 @@ clean:
 	rm controller.js
 
 lint:
-	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*,visualizer/*}.js
+	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*}.js
 
 install:
 	npm install webpack webpack-cli

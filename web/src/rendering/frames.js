@@ -37,17 +37,17 @@ function reset(manager) {
 }
 
 
-function insert(deltaGeometries, manager) {
-  deltaGeometries.forEach((deltaGeometry) => insert1(manager, deltaGeometry))
+function insert(gl, deltaGeometries, manager) {
+  deltaGeometries.forEach((deltaGeometry) => insert1(gl, manager, deltaGeometry))
 }
 
 
-function insert1(manager, geometry) {
+function insert1(gl, manager, geometry) {
   const frame = geometry.frame
   if (Object.keys(manager.frames).length == 0)
     manager.currentFrame = frame
   if (!(frame in manager.frames))
-    manager.frames[frame] = createFrame(manager.program)
+    manager.frames[frame] = createFrame(gl, manager.program)
   insertFrame(manager.frames[frame], geometry)
 }
 
@@ -74,6 +74,8 @@ const MESH_Polyline  = 3
 const MESH_Rectangle = 4
 const MESH_Label     = 5
 const MESH_Axis      = 6
+
+const meshes =[MESH_Cube, MESH_Sphere, MESH_Polyline, MESH_Rectangle, MESH_Label, MESH_Axis]
 
 
 function mesh(shapeMesh) {
@@ -114,16 +116,9 @@ function findShapeMesh(deltaGeometry) {
 }
 
 
-function createFrame(shapeProgram) {
+function createFrame(gl, shapeProgram) {
   const frame = {}
-  [
-    MESH_Cube
-  , MESH_Sphere
-  , MESH_Polyline
-  , MESH_Rectangle
-  , MESH_Label
-  , MESH_Axis
-  ].forEach((shapeMesh) => frame[shapeMesh] = createDisplay(shapeProgram, shapeMesh))
+  meshes.forEach((shapeMesh) => frame[shapeMesh] = createDisplay(gl, shapeProgram, shapeMesh))
   return frame
 }
 
@@ -163,12 +158,12 @@ function resetDisplay(display) {
 }
 
 
-function createDisplay(shapeProgram, shapeMesh) {
+function createDisplay(gl, shapeProgram, shapeMesh) {
   const display = {
     geometries   : {}
   }
-  if (!display.labelDisplay)
-    display.buffer = Buffers.createShapeBuffer(shapeProgram, mesh(shapeMesh))
+  if (shapeMesh != MESH_Label)
+    display.buffer = Buffers.createShapeBuffer(gl, shapeProgram, gl.TRIANGLES, mesh(shapeMesh))
   return display
 }
 
@@ -237,9 +232,9 @@ function deleteDisplay(display, identifiers) {
 
 function insertDisplay(deltaGeometry, shapeMesh, display) {
   const hasBuffer = "buffer" in display
-  const identifier = deltaGeometry.identifier
-  const old = (identifier in display.geometries) ? display.geometries[identifier] : Geometry.defaultGeometry
-  const new1 = Geometry.merge(old, deltaGeometry)
+  const identifier = deltaGeometry.getIden()
+  const geometry = (identifier in display.geometries) ? display.geometries[identifier] : Geometry.defaultGeometry()
+  Geometry.merge(geometry, deltaGeometry)
   switch (revision(shapeMesh, deltaGeometry, display.geometries)) {
     case REVISION_None:
       break
@@ -247,23 +242,23 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
       {
         delete display.geometries[identifier]
         if (hasBuffer)
-          Buffers.deleteInstance(identifier, display.buffer)
+          Buffers.deleteInstance(display.buffer, identifier)
         break
       }
     case REVISION_Insertion:
       {
-        display.geometries[identifier] = new1
+        display.geometries[identifier] = geometry
         if (hasBuffer) {
-          Buffers.deleteInstance(identifier, display.buffer)
-          updateDisplay(identifier, new1, display.buffer)
+          Buffers.deleteInstance(display.buffer, identifier)
+          updateDisplay(identifier, geometry, display.buffer)
         }
         break
       }
     case REVISION_Recoloring:
       {
-        display.geometries[identifier] = new1
+        display.geometries[identifier] = geometry
         if (hasBuffer)
-          Buffers.updateColor(identifier, new1.color, display.buffer)
+          Buffers.updateColor(identifier, geometry.color, display.buffer)
         break
       }
   }
@@ -333,10 +328,10 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 
   }
 
-  Buffers.insertPositions(shapeBuffer, identifier, positions)
-  Buffers.updateRotations(shapeBuffer, identifier, rotations)
-  Buffers.updateScales   (shapeBuffer, identifier, scales   )
-  Buffers.updateColor    (shapeBuffer, identifier, color    )
+  Buffers.insertPositions(identifier, positions, shapeBuffer)
+  Buffers.updateRotations(identifier, rotations, shapeBuffer)
+  Buffers.updateScales   (identifier, scales   , shapeBuffer)
+  Buffers.updateColor    (identifier, color    , shapeBuffer)
 
 }
 
