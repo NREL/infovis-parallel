@@ -1,8 +1,15 @@
 
 const Rendering = {
   Frames   : require("../rendering/frames"  )
+, Linear   : require("../rendering/linear"  )
 , Selector : require("../rendering/selector")
 }
+
+require("../gl-matrix")
+
+const vec3 = glMatrix.vec3
+
+const zero = vec3.fromValues(0, 0, 0)
 
 
 function initialize(gl, initialViewer, initialTool) {
@@ -12,10 +19,10 @@ function initialize(gl, initialViewer, initialTool) {
   , lockRef     : null
   , managerRef  : manager
   , selectorRef : Rendering.Selector.createSelector(gl, manager.program)
-  , povRef      : [initialViewer[0], fromEulerd(initialViewer[1])]
-  , toolRef     : [initalTool   [0], fromEulerd(initialTool  [1])]
+  , povRef      : [initialViewer[0], Rendering.Linear.fromEulerd(initialViewer[1])]
+  , toolRef     : [initialTool  [0], Rendering.Linear.fromEulerd(initialTool  [1])]
   , textRef     : ""
-  , offsetRef   : [zero, fromEulerd(zero)]
+  , offsetRef   : [zero            , Rendering.Linear.fromEulerd(zero            )]
   }
 }
 
@@ -148,5 +155,6 @@ function visualize(gl, viewer, initialViewer, initialTool, debug, logChannel, re
 
 
 module.exports = {
-  visualize : visualize
+  initialize : initialize
+, visualize : visualize
 }

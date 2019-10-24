@@ -196,17 +196,17 @@ function cone(l, d) {
 
   r = d / 2
   n = 32
-  alpha = 2 * pi / n
+  alpha = 2 * Math.PI / n
 
   // Triangles.
   return Array.from({length: n}, (v, k) => k + 1).map(i =>
     [
-      vec3.fromValues(0, 0                       , 0                       )
-    , vec3.fromValues(l, r * cos(alpha *  i     ), r * sin(alpha *  i     ))
-    , vec3.fromValues(l, r * cos(alpha * (i + 1)), r * sin(alpha * (i + 1)))
-    , vec3.fromValues(l, r * cos(alpha * (i + 1)), r * sin(alpha * (i + 1)))
-    , vec3.fromValues(l, r * cos(alpha *  i     ), r * sin(alpha *  i     ))
-    , vec3.fromValues(l, 0                       , 0                       )
+      vec3.fromValues(0, 0                            , 0                            )
+    , vec3.fromValues(l, r * Math.cos(alpha *  i     ), r * Math.sin(alpha *  i     ))
+    , vec3.fromValues(l, r * Math.cos(alpha * (i + 1)), r * Math.sin(alpha * (i + 1)))
+    , vec3.fromValues(l, r * Math.cos(alpha * (i + 1)), r * Math.sin(alpha * (i + 1)))
+    , vec3.fromValues(l, r * Math.cos(alpha *  i     ), r * Math.sin(alpha *  i     ))
+    , vec3.fromValues(l, 0                            , 0                            )
     ]
   ).flat()
 

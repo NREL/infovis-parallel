@@ -180,8 +180,8 @@ module.exports = {
 
 , defaultGeometry     : defaultGeometry
 , deltaColor          : deltaColor
-, deltaGlyph          : deltaGlyp
-, deltaPosition       : deltaPostion
+, deltaGlyph          : deltaGlyph
+, deltaPosition       : deltaPosition
 , deltaSize           : deltaSize
 , deltaText           : deltaText
 , merge               : merge

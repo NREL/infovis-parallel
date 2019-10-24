@@ -71,12 +71,12 @@ function rotationFromPlane(xAxis, yAxis, origin, xPoint, yPoint) {
 
 
 function fromEuler(v) {
-  return quat.fromEuler(v[0], v[1], v[2])
+  return quat.fromEuler(quat.create(), v[0], v[1], v[2])
 }
 
 
 function fromEulerd(v) {
-  return fromEuler(vec3.scale(vec3.create(), v, Math.pi / 180))
+  return fromEuler(vec3.scale(vec3.create(), v, Math.PI / 180))
 }
 
 
@@ -93,7 +93,7 @@ function toEuler(q) {
 
 
 function toEulerd(q) {
-  return vec3.scale(vec3.create(), toEuler(q), 180 / Math.pi)
+  return vec3.scale(vec3.create(), toEuler(q), 180 / Math.PI)
 }
 
 
@@ -176,7 +176,7 @@ function toQuaternion(w, x, y, z) {
 }
 
 
-module.export = {
+module.exports = {
   orthogonal              : orthogonal
 , rotationFromVectorPair  : rotationFromVectorPair
 , projectPlane            : projectPlane

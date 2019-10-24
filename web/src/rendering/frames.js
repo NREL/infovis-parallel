@@ -330,10 +330,9 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 
 
 module.exports = {
-  program        : program
-, createManager  : createManager
+  createManager  : createManager
 , destroyManager : destroyManager
-, currentFrame   : currentFrame
+, currentFrame   : manager => manager.current
 , listFrames     : listFrames
 , insert         : insert
 , delete0        : delete0

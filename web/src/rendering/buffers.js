@@ -85,7 +85,7 @@ function insertPositions(identifier, positions, shapeBuffer) {
 function insertPosition(shapeBuffer, identifier, vertex) {
 
   let empties1 = shapeBuffer.empties
-  let pendindSize1 = shapeBuffer.pendingSize
+  let pendingSize1 = shapeBuffer.pendingSize
   if (empties1.length == 0) {
     empties1 = Array.from({length: pendingSize % 2 + 1}, (v, k) => pendingSize1 + k)
     pendingSize1 = pendingSize1 + empties1.length
@@ -132,7 +132,7 @@ function updateAttributes(field, identifier, values, shapeBuffer) {
 
 
 function updateColor(identifier, color, shapeBuffer) {
-  updateAttribute(colorLens, identifier, color, shapeBuffer)
+  updateAttribute(colorsLens, identifier, color, shapeBuffer)
 }
 
 
