@@ -184,5 +184,10 @@ module.exports = {
 , deltaPosition       : deltaPosition
 , deltaSize           : deltaSize
 , deltaText           : deltaText
+, hasAxis             : (geometry) => "axis"       in geometry.shape
+, hasLabel            : (geometry) => "label"      in geometry.shape
+, hasPoints           : (geometry) => "points"     in geometry.shape
+, hasPolylines        : (geometry) => "polylines"  in geometry.shape
+, hasRectangles       : (geometry) => "rectangles" in geometry.shape
 , merge               : merge
 }

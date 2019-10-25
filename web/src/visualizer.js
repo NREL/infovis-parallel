@@ -1,13 +1,16 @@
 
 const Rendering = {
-  Frames   : require("./rendering/frames"  )
-, Linear   : require("./rendering/linear"  )
-, Selector : require("./rendering/selector")
+  Frames     : require("./rendering/frames"  )
+, Linear     : require("./rendering/linear"  )
+, Projection : require("./rendering/projection")
+, Program    : require("./rendering/program"   )
+, Selector   : require("./rendering/selector")
 }
 
 require("./gl-matrix")
 
 
+const mat4 = glMatrix.mat4
 const vec3 = glMatrix.vec3
 
 const zero = vec3.fromValues(0, 0, 0)
@@ -56,13 +59,21 @@ function visualizeBuffers(gl, configuration, requests) {
   )
 
   function animation(timestamp) {
+
     while (requests.length > 0) {
       const request = requests.pop()
-      console.log("Popped request: ", request)
       Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
     }
+
+    Rendering.Program.selectShapeProgram(gl, graphics.manager.program)
+//  const projection = Rendering.Projection.projection(configuration.display, graphics.pov[0])
+    Rendering.Program.setProjectionModelView(gl, graphics.manager.program, mat4.create(), mat4.create())
+
+    Rendering.Frames.prepare(gl, graphics.manager)
     Rendering.Frames.draw(gl, graphics.manager)
+
     window.requestAnimationFrame(animation)
+
   }
 
   window.requestAnimationFrame(animation)

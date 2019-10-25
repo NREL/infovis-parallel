@@ -30,6 +30,7 @@
   , "key-spacing"              : "off"
   , "max-len"                  : "off"
   , "no-multi-spaces"          : "off"
+  , "object-curly-spacing"     : "off"
   , "padded-blocks"            : "off"
   , "quotes"                   : "off"
   , "require-jsdoc"            : "off"
@@ -50,8 +51,11 @@
   , "require"           : "readonly"
 
   , "FileReader"        : "readonly"
+  , "Float32Array"      : "readonly"
+  , "Map"               : "readonly"
   , "Set"               : "readonly"
   , "Uint8Array"        : "readonly"
+  , "Uint32Array"       : "readonly"
   , "WebSocket"         : "readonly"
 
   , "uiAddress"         : "readonly"

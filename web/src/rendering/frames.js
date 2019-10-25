@@ -13,14 +13,14 @@ const vec3 = glMatrix.vec3
 
 
 function listFrames(manager) {
-  return Object.keys(manager.frames)
+  return manager.frames.keys()
 }
 
 
 function createManager(gl) {
   return {
     program : Program.prepareShapeProgram(gl)
-  , frames  : {}
+  , frames  : new Map()
   , current : 0
   }
 }
@@ -28,12 +28,12 @@ function createManager(gl) {
 
 function destroyManager(gl, manager) {
   // FIXME: Destroy the shape program.
-  Object.values(manager.frames).forEach((frame) => destroyFrame(gl, frame))
+  manager.frames.forEach((frame, _) => destroyFrame(gl, frame))
 }
 
 
 function reset(manager) {
-  Object.values(manager.frames).forEach(resetFrame)
+  manager.frames.forEach((frame, _) => resetFrame(frame))
 }
 
 
@@ -42,29 +42,29 @@ function insert(gl, deltaGeometries, manager) {
 }
 
 
-function insert1(gl, manager, geometry) {
-  const frame = geometry.frame
-  if (Object.keys(manager.frames).length == 0)
-    manager.currentFrame = frame
-  if (!(frame in manager.frames))
-    manager.frames[frame] = createFrame(gl, manager.program)
-  insertFrame(manager.frames[frame], geometry)
+function insert1(gl, manager, deltaGeometry) {
+  const frame = deltaGeometry.getFram()
+  if (manager.frames.size == 0)
+    manager.current = frame
+  if (!manager.frames.has(frame))
+    manager.frames.set(frame, createFrame(gl, manager.program))
+  insertFrame(manager.frames.get(frame), deltaGeometry)
 }
 
 
 function delete0(identifiers, manager) {
-  Object.values(manager.frames).forEach((frame) => deleteFrame(identifiers, frame))
+  manager.frames.forEach((frame, _) => deleteFrame(identifiers, frame))
 }
 
 
 function prepare(gl, manager) {
-  Object.values(manager.frames).forEach((frame) => prepareFrame(gl, frame))
+  manager.frames.forEach((frame, _) => prepareFrame(gl, frame))
 }
 
 
 function draw(gl, manager) {
-  if (manager.current in manager.frames)
-    drawFrame(gl, manager.frames[manager.current])
+  if (manager.frames.has(manager.current))
+    drawFrame(gl, manager.frames.get(manager.current))
 }
 
 
@@ -117,50 +117,50 @@ function findShapeMesh(deltaGeometry) {
 
 
 function createFrame(gl, shapeProgram) {
-  const frame = {}
-  meshes.forEach((shapeMesh) => frame[shapeMesh] = createDisplay(gl, shapeProgram, shapeMesh))
+  const frame = new Map()
+  meshes.forEach((shapeMesh) => frame.set(shapeMesh, createDisplay(gl, shapeProgram, shapeMesh)))
   return frame
 }
 
 
 function destroyFrame(gl, frame) {
-  Object.values(frame).forEach((display) => destroyDisplay(gl, display))
+  frame.forEach((display, _) => destroyDisplay(gl, display))
 }
 
 
 function resetFrame(frame) {
-  Object.values(frame).forEach(resetDisplay)
+  frame.forEach((display, _) => resetDisplay(display))
 }
 
 
 function insertFrame(frame, deltaGeometry) {
-  Object.entries(frame).forEach(([shapeMesh, display]) => insertDisplay(deltaGeometry, shapeMesh, display))
+  frame.forEach((display, shapeMesh) => insertDisplay(deltaGeometry, shapeMesh, display))
 }
 
 
 function deleteFrame(frame, identifiers) {
-  Object.values(frame).forEach((display) => deleteDisplay(display, identifiers))
+  frame.forEach((display, _) => deleteDisplay(display, identifiers))
 }
 
 
 function prepareFrame(gl, frame) {
-  Object.values(frame).forEach((display) => prepareDisplay(gl, display))
+  frame.forEach((display, _) => prepareDisplay(gl, display))
 }
 
 
 function drawFrame(gl, frame) {
-  Object.values(frame).forEach((display) => drawDisplay(gl, display))
+  frame.forEach((display, _) => drawDisplay(gl, display))
 }
 
 
 function resetDisplay(display) {
-  deleteDisplay(display, Object.keys(display.geometries))
+  deleteDisplay(display, display.geometries.keys())
 }
 
 
 function createDisplay(gl, shapeProgram, shapeMesh) {
   const display = {
-    geometries   : {}
+    geometries : new Map()
   }
   if (shapeMesh != MESH_Label)
     display.buffer = Buffers.createShapeBuffer(gl, shapeProgram, gl.TRIANGLES, mesh(shapeMesh))
@@ -169,22 +169,27 @@ function createDisplay(gl, shapeProgram, shapeMesh) {
 
 
 function destroyDisplay(gl, display) {
-  if ("buffer" in display)
+  if (hasBuffer(display))
     Buffers.destroyShapeBuffer(gl, display.buffer)
 }
 
 
 function prepareDisplay(gl, display) {
-  if ("buffer" in display)
+  if (hasBuffer(display))
     Buffers.prepareShapeBuffer(gl, display.buffer)
 }
 
 
 function drawDisplay(gl, display) {
-  if ("buffer" in display)
+  if (hasBuffer(display))
     Buffers.drawInstances(gl, display.buffer)
   else
     ; // FIXME: Daw labels.
+}
+
+
+function hasBuffer(display) {
+  return "buffer" in display
 }
 
 
@@ -198,7 +203,7 @@ function revision(shapeMesh, deltaGeometry, geometries) {
 
   const shapeMesh1 = findShapeMesh(deltaGeometry)
 
-  const old   = deltaGeometry.getIden() in geometries
+  const old   = geometries.has(deltaGeometry.getIden())
   const shape = Geometry.deltaPosition(deltaGeometry)
   const size  = Geometry.deltaSize    (deltaGeometry)
   const color = Geometry.deltaColor   (deltaGeometry)
@@ -224,31 +229,32 @@ function revision(shapeMesh, deltaGeometry, geometries) {
 
 
 function deleteDisplay(display, identifiers) {
-  identifiers.forEach((identifier) => delete display.geometries[identifier])
-  if ("buffer" in display)
+  identifiers.forEach((identifier) => display.geometries.delete(identifier))
+  if (hasBuffer(display))
     identifiers.forEach((identifier) => Buffers.deleteInstance(display.buffer, identifier))
 }
 
 
 function insertDisplay(deltaGeometry, shapeMesh, display) {
-  const hasBuffer = "buffer" in display
+  const hasBuffer1 = hasBuffer(display)
   const identifier = deltaGeometry.getIden()
-  const geometry = (identifier in display.geometries) ? display.geometries[identifier] : Geometry.defaultGeometry()
-  Geometry.merge(geometry, deltaGeometry)
+  const geometry = display.geometries.has(identifier) ? display.geometries.get(identifier) : Geometry.defaultGeometry()
+  if (revision != REVISION_None)
+    Geometry.merge(geometry, deltaGeometry)
   switch (revision(shapeMesh, deltaGeometry, display.geometries)) {
     case REVISION_None:
       break
     case REVISION_Deletion:
       {
-        delete display.geometries[identifier]
-        if (hasBuffer)
+        display.geometries.delete(identifier)
+        if (hasBuffer1)
           Buffers.deleteInstance(display.buffer, identifier)
         break
       }
     case REVISION_Insertion:
       {
-        display.geometries[identifier] = geometry
-        if (hasBuffer) {
+        display.geometries.set(identifier, geometry)
+        if (hasBuffer1) {
           Buffers.deleteInstance(display.buffer, identifier)
           updateDisplay(identifier, geometry, display.buffer)
         }
@@ -256,8 +262,8 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
       }
     case REVISION_Recoloring:
       {
-        display.geometries[identifier] = geometry
-        if (hasBuffer)
+        display.geometries.set(identifier, geometry)
+        if (hasBuffer1)
           Buffers.updateColor(identifier, geometry.color, display.buffer)
         break
       }
@@ -276,15 +282,15 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
   const right = vec3.fromValues(1, 0, 0)
   const back  = vec3.fromValues(0, 0, 1)
 
-  if ("points" in geometry) {
+  if (Geometry.hasPoints(geometry)) {
 
-    positions.push(...geometry.points.flat())
+    positions.push(...geometry.shape.points.flat())
     rotations.push(...positions.map((point) => noRotation))
     scales.push(...positions.map((point) => vec3.fromValues(geometry.size, geometry.size, geometry.size)))
 
-  } else if ("polylines" in geometry) {
+  } else if (Geometry.hasPolylines(geometry)) {
 
-    geometry.polylines.map((polyline) => [
+    geometry.shape.polylines.map((polyline) => [
       polyline.slice(0, polyline.length - 1)
     , polyline.slice(1, polyline.length    )
     ]).flat().forEach(function(u0, u1) {
@@ -296,9 +302,9 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
     })
 
 
-  } else if ("rectangles" in geometry) {
+  } else if (Geometry.hasRectangles(geometry)) {
 
-    geometry.rectangles.forEach(function([o, u, v]) {
+    geometry.shape.rectangles.forEach(function([o, u, v]) {
       const w = vec3.length(vec3.scaleAndAdd(vec3.create(), u, o, -1))
       const h = vec3.length(vec3.scaleAndAdd(vec3.create(), v, o, -1))
       const q = Linear.rotationFromPlane(right, back, o, u, v)
@@ -311,14 +317,14 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
       scales.push(vec3.fromValues(w, geometry.size, h))
     })
 
-  } else if ("label" in geometry) {
+  } else if (Geometry.hasLabel(geometry)) {
 
     undefined
 
-  } else if ("axis" in geometry) {
+  } else if (Geometry.hasAxis(geometry)) {
 
-    const u0 = geometry.axis[0]
-    const u1 = geometry.axis[1]
+    const u0 = geometry.shape.axis[0]
+    const u1 = geometry.shape.axis[1]
     const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
     const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
 
@@ -342,7 +348,7 @@ module.exports = {
 , currentFrame   : (manager) => manager.current
 , listFrames     : listFrames
 , insert         : insert
-, delete0        : delete0
+, delete         : delete0
 , reset          : reset
 , prepare        : prepare
 , draw           : draw

@@ -78,11 +78,11 @@ function prepareShapeProgram(gl) {
   , rotationsLocation    : gl.getAttribLocation (program, "instance_rotation"   )
   , scalesLocation       : gl.getAttribLocation (program, "instance_scale"      )
   , colorsLocation       : gl.getAttribLocation (program, "instance_color"      )
-  , meshDescription      : {size: 3, isFloat: true , stride: 12}
-  , positionsDescription : {size: 3, isFloat: true , stride: 12}
-  , rotationsDescription : {size: 4, isFloat: true , stride: 16}
-  , scalesDescription    : {size: 3, isFloat: true , stride: 12}
-  , colorsDescription    : {size: 1, isFloat: false, stride:  4}
+  , meshDescription      : {components: 3, isFloat: true }
+  , positionsDescription : {components: 3, isFloat: true }
+  , rotationsDescription : {components: 4, isFloat: true }
+  , scalesDescription    : {components: 3, isFloat: true }
+  , colorsDescription    : {components: 1, isFloat: false}
   }
 
 }
@@ -94,8 +94,17 @@ function selectShapeProgram(gl, shapeProgram) {
 
 
 function setProjectionModelView(gl, shapeProgram, projection, modelView) {
-  const matrx = makeMatrix(projection, modelView)
-  gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, matrx)
+
+  const matrx = projection //// FIXME makeMatrix(projection, modelView)
+
+  // FIXME: This may be unnecessary.
+  const bytes = new Float32Array(16)
+  for (let i = 0; i < 4; ++i)
+    for (let j = 0; j < 4; ++j)
+      bytes[i * 4 + j] = matrx[i * 4 + j]
+
+  gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, bytes)
+
 }
 
 
@@ -110,7 +119,7 @@ function bindMesh(gl, shapeProgram, bufferObject) {
 
 
 function bindPositions(gl, shapeProgram, bufferObject) {
-  bindAttributes(gl, true, shapeProgram.positionsLocation, shapeProgram.positionsDescrption, bufferObject)
+  bindAttributes(gl, true, shapeProgram.positionsLocation, shapeProgram.positionsDescription, bufferObject)
 }
 
 
@@ -130,24 +139,21 @@ function bindColors(gl, shapeProgram, bufferObject) {
 
 
 function bindAttributes(gl, instanced, location, description, buffer) {
+
+  const bytes = 4 // 32-bit elements.
+
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-  gl.vertexAttribPointer(
-    location
-  , description.numComponents
-  , gl.FLOAT
-  , !description.isFloat
-  , description.stride
-  , 0
-  )
+
+  if (description.isFloat)
+    gl.vertexAttribPointer (location, description.components, gl.FLOAT, false, description.components * bytes, 0)
+  else
+    gl.vertexAttribIPointer(location, description.components, gl.UNSIGNED_INT, description.components * bytes, 0)
+
   if (instanced)
     gl.vertexAttribDivisor(location, 1)
-  gl.enableVertexAttribArray(location)
-  // FIXME: Do we need to unbind?
-//gl.bindBuffer(gl.ARRAY_BUFFER, null)
-}
 
-function unbindAttributes(gl, location) {
-  gl.disableVertexAttribArray(location)
+  gl.enableVertexAttribArray(location)
+
 }
 
 
