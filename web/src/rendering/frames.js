@@ -149,7 +149,7 @@ function prepareFrame(gl, frame) {
 
 
 function drawFrame(gl, frame) {
-  frame.forEach((display, mesh) => {console.log("drawFrame: mesh = ", mesh); drawDisplay(gl, display)})
+  frame.forEach((display, _) => drawDisplay(gl, display))
 }
 
 

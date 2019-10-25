@@ -230,13 +230,9 @@ function drawInstances(gl, shapeBuffer) {
   if (shapeBuffer.size == 0)
     return
 
-  console.log("drawInstances: vertices = ", shapeBuffer.vertexCount, ", instances = ", shapeBuffer.instanceCount)
-
   const shapeProgram = shapeBuffer.shapeProgram
 
   Program.selectShapeProgram(gl, shapeProgram)
-
-  // FIXME: SYnc projection model view.
 
   Program.bindMesh     (gl, shapeProgram, shapeBuffer.mesh     )
   Program.bindPositions(gl, shapeProgram, shapeBuffer.positions)
@@ -245,8 +241,6 @@ function drawInstances(gl, shapeBuffer) {
   Program.bindColors   (gl, shapeProgram, shapeBuffer.colors   )
 
   gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)
-
-  Program.selectShapeProgram(gl, null)
 
 }
 
