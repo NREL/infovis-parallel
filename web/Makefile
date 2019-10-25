@@ -13,7 +13,7 @@ controller.js: $(SRCS)
 clean:
 	rm controller.js
 
-lint:
+lint: controller.js
 	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*}.js
 
 install:

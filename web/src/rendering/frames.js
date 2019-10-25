@@ -149,7 +149,7 @@ function prepareFrame(gl, frame) {
 
 
 function drawFrame(gl, frame) {
-  frame.forEach((display, _) => drawDisplay(gl, display))
+  frame.forEach((display, mesh) => {console.log("drawFrame: mesh = ", mesh); drawDisplay(gl, display)})
 }
 
 
@@ -203,27 +203,23 @@ function revision(shapeMesh, deltaGeometry, geometries) {
 
   const shapeMesh1 = findShapeMesh(deltaGeometry)
 
-  const old   = geometries.has(deltaGeometry.getIden())
-  const shape = Geometry.deltaPosition(deltaGeometry)
-  const size  = Geometry.deltaSize    (deltaGeometry)
-  const color = Geometry.deltaColor   (deltaGeometry)
-  const mesh  = shapeMesh1 != 0 && shapeMesh1 != shapeMesh
-  const morph = shapeMesh == MESH_Cube   && shapeMesh1 == MESH_Sphere ||
-                shapeMesh == MESH_Sphere && shapeMesh1 == MESH_Cube
+  const mesh     = shapeMesh1 == shapeMesh
+  const relevant = mesh || shapeMesh1 == 0
+  const old      = geometries.has(deltaGeometry.getIden())
+  const position = Geometry.deltaPosition(deltaGeometry)
+  const size     = Geometry.deltaSize    (deltaGeometry)
+  const color    = Geometry.deltaColor   (deltaGeometry)
+  const morph    = shapeMesh == MESH_Cube   && shapeMesh1 == MESH_Sphere ||
+                   shapeMesh == MESH_Sphere && shapeMesh1 == MESH_Cube
 
-  if (!old && shape)
-    return REVISION_Insertion
-  if (!old)
-    return REVISION_None
-  if (shape && !mesh && morph)
-    return REVISION_Deletion
-  if (shape && !mesh)
-    return REVISION_None
-  if (shape || size)
-    return REVISION_Insertion
-  if (color)
-    return REVISION_Recoloring
-  return REVISION_None
+  //  FIXME: Recheck this logic.
+  if (!old && relevant) return REVISION_Insertion  // New and relevant.
+  if (!old)             return REVISION_None       // New and irrelevant.
+  if (!mesh && morph)   return REVISION_Deletion   // Changed to different mesh, and no longer relevant.
+  if (!relevant)        return REVISION_None       // Old, but irrelevant.
+  if (position || size) return REVISION_Insertion  // Relevant change in position or size.
+  if (color)            return REVISION_Recoloring // Relevant change in color.
+  return REVISION_None                             // Nothing to do.
 
 }
 

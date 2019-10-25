@@ -55,7 +55,7 @@ function projectionKooimaOffAxis(display, eye) {
     1, 0, 0, eye[0]
   , 0, 1, 0, eye[1]
   , 0, 0, 1, eye[2]
-  , 0, 0, 0,      1
+  , 0, 0, 0, 1
   )
 
   return mat4.multiply(mat4.create(), frustum, mat4.multiply(mat4.create(), m, translate))
@@ -63,6 +63,12 @@ function projectionKooimaOffAxis(display, eye) {
 }
 
 
+function modelView(offsetPosition, offsetRotation) {
+  return mat4.fromRotationTranslation(mat4.create(), offsetRotation, offsetPosition)
+}
+
+
 module.exports = {
   projection      : projectionKooimaOffAxis
+, modelView       : modelView
 }

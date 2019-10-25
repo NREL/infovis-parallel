@@ -15,6 +15,7 @@
   , "no-throw-literal"         : "warn"
   , "no-unexpected-multiline"  : "warn"
   , "spaced-comment"           : "warn"
+  , "no-constant-condition"    : "warn"
 
   , "array-bracket-spacing"    : "off"
   , "block-spacing"            : "off"

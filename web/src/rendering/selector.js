@@ -19,10 +19,9 @@ function createSelector(gl, shapeProgram) {
 }
 
 
-function prepareSelector(gl, positionRotation, shapeBuffer) {
-  const [[px, py, pz], [rw, rx, ry, rz]] = positionRotation // FIXME: Check ordering.
-  Buffers.updatePositions(1, [vec3.fromValues(px, py, pz)    ], shapeBuffer)
-  Buffers.updateRotations(1, [quat.fromValues(rx, ry, rz, rw)], shapeBuffer)
+function prepareSelector(gl, position, rotation, shapeBuffer) {
+  Buffers.updatePositions(1, [position], shapeBuffer)
+  Buffers.updateRotations(1, [rotation], shapeBuffer)
   Buffers.prepareShapeBuffer(gl, shapeBuffer)
 }
 
@@ -33,7 +32,7 @@ function drawSelector(gl, shapeBuffer) {
 
 
 module.exports = {
-  createSelector  : createSelector
-, prepareSelector : prepareSelector
-, drawSelector    : drawSelector
+  create  : createSelector
+, prepare : prepareSelector
+, draw    : drawSelector
 }

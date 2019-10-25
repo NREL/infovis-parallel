@@ -46,7 +46,7 @@ function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
   return {
     shapeProgram     : shapeProgram
   , primitiveMode    : primitiveMode
-  , mesh             : buildBuffer(gl, primitives, 3)
+  , mesh             : buildBuffer(gl, primitives, {components: 3, isFloat: true})
   , vertexCount      : primitives.length
   , instanceCount    : 0
   , positions        : null
@@ -229,6 +229,8 @@ function drawInstances(gl, shapeBuffer) {
 
   if (shapeBuffer.size == 0)
     return
+
+  console.log("drawInstances: vertices = ", shapeBuffer.vertexCount, ", instances = ", shapeBuffer.instanceCount)
 
   const shapeProgram = shapeBuffer.shapeProgram
 

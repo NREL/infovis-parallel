@@ -29,7 +29,8 @@ void main() {
                 float((0x00FF0000u & instance_color) >> 16) / 255.,
                 float((0x0000FF00u & instance_color) >>  8) / 255.,
                 float( 0x000000FFu & instance_color       ) / 255.);
-}`
+}
+`
 
 
 const fragmentShaderSource = `#version 300 es
@@ -43,31 +44,26 @@ void main(void) {
   if (vColor.a <= 0.)
     discard;
   outColor = vColor;
-}`
+}
+`
 
 
 function prepareShapeProgram(gl) {
 
-  const vertexShader = gl.createShader(gl.VERTEX_SHADER)
-  gl.shaderSource(vertexShader, vertexShaderSource)
-  gl.compileShader(vertexShader)
-  const vertexSuccess = gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)
-  if (!vertexSuccess)
-    throw new Error("Could not compile vertex shader:" + gl.getShaderInfoLog(vertexShader))
-
-  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
-  gl.shaderSource(fragmentShader, fragmentShaderSource)
-  gl.compileShader(fragmentShader)
-  const fragmentSuccess = gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)
-  if (!fragmentSuccess)
-    throw new Error("Could not compile fragment shader: " + gl.getShaderInfoLog(fragmentShader))
+  function makeShader(name, type, source) {
+    const shader = gl.createShader(type)
+    gl.shaderSource(shader, source)
+    gl.compileShader(shader)
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+      throw new Error("Could not compile " + name + " shader:" + gl.getShaderInfoLog(shader))
+    return shader
+  }
 
   const program = gl.createProgram()
-  gl.attachShader(program, vertexShader  )
-  gl.attachShader(program, fragmentShader)
+  gl.attachShader(program, makeShader("vertex"  , gl.VERTEX_SHADER  , vertexShaderSource  ))
+  gl.attachShader(program, makeShader("fragment", gl.FRAGMENT_SHADER, fragmentShaderSource))
   gl.linkProgram(program)
-  const programSuccess = gl.getProgramParameter(program, gl.LINK_STATUS)
-  if (!programSuccess)
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS))
     throw new Error("Could not link program: " + gl.getProgramInfoLog(program))
 
   return {
@@ -95,21 +91,11 @@ function selectShapeProgram(gl, shapeProgram) {
 
 function setProjectionModelView(gl, shapeProgram, projection, modelView) {
 
-  const matrx = projection //// FIXME makeMatrix(projection, modelView)
+  const pmv = mat4.multiply(mat4.create(), projection, modelView)
 
-  // FIXME: This may be unnecessary.
-  const bytes = new Float32Array(16)
-  for (let i = 0; i < 4; ++i)
-    for (let j = 0; j < 4; ++j)
-      bytes[i * 4 + j] = matrx[i * 4 + j]
+  gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, pmv)
 
-  gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, bytes)
-
-}
-
-
-function makeMatrix(gl, projection, modelView) {
-  return mat4.multiply(mat4.create(), projection, modelView)
+  return pmv
 }
 
 

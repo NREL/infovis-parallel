@@ -38,39 +38,39 @@ function get() {
 
   configuration.server.address = uiAddress.value
 
-  configuration.display.stereo    = uiStereo.checked
-  configuration.display.nearPlane = uiNearPlane.value
-  configuration.display.farPlane  = uiFarPlane.value
+  configuration.display.stereo    =            uiStereo.checked
+  configuration.display.nearPlane = parseFloat(uiNearPlane.value)
+  configuration.display.farPlane  = parseFloat(uiFarPlane.value )
 
-  configuration.display.eyeSeparation[0] = uiEyeSeparationX.value
-  configuration.display.eyeSeparation[1] = uiEyeSeparationY.value
-  configuration.display.eyeSeparation[2] = uiEyeSeparationZ.value
+  configuration.display.eyeSeparation[0] = parseFloat(uiEyeSeparationX.value)
+  configuration.display.eyeSeparation[1] = parseFloat(uiEyeSeparationY.value)
+  configuration.display.eyeSeparation[2] = parseFloat(uiEyeSeparationZ.value)
 
-  configuration.display.lowerLeft[0] = uiLowerLeftX.value
-  configuration.display.lowerLeft[1] = uiLowerLeftY.value
-  configuration.display.lowerLeft[2] = uiLowerLeftZ.value
+  configuration.display.lowerLeft[0] = parseFloat(uiLowerLeftX.value)
+  configuration.display.lowerLeft[1] = parseFloat(uiLowerLeftY.value)
+  configuration.display.lowerLeft[2] = parseFloat(uiLowerLeftZ.value)
 
-  configuration.display.lowerRight[0] = uiLowerRightX.value
-  configuration.display.lowerRight[1] = uiLowerRightY.value
-  configuration.display.lowerRight[2] = uiLowerRightZ.value
+  configuration.display.lowerRight[0] = parseFloat(uiLowerRightX.value)
+  configuration.display.lowerRight[1] = parseFloat(uiLowerRightY.value)
+  configuration.display.lowerRight[2] = parseFloat(uiLowerRightZ.value)
 
-  configuration.display.upperLeft[0] = uiUpperLeftX.value
-  configuration.display.upperLeft[1] = uiUpperLeftY.value
-  configuration.display.upperLeft[2] = uiUpperLeftZ.value
+  configuration.display.upperLeft[0] = parseFloat(uiUpperLeftX.value)
+  configuration.display.upperLeft[1] = parseFloat(uiUpperLeftY.value)
+  configuration.display.upperLeft[2] = parseFloat(uiUpperLeftZ.value)
 
-  configuration.initial.view.position   [0] = uiViewPositionX.value
-  configuration.initial.view.position   [1] = uiViewPositionY.value
-  configuration.initial.view.position   [2] = uiViewPositionZ.value
-  configuration.initial.view.orientation[0] = uiViewOrientationX.value
-  configuration.initial.view.orientation[1] = uiViewOrientationY.value
-  configuration.initial.view.orientation[2] = uiViewOrientationZ.value
+  configuration.initial.view.position   [0] = parseFloat(uiViewPositionX.value   )
+  configuration.initial.view.position   [1] = parseFloat(uiViewPositionY.value   )
+  configuration.initial.view.position   [2] = parseFloat(uiViewPositionZ.value   )
+  configuration.initial.view.orientation[0] = parseFloat(uiViewOrientationX.value)
+  configuration.initial.view.orientation[1] = parseFloat(uiViewOrientationY.value)
+  configuration.initial.view.orientation[2] = parseFloat(uiViewOrientationZ.value)
 
-  configuration.initial.tool.position   [0] = uiToolPositionX.value
-  configuration.initial.tool.position   [1] = uiToolPositionY.value
-  configuration.initial.tool.position   [2] = uiToolPositionZ.value
-  configuration.initial.tool.orientation[0] = uiToolOrientationX.value
-  configuration.initial.tool.orientation[1] = uiToolOrientationY.value
-  configuration.initial.tool.orientation[2] = uiToolOrientationZ.value
+  configuration.initial.tool.position   [0] = parseFloat(uiToolPositionX.value   )
+  configuration.initial.tool.position   [1] = parseFloat(uiToolPositionY.value   )
+  configuration.initial.tool.position   [2] = parseFloat(uiToolPositionZ.value   )
+  configuration.initial.tool.orientation[0] = parseFloat(uiToolOrientationX.value)
+  configuration.initial.tool.orientation[1] = parseFloat(uiToolOrientationY.value)
+  configuration.initial.tool.orientation[2] = parseFloat(uiToolOrientationZ.value)
 
   theConfiguration = configuration
 
