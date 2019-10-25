@@ -10,6 +10,7 @@ const vec3 = glMatrix.vec3
 
 
 function createSelector(gl, shapeProgram) {
+  console.debug("createSelector")
   const shapeBuffer = Buffers.createShapeBuffer(gl, shapeProgram, gl.TRIANGLES, Shapes.cone(1, 1))
   Buffers.insertPositions(1, [vec3.fromValues(0, 0, 0)         ], shapeBuffer)
   Buffers.updateRotations(1, [quat.fromValues(0, 0, 0, 1)      ], shapeBuffer) // FIXME: This differs from the Haskell version, which might be incorrect.
@@ -20,6 +21,7 @@ function createSelector(gl, shapeProgram) {
 
 
 function prepareSelector(gl, position, rotation, shapeBuffer) {
+  console.debug("prepareSelector")
   Buffers.updatePositions(1, [position], shapeBuffer)
   Buffers.updateRotations(1, [rotation], shapeBuffer)
   Buffers.prepareShapeBuffer(gl, shapeBuffer)
@@ -27,6 +29,7 @@ function prepareSelector(gl, position, rotation, shapeBuffer) {
 
 
 function drawSelector(gl, shapeBuffer) {
+  console.debug("drawSelector")
   Buffers.drawInstances(gl, shapeBuffer)
 }
 

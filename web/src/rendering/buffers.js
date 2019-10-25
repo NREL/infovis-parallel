@@ -96,6 +96,8 @@ function insertPosition(shapeBuffer, identifier, vertex) {
   empties1.forEach(function(x) {location = location == null ? x : Math.min(location, x)})
   empties1.delete(location)
 
+  console.debug("insertPosition: identifier =", identifier, ", vertex =", vertex)
+  console.debug("insertPosition: location = ", location, ", pendingSize1 =", pendingSize1, ", empties1 =", empties1)
   shapeBuffer.empties = empties1
   shapeBuffer.pendingSize = pendingSize1
   shapeBuffer.pendingPositions.set(location, vertex)
@@ -107,16 +109,19 @@ function insertPosition(shapeBuffer, identifier, vertex) {
 
 
 function updatePositions(identifier, positions, shapeBuffer) {
+  console.debug("updatePositions: identifier =", identifier, ", positions =", positions)
   updateAttributes(positionsLens, identifier, positions, shapeBuffer)
 }
 
 
 function updateRotations(identifier, rotations, shapeBuffer) {
+  console.debug("updateRotations: identifier =", identifier, ", rotations =", rotations)
   updateAttributes(rotationsLens, identifier, rotations, shapeBuffer)
 }
 
 
 function updateScales(identifier, scales, shapeBuffer) {
+  console.debug("updateScales: identifier =", identifier, ", scales =", scales)
   updateAttributes(scalesLens, identifier, scales, shapeBuffer)
 }
 
@@ -133,6 +138,7 @@ function updateAttributes(field, identifier, values, shapeBuffer) {
 
 
 function updateColor(identifier, color, shapeBuffer) {
+  console.debug("updateColor: identifier =", identifier, ", color =", color)
   updateAttribute(colorsLens, identifier, color, shapeBuffer)
 }
 
@@ -160,6 +166,7 @@ function deleteInstance(shapeBuffer, identifier) {
 
 
 function prepareShapeBuffer(gl, shapeBuffer) {
+  console.debug("prepareShapeBuffer")
   expandShapeBuffer(gl, shapeBuffer)
   updateShapeBuffer(gl, shapeBuffer)
 }
@@ -172,6 +179,8 @@ function updateShapeBuffer(gl, shapeBuffer) {
       shapeBuffer.pendingScales.size    +
       shapeBuffer.pendingColors     == 0)
     return
+
+  console.debug("updateShapeBuffer")
 
   updateBuffer(gl, shapeBuffer.pendingPositions, shapeBuffer.positions, shapeBuffer.shapeProgram.positionsDescription)
   updateBuffer(gl, shapeBuffer.pendingRotations, shapeBuffer.rotations, shapeBuffer.shapeProgram.rotationsDescription)
@@ -208,6 +217,8 @@ function expandShapeBuffer(gl, shapeBuffer) {
     return Array.from({length: pendingSize}, (v, k) => value)
   }
 
+  console.debug("expandShapeBuffer: size =", size, ", pendingSize =", pendingSize)
+
   if (size == 0) {
     shapeBuffer.positions = buildBuffer(gl, replicate(zeroPosition), shapeBuffer.shapeProgram.positionsDescription)
     shapeBuffer.rotations = buildBuffer(gl, replicate(zeroRotation), shapeBuffer.shapeProgram.rotationsDescription)
@@ -230,6 +241,8 @@ function drawInstances(gl, shapeBuffer) {
   if (shapeBuffer.size == 0)
     return
 
+  console.debug("drawInstances: vertices =", shapeBuffer.vertexCount, ", instances =", shapeBuffer.instanceCount)
+
   const shapeProgram = shapeBuffer.shapeProgram
 
   Program.selectShapeProgram(gl, shapeProgram)
@@ -240,12 +253,15 @@ function drawInstances(gl, shapeBuffer) {
   Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
   Program.bindColors   (gl, shapeProgram, shapeBuffer.colors   )
 
+  console.debug("drawInstances: gl.drawArraysInstanced")
   gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)
 
 }
 
 
 function buildBuffer(gl, primitives, description) {
+
+  console.debug("buildBuffer: description = ", description, ", primitives ="  , primitives)
 
   const components = description.components
   const bufferObject = gl.createBuffer()
@@ -272,6 +288,8 @@ function buildBuffer(gl, primitives, description) {
 
 function updateBuffer(gl, updates, bufferObject, description) {
 
+  console.debug("updateBuffer: description = ", description, ", updates ="     , updates)
+
   const components = description.components
   const bytes = description.isFloat ?
     new Float32Array(components)    :
@@ -294,6 +312,8 @@ function updateBuffer(gl, updates, bufferObject, description) {
 
 
 function expandBuffer(gl, description, oldSize, newSize, oldBufferObject) {
+
+  console.debug("expandBuffer: description = ", description, ", oldSize =", oldSize, ", newSize =", newSize)
 
   const bytes = 4 // 32-bit elements.
   const components = description.components

@@ -8,8 +8,8 @@ const requestQueue = []
 
 
 function echoHandler(connection, request) {
+  console.debug("echoHandler: request =", request)
   requestQueue.unshift(request)
-  window.lastRequest = request
 }
 
 

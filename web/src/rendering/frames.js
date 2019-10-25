@@ -58,13 +58,15 @@ function delete0(identifiers, manager) {
 
 
 function prepare(gl, manager) {
-  manager.frames.forEach((frame, _) => prepareFrame(gl, frame))
+  manager.frames.forEach((frame, f) => {console.debug("prepare: frame =", f); prepareFrame(gl, frame)})
 }
 
 
 function draw(gl, manager) {
-  if (manager.frames.has(manager.current))
+  if (manager.frames.has(manager.current)) {
+    console.debug("draw: frame =", manager.current)
     drawFrame(gl, manager.frames.get(manager.current))
+  }
 }
 
 
@@ -144,12 +146,12 @@ function deleteFrame(frame, identifiers) {
 
 
 function prepareFrame(gl, frame) {
-  frame.forEach((display, _) => prepareDisplay(gl, display))
+  frame.forEach((display, mesh) => {console.debug("prepareFrame: mesh =", mesh); prepareDisplay(gl, display)})
 }
 
 
 function drawFrame(gl, frame) {
-  frame.forEach((display, _) => drawDisplay(gl, display))
+  frame.forEach((display, mesh) => {console.debug("drawFrame: mesh =", mesh); drawDisplay(gl, display)})
 }
 
 
