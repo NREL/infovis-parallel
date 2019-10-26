@@ -19,8 +19,8 @@ const zero = vec3.fromValues(0, 0, 0)
 
 
 // FIXME: Investigate
-const useBlending = false
-const useCulling = false
+const useBlending = true
+const useCulling = true
 
 
 function setupCanvas(gl) {
