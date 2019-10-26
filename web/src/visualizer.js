@@ -96,7 +96,8 @@ function visualizeBuffers(gl, configuration, requests) {
       while (requests.length > 0) {
         const request = requests.pop()
         console.debug("animation: request =", request)
-//      Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+        if (!Rendering.Program.isDEBUG())
+          Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
       }
 
       setupCanvas(gl)
@@ -135,14 +136,16 @@ function visualizeBuffers(gl, configuration, requests) {
       , configuration.display.nearPlane
       , configuration.display.farPlane
       )
-      const modelView1 = mat4.translate(mat4.create(), mat4.create(), graphics.offset.position)
 
       if (Rendering.Program.isDEBUG())
-        Rendering.Buffers.drawInstances(gl, shapeBuffer, projection1, modelView1)
+        Rendering.Buffers.drawInstances(gl, shapeBuffer, projection1, modelView)
       else {
         Rendering.Frames.draw(gl, graphics.manager, projection, modelView)
         Rendering.Selector.draw(gl, graphics.selector, projection, modelView)
       }
+
+console.log("projection =", projection)
+console.log("projection1 =", projection1)
 
     }
 
