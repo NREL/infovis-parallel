@@ -1,6 +1,6 @@
 
 const Rendering = {
-  Debug      : require("./rendering/debug"     )
+  Buffers    : require("./rendering/buffers"   )
 , Frames     : require("./rendering/frames"    )
 , Linear     : require("./rendering/linear"    )
 , Program    : require("./rendering/program"   )
@@ -17,6 +17,11 @@ const vec3 = glMatrix.vec3
 const zero = vec3.fromValues(0, 0, 0)
 
 
+// FIXME: Investigate
+const useBlending = false
+const useCulling = false
+
+
 function setupCanvas(gl) {
 
   console.debug("setupCanvas")
@@ -29,14 +34,12 @@ function setupCanvas(gl) {
   gl.enable(gl.DEPTH_TEST)
   gl.depthFunc(gl.LEQUAL)
 
-  // FIXME: Test before using.
-  if (false) {
+  if (useBlending) {
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
   }
 
-  // FIXME: Test before using.
-  if (false) {
+  if (useCulling) {
     gl.enable(gl.CULL_FACE)
     gl.cullFace(gl.BACK)
   }
@@ -60,9 +63,29 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 
 function visualizeBuffers(gl, configuration, requests) {
 
-  if (true) {
-    Rendering.Debug.main(gl)
+  if (Rendering.Program.isDEBUG()) {
+
+    const shapeProgram = Rendering.Program.prepareShapeProgram(gl)
+    Rendering.Program.selectShapeProgram(gl, shapeProgram)
+
+    const shapeBuffer = Rendering.Buffers.createShapeBuffer(
+      gl
+    , shapeProgram
+    , gl.TRIANGLES
+    , [[-0.3, -0.5], [0.3, -0.5], [0.0, 0.5]]
+    )
+
+    const primitives = [[1.0, 0.5, 0.0], [0.0, 0.5, 1.0]]
+    shapeBuffer.colors = Rendering.Buffers.buildBuffer(gl, primitives, shapeProgram.colorsDescription)
+    shapeBuffer.instanceCount = primitives.length
+    shapeBuffer.size = primitives.length
+
+    setupCanvas(gl)
+
+    Rendering.Buffers.drawInstances(gl, shapeBuffer)
+
     return
+
   }
 
   const graphics = initializeGraphics(

@@ -190,5 +190,6 @@ module.exports = {
 , bindScales              : bindScales
 , bindColors              : bindColors
 
+, isDEBUG                 : () => DEBUG
 , bindAttributes          : bindAttributes
 }

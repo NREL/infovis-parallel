@@ -43,10 +43,18 @@ function hasIdentifier(shapeBuffer, identifier) {
 
 
 function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
-  return {
+  return Program.isDEBUG() ? {
     shapeProgram     : shapeProgram
   , primitiveMode    : primitiveMode
-  , mesh             : buildBuffer(gl, primitives, {components: 3, isFloat: true})
+  , mesh             : buildBuffer(gl, primitives, shapeProgram.meshDescription)
+  , vertexCount      : primitives.length
+  , instanceCount    : 0
+  , colors           : null
+  , size             : 0
+  } : {
+    shapeProgram     : shapeProgram
+  , primitiveMode    : primitiveMode
+  , mesh             : buildBuffer(gl, primitives, shapeProgram.meshDescription)
   , vertexCount      : primitives.length
   , instanceCount    : 0
   , positions        : null
@@ -248,9 +256,11 @@ function drawInstances(gl, shapeBuffer) {
   Program.selectShapeProgram(gl, shapeProgram)
 
   Program.bindMesh     (gl, shapeProgram, shapeBuffer.mesh     )
-  Program.bindPositions(gl, shapeProgram, shapeBuffer.positions)
-  Program.bindRotations(gl, shapeProgram, shapeBuffer.rotations)
-  Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
+  if (!Program.isDEBUG()) {
+    Program.bindPositions(gl, shapeProgram, shapeBuffer.positions)
+    Program.bindRotations(gl, shapeProgram, shapeBuffer.rotations)
+    Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
+  }
   Program.bindColors   (gl, shapeProgram, shapeBuffer.colors   )
 
   console.debug("drawInstances: gl.drawArraysInstanced")
