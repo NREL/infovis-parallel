@@ -15,14 +15,20 @@ uniform mat4 projection_modelview;
 in vec3 mesh_position;
 
 in vec3 instance_position;
-in vec4 instance_color;
+in vec4 instance_rotation;
+in vec3 instance_scale   ;
+in uint instance_color;
 
 flat out vec4 vColor;
 
 void main()
 {
-    vColor = instance_color;
-    gl_Position = projection_modelview * vec4(mesh_position + instance_position, 1.0);
+  vColor = vec4(float((0xFF000000u & instance_color) >> 24) / 255.,
+                float((0x00FF0000u & instance_color) >> 16) / 255.,
+                float((0x0000FF00u & instance_color) >>  8) / 255.,
+                float( 0x000000FFu & instance_color       ) / 255.);
+  gl_Position = instance_rotation;
+  gl_Position = projection_modelview * vec4(mesh_position * instance_scale + instance_position, 1.0);
 }
 ` : `#version 300 es
 
@@ -84,16 +90,7 @@ function prepareShapeProgram(gl) {
   if (!gl.getProgramParameter(program, gl.LINK_STATUS))
     throw new Error("Could not link program: " + gl.getProgramInfoLog(program))
 
-  return DEBUG ? {
-    program              : program
-  , pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
-  , meshLocation         : gl.getAttribLocation (program, "mesh_position"       )
-  , positionsLocation    : gl.getAttribLocation (program, "instance_position"   )
-  , colorsLocation       : gl.getAttribLocation (program, "instance_color"      )
-  , meshDescription      : {components: 3, isFloat: true}
-  , positionsDescription : {components: 3, isFloat: true}
-  , colorsDescription    : {components: 3, isFloat: true}
-  } : {
+  return {
     program              : program
   , pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
   , meshLocation         : gl.getAttribLocation (program, "mesh_position"       )

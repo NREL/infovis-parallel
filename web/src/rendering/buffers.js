@@ -43,16 +43,7 @@ function hasIdentifier(shapeBuffer, identifier) {
 
 
 function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
-  return Program.isDEBUG() ? {
-    shapeProgram     : shapeProgram
-  , primitiveMode    : primitiveMode
-  , mesh             : buildBuffer(gl, primitives, shapeProgram.meshDescription)
-  , vertexCount      : primitives.length
-  , instanceCount    : 0
-  , positions        : null
-  , colors           : null
-  , size             : 0
-  } : {
+  return {
     shapeProgram     : shapeProgram
   , primitiveMode    : primitiveMode
   , mesh             : buildBuffer(gl, primitives, shapeProgram.meshDescription)
@@ -258,10 +249,8 @@ function drawInstances(gl, shapeBuffer, projection, modelView) {
 
   Program.bindMesh     (gl, shapeProgram, shapeBuffer.mesh     )
   Program.bindPositions(gl, shapeProgram, shapeBuffer.positions)
-  if (!Program.isDEBUG()) {
-    Program.bindRotations(gl, shapeProgram, shapeBuffer.rotations)
-    Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
-  }
+  Program.bindRotations(gl, shapeProgram, shapeBuffer.rotations)
+  Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
   Program.bindColors   (gl, shapeProgram, shapeBuffer.colors   )
 
   Program.setProjectionModelView(gl, shapeProgram, projection, modelView)
