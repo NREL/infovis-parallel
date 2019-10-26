@@ -49,6 +49,7 @@ function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
   , mesh             : buildBuffer(gl, primitives, shapeProgram.meshDescription)
   , vertexCount      : primitives.length
   , instanceCount    : 0
+  , positions        : null
   , colors           : null
   , size             : 0
   } : {
@@ -256,8 +257,8 @@ function drawInstances(gl, shapeBuffer, projection, modelView) {
   Program.selectShapeProgram(gl, shapeProgram)
 
   Program.bindMesh     (gl, shapeProgram, shapeBuffer.mesh     )
+  Program.bindPositions(gl, shapeProgram, shapeBuffer.positions)
   if (!Program.isDEBUG()) {
-    Program.bindPositions(gl, shapeProgram, shapeBuffer.positions)
     Program.bindRotations(gl, shapeProgram, shapeBuffer.rotations)
     Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
   }

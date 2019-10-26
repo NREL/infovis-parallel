@@ -111,13 +111,23 @@ function visualizeBuffers(gl, configuration, requests) {
           gl
         , graphics.manager.program
         , gl.TRIANGLES
-        , [[-0.3, -0.5], [0.3, -0.5], [0.0, 0.5]]
+        , [[-0.3, -0.5, 0], [0.3, -0.5, 0], [0.0, 0.5, 0]]
         )
 
-        const primitives = [[1.0, 0.5, 0.0], [0.0, 0.5, 1.0]]
-        shapeBuffer.colors = Rendering.Buffers.buildBuffer(gl, primitives, graphics.manager.program.colorsDescription)
-        shapeBuffer.instanceCount = primitives.length
-        shapeBuffer.size = primitives.length
+        const positions = [[-0.5, 0, 0], [0.5, 0, 0]]
+        shapeBuffer.positions = Rendering.Buffers.buildBuffer(gl, positions, graphics.manager.program.positionsDescription)
+
+//      const rotations = [[0, 0, 0, 1], [0, 0, 0, 1]]
+//      shapeBuffer.rotations = Rendering.Buffers.buildBuffer(gl, rotations, graphics.manager.program.rotationsDescription)
+
+//      const scales = [[1, 1, 1], [1, 1, 1]]
+//      shapeBuffer.scales = Rendering.Buffers.buildBuffer(gl, scales, graphics.manager.program.scalesDescription)
+
+        const colors = [[1.0, 0.5, 0.0], [0.0, 0.5, 1.0]]
+        shapeBuffer.colors = Rendering.Buffers.buildBuffer(gl, colors, graphics.manager.program.colorsDescription)
+
+        shapeBuffer.instanceCount = positions.length
+        shapeBuffer.size = positions.length
 
       } else {
 

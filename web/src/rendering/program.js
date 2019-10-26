@@ -12,15 +12,17 @@ const vertexShaderSource = DEBUG ? `#version 300 es
 
 uniform mat4 projection_modelview;
 
-in vec2 pos;
-in vec4 color;
+in vec3 mesh_position;
 
-flat out vec4 v_color;
+in vec3 instance_position;
+in vec4 instance_color;
+
+flat out vec4 vColor;
 
 void main()
 {
-    v_color = color;
-    gl_Position = projection_modelview * vec4(pos + vec2(float(gl_InstanceID) - 0.5, 0.0), 0.0, 1.0);
+    vColor = instance_color;
+    gl_Position = projection_modelview * vec4(mesh_position + instance_position, 1.0);
 }
 ` : `#version 300 es
 
@@ -50,23 +52,11 @@ void main() {
 `
 
 
-const fragmentShaderSource = DEBUG ? `#version 300 es
+const fragmentShaderSource = `#version 300 es
 
 precision highp float;
 
-flat in vec4 v_color;
-
-out vec4 color;
-
-void main()
-{
-    color = v_color;
-}
-` : `#version 300 es
-
-precision mediump float;
-
-in  vec4 vColor;
+flat in vec4 vColor;
 out vec4 color;
 
 void main(void) {
@@ -97,9 +87,11 @@ function prepareShapeProgram(gl) {
   return DEBUG ? {
     program              : program
   , pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
-  , meshLocation         : gl.getAttribLocation (program, "pos"  )
-  , colorsLocation       : gl.getAttribLocation (program, "color")
-  , meshDescription      : {components: 2, isFloat: true}
+  , meshLocation         : gl.getAttribLocation (program, "mesh_position"       )
+  , positionsLocation    : gl.getAttribLocation (program, "instance_position"   )
+  , colorsLocation       : gl.getAttribLocation (program, "instance_color"      )
+  , meshDescription      : {components: 3, isFloat: true}
+  , positionsDescription : {components: 3, isFloat: true}
   , colorsDescription    : {components: 3, isFloat: true}
   } : {
     program              : program
