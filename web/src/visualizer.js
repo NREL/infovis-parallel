@@ -66,7 +66,7 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 
 function visualizeBuffers(gl, configuration, requests) {
 
-  const graphics = DEBUG ? {
+  const graphics = false && DEBUG ? {
     manager: {
       program: Rendering.Program.prepareShapeProgram(gl)
     }
@@ -99,7 +99,7 @@ function visualizeBuffers(gl, configuration, requests) {
       while (requests.length > 0) {
         const request = requests.pop()
         console.debug("animation: request =", request)
-        if (!DEBUG)
+        if (true || !DEBUG)
           Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
       }
 
@@ -108,7 +108,7 @@ function visualizeBuffers(gl, configuration, requests) {
       Rendering.Program.selectShapeProgram(gl, graphics.manager.program)
 
       let shapeBuffer = null
-      if (DEBUG) {
+      if (false && DEBUG) {
 
         shapeBuffer = Rendering.Buffers.createShapeBuffer(
           gl
@@ -153,7 +153,7 @@ function visualizeBuffers(gl, configuration, requests) {
       , configuration.display.farPlane
       )
 
-      if (DEBUG)
+      if (false && DEBUG)
         Rendering.Buffers.drawInstances(gl, shapeBuffer, projection1, modelView)
       else {
         Rendering.Frames.draw(gl, graphics.manager, projection, modelView)
