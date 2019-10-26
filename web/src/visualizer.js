@@ -118,8 +118,7 @@ function visualizeBuffers(gl, configuration, requests) {
       Rendering.Frames.prepare(gl, graphics.manager)
       Rendering.Selector.prepare(gl, graphics.tool.position, graphics.tool.rotation, graphics.selector)
 
-      // FIXME: Test before using.
-      if (false) {
+      if (!Rendering.Program.isDEBUG()) {
 
         const  projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
         const modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
