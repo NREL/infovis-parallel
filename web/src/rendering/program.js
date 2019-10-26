@@ -133,16 +133,16 @@ function bindColors(gl, shapeProgram, bufferObject) {
 
 function bindAttributes(gl, instanced, location, description, buffer) {
 
-  const bytes = 4 // 32-bit elements.
+  const byteCount = 4 // 32-bit elements.
 
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
 
   gl.enableVertexAttribArray(location)
 
   if (description.isFloat)
-    gl.vertexAttribPointer (location, description.components, gl.FLOAT, false, description.components * bytes, 0)
+    gl.vertexAttribPointer (location, description.components, gl.FLOAT, false, description.components * byteCount, 0)
   else
-    gl.vertexAttribIPointer(location, description.components, gl.UNSIGNED_INT, description.components * bytes, 0)
+    gl.vertexAttribIPointer(location, description.components, gl.UNSIGNED_INT, description.components * byteCount, 0)
 
   if (instanced)
     gl.vertexAttribDivisor(location, 1)

@@ -173,9 +173,9 @@ function prepareShapeBuffer(gl, shapeBuffer) {
 
     ;
 
-  else if (shapeBuffer.size == 0) {
+  else if (false && shapeBuffer.size == 0) {
 
-    if (true) {
+    if (false) {
 
       shapeBuffer.positions = buildBuffer(gl, Array.from(shapeBuffer.pendingPositions.values()), shapeBuffer.shapeProgram.positionsDescription)
       shapeBuffer.rotations = buildBuffer(gl, Array.from(shapeBuffer.pendingRotations.values()), shapeBuffer.shapeProgram.rotationsDescription)
@@ -346,8 +346,13 @@ function updateBuffer(gl, updates, bufferObject, description) {
 
   console.debug("updateBuffer: description = ", description, ", updates ="     , updates)
 
+  const byteCount = 4 // 32-bit elements.
+
   const components = description.components
   const bytes = description.isFloat ?
+    new Float32Array(components)    :
+    new Uint32Array (components)
+  const bytes1 = description.isFloat ?
     new Float32Array(components)    :
     new Uint32Array (components)
 
@@ -359,8 +364,17 @@ function updateBuffer(gl, updates, bufferObject, description) {
     else
       for (let j = 0; j < components; ++j)
         bytes[j] = value[j]
-    gl.bufferSubData(gl.ARRAY_BUFFER, components * location, bytes)
+    console.debug("updateBuffer: bytes =", bytes)
+    gl.bufferSubData   (gl.ARRAY_BUFFER, location * components * byteCount, bytes )
+    gl.getBufferSubData(gl.ARRAY_BUFFER, location * components * byteCount, bytes1)
+    console.debug("updateBuffer: bytes1 =", bytes1)
   })
+
+  const bytes2 = description.isFloat ?
+    new Float32Array(2 * components) :
+    new Uint32Array (2 * components)
+  gl.getBufferSubData(gl.ARRAY_BUFFER, 0, bytes2)
+  console.debug("updateBuffer: bytes2 =", bytes2)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
@@ -371,17 +385,17 @@ function expandBuffer(gl, description, oldSize, newSize, oldBufferObject) {
 
   console.debug("expandBuffer: description = ", description, ", oldSize =", oldSize, ", newSize =", newSize)
 
-  const bytes = 4 // 32-bit elements.
+  const byteCount = 4 // 32-bit elements.
   const components = description.components
 
   const newBufferObject = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, newBufferObject)
-  gl.bufferData(newBufferObject, bytes * components * newSize, gl.DYNAMIC_DRAW)
+  gl.bufferData(newBufferObject, newSize * components * byteCount, gl.DYNAMIC_DRAW)
   gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
   gl.bindBuffer(gl.COPY_READ_BUFFER , oldBufferObject)
   gl.bindBuffer(gl.COPY_WRITE_BUFFER, newBufferObject)
-  gl.copyBufferSubData(gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, bytes * components * oldSize)
+  gl.copyBufferSubData(gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, 0, 0, oldSize * components * byteCount)
   gl.bindBuffer(gl.COPY_READ_BUFFER, null)
   gl.bindBuffer(gl.COPY_WRITE_BUFFER, null)
 
