@@ -166,9 +166,43 @@ function deleteInstance(shapeBuffer, identifier) {
 
 
 function prepareShapeBuffer(gl, shapeBuffer) {
+
   console.debug("prepareShapeBuffer")
-  expandShapeBuffer(gl, shapeBuffer)
-  updateShapeBuffer(gl, shapeBuffer)
+
+  if (shapeBuffer.pendingSize == 0)
+
+    ;
+
+  else if (shapeBuffer.size == 0) {
+
+    shapeBuffer.positions = buildBuffer(gl, Array.from(shapeBuffer.pendingPositions.values()), shapeBuffer.shapeProgram.positionsDescription)
+    shapeBuffer.rotations = buildBuffer(gl, Array.from(shapeBuffer.pendingRotations.values()), shapeBuffer.shapeProgram.rotationsDescription)
+    shapeBuffer.scales    = buildBuffer(gl, Array.from(shapeBuffer.pendingScales.values()   ), shapeBuffer.shapeProgram.scalesDescription   )
+    shapeBuffer.colors    = buildBuffer(gl, Array.from(shapeBuffer.pendingColors.values()   ), shapeBuffer.shapeProgram.colorsDescription   )
+
+    shapeBuffer.size = shapeBuffer.pendingSize
+
+    let location = null
+    shapeBuffer.locationses.forEach((xs, _) =>
+      xs.forEach(
+        function(x) {
+          location = Math.max(location, x)
+        }
+      )
+    )
+
+    shapeBuffer.instanceCount    = location + 1
+    shapeBuffer.pendingPositions = new Map()
+    shapeBuffer.pendingRotations = new Map()
+    shapeBuffer.pendingScales    = new Map()
+    shapeBuffer.pendingColors    = new Map()
+
+  } else {
+
+    expandShapeBuffer(gl, shapeBuffer)
+    updateShapeBuffer(gl, shapeBuffer)
+
+  }
 }
 
 
@@ -280,6 +314,7 @@ function buildBuffer(gl, primitives, description) {
     for (let i = 0; i < primitives.length; ++i)
       for (let j = 0; j < components; ++j)
         bytes[i * components + j] = primitives[i][j]
+  console.debug("buildBuffer: bytes =", bytes)
   gl.bufferData(gl.ARRAY_BUFFER, bytes, gl.DYNAMIC_DRAW)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null)

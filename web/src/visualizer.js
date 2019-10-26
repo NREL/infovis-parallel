@@ -118,19 +118,22 @@ function visualizeBuffers(gl, configuration, requests) {
         )
 
         const positions = [[-0.5, 0, 0], [0.5, 0, 0]]
-        shapeBuffer.positions = Rendering.Buffers.buildBuffer(gl, positions, graphics.manager.program.positionsDescription)
+        for (let i = 0; i < positions.length; ++i)
+          Rendering.Buffers.insertPositions(101 + i, [positions[i]], shapeBuffer)
 
         const rotations = [[Math.sqrt(2), 0, 0, Math.sqrt(2)], [0, 0, 0, 1]]
-        shapeBuffer.rotations = Rendering.Buffers.buildBuffer(gl, rotations, graphics.manager.program.rotationsDescription)
+        for (let i = 0; i < rotations.length; ++i)
+          Rendering.Buffers.updateRotations(101 +i, [rotations[i]], shapeBuffer)
 
         const scales = [[0.75, 0.75, 0.75], [1.25, 1.25, 1.25]]
-        shapeBuffer.scales = Rendering.Buffers.buildBuffer(gl, scales, graphics.manager.program.scalesDescription)
+        for (let i = 0; i < rotations.length; ++i)
+          Rendering.Buffers.updateScales(101 + i, [scales[i]], shapeBuffer)
 
         const colors = [2798576639, 528004351]
-        shapeBuffer.colors = Rendering.Buffers.buildBuffer(gl, colors, graphics.manager.program.colorsDescription)
+        for (let i = 0; i < rotations.length; ++i)
+          Rendering.Buffers.updateColor(101 + i, colors[i], shapeBuffer)
 
-        shapeBuffer.instanceCount = positions.length
-        shapeBuffer.size = positions.length
+        Rendering.Buffers.prepareShapeBuffer(gl, shapeBuffer)
 
       } else {
 
