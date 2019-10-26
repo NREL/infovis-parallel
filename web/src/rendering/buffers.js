@@ -263,14 +263,14 @@ function buildBuffer(gl, primitives, description) {
 
   console.debug("buildBuffer: description = ", description, ", primitives ="  , primitives)
 
-  const components = description.components
   const bufferObject = gl.createBuffer()
-  const bytes = description.isFloat                  ?
-    new Float32Array(primitives.length * components) :
-    new Uint32Array (primitives.length * components)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferObject)
 
+  const components = description.components
+  const bytes = description.isFloat                  ?
+    new Float32Array(primitives.length * components) :
+    new Uint32Array (primitives.length * components)
   if (components == 1)
     for (let i = 0; i < primitives.length; ++i)
       bytes[i] = primitives[i]
@@ -346,4 +346,6 @@ module.exports = {
 , updateColor        : updateColor
 , deleteInstance     : deleteInstance
 , drawInstances      : drawInstances
+
+, buildBuffer        : buildBuffer
 }

@@ -1,6 +1,7 @@
 
 const Rendering = {
-  Frames     : require("./rendering/frames"    )
+  Debug      : require("./rendering/debug"     )
+,Frames     : require("./rendering/frames"    )
 , Linear     : require("./rendering/linear"    )
 , Program    : require("./rendering/program"   )
 , Projection : require("./rendering/projection")
@@ -35,8 +36,10 @@ function setupCanvas(gl) {
   }
 
   // FIXME: Test before using.
-  if (false)
+  if (false) {
     gl.enable(gl.CULL_FACE)
+    gl.cullFace(gl.BACK)
+  }
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
@@ -56,6 +59,11 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 
 
 function visualizeBuffers(gl, configuration, requests) {
+
+  if (true) {
+    Rendering.Debug.main(gl)
+    return
+  }
 
   const graphics = initializeGraphics(
     gl

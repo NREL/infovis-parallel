@@ -47,8 +47,7 @@ void main(void) {
 }
 `
 
-
-function prepareShapeProgram(gl) {
+function prepareShapeProgram(gl, vs, fs) {
 
   function makeShader(name, type, source) {
     const shader = gl.createShader(type)
@@ -60,25 +59,25 @@ function prepareShapeProgram(gl) {
   }
 
   const program = gl.createProgram()
-  gl.attachShader(program, makeShader("vertex"  , gl.VERTEX_SHADER  , vertexShaderSource  ))
-  gl.attachShader(program, makeShader("fragment", gl.FRAGMENT_SHADER, fragmentShaderSource))
+  gl.attachShader(program, makeShader("vertex"  , gl.VERTEX_SHADER  , vs))//vertexShaderSource  ))
+  gl.attachShader(program, makeShader("fragment", gl.FRAGMENT_SHADER, fs))//fragmentShaderSource))
   gl.linkProgram(program)
   if (!gl.getProgramParameter(program, gl.LINK_STATUS))
     throw new Error("Could not link program: " + gl.getProgramInfoLog(program))
 
   return {
     program              : program
-  , pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
-  , meshLocation         : gl.getAttribLocation (program, "mesh_position"       )
-  , positionsLocation    : gl.getAttribLocation (program, "instance_position"   )
-  , rotationsLocation    : gl.getAttribLocation (program, "instance_rotation"   )
-  , scalesLocation       : gl.getAttribLocation (program, "instance_scale"      )
-  , colorsLocation       : gl.getAttribLocation (program, "instance_color"      )
-  , meshDescription      : {components: 3, isFloat: true }
-  , positionsDescription : {components: 3, isFloat: true }
-  , rotationsDescription : {components: 4, isFloat: true }
-  , scalesDescription    : {components: 3, isFloat: true }
-  , colorsDescription    : {components: 1, isFloat: false}
+//, pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
+//, meshLocation         : gl.getAttribLocation (program, "mesh_position"       )
+//, positionsLocation    : gl.getAttribLocation (program, "instance_position"   )
+//, rotationsLocation    : gl.getAttribLocation (program, "instance_rotation"   )
+//, scalesLocation       : gl.getAttribLocation (program, "instance_scale"      )
+//, colorsLocation       : gl.getAttribLocation (program, "instance_color"      )
+//, meshDescription      : {components: 3, isFloat: true }
+//, positionsDescription : {components: 3, isFloat: true }
+//, rotationsDescription : {components: 4, isFloat: true }
+//, scalesDescription    : {components: 3, isFloat: true }
+//, colorsDescription    : {components: 1, isFloat: false}
   }
 
 }
@@ -140,6 +139,8 @@ function bindAttributes(gl, instanced, location, description, buffer) {
 
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
 
+  gl.enableVertexAttribArray(location)
+
   if (description.isFloat)
     gl.vertexAttribPointer (location, description.components, gl.FLOAT, false, description.components * bytes, 0)
   else
@@ -148,7 +149,7 @@ function bindAttributes(gl, instanced, location, description, buffer) {
   if (instanced)
     gl.vertexAttribDivisor(location, 1)
 
-  gl.enableVertexAttribArray(location)
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
 }
 
@@ -162,4 +163,6 @@ module.exports = {
 , bindRotations           : bindRotations
 , bindScales              : bindScales
 , bindColors              : bindColors
+
+, bindAttributes          : bindAttributes
 }
