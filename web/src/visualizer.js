@@ -18,8 +18,6 @@ const vec3 = glMatrix.vec3
 const zero = vec3.fromValues(0, 0, 0)
 
 
-const DEBUG = true
-
 // FIXME: Investigate
 const useBlending = false
 const useCulling = false
@@ -66,19 +64,7 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 
 function visualizeBuffers(gl, configuration, requests) {
 
-  const graphics = false && DEBUG ? {
-    manager: {
-      program: Rendering.Program.prepareShapeProgram(gl)
-    }
-  , pov: {
-      position: configuration.initial.view.position
-    , rotation: configuration.initial.view.orientation
-    }
-  , offset: {
-      position: vec3.fromValues(0, 0, -10)
-    , rotation: Rendering.Linear.fromEulerd(zero)
-    }
-  } : initializeGraphics(
+  const graphics = initializeGraphics(
     gl
   , {
       position: configuration.initial.view.position
@@ -99,48 +85,15 @@ function visualizeBuffers(gl, configuration, requests) {
       while (requests.length > 0) {
         const request = requests.pop()
         console.debug("animation: request =", request)
-        if (true || !DEBUG)
-          Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+        Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
       }
 
       setupCanvas(gl)
 
       Rendering.Program.selectShapeProgram(gl, graphics.manager.program)
 
-      let shapeBuffer = null
-      if (false && DEBUG) {
-
-        shapeBuffer = Rendering.Buffers.createShapeBuffer(
-          gl
-        , graphics.manager.program
-        , gl.TRIANGLES
-        , Rendering.Shapes.cube(0.3)
-        )
-
-        const positions = [[-0.5, 0, 0], [0.5, 0, 0]]
-        for (let i = 0; i < positions.length; ++i)
-          Rendering.Buffers.insertPositions(101 + i, [positions[i]], shapeBuffer)
-
-        const rotations = [[Math.sqrt(2), 0, 0, Math.sqrt(2)], [0, 0, 0, 1]]
-        for (let i = 0; i < rotations.length; ++i)
-          Rendering.Buffers.updateRotations(101 +i, [rotations[i]], shapeBuffer)
-
-        const scales = [[0.75, 0.75, 0.75], [1.25, 1.25, 1.25]]
-        for (let i = 0; i < rotations.length; ++i)
-          Rendering.Buffers.updateScales(101 + i, [scales[i]], shapeBuffer)
-
-        const colors = [2798576639, 528004351]
-        for (let i = 0; i < rotations.length; ++i)
-          Rendering.Buffers.updateColor(101 + i, colors[i], shapeBuffer)
-
-        Rendering.Buffers.prepareShapeBuffer(gl, shapeBuffer)
-
-      } else {
-
-        Rendering.Frames.prepare(gl, graphics.manager)
-        Rendering.Selector.prepare(gl, graphics.tool.position, graphics.tool.rotation, graphics.selector)
-
-      }
+      Rendering.Frames.prepare(gl, graphics.manager)
+      Rendering.Selector.prepare(gl, graphics.tool.position, graphics.tool.rotation, graphics.selector)
 
       const projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
       const modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
@@ -153,15 +106,11 @@ function visualizeBuffers(gl, configuration, requests) {
       , configuration.display.farPlane
       )
 
-      if (false && DEBUG)
-        Rendering.Buffers.drawInstances(gl, shapeBuffer, projection1, modelView)
-      else {
-        Rendering.Frames.draw(gl, graphics.manager, projection, modelView)
-        Rendering.Selector.draw(gl, graphics.selector, projection, modelView)
-      }
+      Rendering.Frames.draw(gl, graphics.manager, projection, modelView)
+      Rendering.Selector.draw(gl, graphics.selector, projection, modelView)
 
-console.log("projection =", projection)
-console.log("projection1 =", projection1)
+      console.log("projection =", projection)
+      console.log("projection1 =", projection1)
 
     }
 

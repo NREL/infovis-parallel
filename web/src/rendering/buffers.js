@@ -169,59 +169,8 @@ function prepareShapeBuffer(gl, shapeBuffer) {
 
   console.debug("prepareShapeBuffer")
 
-  if (shapeBuffer.pendingSize == 0)
-
-    ;
-
-  else if (false && shapeBuffer.size == 0) {
-
-    if (false) {
-
-      shapeBuffer.positions = buildBuffer(gl, Array.from(shapeBuffer.pendingPositions.values()), shapeBuffer.shapeProgram.positionsDescription)
-      shapeBuffer.rotations = buildBuffer(gl, Array.from(shapeBuffer.pendingRotations.values()), shapeBuffer.shapeProgram.rotationsDescription)
-      shapeBuffer.scales    = buildBuffer(gl, Array.from(shapeBuffer.pendingScales.values()   ), shapeBuffer.shapeProgram.scalesDescription   )
-      shapeBuffer.colors    = buildBuffer(gl, Array.from(shapeBuffer.pendingColors.values()   ), shapeBuffer.shapeProgram.colorsDescription   )
-
-      shapeBuffer.size = shapeBuffer.pendingSize
-
-      let location = null
-      shapeBuffer.locationses.forEach((xs, _) =>
-        xs.forEach(
-          function(x) {
-            location = Math.max(location, x)
-          }
-        )
-      )
-
-      shapeBuffer.instanceCount    = location + 1
-      shapeBuffer.pendingPositions = new Map()
-      shapeBuffer.pendingRotations = new Map()
-      shapeBuffer.pendingScales    = new Map()
-      shapeBuffer.pendingColors    = new Map()
-
-    } else {
-
-      function replicate(value) {
-        return Array.from({length: shapeBuffer.pendingSize}, (v, k) => value)
-      }
-
-      shapeBuffer.positions = buildBuffer(gl, replicate(zeroPosition), shapeBuffer.shapeProgram.positionsDescription)
-      shapeBuffer.rotations = buildBuffer(gl, replicate(zeroRotation), shapeBuffer.shapeProgram.rotationsDescription)
-      shapeBuffer.scales    = buildBuffer(gl, replicate(zeroScale   ), shapeBuffer.shapeProgram.scalesDescription   )
-      shapeBuffer.colors    = buildBuffer(gl, replicate(zeroColor   ), shapeBuffer.shapeProgram.colorsDescription   )
-
-      shapeBuffer.size = shapeBuffer.pendingSize
-
-      updateShapeBuffer(gl, shapeBuffer)
-
-    }
-
-  } else {
-
-    expandShapeBuffer(gl, shapeBuffer)
-    updateShapeBuffer(gl, shapeBuffer)
-
-  }
+  expandShapeBuffer(gl, shapeBuffer)
+  updateShapeBuffer(gl, shapeBuffer)
 }
 
 
@@ -333,7 +282,6 @@ function buildBuffer(gl, primitives, description) {
     for (let i = 0; i < primitives.length; ++i)
       for (let j = 0; j < components; ++j)
         bytes[i * components + j] = primitives[i][j]
-  console.debug("buildBuffer: bytes =", bytes)
   gl.bufferData(gl.ARRAY_BUFFER, bytes, gl.DYNAMIC_DRAW)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null)
@@ -352,9 +300,6 @@ function updateBuffer(gl, updates, bufferObject, description) {
   const bytes = description.isFloat ?
     new Float32Array(components)    :
     new Uint32Array (components)
-  const bytes1 = description.isFloat ?
-    new Float32Array(components)    :
-    new Uint32Array (components)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferObject)
 
@@ -364,17 +309,8 @@ function updateBuffer(gl, updates, bufferObject, description) {
     else
       for (let j = 0; j < components; ++j)
         bytes[j] = value[j]
-    console.debug("updateBuffer: bytes =", bytes)
-    gl.bufferSubData   (gl.ARRAY_BUFFER, location * components * byteCount, bytes )
-    gl.getBufferSubData(gl.ARRAY_BUFFER, location * components * byteCount, bytes1)
-    console.debug("updateBuffer: bytes1 =", bytes1)
+    gl.bufferSubData   (gl.ARRAY_BUFFER, location * components * byteCount, bytes)
   })
-
-  const bytes2 = description.isFloat ?
-    new Float32Array(2 * components) :
-    new Uint32Array (2 * components)
-  gl.getBufferSubData(gl.ARRAY_BUFFER, 0, bytes2)
-  console.debug("updateBuffer: bytes2 =", bytes2)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
@@ -418,6 +354,4 @@ module.exports = {
 , updateColor        : updateColor
 , deleteInstance     : deleteInstance
 , drawInstances      : drawInstances
-
-, buildBuffer        : buildBuffer
 }
