@@ -6,6 +6,7 @@ const Rendering = {
 , Program    : require("./rendering/program"   )
 , Projection : require("./rendering/projection")
 , Selector   : require("./rendering/selector"  )
+, Shapes     : require("./rendering/shapes"    )
 }
 
 require("./gl-matrix")
@@ -16,6 +17,8 @@ const vec3 = glMatrix.vec3
 
 const zero = vec3.fromValues(0, 0, 0)
 
+
+const DEBUG = true
 
 // FIXME: Investigate
 const useBlending = false
@@ -63,7 +66,7 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 
 function visualizeBuffers(gl, configuration, requests) {
 
-  const graphics = Rendering.Program.isDEBUG() ? {
+  const graphics = DEBUG ? {
     manager: {
       program: Rendering.Program.prepareShapeProgram(gl)
     }
@@ -96,7 +99,7 @@ function visualizeBuffers(gl, configuration, requests) {
       while (requests.length > 0) {
         const request = requests.pop()
         console.debug("animation: request =", request)
-        if (!Rendering.Program.isDEBUG())
+        if (!DEBUG)
           Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
       }
 
@@ -105,19 +108,19 @@ function visualizeBuffers(gl, configuration, requests) {
       Rendering.Program.selectShapeProgram(gl, graphics.manager.program)
 
       let shapeBuffer = null
-      if (Rendering.Program.isDEBUG()) {
+      if (DEBUG) {
 
         shapeBuffer = Rendering.Buffers.createShapeBuffer(
           gl
         , graphics.manager.program
         , gl.TRIANGLES
-        , [[-0.3, -0.5, 0], [0.3, -0.5, 0], [0.0, 0.5, 0]]
+        , Rendering.Shapes.cube(0.3)
         )
 
         const positions = [[-0.5, 0, 0], [0.5, 0, 0]]
         shapeBuffer.positions = Rendering.Buffers.buildBuffer(gl, positions, graphics.manager.program.positionsDescription)
 
-        const rotations = [[0, 0, 0, 1], [0, 0, 0, 1]]
+        const rotations = [[Math.sqrt(2), 0, 0, Math.sqrt(2)], [0, 0, 0, 1]]
         shapeBuffer.rotations = Rendering.Buffers.buildBuffer(gl, rotations, graphics.manager.program.rotationsDescription)
 
         const scales = [[0.75, 0.75, 0.75], [1.25, 1.25, 1.25]]
@@ -147,7 +150,7 @@ function visualizeBuffers(gl, configuration, requests) {
       , configuration.display.farPlane
       )
 
-      if (Rendering.Program.isDEBUG())
+      if (DEBUG)
         Rendering.Buffers.drawInstances(gl, shapeBuffer, projection1, modelView)
       else {
         Rendering.Frames.draw(gl, graphics.manager, projection, modelView)

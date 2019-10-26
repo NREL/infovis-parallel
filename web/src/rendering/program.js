@@ -5,10 +5,7 @@ require("../gl-matrix")
 const mat4 = glMatrix.mat4
 
 
-const DEBUG = true
-
-
-const vertexShaderSource = DEBUG ? `#version 300 es
+const vertexShaderSource = `#version 300 es
 
 uniform mat4 projection_modelview;
 
@@ -17,31 +14,9 @@ in vec3 mesh_position;
 in vec3 instance_position;
 in vec4 instance_rotation;
 in vec3 instance_scale   ;
-in uint instance_color;
-
-flat out vec4 vColor;
-
-void main()
-{
-  vColor = vec4(float((0xFF000000u & instance_color) >> 24) / 255.,
-                float((0x00FF0000u & instance_color) >> 16) / 255.,
-                float((0x0000FF00u & instance_color) >>  8) / 255.,
-                float( 0x000000FFu & instance_color       ) / 255.);
-  gl_Position = instance_rotation;
-  gl_Position = projection_modelview * vec4(mesh_position * instance_scale + instance_position, 1.0);
-}
-` : `#version 300 es
-
-uniform mat4 projection_modelview;
-
-in vec3 mesh_position;
-
-in vec3 instance_position;
-in vec3 instance_scale   ;
-in vec4 instance_rotation;
 in uint instance_color   ;
 
-out vec4 vColor;
+flat out vec4 vColor;
 
 vec3 rotate(vec3 p, vec4 q) {
   return p + 2. * cross(q.xyz, cross(q.xyz, p) + q.w * p);
@@ -54,8 +29,7 @@ void main() {
                 float((0x00FF0000u & instance_color) >> 16) / 255.,
                 float((0x0000FF00u & instance_color) >>  8) / 255.,
                 float( 0x000000FFu & instance_color       ) / 255.);
-}
-`
+}`
 
 
 const fragmentShaderSource = `#version 300 es
@@ -69,8 +43,7 @@ void main(void) {
   if (vColor.a == 0.)
     discard;
   color = vColor;
-}
-`
+}`
 
 function prepareShapeProgram(gl) {
 
@@ -188,7 +161,4 @@ module.exports = {
 , bindRotations           : bindRotations
 , bindScales              : bindScales
 , bindColors              : bindColors
-
-, isDEBUG                 : () => DEBUG
-, bindAttributes          : bindAttributes
 }
