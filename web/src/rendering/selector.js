@@ -28,9 +28,9 @@ function prepareSelector(gl, position, rotation, shapeBuffer) {
 }
 
 
-function drawSelector(gl, shapeBuffer) {
+function drawSelector(gl, shapeBuffer, projection, modelView) {
   console.debug("drawSelector")
-  Buffers.drawInstances(gl, shapeBuffer)
+  Buffers.drawInstances(gl, shapeBuffer, projection, modelView)
 }
 
 

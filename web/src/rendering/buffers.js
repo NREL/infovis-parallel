@@ -244,7 +244,7 @@ function expandShapeBuffer(gl, shapeBuffer) {
 }
 
 
-function drawInstances(gl, shapeBuffer) {
+function drawInstances(gl, shapeBuffer, projection, modelView) {
 
   if (shapeBuffer.size == 0)
     return
@@ -262,6 +262,8 @@ function drawInstances(gl, shapeBuffer) {
     Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
   }
   Program.bindColors   (gl, shapeProgram, shapeBuffer.colors   )
+
+  Program.setProjectionModelView(gl, shapeProgram, projection, modelView)
 
   console.debug("drawInstances: gl.drawArraysInstanced")
   gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)

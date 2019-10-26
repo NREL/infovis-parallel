@@ -63,32 +63,19 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 
 function visualizeBuffers(gl, configuration, requests) {
 
-  if (Rendering.Program.isDEBUG()) {
-
-    const shapeProgram = Rendering.Program.prepareShapeProgram(gl)
-    Rendering.Program.selectShapeProgram(gl, shapeProgram)
-
-    const shapeBuffer = Rendering.Buffers.createShapeBuffer(
-      gl
-    , shapeProgram
-    , gl.TRIANGLES
-    , [[-0.3, -0.5], [0.3, -0.5], [0.0, 0.5]]
-    )
-
-    const primitives = [[1.0, 0.5, 0.0], [0.0, 0.5, 1.0]]
-    shapeBuffer.colors = Rendering.Buffers.buildBuffer(gl, primitives, shapeProgram.colorsDescription)
-    shapeBuffer.instanceCount = primitives.length
-    shapeBuffer.size = primitives.length
-
-    setupCanvas(gl)
-
-    Rendering.Buffers.drawInstances(gl, shapeBuffer)
-
-    return
-
-  }
-
-  const graphics = initializeGraphics(
+  const graphics = Rendering.Program.isDEBUG() ? {
+    manager: {
+      program: Rendering.Program.prepareShapeProgram(gl)
+    }
+  , pov: {
+      position: configuration.initial.view.position
+    , rotation: configuration.initial.view.orientation
+    }
+  , offset: {
+      position: vec3.fromValues(0, 0, -10)
+    , rotation: Rendering.Linear.fromEulerd(zero)
+    }
+  } : initializeGraphics(
     gl
   , {
       position: configuration.initial.view.position
@@ -100,6 +87,7 @@ function visualizeBuffers(gl, configuration, requests) {
     }
   )
 
+
   function animation(timestamp) {
 
 
@@ -108,39 +96,53 @@ function visualizeBuffers(gl, configuration, requests) {
       while (requests.length > 0) {
         const request = requests.pop()
         console.debug("animation: request =", request)
-        Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+//      Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
       }
 
       setupCanvas(gl)
 
       Rendering.Program.selectShapeProgram(gl, graphics.manager.program)
 
-      Rendering.Frames.prepare(gl, graphics.manager)
-      Rendering.Selector.prepare(gl, graphics.tool.position, graphics.tool.rotation, graphics.selector)
+      let shapeBuffer = null
+      if (Rendering.Program.isDEBUG()) {
 
-      if (!Rendering.Program.isDEBUG()) {
+        shapeBuffer = Rendering.Buffers.createShapeBuffer(
+          gl
+        , graphics.manager.program
+        , gl.TRIANGLES
+        , [[-0.3, -0.5], [0.3, -0.5], [0.0, 0.5]]
+        )
 
-        const  projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
-        const modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
-        Rendering.Program.setProjectionModelView(gl, graphics.manager.program, projection, modelView)
+        const primitives = [[1.0, 0.5, 0.0], [0.0, 0.5, 1.0]]
+        shapeBuffer.colors = Rendering.Buffers.buildBuffer(gl, primitives, graphics.manager.program.colorsDescription)
+        shapeBuffer.instanceCount = primitives.length
+        shapeBuffer.size = primitives.length
 
       } else {
 
-        console.debug("animation: <alternative pmv>")
-        const fieldOfView = 45 * Math.PI / 180;   // in radians
-        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-        const zNear = 0.1;
-        const zFar = 100.0;
-        const projection = mat4.create();
-        mat4.perspective(projection, fieldOfView, aspect, zNear, zFar);
-        const modelView = mat4.create();
-        mat4.translate(modelView, modelView, [-0.0, 0.0, -15.0]);
-        Rendering.Program.setProjectionModelView(gl, graphics.manager.program, projection, modelView)
+        Rendering.Frames.prepare(gl, graphics.manager)
+        Rendering.Selector.prepare(gl, graphics.tool.position, graphics.tool.rotation, graphics.selector)
 
       }
 
-      Rendering.Frames.draw(gl, graphics.manager)
-      Rendering.Selector.draw(gl, graphics.selector)
+      const projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
+      const modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+
+      const projection1 = mat4.perspective(
+        mat4.create()
+      , 45 * Math.PI / 180
+      , gl.canvas.clientWidth / gl.canvas.clientHeight
+      , configuration.display.nearPlane
+      , configuration.display.farPlane
+      )
+      const modelView1 = mat4.translate(mat4.create(), mat4.create(), graphics.offset.position)
+
+      if (Rendering.Program.isDEBUG())
+        Rendering.Buffers.drawInstances(gl, shapeBuffer, projection1, modelView1)
+      else {
+        Rendering.Frames.draw(gl, graphics.manager, projection, modelView)
+        Rendering.Selector.draw(gl, graphics.selector, projection, modelView)
+      }
 
     }
 

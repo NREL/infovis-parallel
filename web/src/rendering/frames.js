@@ -8,6 +8,7 @@ const Shapes   = require("./shapes"  )
 require("../gl-matrix")
 
 
+const mat4 = glMatrix.mat4
 const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
@@ -19,9 +20,11 @@ function listFrames(manager) {
 
 function createManager(gl) {
   return {
-    program : Program.prepareShapeProgram(gl)
-  , frames  : new Map()
-  , current : 0
+    program    : Program.prepareShapeProgram(gl)
+  , frames     : new Map()
+  , current    : 0
+  , projection : mat4.create()
+  , modelView  : mat4.create()
   }
 }
 
@@ -65,7 +68,7 @@ function prepare(gl, manager) {
 function draw(gl, manager) {
   if (manager.frames.has(manager.current)) {
     console.debug("draw: frame =", manager.current)
-    drawFrame(gl, manager.frames.get(manager.current))
+    drawFrame(gl, manager.frames.get(manager.current), manager.projection, manager.modelView)
   }
 }
 
@@ -150,8 +153,8 @@ function prepareFrame(gl, frame) {
 }
 
 
-function drawFrame(gl, frame) {
-  frame.forEach((display, mesh) => {console.debug("drawFrame: mesh =", mesh); drawDisplay(gl, display)})
+function drawFrame(gl, frame, projection, modelView) {
+  frame.forEach((display, mesh) => {console.debug("drawFrame: mesh =", mesh); drawDisplay(gl, display, projection, modelView)})
 }
 
 
@@ -182,9 +185,9 @@ function prepareDisplay(gl, display) {
 }
 
 
-function drawDisplay(gl, display) {
+function drawDisplay(gl, display, projection, modelView) {
   if (hasBuffer(display))
-    Buffers.drawInstances(gl, display.buffer)
+    Buffers.drawInstances(gl, display.buffer, projection, modelView)
   else
     ; // FIXME: Daw labels.
 }

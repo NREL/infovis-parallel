@@ -9,13 +9,18 @@ const DEBUG = true
 
 
 const vertexShaderSource = DEBUG ? `#version 300 es
-layout(location = 0) in vec2 pos;
-layout(location = 1) in vec4 color;
+
+uniform mat4 projection_modelview;
+
+in vec2 pos;
+in vec4 color;
+
 flat out vec4 v_color;
+
 void main()
 {
     v_color = color;
-    gl_Position = vec4(pos + vec2(float(gl_InstanceID) - 0.5, 0.0), 0.0, 1.0);
+    gl_Position = projection_modelview * vec4(pos + vec2(float(gl_InstanceID) - 0.5, 0.0), 0.0, 1.0);
 }
 ` : `#version 300 es
 
@@ -46,9 +51,13 @@ void main() {
 
 
 const fragmentShaderSource = DEBUG ? `#version 300 es
+
 precision highp float;
+
 flat in vec4 v_color;
+
 out vec4 color;
+
 void main()
 {
     color = v_color;
@@ -87,6 +96,7 @@ function prepareShapeProgram(gl) {
 
   return DEBUG ? {
     program              : program
+  , pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
   , meshLocation         : gl.getAttribLocation (program, "pos"  )
   , colorsLocation       : gl.getAttribLocation (program, "color")
   , meshDescription      : {components: 2, isFloat: true}
