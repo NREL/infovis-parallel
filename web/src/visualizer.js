@@ -1,7 +1,7 @@
 
 const Rendering = {
   Debug      : require("./rendering/debug"     )
-,Frames     : require("./rendering/frames"    )
+, Frames     : require("./rendering/frames"    )
 , Linear     : require("./rendering/linear"    )
 , Program    : require("./rendering/program"   )
 , Projection : require("./rendering/projection")

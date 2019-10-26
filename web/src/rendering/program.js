@@ -5,7 +5,19 @@ require("../gl-matrix")
 const mat4 = glMatrix.mat4
 
 
-const vertexShaderSource = `#version 300 es
+const DEBUG = true
+
+
+const vertexShaderSource = DEBUG ? `#version 300 es
+layout(location = 0) in vec2 pos;
+layout(location = 1) in vec4 color;
+flat out vec4 v_color;
+void main()
+{
+    v_color = color;
+    gl_Position = vec4(pos + vec2(float(gl_InstanceID) - 0.5, 0.0), 0.0, 1.0);
+}
+` : `#version 300 es
 
 uniform mat4 projection_modelview;
 
@@ -33,7 +45,15 @@ void main() {
 `
 
 
-const fragmentShaderSource = `#version 300 es
+const fragmentShaderSource = DEBUG ? `#version 300 es
+precision highp float;
+flat in vec4 v_color;
+out vec4 color;
+void main()
+{
+    color = v_color;
+}
+` : `#version 300 es
 
 precision mediump float;
 
@@ -47,7 +67,7 @@ void main(void) {
 }
 `
 
-function prepareShapeProgram(gl, vs, fs) {
+function prepareShapeProgram(gl) {
 
   function makeShader(name, type, source) {
     const shader = gl.createShader(type)
@@ -59,25 +79,31 @@ function prepareShapeProgram(gl, vs, fs) {
   }
 
   const program = gl.createProgram()
-  gl.attachShader(program, makeShader("vertex"  , gl.VERTEX_SHADER  , vs))//vertexShaderSource  ))
-  gl.attachShader(program, makeShader("fragment", gl.FRAGMENT_SHADER, fs))//fragmentShaderSource))
+  gl.attachShader(program, makeShader("vertex"  , gl.VERTEX_SHADER  , vertexShaderSource  ))
+  gl.attachShader(program, makeShader("fragment", gl.FRAGMENT_SHADER, fragmentShaderSource))
   gl.linkProgram(program)
   if (!gl.getProgramParameter(program, gl.LINK_STATUS))
     throw new Error("Could not link program: " + gl.getProgramInfoLog(program))
 
-  return {
+  return DEBUG ? {
     program              : program
-//, pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
-//, meshLocation         : gl.getAttribLocation (program, "mesh_position"       )
-//, positionsLocation    : gl.getAttribLocation (program, "instance_position"   )
-//, rotationsLocation    : gl.getAttribLocation (program, "instance_rotation"   )
-//, scalesLocation       : gl.getAttribLocation (program, "instance_scale"      )
-//, colorsLocation       : gl.getAttribLocation (program, "instance_color"      )
-//, meshDescription      : {components: 3, isFloat: true }
-//, positionsDescription : {components: 3, isFloat: true }
-//, rotationsDescription : {components: 4, isFloat: true }
-//, scalesDescription    : {components: 3, isFloat: true }
-//, colorsDescription    : {components: 1, isFloat: false}
+  , meshLocation         : gl.getAttribLocation (program, "pos"  )
+  , colorsLocation       : gl.getAttribLocation (program, "color")
+  , meshDescription      : {components: 2, isFloat: true}
+  , colorsDescription    : {components: 3, isFloat: true}
+  } : {
+    program              : program
+  , pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
+  , meshLocation         : gl.getAttribLocation (program, "mesh_position"       )
+  , positionsLocation    : gl.getAttribLocation (program, "instance_position"   )
+  , rotationsLocation    : gl.getAttribLocation (program, "instance_rotation"   )
+  , scalesLocation       : gl.getAttribLocation (program, "instance_scale"      )
+  , colorsLocation       : gl.getAttribLocation (program, "instance_color"      )
+  , meshDescription      : {components: 3, isFloat: true }
+  , positionsDescription : {components: 3, isFloat: true }
+  , rotationsDescription : {components: 4, isFloat: true }
+  , scalesDescription    : {components: 3, isFloat: true }
+  , colorsDescription    : {components: 1, isFloat: false}
   }
 
 }
