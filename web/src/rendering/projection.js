@@ -46,7 +46,7 @@ function projectionKooimaOffAxis(display, eye) {
   const frustum = mat4.frustum(mat4.create(), left, right, bottom, top, near, far)
 
   // Translation matrix.
-  const translate = mat4.translate(mat4.create(), mat4.create(), eye)
+  const translate = mat4.translate(mat4.create(), mat4.create(), vec3.scaleAndAdd(vec3.create(), vec3.create(), eye, -1))
 
 //  near       =   1.0e-2
 //  far        = 100.0
