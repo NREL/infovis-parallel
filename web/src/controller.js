@@ -4,11 +4,14 @@ const Connection    = require("./connection"   )
 const Visualizer    = require("./visualizer"   )
 
 
+const DEBUG = true
+
+
 const requestQueue = []
 
 
 function echoHandler(connection, request) {
-  console.debug("echoHandler: request =", request)
+  if (DEBUG) console.debug("echoHandler: request =", request)
   requestQueue.unshift(request)
 }
 

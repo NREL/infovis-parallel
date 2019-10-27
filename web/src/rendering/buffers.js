@@ -4,6 +4,9 @@ const Program = require("./program")
 require("../gl-matrix")
 
 
+const DEBUG = true
+
+
 const zeroPosition = glMatrix.vec3.fromValues(0, 0, 0)
 
 const zeroRotation = glMatrix.quat.fromValues(0, 0, 0, 1)
@@ -96,8 +99,8 @@ function insertPosition(shapeBuffer, identifier, vertex) {
   empties1.forEach(function(x) {location = location == null ? x : Math.min(location, x)})
   empties1.delete(location)
 
-  console.debug("insertPosition: identifier =", identifier, ", vertex =", vertex)
-  console.debug("insertPosition: location = ", location, ", pendingSize1 =", pendingSize1, ", empties1 =", empties1)
+  if (DEBUG) console.debug("insertPosition: identifier =", identifier, ", vertex =", vertex)
+  if (DEBUG) console.debug("insertPosition: location = ", location, ", pendingSize1 =", pendingSize1, ", empties1 =", empties1)
   shapeBuffer.empties = empties1
   shapeBuffer.pendingSize = pendingSize1
   shapeBuffer.pendingPositions.set(location, vertex)
@@ -109,19 +112,19 @@ function insertPosition(shapeBuffer, identifier, vertex) {
 
 
 function updatePositions(identifier, positions, shapeBuffer) {
-  console.debug("updatePositions: identifier =", identifier, ", positions =", positions)
+  if (DEBUG) console.debug("updatePositions: identifier =", identifier, ", positions =", positions)
   updateAttributes(positionsLens, identifier, positions, shapeBuffer)
 }
 
 
 function updateRotations(identifier, rotations, shapeBuffer) {
-  console.debug("updateRotations: identifier =", identifier, ", rotations =", rotations)
+  if (DEBUG) console.debug("updateRotations: identifier =", identifier, ", rotations =", rotations)
   updateAttributes(rotationsLens, identifier, rotations, shapeBuffer)
 }
 
 
 function updateScales(identifier, scales, shapeBuffer) {
-  console.debug("updateScales: identifier =", identifier, ", scales =", scales)
+  if (DEBUG) console.debug("updateScales: identifier =", identifier, ", scales =", scales)
   updateAttributes(scalesLens, identifier, scales, shapeBuffer)
 }
 
@@ -138,7 +141,7 @@ function updateAttributes(field, identifier, values, shapeBuffer) {
 
 
 function updateColor(identifier, color, shapeBuffer) {
-  console.debug("updateColor: identifier =", identifier, ", color =", color)
+  if (DEBUG) console.debug("updateColor: identifier =", identifier, ", color =", color)
   updateAttribute(colorsLens, identifier, color, shapeBuffer)
 }
 
@@ -167,7 +170,7 @@ function deleteInstance(shapeBuffer, identifier) {
 
 function prepareShapeBuffer(gl, shapeBuffer) {
 
-  console.debug("prepareShapeBuffer")
+  if (DEBUG) console.debug("prepareShapeBuffer")
 
   expandShapeBuffer(gl, shapeBuffer)
   updateShapeBuffer(gl, shapeBuffer)
@@ -182,7 +185,7 @@ function updateShapeBuffer(gl, shapeBuffer) {
       shapeBuffer.pendingColors     == 0)
     return
 
-  console.debug("updateShapeBuffer")
+  if (DEBUG) console.debug("updateShapeBuffer")
 
   updateBuffer(gl, shapeBuffer.pendingPositions, shapeBuffer.positions, shapeBuffer.shapeProgram.positionsDescription)
   updateBuffer(gl, shapeBuffer.pendingRotations, shapeBuffer.rotations, shapeBuffer.shapeProgram.rotationsDescription)
@@ -219,7 +222,7 @@ function expandShapeBuffer(gl, shapeBuffer) {
     return Array.from({length: pendingSize}, (v, k) => value)
   }
 
-  console.debug("expandShapeBuffer: size =", size, ", pendingSize =", pendingSize)
+  if (DEBUG) console.debug("expandShapeBuffer: size =", size, ", pendingSize =", pendingSize)
 
   if (size == 0) {
     shapeBuffer.positions = buildBuffer(gl, replicate(zeroPosition), shapeBuffer.shapeProgram.positionsDescription)
@@ -243,7 +246,7 @@ function drawInstances(gl, shapeBuffer, projection, modelView) {
   if (shapeBuffer.size == 0)
     return
 
-  console.debug("drawInstances: vertices =", shapeBuffer.vertexCount, ", instances =", shapeBuffer.instanceCount)
+  if (DEBUG) console.debug("drawInstances: vertices =", shapeBuffer.vertexCount, ", instances =", shapeBuffer.instanceCount)
 
   const shapeProgram = shapeBuffer.shapeProgram
 
@@ -257,7 +260,7 @@ function drawInstances(gl, shapeBuffer, projection, modelView) {
   Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
   Program.bindColors   (gl, shapeProgram, shapeBuffer.colors   )
 
-  console.debug("drawInstances: gl.drawArraysInstanced")
+  if (DEBUG) console.debug("drawInstances: gl.drawArraysInstanced")
   gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)
 
 }
@@ -265,7 +268,7 @@ function drawInstances(gl, shapeBuffer, projection, modelView) {
 
 function buildBuffer(gl, primitives, description) {
 
-  console.debug("buildBuffer: description = ", description, ", primitives ="  , primitives)
+  if (DEBUG) console.debug("buildBuffer: description = ", description, ", primitives ="  , primitives)
 
   const bufferObject = gl.createBuffer()
 
@@ -292,7 +295,7 @@ function buildBuffer(gl, primitives, description) {
 
 function updateBuffer(gl, updates, bufferObject, description) {
 
-  console.debug("updateBuffer: description = ", description, ", updates ="     , updates)
+  if (DEBUG) console.debug("updateBuffer: description = ", description, ", updates ="     , updates)
 
   const byteCount = 4 // 32-bit elements.
 
@@ -319,7 +322,7 @@ function updateBuffer(gl, updates, bufferObject, description) {
 
 function expandBuffer(gl, description, oldSize, newSize, oldBufferObject) {
 
-  console.debug("expandBuffer: description = ", description, ", oldSize =", oldSize, ", newSize =", newSize)
+  if (DEBUG) console.debug("expandBuffer: description = ", description, ", oldSize =", oldSize, ", newSize =", newSize)
 
   const byteCount = 4 // 32-bit elements.
   const components = description.components

@@ -5,6 +5,9 @@ require("../gl-matrix")
 const mat4 = glMatrix.mat4
 
 
+const DEBUG = true
+
+
 const vertexShaderSource = `#version 300 es
 
 uniform mat4 projection_modelview;
@@ -82,7 +85,7 @@ function prepareShapeProgram(gl) {
 
 
 function selectShapeProgram(gl, shapeProgram) {
-  console.debug("selectShapeProgram")
+  if (DEBUG) console.debug("selectShapeProgram")
   gl.useProgram(shapeProgram == null ? null : shapeProgram.program)
 }
 
@@ -93,40 +96,40 @@ function setProjectionModelView(gl, shapeProgram, projection, modelView) {
 
   gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, pmv)
 
-  console.debug("setProjectionModelView: projection =", projection)
-  console.debug("setProjectionModelView: modelView =" , modelView )
-  console.debug("setProjectionModelView: pmv ="       , pmv       )
+  if (DEBUG) console.debug("setProjectionModelView: projection =", projection)
+  if (DEBUG) console.debug("setProjectionModelView: modelView =" , modelView )
+  if (DEBUG) console.debug("setProjectionModelView: pmv ="       , pmv       )
 
   return pmv
 }
 
 
 function bindMesh(gl, shapeProgram, bufferObject) {
-  console.debug("bindMesh: meshDescription =", shapeProgram.meshDescription)
+  if (DEBUG) console.debug("bindMesh: meshDescription =", shapeProgram.meshDescription)
   bindAttributes(gl, false, shapeProgram.meshLocation, shapeProgram.meshDescription, bufferObject)
 }
 
 
 function bindPositions(gl, shapeProgram, bufferObject) {
-  console.debug("bindPositions: meshDescription =", shapeProgram.positionsDescription)
+  if (DEBUG) console.debug("bindPositions: meshDescription =", shapeProgram.positionsDescription)
   bindAttributes(gl, true, shapeProgram.positionsLocation, shapeProgram.positionsDescription, bufferObject)
 }
 
 
 function bindRotations(gl, shapeProgram, bufferObject) {
-  console.debug("bindRotations: meshDescription =", shapeProgram.rotationsDescription)
+  if (DEBUG) console.debug("bindRotations: meshDescription =", shapeProgram.rotationsDescription)
   bindAttributes(gl, true, shapeProgram.rotationsLocation, shapeProgram.rotationsDescription, bufferObject)
 }
 
 
 function bindScales(gl, shapeProgram, bufferObject) {
-  console.debug("bindScales: meshDescription =", shapeProgram.scalesDescription)
+  if (DEBUG) console.debug("bindScales: meshDescription =", shapeProgram.scalesDescription)
   bindAttributes(gl, true, shapeProgram.scalesLocation, shapeProgram.scalesDescription, bufferObject)
 }
 
 
 function bindColors(gl, shapeProgram, bufferObject) {
-  console.debug("bindColors: meshDescription =", shapeProgram.colorsDescription)
+  if (DEBUG) console.debug("bindColors: meshDescription =", shapeProgram.colorsDescription)
   bindAttributes(gl, true, shapeProgram.colorsLocation, shapeProgram.colorsDescription, bufferObject)
 }
 

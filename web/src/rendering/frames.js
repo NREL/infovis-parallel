@@ -13,6 +13,9 @@ const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
 
+const DEBUG = true
+
+
 function listFrames(manager) {
   return manager.frames.keys()
 }
@@ -61,13 +64,13 @@ function delete0(identifiers, manager) {
 
 
 function prepare(gl, manager) {
-  manager.frames.forEach((frame, f) => {console.debug("prepare: frame =", f); prepareFrame(gl, frame)})
+  manager.frames.forEach((frame, f) => {if (DEBUG) console.debug("prepare: frame =", f); prepareFrame(gl, frame)})
 }
 
 
 function draw(gl, manager) {
   if (manager.frames.has(manager.current)) {
-    console.debug("draw: frame =", manager.current)
+    if (DEBUG) console.debug("draw: frame =", manager.current)
     drawFrame(gl, manager.frames.get(manager.current), manager.projection, manager.modelView)
   }
 }
@@ -149,12 +152,12 @@ function deleteFrame(frame, identifiers) {
 
 
 function prepareFrame(gl, frame) {
-  frame.forEach((display, mesh) => {console.debug("prepareFrame: mesh =", mesh); prepareDisplay(gl, display)})
+  frame.forEach((display, mesh) => {if (DEBUG) console.debug("prepareFrame: mesh =", mesh); prepareDisplay(gl, display)})
 }
 
 
 function drawFrame(gl, frame, projection, modelView) {
-  frame.forEach((display, mesh) => {console.debug("drawFrame: mesh =", mesh); drawDisplay(gl, display, projection, modelView)})
+  frame.forEach((display, mesh) => {if (DEBUG) console.debug("drawFrame: mesh =", mesh); drawDisplay(gl, display, projection, modelView)})
 }
 
 

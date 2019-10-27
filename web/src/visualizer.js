@@ -12,6 +12,9 @@ const Rendering = {
 require("./gl-matrix")
 
 
+const DEBUG = true
+
+
 const vec3 = glMatrix.vec3
 
 const zero = vec3.fromValues(0, 0, 0)
@@ -19,7 +22,7 @@ const zero = vec3.fromValues(0, 0, 0)
 
 function setupCanvas(gl, useBlending = true, useCulling = true) {
 
-  console.debug("setupCanvas")
+  if (DEBUG) console.debug("setupCanvas")
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
@@ -78,7 +81,7 @@ function visualizeBuffers(gl, configuration, requests) {
 
       while (requests.length > 0) {
         const request = requests.pop()
-        console.debug("animation: request =", request)
+        if (DEBUG) console.debug("animation: request =", request)
         Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
       }
 
