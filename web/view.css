@@ -50,6 +50,10 @@ a:active {
 ; top       : 0
 }
 
+#uiScratch {
+  visibility: hidden
+}
+
 #uiCanvas {
   margin: 0
 ; width : 100%

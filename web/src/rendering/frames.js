@@ -7,6 +7,7 @@ const Geometry = require("./geometry")
 const Linear   = require("./linear"  )
 const Program  = require("./program" )
 const Shapes   = require("./shapes"  )
+const Text     = require("./text"    )
 
 require("../gl-matrix")
 
@@ -173,7 +174,9 @@ function createDisplay(gl, shapeProgram, shapeMesh) {
   const display = {
     geometries : new Map()
   }
-  if (shapeMesh != MESH_Label)
+  if (shapeMesh == MESH_Label)
+    display.labels = new Map()
+  else
     display.buffer = Buffers.createShapeBuffer(gl, shapeProgram, gl.TRIANGLES, mesh(shapeMesh))
   return display
 }
@@ -194,13 +197,18 @@ function prepareDisplay(gl, display) {
 function drawDisplay(gl, display, projection, modelView) {
   if (hasBuffer(display))
     Buffers.drawInstances(gl, display.buffer, projection, modelView)
-  else
-    ; // FIXME: Draw labels.
+  if (hasPixmaps(display))
+    Text.drawText()
 }
 
 
 function hasBuffer(display) {
   return "buffer" in display
+}
+
+
+function hasPixmaps(display) {
+  return "pixmaps" in display
 }
 
 
@@ -266,6 +274,8 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
           Buffers.deleteInstance(display.buffer, identifier)
           updateDisplay(identifier, geometry, display.buffer)
         }
+        if (hasPixmaps(display))
+          display.pixmaps.set(identifier, Text.makePixmaps(geometry.text))
         break
       }
     case REVISION_Recoloring:

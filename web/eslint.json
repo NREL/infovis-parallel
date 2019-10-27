@@ -75,6 +75,7 @@
   , "uiLowerRightZ"     : "readonly"
   , "uiNearPlane"       : "readonly"
   , "uiStereo"          : "readonly"
+  , "uiTexture"         : "readonly"
   , "uiToolOrientationX": "readonly"
   , "uiToolOrientationY": "readonly"
   , "uiToolOrientationZ": "readonly"
