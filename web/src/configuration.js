@@ -2,8 +2,13 @@
 const CONFIGURATION_KEY = "configuration"
 
 
-const defaultConfiguration =
-  {
+function defaultConfiguration(w = window.innerWidth, h = window.innerHeight) {
+
+  const aspect = w / h
+  const padding = 1 / 3
+  const padding1 = (Math.max(aspect, 1 / aspect) * (1 + 2 * padding) - 1) / 2
+
+  return {
     server : {
       address        : "ws://127.0.0.1:42042"
     }
@@ -12,14 +17,14 @@ const defaultConfiguration =
     , eyeSeparation  : [0.10, 0, 0]
     , nearPlane      : 0.01
     , farPlane       : 100
-    , lowerLeft      : [-0.940, -0.320, 0]
-    , lowerRight     : [ 1.940, -0.320, 0]
-    , upperLeft      : [-0.940,  1.320, 0]
+    , lowerLeft      : aspect > 1 ? [  - padding1,   - padding, 0] : [  - padding,   - padding1, 0]
+    , lowerRight     : aspect > 1 ? [1 + padding1,   - padding, 0] : [1 + padding,   - padding1, 0]
+    , upperLeft      : aspect > 1 ? [  - padding1, 1 + padding, 0] : [  - padding, 1 + padding1, 0]
     }
   , initial         : {
       view          : {
-        position    : [ 3,   2, 10  ]
-      , orientation : [ 0, -90,  0  ]
+        position    : [ 3,   2, 15]
+      , orientation : [ 0, -90,  0]
       }
     , tool          : {
         position    : [-0.1,  0.5, 0.5]
@@ -28,13 +33,15 @@ const defaultConfiguration =
     }
   }
 
+}
 
-let theConfiguration = defaultConfiguration
+
+let theConfiguration = defaultConfiguration()
 
 
 function get() {
 
-  const configuration = defaultConfiguration
+  const configuration = defaultConfiguration()
 
   configuration.server.address = uiAddress.value
 
@@ -126,7 +133,7 @@ function store() {
 
 function retrieve() {
   theConfiguration = localStorage.getItem(CONFIGURATION_KEY) == null ?
-    defaultConfiguration                                             :
+    defaultConfiguration()                                           :
     JSON.parse(localStorage.getItem(CONFIGURATION_KEY))
   put()
 }
