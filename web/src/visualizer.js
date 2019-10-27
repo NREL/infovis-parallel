@@ -3,8 +3,7 @@
 
 
 const Rendering = {
-  Buffers    : require("./rendering/buffers"   )
-, Frames     : require("./rendering/frames"    )
+  Frames     : require("./rendering/frames"    )
 , Linear     : require("./rendering/linear"    )
 , Program    : require("./rendering/program"   )
 , Projection : require("./rendering/projection")
@@ -18,9 +17,7 @@ require("./gl-matrix")
 const DEBUG = true
 
 
-const vec3 = glMatrix.vec3
-
-const zero = vec3.fromValues(0, 0, 0)
+const zero = glMatrix.vec3.fromValues(0, 0, 0)
 
 
 function setupCanvas(gl, useBlending = true, useCulling = true) {
@@ -68,11 +65,11 @@ function visualizeBuffers(gl, configuration, requests) {
     gl
   , {
       position: configuration.initial.view.position
-    , rotation: configuration.initial.view.orientation
+    , rotation: Rendering.Linear.fromEulerd(configuration.initial.view.orientation)
     }
   , {
       position: configuration.initial.tool.position
-    , rotation: configuration.initial.tool.orientation
+    , rotation: Rendering.Linear.fromEulerd(configuration.initial.tool.orientation)
     }
   )
 
@@ -90,16 +87,14 @@ function visualizeBuffers(gl, configuration, requests) {
 
       setupCanvas(gl)
 
-      Rendering.Program.selectShapeProgram(gl, graphics.manager.program)
-
       Rendering.Frames.prepare(gl, graphics.manager)
-      Rendering.Selector.prepare(gl, graphics.tool.position, graphics.tool.rotation, graphics.selector)
+      Rendering.Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
 
       graphics.manager.projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
       graphics.manager.modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
 
-      Rendering.Frames.draw  (gl, graphics.manager )
-//    Rendering.Selector.draw(gl, graphics.selector)
+      Rendering.Frames.draw(gl, graphics.manager )
+      Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
 
     }
 

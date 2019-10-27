@@ -195,7 +195,7 @@ function drawDisplay(gl, display, projection, modelView) {
   if (hasBuffer(display))
     Buffers.drawInstances(gl, display.buffer, projection, modelView)
   else
-    ; // FIXME: Daw labels.
+    ; // FIXME: Draw labels.
 }
 
 
