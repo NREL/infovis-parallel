@@ -16,6 +16,18 @@ td input {
   width: 100%
 }
 
+a, a:visited {
+  color: black
+}
+
+a:hover {
+  color: darkred
+}
+
+a:active {
+  color: darkred
+}
+
 #uiConnector {
   position: absolute
 ; left    : 0
@@ -25,9 +37,10 @@ td input {
 }
 
 #uiDisconnector {
-  position: absolute
-; left    : 0
-; top     : 0
+  position  : absolute
+; left      : 0
+; top       : 0
+; visibility: hidden
 }
 
 #uiVisualize {

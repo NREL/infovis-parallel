@@ -141,6 +141,7 @@ function retrieve() {
 
 function load() {
   const input = document.createElement("input")
+  input.accept = "application/json"
   input.type = "file"
   input.onchange = (e) => {
     const file = e.target.files[0]
@@ -156,10 +157,17 @@ function load() {
 }
 
 
+function download() {
+  uiDownload.href = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(theConfiguration))
+}
+
+
 module.exports = {
-  current : function() {       return theConfiguration}
-, update  : function() {get(); return theConfiguration}
-, reset   : retrieve
-, load    : load
-, save    : store
+  current  : function() {       return theConfiguration}
+, update   : function() {get(); return theConfiguration}
+, compute  : function() {theConfiguration = defaultConfiguration(); put()}
+, reset    : retrieve
+, load     : load
+, save     : store
+, download : download
 }

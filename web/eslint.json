@@ -62,6 +62,7 @@
   , "uiAddress"         : "readonly"
   , "uiCanvas"          : "readonly"
   , "uiConnector"       : "readonly"
+  , "uiDownload"        : "readonly"
   , "uiEyeSeparationX"  : "readonly"
   , "uiEyeSeparationY"  : "readonly"
   , "uiEyeSeparationZ"  : "readonly"

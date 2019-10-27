@@ -30,7 +30,7 @@ function startup() {
 
   Visualizer.setupCanvas(gl)
 
-  Configuration.reset()
+  Configuration.compute()
   Connection.updateButtons()
 }
 
