@@ -11,12 +11,12 @@ const Shapes   = require("./shapes"  )
 require("../gl-matrix")
 
 
+const DEBUG = true
+
+
 const mat4 = glMatrix.mat4
 const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
-
-
-const DEBUG = true
 
 
 function listFrames(manager) {
@@ -246,9 +246,10 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
   const hasBuffer1 = hasBuffer(display)
   const identifier = deltaGeometry.getIden()
   const geometry = display.geometries.has(identifier) ? display.geometries.get(identifier) : Geometry.defaultGeometry()
-  if (revision != REVISION_None)
+  const revision1 = revision(shapeMesh, deltaGeometry, display.geometries)
+  if (revision1 != REVISION_None)
     Geometry.merge(geometry, deltaGeometry)
-  switch (revision(shapeMesh, deltaGeometry, display.geometries)) {
+  switch (revision1) {
     case REVISION_None:
       break
     case REVISION_Deletion:
@@ -300,13 +301,16 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
     geometry.shape.polylines.map((polyline) => [
       polyline.slice(0, polyline.length - 1)
     , polyline.slice(1, polyline.length    )
-    ]).flat().forEach(function(u0, u1) {
-      const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
-      const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
-      positions.push(uc)
-      rotations.push(Linear.rotationFromVectorPair(right, ud))
-      scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size))
-    })
+    ]).forEach(([u0s, u1s]) =>
+      u0s.map(function(u0, i) {
+        const u1 = u1s[i]
+        const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
+        const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
+        positions.push(uc)
+        rotations.push(Linear.rotationFromVectorPair(right, ud))
+        scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size))
+      })
+    )
 
 
   } else if (Geometry.hasRectangles(geometry)) {

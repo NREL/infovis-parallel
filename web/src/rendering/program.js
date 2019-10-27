@@ -8,7 +8,7 @@ require("../gl-matrix")
 const mat4 = glMatrix.mat4
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 const vertexShaderSource = `#version 300 es

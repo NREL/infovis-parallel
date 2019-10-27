@@ -59,7 +59,7 @@ function rotationFromVectorPairs(u0, v0, u2, v2) {
   const v0p = vec3.normalize(vec3.create(), projectPlane(v0, u0))
   const v1p = vec3.normalize(vec3.create(), projectPlane(v1, u0))
   const q1 = vec3.equals(vec3.add(vec3.create(), v0p, v1p), zero) ? quatFromPair(vec3.normalize(vec3.create(), u0), 0) : rotationFromVectorPair(v0p, v1p)
-  return vec3.normalize(vec3.create(), vec3.add(vec3.create(), q2, q1))
+  return quat.normalize(quat.create(), quat.multiply(quat.create(), q2, q1))
 }
 
 
@@ -67,8 +67,8 @@ function rotationFromPlane(xAxis, yAxis, origin, xPoint, yPoint) {
   return rotationFromVectorPairs(
     xAxis
   , yAxis
-  , vec3.scalarAndAdd(vec3.create(), xPoint, origin, -1)
-  , vec3.scalarAndAdd(vec3.create(), yPoint, origin, -1)
+  , vec3.scaleAndAdd(vec3.create(), xPoint, origin, -1)
+  , vec3.scaleAndAdd(vec3.create(), yPoint, origin, -1)
   )
 }
 

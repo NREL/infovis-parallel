@@ -73,6 +73,8 @@ function visualizeBuffers(gl, configuration, requests) {
     }
   )
 
+  if (DEBUG)
+    window.theGraphics = graphics
 
   function animation(timestamp) {
 
@@ -80,9 +82,16 @@ function visualizeBuffers(gl, configuration, requests) {
     if (requests.length > 0) {
 
       while (requests.length > 0) {
+
         const request = requests.pop()
-        if (DEBUG) console.debug("animation: request =", request)
+
+        if (DEBUG) {
+          console.debug("animation: request =", request)
+          window.theRequest = request
+        }
+
         Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+
       }
 
       setupCanvas(gl)

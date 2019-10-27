@@ -12,7 +12,7 @@ const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 function createSelector(gl, shapeProgram) {

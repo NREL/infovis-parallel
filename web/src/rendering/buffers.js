@@ -7,7 +7,7 @@ const Program = require("./program")
 require("../gl-matrix")
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 const zeroPosition = glMatrix.vec3.fromValues(0, 0, 0)

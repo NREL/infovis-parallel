@@ -7,7 +7,7 @@ const Connection    = require("./connection"   )
 const Visualizer    = require("./visualizer"   )
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 const requestQueue = []
