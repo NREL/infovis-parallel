@@ -30,8 +30,8 @@ a:active {
 
 #uiConnector {
   position: absolute
-; left    : 0
-; top     : 0
+; left    : 20px
+; top     : 20px
 ; width   : 400px
 ; height  : 100%
 }
