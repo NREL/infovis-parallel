@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const Buffers  = require("./buffers" )
 const Geometry = require("./geometry")
 const Linear   = require("./linear"  )

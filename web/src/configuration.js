@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const CONFIGURATION_KEY = "configuration"
 
 

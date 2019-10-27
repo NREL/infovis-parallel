@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const Program = require("./program")
 
 require("../gl-matrix")

@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const Rendering = {
   Buffers    : require("./rendering/buffers"   )
 , Frames     : require("./rendering/frames"    )

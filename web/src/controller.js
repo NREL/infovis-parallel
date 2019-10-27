@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const Configuration = require("./configuration")
 const Connection    = require("./connection"   )
 const Visualizer    = require("./visualizer"   )

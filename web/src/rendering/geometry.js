@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 require("../gl-matrix")
 
 

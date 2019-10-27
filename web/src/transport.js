@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 require("./infovis.proto3_pb")
 
 

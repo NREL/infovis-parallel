@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const Buffers  = require("./buffers"   )
 const Shapes   = require("./shapes"    )
 

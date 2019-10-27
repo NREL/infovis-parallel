@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 function drawText(text) {
 }
 

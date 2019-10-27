@@ -1,4 +1,7 @@
 
+'use strict';
+
+
 const Transport = require("./transport")
 
 
