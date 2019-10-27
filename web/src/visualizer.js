@@ -89,11 +89,11 @@ function visualizeBuffers(gl, configuration, requests) {
       Rendering.Frames.prepare(gl, graphics.manager)
       Rendering.Selector.prepare(gl, graphics.tool.position, graphics.tool.rotation, graphics.selector)
 
-      const projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
-      const modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+      graphics.manager.projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
+      graphics.manager.modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
 
-      Rendering.Frames.draw  (gl, graphics.manager , projection, modelView)
-      Rendering.Selector.draw(gl, graphics.selector, projection, modelView)
+      Rendering.Frames.draw  (gl, graphics.manager )
+//    Rendering.Selector.draw(gl, graphics.selector)
 
     }
 
