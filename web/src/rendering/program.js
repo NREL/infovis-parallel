@@ -91,7 +91,10 @@ function setProjectionModelView(gl, shapeProgram, projection, modelView) {
 
   const pmv = mat4.multiply(mat4.create(), projection, modelView)
 
-  gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, pmv)
+  if (false)
+    gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, pmv)
+  else
+    gl.uniformMatrix4fv(shapeProgram.pmvLocation, false, mat4.fromValues(6.944444179534912, 0.0, -1.7361111640930176, -3.4722213745117188, 0.0, 12.195122718811035, -1.829268455505371, -6.097560882568359, 0.0, 0.0, 1.0002000331878662, 9.981998443603516, 0.0, 0.0, -1.0, 10.0))
 
   console.debug("setProjectionModelView: projection =", projection)
   console.debug("setProjectionModelView: modelView =" , modelView )

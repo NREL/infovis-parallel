@@ -249,13 +249,13 @@ function drawInstances(gl, shapeBuffer, projection, modelView) {
 
   Program.selectShapeProgram(gl, shapeProgram)
 
+  Program.setProjectionModelView(gl, shapeProgram, projection, modelView)
+
   Program.bindMesh     (gl, shapeProgram, shapeBuffer.mesh     )
   Program.bindPositions(gl, shapeProgram, shapeBuffer.positions)
   Program.bindRotations(gl, shapeProgram, shapeBuffer.rotations)
   Program.bindScales   (gl, shapeProgram, shapeBuffer.scales   )
   Program.bindColors   (gl, shapeProgram, shapeBuffer.colors   )
-
-  Program.setProjectionModelView(gl, shapeProgram, projection, modelView)
 
   console.debug("drawInstances: gl.drawArraysInstanced")
   gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)

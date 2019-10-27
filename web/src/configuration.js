@@ -12,18 +12,18 @@ const defaultConfiguration =
     , eyeSeparation  : [0.10, 0, 0]
     , nearPlane      : 0.01
     , farPlane       : 100
-    , lowerLeft      : [-0.50, -0.25, 0  ]
-    , lowerRight     : [ 1.50, -0.25, 0  ]
-    , upperLeft      : [-0.50,  1.25, 0  ]
+    , lowerLeft      : [-0.940, -0.320, 0]
+    , lowerRight     : [ 1.940, -0.320, 0]
+    , upperLeft      : [-0.940,  1.320, 0]
     }
   , initial         : {
       view          : {
-        position    : [ 0.50,  0.50, 3  ]
-      , orientation : [    0,   -90, 0  ]
+        position    : [ 3,   2, 10  ]
+      , orientation : [ 0, -90,  0  ]
       }
     , tool          : {
-        position    : [-0.1 ,  0.5 , 0.5]
-      , orientation : [    0,   -90, 0  ]
+        position    : [-0.1,  0.5, 0.5]
+      , orientation : [ 0  ,-90  , 0  ]
       }
     }
   }

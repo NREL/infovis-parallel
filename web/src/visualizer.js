@@ -12,18 +12,12 @@ const Rendering = {
 require("./gl-matrix")
 
 
-const mat4 = glMatrix.mat4
 const vec3 = glMatrix.vec3
 
 const zero = vec3.fromValues(0, 0, 0)
 
 
-// FIXME: Investigate
-const useBlending = true
-const useCulling = true
-
-
-function setupCanvas(gl) {
+function setupCanvas(gl, useBlending = true, useCulling = true) {
 
   console.debug("setupCanvas")
 
@@ -98,19 +92,8 @@ function visualizeBuffers(gl, configuration, requests) {
       const projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
       const modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
 
-      const projection1 = mat4.perspective(
-        mat4.create()
-      , 45 * Math.PI / 180
-      , gl.canvas.clientWidth / gl.canvas.clientHeight
-      , configuration.display.nearPlane
-      , configuration.display.farPlane
-      )
-
-      Rendering.Frames.draw(gl, graphics.manager, projection, modelView)
+      Rendering.Frames.draw  (gl, graphics.manager , projection, modelView)
       Rendering.Selector.draw(gl, graphics.selector, projection, modelView)
-
-      console.log("projection =", projection)
-      console.log("projection1 =", projection1)
 
     }
 

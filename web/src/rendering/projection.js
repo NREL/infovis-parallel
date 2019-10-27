@@ -43,22 +43,41 @@ function projectionKooimaOffAxis(display, eye) {
   )
 
   // Frustum matrix.
-  const frustum = mat4.fromValues(
-    2 * near / (right - left),                         0,   (right + left  ) / (right - left  ),                               0
-  ,                         0, 2 * near / (top - bottom),   (top   + bottom) / (top   - bottom),                               0
-  ,                         0,                         0, - (far   + near  ) / (far   - near  ), - 2 * far * near / (far - near)
-  ,                         0,                         0,                                    -1,                               0
-  )
+  const frustum = mat4.frustum(mat4.create(), left, right, bottom, top, near, far)
 
   // Translation matrix.
-  const translate = mat4.fromValues(
-    1, 0, 0, eye[0]
-  , 0, 1, 0, eye[1]
-  , 0, 0, 1, eye[2]
-  , 0, 0, 0, 1
-  )
+  const translate = mat4.translate(mat4.create(), mat4.create(), eye)
 
-  return mat4.multiply(mat4.create(), frustum, mat4.multiply(mat4.create(), m, translate))
+//  near       =   1.0e-2
+//  far        = 100.0
+//  lowerLeft  =  -0.94 - 0.32   0.0
+//  lowerRight =   1.94 - 0.32   0.0
+//  upperLeft  =  -0.94   1.32   0.0
+//  eye        =   3.0    2.0   10.0
+//  vr         =   1.0    0.0    0.0
+//  vu         =   0.0    1.0    0.0
+//  vn         =   0.0    0.0    1.0
+//  va         =  -3.94 -2.32  -10.0
+//  vb         =  -1.06 -2.32  -10.0
+//  vc         =  -3.94 -0.68  -10.0
+//  throw      =  10.0
+//  scale      =   1.0e-3
+//  left       =  -3.94e-3
+//  right      =  -1.06e-3
+//  bottom     =  -2.32e-3
+//  top        =  -6.8e-4
+//  m          = 1.0                0.0                0.0                 0.0
+//               0.0                1.0                0.0                 0.0
+//               0.0                0.0                1.0                 0.0
+//               0.0                0.0                0.0                 1.0
+//  result     = 6.944444179534912  0.0               -1.7361111640930176 -3.4722213745117188
+//               0.0               12.195122718811035 -1.829268455505371  -6.097560882568359
+//               0.0                0.0               -1.0002000331878662  9.981998443603516
+//               0.0               0.0                -1.0                 10.0
+
+  const result =  mat4.multiply(mat4.create(), frustum, mat4.multiply(mat4.create(), m, translate))
+
+  return mat4.transpose(mat4.create(), result)
 
 }
 
