@@ -55,14 +55,14 @@ in vec2 texture ;
 flat out vec2 vTexture;
 
 void main(void) {
-  gl_Position = projection_modelview * vec4(position, 1.0);
+  gl_Position = projection_modelview * vec4(position, 1.);
   vTexture = texture;
 }`
 
 
 const fragmentShaderSource = `#version 300 es
 
-precision mediump float;
+precision highp float;
 
 uniform sampler2D sampler;
 
@@ -70,7 +70,7 @@ flat in vec2 vTexture;
 out vec4 color;
 
 void main(void) {
-  color = texture(sampler, vec2(vTexture.s, vTexture.t));
+  color = texture(sampler, vTexture);
 }`
 
 
@@ -178,8 +178,11 @@ function drawText(gl, imageData, points, size, perspective, modelView) {
 
     gl.bindTexture(gl.TEXTURE_2D, theShaders.texture)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageData)
+    // FIXME: Experiment with these texture parameters.
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     gl.generateMipmap(gl.TEXTURE_2D)
 
     gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0)
