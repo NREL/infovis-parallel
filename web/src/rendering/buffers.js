@@ -315,7 +315,7 @@ function updateBuffer(gl, updates, bufferObject, description) {
     else
       for (let j = 0; j < components; ++j)
         bytes[j] = value[j]
-    gl.bufferSubData   (gl.ARRAY_BUFFER, location * components * byteCount, bytes)
+    gl.bufferSubData(gl.ARRAY_BUFFER, location * components * byteCount, bytes)
   })
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null)

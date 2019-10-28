@@ -51,7 +51,8 @@ void main(void) {
   color = vColor;
 }`
 
-function prepareShapeProgram(gl) {
+
+function compileAndLink(gl, vertexShader, fragmentShader) {
 
   function makeShader(name, type, source) {
     const shader = gl.createShader(type)
@@ -63,12 +64,18 @@ function prepareShapeProgram(gl) {
   }
 
   const program = gl.createProgram()
-  gl.attachShader(program, makeShader("vertex"  , gl.VERTEX_SHADER  , vertexShaderSource  ))
-  gl.attachShader(program, makeShader("fragment", gl.FRAGMENT_SHADER, fragmentShaderSource))
+  gl.attachShader(program, makeShader("vertex"  , gl.VERTEX_SHADER  , vertexShader  ))
+  gl.attachShader(program, makeShader("fragment", gl.FRAGMENT_SHADER, fragmentShader))
   gl.linkProgram(program)
   if (!gl.getProgramParameter(program, gl.LINK_STATUS))
     throw new Error("Could not link program: " + gl.getProgramInfoLog(program))
 
+  return program
+}
+
+
+function prepareShapeProgram(gl) {
+  const program = compileAndLink(gl, vertexShaderSource, fragmentShaderSource)
   return {
     program              : program
   , pmvLocation          : gl.getUniformLocation(program, "projection_modelview")
@@ -159,12 +166,13 @@ function bindAttributes(gl, instanced, location, description, buffer) {
 
 
 module.exports = {
-  prepareShapeProgram     : prepareShapeProgram
-, selectShapeProgram      : selectShapeProgram
-, setProjectionModelView  : setProjectionModelView
-, bindMesh                : bindMesh
-, bindPositions           : bindPositions
-, bindRotations           : bindRotations
-, bindScales              : bindScales
-, bindColors              : bindColors
+  compileAndLink         : compileAndLink
+, prepareShapeProgram    : prepareShapeProgram
+, selectShapeProgram     : selectShapeProgram
+, setProjectionModelView : setProjectionModelView
+, bindMesh               : bindMesh
+, bindPositions          : bindPositions
+, bindRotations          : bindRotations
+, bindScales             : bindScales
+, bindColors             : bindColors
 }

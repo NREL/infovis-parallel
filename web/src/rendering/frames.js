@@ -175,7 +175,7 @@ function createDisplay(gl, shapeProgram, shapeMesh) {
     geometries : new Map()
   }
   if (shapeMesh == MESH_Label)
-    display.labels = new Map()
+    display.pixmaps = new Map()
   else
     display.buffer = Buffers.createShapeBuffer(gl, shapeProgram, gl.TRIANGLES, mesh(shapeMesh))
   return display
@@ -198,7 +198,14 @@ function drawDisplay(gl, display, projection, modelView) {
   if (hasBuffer(display))
     Buffers.drawInstances(gl, display.buffer, projection, modelView)
   if (hasPixmaps(display))
-    Text.drawText()
+    display.geometries.forEach((geometry, identifier) => Text.drawText(
+      gl
+    , display.pixmaps.get(identifier)
+    , geometry.shape.label
+    , geometry.size
+    , projection
+    , modelView
+    ))
 }
 
 
@@ -275,7 +282,7 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
           updateDisplay(identifier, geometry, display.buffer)
         }
         if (hasPixmaps(display))
-          display.pixmaps.set(identifier, Text.makePixmaps(geometry.text))
+          display.pixmaps.set(identifier, Text.makePixmap(geometry.text))
         break
       }
     case REVISION_Recoloring:

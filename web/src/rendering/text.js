@@ -2,14 +2,24 @@
 'use strict'
 
 
-// Based on <https://delphic.me.uk/tutorials/webgl-text>.
+const Program = require("./program")
+
+require("../gl-matrix")
+
+
+const mat4 = glMatrix.mat4
+const vec3 = glMatrix.vec3
+
+
+const DEBUG = true
+
 
 function makePixmap(
   text
-, textColor       = "gray"      // CSS color
-, textHeight      = 50          // px
-, fontFamily      = "monospace" // CSS font
-, backgroundColor = "#FFFFFF00" // CSS color
+, textColor       = DEBUG ? "white" : "#FFFF0080" // CSS color
+, textHeight      = 50                            // px
+, fontFamily      = "monospace"                   // CSS font
+, backgroundColor = DEBUG ? "gray"  : "#FFFFFF00" // CSS color
 ) {
 
   const ctx = uiTexture.getContext("2d")
@@ -37,413 +47,143 @@ function makePixmap(
 
 const vertexShaderSource = `#version 300 es
 
-attribute vec3 aVertexPosition
-attribute vec3 aVertexNormal
-attribute vec2 aTextureCoord
+uniform mat4 projection_modelview;
 
-uniform mat4 uMVMatrix
-uniform mat4 uPMatrix
-uniform mat3 uNMatrix
+in vec3 position;
+in vec2 texture ;
 
-uniform vec3 uAmbientColor
-
-uniform vec3 uLightingDirection
-uniform vec3 uDirectionalColor
-
-uniform bool uUseLighting
-
-varying vec2 vTextureCoord
-varying vec3 vLightWeighting
+flat out vec2 vTexture;
 
 void main(void) {
-  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0)
-  vTextureCoord = aTextureCoord
-
-  if (!uUseLighting) {
-    vLightWeighting = vec3(1.0, 1.0, 1.0)
-  } else {
-    vec3 transformedNormal = uNMatrix * aVertexNormal
-    float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0)
-    vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting
-  }
+  gl_Position = projection_modelview * vec4(position, 1.0);
+  vTexture = texture;
 }`
 
 
 const fragmentShaderSource = `#version 300 es
 
-precision mediump float
+precision mediump float;
 
-varying vec2 vTextureCoord
-varying vec3 vLightWeighting
+uniform sampler2D sampler;
 
-uniform sampler2D uSampler
+flat in vec2 vTexture;
+out vec4 color;
 
 void main(void) {
-    vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t))
-    gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a)
+  color = texture(sampler, vec2(vTexture.s, vTexture.t));
 }`
 
 
-/*
-function getShader(gl, id) {
-    var shaderScript = document.getElementById(id)
-    if (!shaderScript) {
-        return null
-    }
+let theShaders = null
 
-    var str = ""
-    var k = shaderScript.firstChild
-    while (k) {
-        if (k.nodeType == 3) {
-            str += k.textContent
-        }
-        k = k.nextSibling
-    }
 
-    var shader
-    if (shaderScript.type == "x-shader/x-fragment") {
-        shader = gl.createShader(gl.FRAGMENT_SHADER)
-    } else if (shaderScript.type == "x-shader/x-vertex") {
-        shader = gl.createShader(gl.VERTEX_SHADER)
-    } else {
-        return null
-    }
+function ensureShaders(gl) {
 
-    gl.shaderSource(shader, str)
-    gl.compileShader(shader)
+  if (theShaders != null)
+    return
 
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader))
-        return null
-    }
+  theShaders = {}
 
-    return shader
+  theShaders.program = Program.compileAndLink(gl, vertexShaderSource, fragmentShaderSource)
+  gl.useProgram(theShaders.program)
+
+  theShaders.pmvUniform     = gl.getUniformLocation(theShaders.program, "projection_modelview")
+  theShaders.samplerUniform = gl.getUniformLocation(theShaders.program, "sampler"             )
+
+  theShaders.positionAttribute = gl.getAttribLocation(theShaders.program, "position")
+  theShaders.textureAttribute  = gl.getAttribLocation(theShaders.program, "texture" )
+
+  gl.enableVertexAttribArray(theShaders.positionAttribute)
+  gl.enableVertexAttribArray(theShaders.textureAttribute )
+
+  theShaders.positionBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, theShaders.positionBuffer)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1., -1.,  0.
+  ,  1., -1.,  0.
+  ,  1.,  1.,  0.
+  , -1.,  1.,  0.
+  ]), gl.DYNAMIC_DRAW)
+
+  theShaders.textureBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, theShaders.textureBuffer)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    0., 0.
+  , 1., 0.
+  , 1., 1.
+  , 0., 1.
+  ]), gl.STATIC_DRAW)
+
+  theShaders.indexBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, theShaders.indexBuffer)
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([
+    0, 1, 2
+  , 0, 2, 3
+  , 0, 3, 2
+  , 0, 2, 1
+  ]), gl.STATIC_DRAW)
+
+  theShaders.texture = gl.createTexture()
+
 }
 
-var shaderProgram
 
-function initShaders() {
-    var fragmentShader = getShader(gl, "shader-fs")
-    var vertexShader = getShader(gl, "shader-vs")
+function drawText(gl, imageData, points, size, perspective, modelView) {
 
-    shaderProgram = gl.createProgram()
-    gl.attachShader(shaderProgram, vertexShader)
-    gl.attachShader(shaderProgram, fragmentShader)
-    gl.linkProgram(shaderProgram)
+    const pmv = mat4.multiply(mat4.create(), perspective, modelView)
 
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        alert("Could not initialise shaders")
-    }
+    const size1 = size / imageData.height * imageData.width
 
-    gl.useProgram(shaderProgram)
+    const o = vec3.fromValues(points[0][0], points[0][1], points[0][2])
+    const h = vec3.fromValues(points[1][0], points[1][1], points[1][2])
+    const v = vec3.fromValues(points[2][0], points[2][1], points[2][2])
 
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition")
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute)
+    const oh = vec3.scale(vec3.create(), vec3.normalize(vec3.create(), vec3.scaleAndAdd(vec3.create(), h, o, -1)), size1)
+    const ov = vec3.scale(vec3.create(), vec3.normalize(vec3.create(), vec3.scaleAndAdd(vec3.create(), v, o, -1)), size )
 
-    shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal")
-    gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute)
+    const h1 = vec3.add(vec3.create(), o, oh)
+    const v1 = vec3.add(vec3.create(), o, ov)
+    const c  = vec3.add(vec3.create(), o, vec3.add(vec3.create(), oh, ov))
 
-    shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord")
-    gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute)
-
-    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix")
-    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix")
-    shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix")
-    shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler")
-    shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, "uUseLighting")
-    shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor")
-    shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection")
-    shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor")
-}
-
-function handleLoadedTexture(texture, textureCanvas) {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-
-    gl.bindTexture(gl.TEXTURE_2D, texture)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureCanvas)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
-    gl.generateMipmap(gl.TEXTURE_2D)
-
-    gl.bindTexture(gl.TEXTURE_2D, null)
-}
-
-var canvasTexture
-
-function initTexture() {
-    canvasTexture = gl.createTexture()
-    handleLoadedTexture(canvasTexture, document.getElementById('textureCanvas'))
-}
-
-var mvMatrix = mat4.create()
-var mvMatrixStack = []
-var pMatrix = mat4.create()
-
-function mvPushMatrix() {
-    var copy = mat4.create()
-    mat4.set(mvMatrix, copy)
-    mvMatrixStack.push(copy)
-}
-
-function mvPopMatrix() {
-    if (mvMatrixStack.length == 0) {
-        throw "Invalid popMatrix!"
-    }
-    mvMatrix = mvMatrixStack.pop()
-}
-
-function setMatrixUniforms() {
-    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
-    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix)
-
-    var normalMatrix = mat3.create()
-    mat4.toInverseMat3(mvMatrix, normalMatrix)
-    mat3.transpose(normalMatrix)
-    gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix)
-}
-
-function degToRad(degrees) {
-    return degrees * Math.PI / 180
-}
-
-var xRot = 0
-var xSpeed = 10
-
-var yRot = 0
-var ySpeed = -10
-
-var z = -5.0
-
-var cubeVertexPositionBuffer
-var cubeVertexNormalBuffer
-var cubeVertexTextureCoordBuffer
-var cubeVertexIndexBuffer
-
-function initBuffers() {
-    cubeVertexPositionBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer)
-    vertices = [
-        // Front face
-        -1.0, -1.0,  1.0,
-         1.0, -1.0,  1.0,
-         1.0,  1.0,  1.0,
-        -1.0,  1.0,  1.0,
-
-        // Back face
-        -1.0, -1.0, -1.0,
-        -1.0,  1.0, -1.0,
-         1.0,  1.0, -1.0,
-         1.0, -1.0, -1.0,
-
-        // Top face
-        -1.0,  1.0, -1.0,
-        -1.0,  1.0,  1.0,
-         1.0,  1.0,  1.0,
-         1.0,  1.0, -1.0,
-
-        // Bottom face
-        -1.0, -1.0, -1.0,
-         1.0, -1.0, -1.0,
-         1.0, -1.0,  1.0,
-        -1.0, -1.0,  1.0,
-
-        // Right face
-         1.0, -1.0, -1.0,
-         1.0,  1.0, -1.0,
-         1.0,  1.0,  1.0,
-         1.0, -1.0,  1.0,
-
-        // Left face
-        -1.0, -1.0, -1.0,
-        -1.0, -1.0,  1.0,
-        -1.0,  1.0,  1.0,
-        -1.0,  1.0, -1.0,
+    const corners = [
+       o[0],  o[1],  o[2]
+    , h1[0], h1[1], h1[2]
+    ,  c[0] , c[1],  c[2]
+    , v1[0], v1[1], v1[2]
     ]
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-    cubeVertexPositionBuffer.itemSize = 3
-    cubeVertexPositionBuffer.numItems = 24
 
-    cubeVertexNormalBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexNormalBuffer)
-    var vertexNormals = [
-        // Front face
-         0.0,  0.0,  1.0,
-         0.0,  0.0,  1.0,
-         0.0,  0.0,  1.0,
-         0.0,  0.0,  1.0,
+    if (DEBUG) console.debug("drawText: corners =", corners, ", imageData =", imageData)
 
-        // Back face
-         0.0,  0.0, -1.0,
-         0.0,  0.0, -1.0,
-         0.0,  0.0, -1.0,
-         0.0,  0.0, -1.0,
+    ensureShaders(gl)
 
-        // Top face
-         0.0,  1.0,  0.0,
-         0.0,  1.0,  0.0,
-         0.0,  1.0,  0.0,
-         0.0,  1.0,  0.0,
+    gl.bindBuffer(gl.ARRAY_BUFFER, theShaders.positionBuffer)
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(corners))
+    gl.vertexAttribPointer(theShaders.positionAttribute, 3, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(theShaders.positionAttribute)
 
-        // Bottom face
-         0.0, -1.0,  0.0,
-         0.0, -1.0,  0.0,
-         0.0, -1.0,  0.0,
-         0.0, -1.0,  0.0,
+    gl.bindBuffer(gl.ARRAY_BUFFER, theShaders.textureBuffer)
+    gl.vertexAttribPointer(theShaders.textureAttribute, 2, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(theShaders.textureAttribute)
 
-        // Right face
-         1.0,  0.0,  0.0,
-         1.0,  0.0,  0.0,
-         1.0,  0.0,  0.0,
-         1.0,  0.0,  0.0,
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, theShaders.indexBuffer)
 
-        // Left face
-        -1.0,  0.0,  0.0,
-        -1.0,  0.0,  0.0,
-        -1.0,  0.0,  0.0,
-        -1.0,  0.0,  0.0
-    ]
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW)
-    cubeVertexNormalBuffer.itemSize = 3
-    cubeVertexNormalBuffer.numItems = 24
+    gl.useProgram(theShaders.program)
 
-    cubeVertexTextureCoordBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer)
-    var textureCoords = [
-        // Front face
-        0.0, 0.0,
-        1.0, 0.0,
-        1.0, 1.0,
-        0.0, 1.0,
-
-        // Back face
-        1.0, 0.0,
-        1.0, 1.0,
-        0.0, 1.0,
-        0.0, 0.0,
-
-        // Top face
-        0.0, 1.0,
-        0.0, 0.0,
-        1.0, 0.0,
-        1.0, 1.0,
-
-        // Bottom face
-        1.0, 1.0,
-        0.0, 1.0,
-        0.0, 0.0,
-        1.0, 0.0,
-
-        // Right face
-        1.0, 0.0,
-        1.0, 1.0,
-        0.0, 1.0,
-        0.0, 0.0,
-
-        // Left face
-        0.0, 0.0,
-        1.0, 0.0,
-        1.0, 1.0,
-        0.0, 1.0
-    ]
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW)
-    cubeVertexTextureCoordBuffer.itemSize = 2
-    cubeVertexTextureCoordBuffer.numItems = 24
-
-    cubeVertexIndexBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer)
-    var cubeVertexIndices = [
-        0, 1, 2,      0, 2, 3,    // Front face
-        4, 5, 6,      4, 6, 7,    // Back face
-        8, 9, 10,     8, 10, 11,  // Top face
-        12, 13, 14,   12, 14, 15, // Bottom face
-        16, 17, 18,   16, 18, 19, // Right face
-        20, 21, 22,   20, 22, 23  // Left face
-    ]
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW)
-    cubeVertexIndexBuffer.itemSize = 1
-    cubeVertexIndexBuffer.numItems = 36
-}
-
-function drawScene() {
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-    mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix)
-
-    mat4.identity(mvMatrix)
-
-    mat4.translate(mvMatrix, [0.0, 0.0, z])
-
-    mat4.rotate(mvMatrix, degToRad(xRot), [1, 0, 0])
-    mat4.rotate(mvMatrix, degToRad(yRot), [0, 1, 0])
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer)
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexNormalBuffer)
-    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, cubeVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer)
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0)
+    gl.uniformMatrix4fv(theShaders.pmvUniform, false, pmv)
+    gl.uniform1i(theShaders.samplerUniform   , 0         )
 
     gl.activeTexture(gl.TEXTURE0)
-    gl.bindTexture(gl.TEXTURE_2D, canvasTexture)
-    gl.uniform1i(shaderProgram.samplerUniform, 0)
-    var lighting = true
-    gl.uniform1i(shaderProgram.useLightingUniform, lighting)
-    if (lighting) {
-        gl.uniform3f(shaderProgram.ambientColorUniform, 0.2, 0.2, 0.2)
 
-        var lightingDirection = [ -0.25, -0.25, -1 ]
-        var adjustedLD = vec3.create()
-        vec3.normalize(lightingDirection, adjustedLD)
-        vec3.scale(adjustedLD, -1)
-        gl.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD)
-        gl.uniform3f(shaderProgram.directionalColorUniform, 0.8, 0.8, 0.8)
-    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer)
-    setMatrixUniforms()
-    gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
-}
+    gl.bindTexture(gl.TEXTURE_2D, theShaders.texture)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageData)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.generateMipmap(gl.TEXTURE_2D)
 
-var lastTime = 0
+    gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0)
 
-function animate() {
-    var timeNow = new Date().getTime()
-    if (lastTime != 0) {
-        var elapsed = timeNow - lastTime
-
-        xRot += (xSpeed * elapsed) / 1000.0
-        yRot += (ySpeed * elapsed) / 1000.0
-    }
-    lastTime = timeNow
-}
-
-
-function tick() {
-    requestAnimFrame(tick)
-    drawScene()
-    animate()
-}
-
-
-function webGLStart() {
-    var canvas = document.getElementById("webglCanvas")
-    initGL(canvas)
-    initShaders()
-    initBuffers()
-    initTexture()
-
-    gl.clearColor(0.0, 0.0, 0.0, 1.0)
-    gl.enable(gl.DEPTH_TEST)
-
-    tick()
-}
-*/
-
-
-function drawText(text) {
 }
 
 
