@@ -105,6 +105,7 @@ function ensureShaders(gl) {
   ,  1.,  1.,  0.
   , -1.,  1.,  0.
   ]), gl.DYNAMIC_DRAW)
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
   theShaders.textureBuffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, theShaders.textureBuffer)
@@ -114,6 +115,7 @@ function ensureShaders(gl) {
   , 1., 1.
   , 0., 1.
   ]), gl.STATIC_DRAW)
+  gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
   theShaders.indexBuffer = gl.createBuffer()
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, theShaders.indexBuffer)
@@ -123,6 +125,7 @@ function ensureShaders(gl) {
   , 0, 3, 2
   , 0, 2, 1
   ]), gl.STATIC_DRAW)
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
 
   theShaders.texture = gl.createTexture()
 
@@ -157,18 +160,20 @@ function drawText(gl, imageData, points, size, perspective, modelView) {
 
     ensureShaders(gl)
 
+    gl.useProgram(theShaders.program)
+
     gl.bindBuffer(gl.ARRAY_BUFFER, theShaders.positionBuffer)
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(corners))
     gl.vertexAttribPointer(theShaders.positionAttribute, 3, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(theShaders.positionAttribute)
+    gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, theShaders.textureBuffer)
     gl.vertexAttribPointer(theShaders.textureAttribute, 2, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(theShaders.textureAttribute)
+    gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, theShaders.indexBuffer)
-
-    gl.useProgram(theShaders.program)
 
     gl.uniformMatrix4fv(theShaders.pmvUniform, false, pmv)
     gl.uniform1i(theShaders.samplerUniform   , 0         )
@@ -186,6 +191,11 @@ function drawText(gl, imageData, points, size, perspective, modelView) {
     gl.generateMipmap(gl.TEXTURE_2D)
 
     gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0)
+
+    gl.bindTexture(gl.TEXTURE_2D, null)
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+
+    gl.useProgram(null)
 
 }
 

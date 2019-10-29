@@ -87,7 +87,7 @@ const MESH_Rectangle = 4
 const MESH_Label     = 5
 const MESH_Axis      = 6
 
-const meshes =[MESH_Cube, MESH_Sphere, MESH_Polyline, MESH_Rectangle, MESH_Label, MESH_Axis]
+const meshes =[MESH_Label, MESH_Cube, MESH_Sphere, MESH_Polyline, MESH_Rectangle, MESH_Axis]
 
 
 function mesh(shapeMesh) {
@@ -328,7 +328,6 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
         scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size))
       })
     )
-
 
   } else if (Geometry.hasRectangles(geometry)) {
 

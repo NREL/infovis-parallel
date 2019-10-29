@@ -8,8 +8,6 @@ const Rendering = {
 , Program    : require("./rendering/program"   )
 , Projection : require("./rendering/projection")
 , Selector   : require("./rendering/selector"  )
-, Shapes     : require("./rendering/shapes"    )
-, Text       : require("./rendering/text"      )
 }
 
 
