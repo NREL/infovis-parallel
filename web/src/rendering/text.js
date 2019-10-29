@@ -11,13 +11,14 @@ const mat4 = glMatrix.mat4
 const vec3 = glMatrix.vec3
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 function makePixmap(
   text
 , textColor       = DEBUG ? "white" : "#FFFF0080" // CSS color
-, textHeight      = 50                            // px
+, textHeight      = 75                            // px
+, padding         = 10                            // px
 , fontFamily      = "monospace"                   // CSS font
 , backgroundColor = DEBUG ? "gray"  : "#FFFFFF00" // CSS color
 ) {
@@ -25,8 +26,8 @@ function makePixmap(
   const ctx = uiTexture.getContext("2d")
   ctx.font = textHeight + "px " + fontFamily
 
-  const width  = ctx.measureText(text).width
-  const height = textHeight
+  const width  = 2 * padding + ctx.measureText(text).width
+  const height = 2 * padding + textHeight
 
   uiTexture.width  = width
   uiTexture.height = height
@@ -38,7 +39,7 @@ function makePixmap(
   ctx.textAlign = "left"
   ctx.textBaseline = "middle"
   ctx.fillStyle = textColor
-  ctx.fillText(text, 0, height / 2)
+  ctx.fillText(text, padding, height / 2)
 
   return ctx.getImageData(0, 0, width, height)
 
@@ -52,7 +53,7 @@ uniform mat4 projection_modelview;
 in vec3 position;
 in vec2 texture ;
 
-flat out vec2 vTexture;
+out vec2 vTexture;
 
 void main(void) {
   gl_Position = projection_modelview * vec4(position, 1.);
@@ -66,7 +67,7 @@ precision highp float;
 
 uniform sampler2D sampler;
 
-flat in vec2 vTexture;
+in vec2 vTexture;
 out vec4 color;
 
 void main(void) {
@@ -178,8 +179,7 @@ function drawText(gl, imageData, points, size, perspective, modelView) {
 
     gl.bindTexture(gl.TEXTURE_2D, theShaders.texture)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageData)
-    // FIXME: Experiment with these texture parameters.
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)

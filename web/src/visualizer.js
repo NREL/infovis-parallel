@@ -104,22 +104,6 @@ function visualizeBuffers(gl, configuration, requests) {
       graphics.manager.projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
       graphics.manager.modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
 
-      if (DEBUG) {
-        const pixmap = Rendering.Text.makePixmap("Sample")
-        Rendering.Text.drawText(
-          gl
-        , pixmap
-        , [
-            [0.2, 0.2, 0.] // origin
-          , [0.8, 0.2, 0.] // horizontal
-          , [0.2, 0.8, 0.] // vertical
-          ]
-        , 0.2              // size
-        , graphics.manager.projection
-        , graphics.manager.modelView
-        )
-      }
-
       Rendering.Frames.draw(gl, graphics.manager )
       Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
 
