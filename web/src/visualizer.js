@@ -17,7 +17,11 @@ require("./gl-matrix")
 const DEBUG = true
 
 
-const zero = glMatrix.vec3.fromValues(0, 0, 0)
+const quat = glMatrix.quat
+const vec3 = glMatrix.vec3
+
+
+const zero = vec3.fromValues(0, 0, 0)
 
 
 function setupCanvas(gl, useBlending = true, useCulling = true) {
@@ -53,8 +57,8 @@ function initializeGraphics(gl, initialViewer, initialTool) {
   , selector : Rendering.Selector.create(gl, manager.program)
   , pov      : initialViewer
   , tool     : initialTool
-  , text     : ""
   , offset   : {position: zero, rotation: Rendering.Linear.fromEulerd(zero)}
+  , message  : ""
   }
 }
 
@@ -90,7 +94,48 @@ function visualizeBuffers(gl, configuration, requests) {
           window.theRequest = request
         }
 
-        Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+        if (request.getShow() != 0) {
+          if (DEBUG) console.log("animate: show =", request.getShow())
+          graphics.manager.current = request.getShow()
+       }
+
+        if (request.getReset()) {
+          if (DEBUG) console.log("animate: reset")
+          Rendering.Frames.reset(graphics.manager)
+        }
+
+        if (request.getUpsertList().length > 0) {
+          if (DEBUG) console.log("animate: upsert", request.getUpsertList().length)
+          Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+        }
+
+        if (request.getDeleteList().length > 0) {
+          if (DEBUG) console.log("anamiate: delete", request.getDeleteList().length)
+          Rendering.Frames.delete(request.getDeleteList(), graphics.manager)
+        }
+
+        if (request.hasViewloc()) {
+          const loc = request.getViewloc()
+          graphics.pov.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+          graphics.pov.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+          if (DEBUG) console.log("animate: view =", graphics.pov)
+        }
+
+        if (request.hasToolloc()) {
+          const loc = request.getToolloc()
+          graphics.tool.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+          graphics.tool.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+          if (DEBUG) console.log("animate: tool =", graphics.tool)
+        }
+
+        if (request.hasOffsetloc()) {
+          const loc = request.getOffsetloc()
+          graphics.offset.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+          graphics.offset.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+          if (DEBUG) console.log("animate: offset =", graphics.offset)
+        }
+
+        graphics.message = request.getMessage()
 
       }
 
@@ -104,6 +149,10 @@ function visualizeBuffers(gl, configuration, requests) {
 
       Rendering.Frames.draw(gl, graphics.manager )
       Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
+
+      const message = uiMessage.innerText
+      if (graphics.message != message)
+        uiMessage.innerText = graphics.message
 
     }
 

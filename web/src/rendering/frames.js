@@ -21,7 +21,7 @@ const vec3 = glMatrix.vec3
 
 
 function listFrames(manager) {
-  return manager.frames.keys()
+  return Array.from(manager.frames.keys())
 }
 
 
@@ -63,7 +63,7 @@ function insert1(gl, manager, deltaGeometry) {
 
 
 function delete0(identifiers, manager) {
-  manager.frames.forEach((frame, _) => deleteFrame(identifiers, frame))
+  manager.frames.forEach((frame, _) => deleteFrame(frame, identifiers))
 }
 
 
@@ -166,7 +166,7 @@ function drawFrame(gl, frame, projection, modelView) {
 
 
 function resetDisplay(display) {
-  deleteDisplay(display, display.geometries.keys())
+  deleteDisplay(display, Array.from(display.geometries.keys()))
 }
 
 

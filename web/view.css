@@ -36,11 +36,20 @@ a:active {
 ; height  : 100%
 }
 
-#uiDisconnector {
+#uiBanner {
   position  : absolute
-; left      : 0
-; top       : 0
-; visibility: hidden
+; left      : 15px
+; top       : 15px
+}
+
+#uiDisconnect {
+  visibility: hidden
+}
+
+#uiMessage {
+  color      : white
+; font-family: monospace
+; font-weight: bold
 }
 
 #uiVisualize {

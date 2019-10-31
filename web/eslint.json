@@ -74,6 +74,7 @@
   , "uiLowerRightX"     : "readonly"
   , "uiLowerRightY"     : "readonly"
   , "uiLowerRightZ"     : "readonly"
+  , "uiMessage"         : "readonly"
   , "uiNearPlane"       : "readonly"
   , "uiStereo"          : "readonly"
   , "uiTexture"         : "readonly"
