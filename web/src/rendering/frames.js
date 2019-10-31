@@ -12,7 +12,7 @@ const Text     = require("./text"    )
 require("../gl-matrix")
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 const mat4 = glMatrix.mat4

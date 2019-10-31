@@ -334,7 +334,7 @@ function expandBuffer(gl, description, oldSize, newSize, oldBufferObject) {
 
   const newBufferObject = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, newBufferObject)
-  gl.bufferData(newBufferObject, newSize * components * byteCount, gl.DYNAMIC_DRAW)
+  gl.bufferData(gl.ARRAY_BUFFER, newSize * components * byteCount, gl.DYNAMIC_DRAW)
   gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
   gl.bindBuffer(gl.COPY_READ_BUFFER , oldBufferObject)

@@ -14,7 +14,7 @@ const Rendering = {
 require("./gl-matrix")
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 const quat = glMatrix.quat
