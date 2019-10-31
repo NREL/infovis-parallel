@@ -114,7 +114,7 @@ function findShapeMesh(deltaGeometry) {
       if (Geometry.deltaGlyph(deltaGeometry))
         return deltaGeometry.getGlyp() == Geometry.GLYPH_Sphere ? MESH_Sphere : MESH_Cube
       else
-        return 0
+        return -1
     case Geometry.GEOMETRY_Polylines:
       return MESH_Polyline
     case Geometry.GEOMETRY_Rectangles:
@@ -229,7 +229,7 @@ function revision(shapeMesh, deltaGeometry, geometries) {
 
   const shapeMesh1 = findShapeMesh(deltaGeometry)
 
-  const mesh     = shapeMesh1 == shapeMesh
+  const mesh     = shapeMesh1 == shapeMesh || shapeMesh1 == -1 && (shapeMesh == MESH_Cube || shapeMesh == MESH_Sphere)
   const relevant = mesh || shapeMesh1 == 0
   const old      = geometries.has(deltaGeometry.getIden())
   const position = Geometry.deltaPosition(deltaGeometry)
