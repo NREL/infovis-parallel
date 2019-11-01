@@ -17,6 +17,9 @@ const vec3 = glMatrix.vec3
 const DEBUG = false
 
 
+const center = vec3.fromValues(0.5, 0.5, 0.5)
+
+
 const x = {
   nextFrame              : "+"
 , previousFrame          : "-"
@@ -86,22 +89,32 @@ function interpret(y, graphics) {
 
   else if ((target != null) && (key in x.move)) {
     if (DEBUG) console.log("interpret: target =", target)
-    target.position = vec3.scaleAndAdd(
+    const rotation = Rendering.Linear.fromEulerd(
+      vec3.scale(
+        vec3.create()
+      , x.move[key][1]
+      , deltaRotation
+      )
+    )
+    target.position = vec3.add(
       vec3.create()
-    , target.position
-    , x.move[key][0]
-    , deltaPosition
+    , vec3.scaleAndAdd(
+        vec3.create()
+      , target.position
+      , x.move[key][0]
+      , deltaPosition
+      )
+    , vec3.scaleAndAdd(
+        vec3.create()
+      , center
+      , vec3.transformQuat(vec3.create(), center, rotation)
+      , -1
+      )
     )
     target.rotation = quat.multiply(
       quat.create()
     , target.rotation
-    , Rendering.Linear.fromEulerd(
-        vec3.scale(
-          vec3.create()
-        , x.move[key][1]
-        , deltaRotation
-        )
-      )
+    , rotation
     )
     if (DEBUG) console.log("interpret: target' =", target)
   }
