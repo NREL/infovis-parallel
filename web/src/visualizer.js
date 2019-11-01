@@ -1,7 +1,7 @@
 
 'use strict';
 
-
+const Keyboard = require("./keyboard")
 const Rendering = {
   Frames     : require("./rendering/frames"    )
 , Linear     : require("./rendering/linear"    )
@@ -63,7 +63,7 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 }
 
 
-function visualizeBuffers(gl, configuration, requests) {
+function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
 
   const graphics = initializeGraphics(
     gl
@@ -82,62 +82,66 @@ function visualizeBuffers(gl, configuration, requests) {
 
   function animation(timestamp) {
 
+    const dirty = keyQueue.length > 0 || requestQueue.length > 0
 
-    if (requests.length > 0) {
+    while (keyQueue.length > 0)
+      Keyboard.interpret(keyQueue.pop(), graphics)
 
-      while (requests.length > 0) {
+    while (requestQueue.length > 0) {
 
-        const request = requests.pop()
+      const request = requestQueue.pop()
 
-        if (DEBUG) {
-          console.debug("animation: request =", request)
-          window.theRequest = request
-        }
-
-        if (request.getShow() != 0) {
-          if (DEBUG) console.log("animate: show =", request.getShow())
-          graphics.manager.current = request.getShow()
-       }
-
-        if (request.getReset()) {
-          if (DEBUG) console.log("animate: reset")
-          Rendering.Frames.reset(graphics.manager)
-        }
-
-        if (request.getUpsertList().length > 0) {
-          if (DEBUG) console.log("animate: upsert", request.getUpsertList().length)
-          Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
-        }
-
-        if (request.getDeleteList().length > 0) {
-          if (DEBUG) console.log("anamiate: delete", request.getDeleteList().length)
-          Rendering.Frames.delete(request.getDeleteList(), graphics.manager)
-        }
-
-        if (request.hasViewloc()) {
-          const loc = request.getViewloc()
-          graphics.pov.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
-          graphics.pov.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-          if (DEBUG) console.log("animate: view =", graphics.pov)
-        }
-
-        if (request.hasToolloc()) {
-          const loc = request.getToolloc()
-          graphics.tool.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
-          graphics.tool.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-          if (DEBUG) console.log("animate: tool =", graphics.tool)
-        }
-
-        if (request.hasOffsetloc()) {
-          const loc = request.getOffsetloc()
-          graphics.offset.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
-          graphics.offset.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-          if (DEBUG) console.log("animate: offset =", graphics.offset)
-        }
-
-        graphics.message = request.getMessage()
-
+      if (DEBUG) {
+        console.debug("animation: request =", request)
+        window.theRequest = request
       }
+
+      if (request.getShow() != 0) {
+        if (DEBUG) console.log("animate: show =", request.getShow())
+        graphics.manager.current = request.getShow()
+     }
+
+      if (request.getReset()) {
+        if (DEBUG) console.log("animate: reset")
+        Rendering.Frames.reset(graphics.manager)
+      }
+
+      if (request.getUpsertList().length > 0) {
+        if (DEBUG) console.log("animate: upsert", request.getUpsertList().length)
+        Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+      }
+
+      if (request.getDeleteList().length > 0) {
+        if (DEBUG) console.log("anamiate: delete", request.getDeleteList().length)
+        Rendering.Frames.delete(request.getDeleteList(), graphics.manager)
+      }
+
+      if (request.hasViewloc()) {
+        const loc = request.getViewloc()
+        graphics.pov.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+        graphics.pov.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+        if (DEBUG) console.log("animate: view =", graphics.pov)
+      }
+
+      if (request.hasToolloc()) {
+        const loc = request.getToolloc()
+        graphics.tool.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+        graphics.tool.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+        if (DEBUG) console.log("animate: tool =", graphics.tool)
+      }
+
+      if (request.hasOffsetloc()) {
+        const loc = request.getOffsetloc()
+        graphics.offset.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+        graphics.offset.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+        if (DEBUG) console.log("animate: offset =", graphics.offset)
+      }
+
+      graphics.message = request.getMessage()
+
+    }
+
+    if (dirty) {
 
       setupCanvas(gl)
 

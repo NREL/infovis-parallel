@@ -12,6 +12,12 @@ const DEBUG = false
 
 const requestQueue = []
 
+const keyQueue = []
+
+let isVisualizing = false
+
+let theContext = null
+
 
 function echoHandler(connection, request) {
   if (DEBUG) console.debug("echoHandler: request =", request)
@@ -19,11 +25,19 @@ function echoHandler(connection, request) {
 }
 
 
-let theContext = null
+function keyHandler(event) {
+  if (!isVisualizing || event.defaultPrevented)
+    return
+  keyQueue.unshift({
+    key  : event.key || event.keyCode
+  , shift: event.shiftKey
+  })
+}
 
 
-// Set up the document.
 function startup() {
+
+  document.addEventListener("keydown", keyHandler)
 
   theContext = uiCanvas.getContext("webgl2")
   const gl = theContext
@@ -35,22 +49,27 @@ function startup() {
 
   Configuration.compute()
   Connection.updateButtons()
+
 }
 
 
 function startVisualizing() {
+
+  isVisualizing = true
+
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler)
-  Visualizer.visualizeBuffers(theContext, configuration, requestQueue)
+  Visualizer.visualizeBuffers(theContext, configuration, requestQueue, keyQueue)
+
 }
 
 
 function stopVisualizing() {
   Connection.unconnect()
+  isVisualizing = false
 }
 
 
-// Export functions.
 module.exports = {
   Configuration    : Configuration
 , startVisualizing : startVisualizing
