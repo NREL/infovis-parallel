@@ -8,6 +8,7 @@ const Rendering = {
 , Program    : require("./rendering/program"   )
 , Projection : require("./rendering/projection")
 , Selector   : require("./rendering/selector"  )
+, Text       : require("./rendering/text"      )
 }
 
 
@@ -24,7 +25,7 @@ const vec3 = glMatrix.vec3
 const zero = vec3.fromValues(0, 0, 0)
 
 
-function setupCanvas(gl, useBlending = true, useCulling = true) {
+function setupCanvas(gl, useBlending = !DEBUG, useCulling = !DEBUG) {
 
   if (DEBUG) console.debug("setupCanvas")
 
@@ -51,6 +52,7 @@ function setupCanvas(gl, useBlending = true, useCulling = true) {
 
 
 function initializeGraphics(gl, initialViewer, initialTool) {
+
   const manager = Rendering.Frames.createManager(gl)
   return {
     manager  : manager
@@ -76,6 +78,8 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
     , rotation: Rendering.Linear.fromEulerd(configuration.initial.tool.orientation)
     }
   )
+
+  Rendering.Text.ensureShaders(gl)
 
   if (DEBUG)
     window.theGraphics = graphics

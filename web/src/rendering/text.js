@@ -176,7 +176,7 @@ function drawText(gl, imageData, points, size, perspective, modelView) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, theShaders.indexBuffer)
 
     gl.uniformMatrix4fv(theShaders.pmvUniform, false, pmv)
-    gl.uniform1i(theShaders.samplerUniform   , 0         )
+    gl.uniform1i(theShaders.samplerUniform, 0)
 
     gl.activeTexture(gl.TEXTURE0)
 
@@ -201,6 +201,7 @@ function drawText(gl, imageData, points, size, perspective, modelView) {
 
 
 module.exports = {
-  makePixmap : makePixmap
-, drawText   : drawText
+  ensureShaders : ensureShaders
+, makePixmap    : makePixmap
+, drawText      : drawText
 }
