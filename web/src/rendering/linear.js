@@ -73,13 +73,13 @@ function rotationFromPlane(xAxis, yAxis, origin, xPoint, yPoint) {
 }
 
 
-function fromEuler(v) {
+function fromEulerd(v) {
   return quat.fromEuler(quat.create(), v[0], v[1], v[2])
 }
 
 
-function fromEulerd(v) {
-  return fromEuler(vec3.scale(vec3.create(), v, Math.PI / 180))
+function fromEuler(v) {
+  return fromEuler(vec3.scale(vec3.create(), v, 180 / Math.PI))
 }
 
 
