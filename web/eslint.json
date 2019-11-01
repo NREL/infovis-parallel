@@ -68,6 +68,7 @@
   , "uiEyeSeparationY"  : "readonly"
   , "uiEyeSeparationZ"  : "readonly"
   , "uiFarPlane"        : "readonly"
+  , "uiKeyboard"        : "readonly"
   , "uiLowerLeftX"      : "readonly"
   , "uiLowerLeftY"      : "readonly"
   , "uiLowerLeftZ"      : "readonly"

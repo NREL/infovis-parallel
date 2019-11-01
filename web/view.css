@@ -5,7 +5,7 @@
 
 th {
   padding-top: 25px
-; text-align: left
+; text-align : left
 }
 
 td button {
@@ -37,10 +37,10 @@ a:active {
 }
 
 #uiBanner {
-  position  : absolute
-; left      : 15px
-; right     : 15px
-; top       : 15px
+  position: absolute
+; left    : 15px
+; right   : 15px
+; top     : 15px
 }
 
 #uiMessage {
@@ -49,6 +49,22 @@ a:active {
 ; color      : white
 ; font-family: monospace
 ; font-weight: bold
+}
+
+#uiKeyboard {
+  position        : absolute
+; left            : 0px
+; right           : 0px
+; bottom          : 0px
+; width           : 100%
+; padding         : 10px
+; background-color: #C0C0C0E0
+; visibility      : hidden
+}
+
+#uiKeyboard p {
+  margin    : 0
+; text-align: center
 }
 
 #uiVisualize {

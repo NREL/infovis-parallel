@@ -70,9 +70,15 @@ function stopVisualizing() {
 }
 
 
+function toggleHelp() {
+  uiKeyboard.style.visibility = uiKeyboard.style.visibility == "visible" ? "hidden" : "visible"
+}
+
+
 module.exports = {
   Configuration    : Configuration
 , startVisualizing : startVisualizing
 , startup          : startup
 , stopVisualizing  : stopVisualizing
+, toggleHelp       : toggleHelp
 }
