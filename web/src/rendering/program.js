@@ -165,6 +165,24 @@ function bindAttributes(gl, instanced, location, description, buffer) {
 }
 
 
+function unbindAttributes(gl, program) {
+
+  gl.disableVertexAttribArray(program.meshLocation)
+
+  const instancedLocations = [
+    program.positionsLocation
+  , program.rotationsLocation
+  , program.scalesLocation
+  , program.colorsLocation
+  ]
+  instancedLocations.forEach(function(location) {
+    gl.vertexAttribDivisor(location, 0)
+    gl.disableVertexAttribArray(location)
+  })
+
+}
+
+
 module.exports = {
   compileAndLink         : compileAndLink
 , prepareShapeProgram    : prepareShapeProgram
@@ -175,4 +193,5 @@ module.exports = {
 , bindRotations          : bindRotations
 , bindScales             : bindScales
 , bindColors             : bindColors
+, unbindAttributes       : unbindAttributes
 }

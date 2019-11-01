@@ -5,7 +5,7 @@
 EXAMPLES=$(addsuffix .pbb,$(basename $(wildcard examples/*.pbt)))
 
 
-all: examples ../unity/linux/Assets/Infovis/Protobuf.cs ../web/lib/infovis.proto3_pb.js
+all: examples ../unity/linux/Assets/Infovis/Protobuf.cs ../web/src/infovis.proto3_pb.js
 
 examples: $(EXAMPLES)
 

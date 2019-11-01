@@ -266,6 +266,7 @@ function drawInstances(gl, shapeBuffer, projection, modelView) {
   if (DEBUG) console.debug("drawInstances: gl.drawArraysInstanced")
   gl.drawArraysInstanced(shapeBuffer.primitiveMode, 0, shapeBuffer.vertexCount, shapeBuffer.instanceCount)
 
+  Program.unbindAttributes(gl, shapeProgram)
   Program.selectShapeProgram(gl, null)
 
 }
