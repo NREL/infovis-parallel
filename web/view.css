@@ -39,15 +39,14 @@ a:active {
 #uiBanner {
   position  : absolute
 ; left      : 15px
+; right     : 15px
 ; top       : 15px
 }
 
-#uiDisconnect {
-  visibility: hidden
-}
-
 #uiMessage {
-  color      : white
+  width      : 100%
+; text-align : center
+; color      : white
 ; font-family: monospace
 ; font-weight: bold
 }

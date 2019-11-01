@@ -13,7 +13,7 @@ function defaultConfiguration(w = window.innerWidth, h = window.innerHeight) {
 
   return {
     server : {
-      address        : "ws://127.0.0.1:42042"
+      address        : "ws://104.198.152.159:42042"
     }
   , display          : {
       stereo         : false
