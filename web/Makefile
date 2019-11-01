@@ -17,11 +17,12 @@ lint: model.html controller.js
 	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*}.js
 	tidy -o /dev/null model.html
 
+deploy: controller.js
+	gsutil -m cp -r -a public-read model.html view.css controller.js src gs://visualize.functionally.io/
+
 install:
 	npm install webpack webpack-cli
 
-deploy:
-	gsutil -m cp -r -a public-read model.html view.css controller.js src gs://visualize.functionally.io/
 
 .SUFFIXES:
 
