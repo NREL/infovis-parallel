@@ -89,7 +89,7 @@ function toEuler(q) {
   const z = q[2]
   const w = q[3]
   const phi = Math.atan2(2 * (w * x  + y * z), 1 - 2 * (x * x + y * y))
-  const theta = Math.asin(2 * (w * y - z * x))
+  const theta = Math.asin(Math.max(-1, Math.min(1, 2 * (w * y - z * x))))
   const psi = Math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z))
   return vec3.fromValues(phi, theta, psi)
 }

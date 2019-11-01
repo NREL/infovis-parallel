@@ -18,6 +18,9 @@ require("./gl-matrix")
 const DEBUG = false
 
 
+const forgetKeys = true
+
+
 const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
@@ -90,6 +93,8 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
 
     while (keyQueue.length > 0)
       Keyboard.interpret(keyQueue.pop(), graphics)
+    if (forgetKeys)
+      keyQueue.length = 0
 
     while (requestQueue.length > 0) {
 

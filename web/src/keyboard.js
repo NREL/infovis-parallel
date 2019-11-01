@@ -25,7 +25,7 @@ const x = {
 , tool                   : {shift: true }
 , deltaOffsetPosition    : 0.02
 , deltaToolPosition      : 0.01
-, deltaRotation          : 0.5
+, deltaRotation          : 1.0
 , move                   : {
                              ArrowRight: [vec3.fromValues( 1,  0,  0), vec3.fromValues( 0,  0,  0)]
                            , ArrowLeft : [vec3.fromValues(-1,  0,  0), vec3.fromValues( 0,  0,  0)]
@@ -92,12 +92,15 @@ function interpret(y, graphics) {
     , x.move[key][0]
     , deltaPosition
     )
-    target.rotation = Rendering.Linear.fromEulerd(
-      vec3.scaleAndAdd(
-        vec3.create()
-      , Rendering.Linear.toEulerd(target.rotation)
-      , x.move[key][1]
-      , deltaRotation
+    target.rotation = quat.multiply(
+      quat.create()
+    , target.rotation
+    , Rendering.Linear.fromEulerd(
+        vec3.scale(
+          vec3.create()
+        , x.move[key][1]
+        , deltaRotation
+        )
       )
     )
     if (DEBUG) console.log("interpret: target' =", target)
