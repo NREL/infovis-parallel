@@ -12,6 +12,15 @@
       <h1>InfoVis Parallel</h1>
       <table>
         <tr>
+          <th colspan="4">Persistence</th>
+        </tr>
+        <tr>
+          <td><a id="uiDownload" href="data:application/json;charset=utf-8,%7B%7D" download="configuration.json" onclick="Controller.Configuration.download()">Configuration:</a></td>
+          <td><button id="uiLoad"  type="button" onclick="Controller.Configuration.load()" >load</button></td>
+          <td><button id="uiSave"  type="button" onclick="Controller.Configuration.save()" >save</button></td>
+          <td><button id="uiReset" type="button" onclick="Controller.Configuration.reset()">recall</button></td>
+        </tr>
+        <tr>
           <th colspan="4">Server</th>
         </tr>
         <tr>
@@ -85,15 +94,6 @@
           <td><input id="uiToolOrientationX" type="number" step="0.01"/></td>
           <td><input id="uiToolOrientationY" type="number" step="0.01"/></td>
           <td><input id="uiToolOrientationZ" type="number" step="0.01"/></td>
-        </tr>
-        <tr>
-          <th colspan="4">Persistence</th>
-        </tr>
-        <tr>
-          <td><a id="uiDownload" href="data:application/json;charset=utf-8,%7B%7D" download="configuration.json" onclick="Controller.Configuration.download()">Configuration:</a></td>
-          <td><button id="uiLoad"  type="button" onclick="Controller.Configuration.load()" >load</button></td>
-          <td><button id="uiSave"  type="button" onclick="Controller.Configuration.save()" >save</button></td>
-          <td><button id="uiReset" type="button" onclick="Controller.Configuration.reset()">recall</button></td>
         </tr>
       </table>
       <br/>
