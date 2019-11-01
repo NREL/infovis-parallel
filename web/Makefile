@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i "make -f" -p nodejs
+#!nix-shell -i "make -f" -p nodejs html-tidy
 
 
 SRCS=$(wildcard src/*.js src/*/*.js)
@@ -13,13 +13,16 @@ controller.js: $(SRCS)
 clean:
 	rm controller.js
 
-lint: controller.js
+lint: model.html controller.js
 	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*}.js
+	tidy -o /dev/null model.html
 
 install:
 	npm install webpack webpack-cli
 
+deploy:
+	gsutil -m cp -r -a public-read model.html view.css controller.js src gs://visualize.functionally.io/
 
 .SUFFIXES:
 
-.PHONY: all clean install lint
+.PHONY: all clean install lint deploy

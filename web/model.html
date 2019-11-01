@@ -19,6 +19,9 @@
           <td colspan="3"><input id="uiAddress" type="text" value="ws://127.0.0.1"/></td>
         </tr>
         <tr>
+          <td colspan="4"><em>The reconnect function does not work yet, so just refresh (F5) the page before attempting to reconnect.</em></td>
+        </tr>
+        <tr>
           <th colspan="4">Display</th>
         </tr>
         <tr>
@@ -87,14 +90,14 @@
           <th colspan="4">Persistence</th>
         </tr>
         <tr>
-          <td><a id="uiDownload" href="data:application/json;charset=utf-8,{}" download="configuration.json" onclick="Controller.Configuration.download()">Configuration:</a></td>
+          <td><a id="uiDownload" href="data:application/json;charset=utf-8,%7B%7D" download="configuration.json" onclick="Controller.Configuration.download()">Configuration:</a></td>
           <td><button id="uiLoad"  type="button" onclick="Controller.Configuration.load()" >load</button></td>
           <td><button id="uiSave"  type="button" onclick="Controller.Configuration.save()" >save</button></td>
           <td><button id="uiReset" type="button" onclick="Controller.Configuration.reset()">recall</button></td>
         </tr>
       </table>
       <br/>
-      <p><i>Tested on Chrome version 72.</i></p>
+      <p><em>Tested on Chrome version 72.</em></p>
     </div>
     <div id="uiScratch">
       <canvas id="uiTexture"></canvas>
@@ -108,7 +111,7 @@
         <div id="uiBanner">
           <table>
             <tr>
-              <td><button id="uiDisconnect" type="button" onclick="Controller.stopVisualizing()" disabled="true">disconnect</button></td>
+              <td><button id="uiDisconnect" type="button" onclick="Controller.stopVisualizing()" disabled="true" title="Press refresh (F5) to disconnect, and before reconnecting.">disconnect</button></td>
               <td id="uiMessage"> </td>
               <td><button id="uiHelp" type="button" onclick="Controller.toggleHelp()">help</button></td>
             </tr>
