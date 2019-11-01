@@ -146,7 +146,10 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
         if (DEBUG) console.log("animate: offset =", graphics.offset)
       }
 
-      graphics.message = request.getMessage()
+      if (request.getMessage() != "") {
+        graphics.message = request.getMessage()
+        if (DEBUG) console.log("animate: message = '", graphics.message, "'")
+      }
 
     }
 
