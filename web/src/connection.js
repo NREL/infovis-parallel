@@ -29,7 +29,14 @@ function disconnected(handler) {
 function reconnect(configuration, handler, disconnector) {
   const url = configuration.server.address
   if (DEBUG) console.debug("reconnect: url =", url)
-  theConnection = Transport.connect(url, handler, () => disconnected(disconnector))
+  theConnection = Transport.connect(
+    url
+  , handler
+  , function(event) {
+      if (DEBUG) console.debug("onclose: event =", event)
+      disconnected(disconnector)
+    }
+  )
   updateButtons()
 }
 
