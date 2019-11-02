@@ -5,7 +5,7 @@
 const Transport = require("./transport")
 
 
-const DEBUG = false
+const DEBUG = true
 
 
 let theConnection = null
@@ -18,7 +18,6 @@ function updateButtons() {
 
 
 function disconnected(handler) {
-  if (DEBUG) console.debug("disconnected")
   const hadConnection = theConnection != null
   theConnection = null
   updateButtons()
@@ -33,7 +32,7 @@ function reconnect(configuration, handler, disconnector) {
     url
   , handler
   , function(event) {
-      if (DEBUG) console.debug("onclose: event =", event)
+      if (DEBUG) console.debug("disconnected: event =", event)
       disconnected(disconnector)
     }
   )
