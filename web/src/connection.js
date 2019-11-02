@@ -5,6 +5,9 @@
 const Transport = require("./transport")
 
 
+const DEBUG = false
+
+
 let theConnection = null
 
 
@@ -15,7 +18,7 @@ function updateButtons() {
 
 
 function disconnected() {
-  console.debug("disconnected")
+  if (DEBUG) console.debug("disconnected")
   theConnection = null
   updateButtons()
 }
@@ -23,14 +26,14 @@ function disconnected() {
 
 function reconnect(configuration, handler) {
   const url = configuration.server.address
-  console.debug("reconnect: url =", url)
+  if (DEBUG) console.debug("reconnect: url =", url)
   theConnection = Transport.connect(url, handler, disconnected)
   updateButtons()
 }
 
 
 function unconnect() {
-  console.debug("unconnect")
+  if (DEBUG) console.debug("unconnect")
   Transport.disconnect(theConnection)
   theConnection = null
   updateButtons()

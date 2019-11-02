@@ -14,7 +14,7 @@ const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
 
-const DEBUG = false
+const DEBUG = true
 
 
 const center = vec3.fromValues(0.5, 0.5, 0.5)
