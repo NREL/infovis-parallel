@@ -25,8 +25,9 @@ function echoHandler(connection, request) {
 }
 
 
-function disconnectHandler() {
-  window.alert("The WebSocket disconnected.")
+function disconnectHandler(lostConnection) {
+  if (lostConnection)
+    window.alert("The WebSocket disconnected.")
   stopVisualizing()
 }
 

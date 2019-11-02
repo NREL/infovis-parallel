@@ -19,9 +19,10 @@ function updateButtons() {
 
 function disconnected(handler) {
   if (DEBUG) console.debug("disconnected")
+  const hadConnection = theConnection != null
   theConnection = null
   updateButtons()
-  handler()
+  handler(hadConnection)
 }
 
 
@@ -35,9 +36,11 @@ function reconnect(configuration, handler, disconnector) {
 
 function unconnect() {
   if (DEBUG) console.debug("unconnect")
-  if (theConnection != null)
-    Transport.disconnect(theConnection)
-  theConnection = null
+  if (theConnection != null) {
+    const oldConnection = theConnection
+    theConnection = null
+    Transport.disconnect(oldConnection)
+  }
   updateButtons()
 }
 
