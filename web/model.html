@@ -15,17 +15,17 @@
           <th colspan="4">Persistence</th>
         </tr>
         <tr>
-          <td><a id="uiDownload" href="data:application/json;charset=utf-8,%7B%7D" download="configuration.json" onclick="Controller.Configuration.download()">Configuration:</a></td>
-          <td><button id="uiLoad"  type="button" onclick="Controller.Configuration.load()" >load</button></td>
-          <td><button id="uiSave"  type="button" onclick="Controller.Configuration.save()" >save</button></td>
-          <td><button id="uiReset" type="button" onclick="Controller.Configuration.reset()">recall</button></td>
+          <td><a id="uiDownload" title="Download configuration file in JSON format." href="data:application/json;charset=utf-8,%7B%7D" download="configuration.json" onclick="Controller.Configuration.download()">Configuration:</a></td>
+          <td><button id="uiLoad"  title="Upload configuration file in JSON format." type="button" onclick="Controller.Configuration.load()" >load</button></td>
+          <td><button id="uiSave"  title="Store configuration for later recall."     type="button" onclick="Controller.Configuration.save()" >save</button></td>
+          <td><button id="uiReset" title="Recall previously stored configuration."   type="button" onclick="Controller.Configuration.reset()">recall</button></td>
         </tr>
         <tr>
           <th colspan="4">Server</th>
         </tr>
         <tr>
-          <td><button id="uiConnect" type="button" onclick="Controller.startVisualizing()">connect</button></td>
-          <td colspan="3"><input id="uiAddress" type="text" value="ws://127.0.0.1"/></td>
+          <td><button id="uiConnect" title="Connect to WebSockets server." type="button" onclick="Controller.startVisualizing()">connect</button></td>
+          <td colspan="3"><input id="uiAddress" title="Address of WebSockets server." type="text" value="ws://127.0.0.1"/></td>
         </tr>
         <tr>
           <td colspan="4"><em>The reconnect function does not work yet, so just refresh (F5) the page before attempting to reconnect.</em></td>
@@ -35,67 +35,68 @@
         </tr>
         <tr>
             <td>Stereo?</td>
-            <td><input id="uiStereo" type="checkbox" disabled="true"/></td>
+            <td><input id="uiStereo" title="Whether to render the display in side-by-side stereo." type="checkbox" disabled="true"/></td>
             <td colspan="2"/>
         </tr>
         <tr>
           <td>Eye&nbsp;separation:</td>
-          <td><input id="uiEyeSeparationX" type="number" step="0.01" disabled="true"/></td>
-          <td><input id="uiEyeSeparationY" type="number" step="0.01" disabled="true"/></td>
-          <td><input id="uiEyeSeparationZ" type="number" step="0.01" disabled="true"/></td>
+          <td><input id="uiEyeSeparationX" title="Separation between eyes (x coordinate)." type="number" step="0.01" disabled="true"/></td>
+          <td><input id="uiEyeSeparationY" title="Separation between eyes (y coordinate)." type="number" step="0.01" disabled="true"/></td>
+          <td><input id="uiEyeSeparationZ" title="Separation between eyes (z coordiante)." type="number" step="0.01" disabled="true"/></td>
         </tr>
         <tr>
           <td>Near&nbsp;plane:</td>
-          <td colspan="3"><input id="uiNearPlane" type="number" step="0.01"/></td>
+          <td colspan="3"><input id="uiNearPlane" title="Distance to the near plane of the display." type="number" step="0.01"/></td>
         </tr>
         <tr>
           <td>Far&nbsp;plane:</td>
-          <td colspan="3"><input id="uiFarPlane" type="number" step="0.01"/></td>
+          <td colspan="3"><input id="uiFarPlane" title="Distance to the far plane of the display." type="number" step="0.01"/></td>
         </tr>
         <tr>
           <td>Lower&nbsp;left:</td>
-          <td><input id="uiLowerLeftX" type="number" step="0.01"/></td>
-          <td><input id="uiLowerLeftY" type="number" step="0.01"/></td>
-          <td><input id="uiLowerLeftZ" type="number" step="0.01"/></td>
+          <td><input id="uiLowerLeftX" title="Location of lower left corner of the display (x coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiLowerLeftY" title="Location of lower left corner of the display (y coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiLowerLeftZ" title="Location of lower left corner of the display (z coordinate)." type="number" step="0.01"/></td>
         </tr>
         <tr>
           <td>Lower&nbsp;right:</td>
-          <td><input id="uiLowerRightX" type="number" step="0.01"/></td>
-          <td><input id="uiLowerRightY" type="number" step="0.01"/></td>
-          <td><input id="uiLowerRightZ" type="number" step="0.01"/></td>
+          <td><input id="uiLowerRightX" title="Location of the lower right corner of the display (x coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiLowerRightY" title="Location of the lower right corner of the display (y coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiLowerRightZ" title="Location of the lower right corner of the display (z coordinate)." type="number" step="0.01"/></td>
         </tr>
         <tr>
           <td>Upper&nbsp;left:</td>
-          <td><input id="uiUpperLeftX" type="number" step="0.01"/></td>
-          <td><input id="uiUpperLeftY" type="number" step="0.01"/></td>
-          <td><input id="uiUpperLeftZ" type="number" step="0.01"/></td>
+          <td><input id="uiUpperLeftX" title="Location of the upper left corner of the display (x coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiUpperLeftY" title="Location of the upper left corner of the display (y coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiUpperLeftZ" title="Location of the upper left corner of the display (z coordinate)." type="number" step="0.01"/></td>
         </tr>
         <tr>
           <th colspan="4">Initialization</th>
         </tr>
         <tr>
           <td rowspan="2">View&nbsp;point:</td>
-          <td><input id="uiViewPositionX" type="number" step="0.01"/></td>
-          <td><input id="uiViewPositionY" type="number" step="0.01"/></td>
-          <td><input id="uiViewPositionZ" type="number" step="0.01"/></td>
+          <td><input id="uiViewPositionX" title="Location of the view point (x coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiViewPositionY" title="Location of the view point (y coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiViewPositionZ" title="Location of the view point (z coordinate)." type="number" step="0.01"/></td>
         </tr>
         <tr>
-          <td><input id="uiViewOrientationX" type="number" step="0.01"/></td>
-          <td><input id="uiViewOrientationY" type="number" step="0.01"/></td>
-          <td><input id="uiViewOrientationZ" type="number" step="0.01"/></td>
+          <td><input id="uiViewOrientationX" title="Orientation of the view point (x Euler angle)." type="number" step="0.01"/></td>
+          <td><input id="uiViewOrientationY" title="Orientation of the view point (y Euler angle)." type="number" step="0.01"/></td>
+          <td><input id="uiViewOrientationZ" title="Orientation of the view point (z Euler angle)." type="number" step="0.01"/></td>
         </tr>
         <tr>
           <td rowspan="2">Tool&nbsp;point:</td>
-          <td><input id="uiToolPositionX" type="number" step="0.01"/></td>
-          <td><input id="uiToolPositionY" type="number" step="0.01"/></td>
-          <td><input id="uiToolPositionZ" type="number" step="0.01"/></td>
+          <td><input id="uiToolPositionX" title="Location of the selection tool (x coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiToolPositionY" title="Location of the selection tool (y coordinate)." type="number" step="0.01"/></td>
+          <td><input id="uiToolPositionZ" title="Location of the selection tool (z coordinate)." type="number" step="0.01"/></td>
         </tr>
         <tr>
-          <td><input id="uiToolOrientationX" type="number" step="0.01"/></td>
-          <td><input id="uiToolOrientationY" type="number" step="0.01"/></td>
-          <td><input id="uiToolOrientationZ" type="number" step="0.01"/></td>
+          <td><input id="uiToolOrientationX" title="Orientation of the selection tool (x coordinate)."type="number" step="0.01"/></td>
+          <td><input id="uiToolOrientationY" title="Orientation of the selection tool (y coordinate)."type="number" step="0.01"/></td>
+          <td><input id="uiToolOrientationZ" title="Orientation of the selection tool (z coordinate)."type="number" step="0.01"/></td>
         </tr>
       </table>
+      <p><em>Data are typically bounded by the unit cube, <code>[0,1] &#x00D7; [0,1] &#x00D7; [0,1]</code>, so choose the units of measure for distances and coordinates accordingly.</em></p>
       <br/>
       <p><em>Tested on Chrome version 72.</em></p>
     </div>
@@ -111,7 +112,7 @@
         <div id="uiBanner">
           <table>
             <tr>
-              <td><button id="uiDisconnect" type="button" onclick="Controller.stopVisualizing()" disabled="true" title="Press refresh (F5) to disconnect, and before reconnecting.">disconnect</button></td>
+              <td><button id="uiDisconnect" title="Press refresh (F5) to disconnect, and before reconnecting." type="button" onclick="Controller.stopVisualizing()" disabled="true">disconnect</button></td>
               <td id="uiMessage"> </td>
               <td><button id="uiHelp" type="button" onclick="Controller.toggleHelp()">help</button></td>
             </tr>
