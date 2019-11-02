@@ -66,6 +66,7 @@ function startVisualizing() {
 
 function stopVisualizing() {
   Connection.unconnect()
+  Visualizer.stop()
   isVisualizing = false
 }
 

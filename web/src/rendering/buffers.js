@@ -80,7 +80,7 @@ function destroyShapeBuffer(gl, shapeBuffer) {
   , shapeBuffer.rotations
   , shapeBuffer.scales
   , shapeBuffer.colors
-  ].forEach(gl.deleteBuffer)
+  ].forEach((buffer) => gl.deleteBuffer(buffer))
 }
 
 

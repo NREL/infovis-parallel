@@ -28,9 +28,6 @@
           <td colspan="3"><input id="uiAddress" title="Address of WebSockets server." type="text" value="ws://127.0.0.1"/></td>
         </tr>
         <tr>
-          <td colspan="4"><em>The reconnect function does not work yet, so just refresh (F5) the page before attempting to reconnect.</em></td>
-        </tr>
-        <tr>
           <th colspan="4">Display</th>
         </tr>
         <tr>
@@ -112,7 +109,7 @@
         <div id="uiBanner">
           <table>
             <tr>
-              <td><button id="uiDisconnect" title="Press refresh (F5) to disconnect, and before reconnecting." type="button" onclick="Controller.stopVisualizing()" disabled="true">disconnect</button></td>
+              <td><button id="uiDisconnect" title="Disconnect from the WebSocket server." type="button" onclick="Controller.stopVisualizing()">disconnect</button></td>
               <td id="uiMessage"> </td>
               <td><button id="uiHelp" type="button" onclick="Controller.toggleHelp()">help</button></td>
             </tr>

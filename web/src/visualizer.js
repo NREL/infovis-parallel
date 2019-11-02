@@ -66,6 +66,7 @@ function ensureManager(gl) {
   Rendering.Frames.destroyManager(gl, theManager)
 }
 
+
 function initializeGraphics(gl, initialViewer, initialTool) {
   ensureManager(gl)
   return {
@@ -79,7 +80,12 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 }
 
 
+let isRunning = false
+
+
 function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
+
+  isRunning = true
 
   const graphics = initializeGraphics(
     gl
@@ -95,10 +101,13 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
 
   Rendering.Text.ensureShaders(gl)
 
-  if (DEBUG)
-    window.theGraphics = graphics
-
   function animation(timestamp) {
+
+    if (!isRunning) {
+      keyQueue.length = 0
+      requestQueue.length = 0
+      return
+    }
 
     const dirty = keyQueue.length > 0 || requestQueue.length > 0
 
@@ -111,10 +120,7 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
 
       const request = requestQueue.pop()
 
-      if (DEBUG) {
-        console.debug("animation: request =", request)
-        window.theRequest = request
-      }
+      if (DEBUG) console.debug("animation: request =", request)
 
       if (request.getShow() != 0) {
         if (DEBUG) console.log("animate: show =", request.getShow())
@@ -192,6 +198,7 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
 
 
 module.exports = {
-  setupCanvas        : setupCanvas
-, visualizeBuffers   : visualizeBuffers
+  setupCanvas      : setupCanvas
+, visualizeBuffers : visualizeBuffers
+, stop             : function() {isRunning = false}
 }
