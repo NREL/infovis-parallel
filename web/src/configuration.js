@@ -26,8 +26,8 @@ function defaultConfiguration(w = window.innerWidth, h = window.innerHeight) {
     }
   , initial         : {
       view          : {
-        position    : [ 3,   2, 15]
-      , orientation : [ 0, -90,  0]
+        position    : [ 3, 2, 15]
+      , orientation : [ 0, 0,  0]
       }
     , tool          : {
         position    : [-0.1,  0.5, 0.5]

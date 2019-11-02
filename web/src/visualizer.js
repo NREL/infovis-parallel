@@ -177,15 +177,37 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
       Rendering.Frames.prepare(gl, graphics.manager)
       Rendering.Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
 
-      graphics.manager.projection = Rendering.Projection.projection(configuration.display, graphics.pov.position)
-      graphics.manager.modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+      const eyes = configuration.display.stereo ? 2 : 1
+      for (let eye = 0; eye < eyes; ++eye) {
 
-      Rendering.Frames.draw(gl, graphics.manager )
-      Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
+        gl.viewport((eyes - 1) * eye * gl.canvas.width / 2, 0, gl.canvas.width / eyes, gl.canvas.height)
 
-      const message = uiMessage.innerText
-      if (graphics.message != message)
-        uiMessage.innerText = graphics.message
+        const eyeOffset = vec3.scale(
+          vec3.create()
+        , vec3.fromValues(
+            configuration.display.eyeSeparation[0]
+          , configuration.display.eyeSeparation[1]
+          , configuration.display.eyeSeparation[2]
+          )
+        , (eyes - 1) * (2 * eye - 1) / 2
+        )
+        const eyePosition = vec3.add(
+          vec3.create()
+        , graphics.pov.position
+        , vec3.transformQuat(vec3.create(), eyeOffset, graphics.pov.rotation)
+        )
+
+        graphics.manager.projection = Rendering.Projection.projection(configuration.display, eyePosition)
+        graphics.manager.modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+
+        Rendering.Frames.draw(gl, graphics.manager )
+        Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
+
+        const message = uiMessage.innerText
+        if (graphics.message != message)
+          uiMessage.innerText = graphics.message
+
+      }
 
     }
 
