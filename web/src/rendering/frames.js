@@ -37,8 +37,8 @@ function createManager(gl) {
 
 
 function destroyManager(gl, manager) {
-  // FIXME: Destroy the shape program.
   manager.frames.forEach((frame, _) => destroyFrame(gl, frame))
+  manager.frames = new Map()
 }
 
 
@@ -372,7 +372,6 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
 module.exports = {
   createManager  : createManager
 , destroyManager : destroyManager
-, currentFrame   : (manager) => manager.current
 , listFrames     : listFrames
 , insert         : insert
 , delete         : delete0

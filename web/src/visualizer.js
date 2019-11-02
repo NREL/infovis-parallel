@@ -54,12 +54,23 @@ function setupCanvas(gl, useBlending = !DEBUG, useCulling = !DEBUG) {
 }
 
 
-function initializeGraphics(gl, initialViewer, initialTool) {
+let theManager  = null
+let theSelector = null
 
-  const manager = Rendering.Frames.createManager(gl)
+
+function ensureManager(gl) {
+  if (theManager == null)
+    theManager = Rendering.Frames.createManager(gl)
+  if (theSelector == null)
+    theSelector = Rendering.Selector.create(gl, theManager.program)
+  Rendering.Frames.destroyManager(gl, theManager)
+}
+
+function initializeGraphics(gl, initialViewer, initialTool) {
+  ensureManager(gl)
   return {
-    manager  : manager
-  , selector : Rendering.Selector.create(gl, manager.program)
+    manager  : theManager
+  , selector : theSelector
   , pov      : initialViewer
   , tool     : initialTool
   , offset   : {position: zero, rotation: Rendering.Linear.fromEulerd(zero)}
@@ -182,6 +193,5 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
 
 module.exports = {
   setupCanvas        : setupCanvas
-, initializeGraphics : initializeGraphics
 , visualizeBuffers   : visualizeBuffers
 }
