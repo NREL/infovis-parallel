@@ -5,6 +5,9 @@
 require("./infovis.proto3_pb")
 
 
+const DEBUG = false
+
+
 function connect(url, handler, closer) {
   const connection = new WebSocket(url)
   connection.binaryType = "arraybuffer"
@@ -12,6 +15,10 @@ function connect(url, handler, closer) {
     function(event) {
       const buffer = new Uint8Array(event.data)
       const request = proto.Infovis.Request.deserializeBinary(buffer)
+      if (DEBUG) {
+        console.debug("receive: buffer =", buffer)
+        window.theRequest = request
+      }
       handler(connection, request)
     }
   connection.onclose = closer
@@ -24,7 +31,17 @@ function disconnect(connection) {
 }
 
 
+function send(connection, response) {
+  if (DEBUG) {
+    console.debug("send: buffer =", response)
+    window.theResponse = response
+  }
+  connection.send(response.serializeBinary())
+}
+
+
 module.exports = {
   connect    : connect
 , disconnect : disconnect
+, send       : send
 }

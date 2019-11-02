@@ -55,7 +55,7 @@ function interpret(y, graphics) {
   const key   = y.key
   const shift = y.shift
 
-  if (DEBUG) console.log("interpret: key =", key, ", shift =", shift)
+  if (DEBUG) console.debug("interpret: key =", key, ", shift =", shift)
 
   let target = null
   let deltaPosition = 0
@@ -88,7 +88,7 @@ function interpret(y, graphics) {
     graphics.tool = {...x.initialTool}
 
   else if ((target != null) && (key in x.move)) {
-    if (DEBUG) console.log("interpret: target =", target)
+    if (DEBUG) console.debug("interpret: target =", target)
     const rotation = Rendering.Linear.fromEulerd(
       vec3.scale(
         vec3.create()
@@ -116,7 +116,7 @@ function interpret(y, graphics) {
     , target.rotation
     , rotation
     )
-    if (DEBUG) console.log("interpret: target' =", target)
+    if (DEBUG) console.debug("interpret: target' =", target)
   }
 
 }

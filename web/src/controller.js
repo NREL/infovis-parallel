@@ -7,9 +7,6 @@ const Connection    = require("./connection"   )
 const Visualizer    = require("./visualizer"   )
 
 
-const DEBUG = false
-
-
 const requestQueue = []
 
 const keyQueue = []
@@ -20,7 +17,6 @@ let theContext = null
 
 
 function echoHandler(connection, request) {
-  if (DEBUG) console.debug("echoHandler: request =", request)
   requestQueue.unshift(request)
 }
 
@@ -66,7 +62,7 @@ function startVisualizing() {
 
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler, disconnectHandler)
-  Visualizer.visualizeBuffers(theContext, configuration, requestQueue, keyQueue)
+  Visualizer.visualizeBuffers(theContext, configuration, requestQueue, keyQueue, Connection.send)
 
 }
 

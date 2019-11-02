@@ -80,10 +80,23 @@ function initializeGraphics(gl, initialViewer, initialTool) {
 }
 
 
+function makeLocation(positionRotation) {
+  const result = new proto.Infovis.Location()
+  result.setPosx(positionRotation.position[0])
+  result.setPosy(positionRotation.position[1])
+  result.setPosz(positionRotation.position[2])
+  result.setRotx(positionRotation.rotation[0])
+  result.setRoty(positionRotation.rotation[1])
+  result.setRotz(positionRotation.rotation[2])
+  result.setRotw(positionRotation.rotation[3])
+  return result
+}
+
+
 let isRunning = false
 
 
-function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
+function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
 
   isRunning = true
 
@@ -109,10 +122,14 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
       return
     }
 
-    const dirty = keyQueue.length > 0 || requestQueue.length > 0
+    const dirtyGraphics = keyQueue.length > 0 || requestQueue.length > 0
 
-    while (keyQueue.length > 0)
+    let dirtyResponse = false
+
+    while (keyQueue.length > 0) {
       Keyboard.interpret(keyQueue.pop(), graphics)
+      dirtyResponse = true
+    }
     if (forgetKeys)
       keyQueue.length = 0
 
@@ -123,22 +140,23 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
       if (DEBUG) console.debug("animation: request =", request)
 
       if (request.getShow() != 0) {
-        if (DEBUG) console.log("animate: show =", request.getShow())
+        if (DEBUG) console.debug("animate: show =", request.getShow())
         graphics.manager.current = request.getShow()
+        dirtyResponse = true
      }
 
       if (request.getReset()) {
-        if (DEBUG) console.log("animate: reset")
+        if (DEBUG) console.debug("animate: reset")
         Rendering.Frames.reset(graphics.manager)
       }
 
       if (request.getUpsertList().length > 0) {
-        if (DEBUG) console.log("animate: upsert", request.getUpsertList().length)
+        if (DEBUG) console.debug("animate: upsert", request.getUpsertList().length)
         Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
       }
 
       if (request.getDeleteList().length > 0) {
-        if (DEBUG) console.log("anamiate: delete", request.getDeleteList().length)
+        if (DEBUG) console.debug("anamiate: delete", request.getDeleteList().length)
         Rendering.Frames.delete(request.getDeleteList(), graphics.manager)
       }
 
@@ -146,31 +164,33 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
         const loc = request.getViewloc()
         graphics.pov.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
         graphics.pov.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-        if (DEBUG) console.log("animate: view =", graphics.pov)
+        dirtyResponse = true
+        if (DEBUG) console.debug("animate: view =", graphics.pov)
       }
 
       if (request.hasToolloc()) {
         const loc = request.getToolloc()
         graphics.tool.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
         graphics.tool.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-        if (DEBUG) console.log("animate: tool =", graphics.tool)
+        dirtyResponse = true
+        if (DEBUG) console.debug("animate: tool =", graphics.tool)
       }
 
       if (request.hasOffsetloc()) {
         const loc = request.getOffsetloc()
         graphics.offset.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
         graphics.offset.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-        if (DEBUG) console.log("animate: offset =", graphics.offset)
+        if (DEBUG) console.debug("animate: offset =", graphics.offset)
       }
 
       if (request.getMessage() != "") {
         graphics.message = request.getMessage()
-        if (DEBUG) console.log("animate: message = '", graphics.message, "'")
+        if (DEBUG) console.debug("animate: message = '", graphics.message, "'")
       }
 
     }
 
-    if (dirty) {
+    if (dirtyGraphics) {
 
       setupCanvas(gl)
 
@@ -209,6 +229,14 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue) {
 
       }
 
+    }
+
+    if (dirtyResponse) {
+      const response = new proto.Infovis.Response()
+      response.setShown(graphics.manager.current)
+      response.setViewloc  (makeLocation(graphics.pov ))
+      response.setToolloc  (makeLocation(graphics.tool))
+      respond(response)
     }
 
     window.requestAnimationFrame(animation)

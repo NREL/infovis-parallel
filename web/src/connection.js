@@ -41,6 +41,11 @@ function reconnect(configuration, handler, disconnector) {
 }
 
 
+function send(buffer) {
+  Transport.send(theConnection, buffer)
+}
+
+
 function unconnect() {
   if (DEBUG) console.debug("unconnect")
   if (theConnection != null) {
@@ -56,5 +61,6 @@ module.exports = {
   current       : () => theConnection
 , reconnect     : reconnect
 , unconnect     : unconnect
+, send          : send
 , updateButtons : updateButtons
 }
