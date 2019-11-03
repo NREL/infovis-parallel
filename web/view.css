@@ -48,8 +48,7 @@ a:active {
 }
 
 #uiMessage0, #uiMessage1 {
-  position   : fixed
-; top        : 15px
+  position   : absolute
 ; width      : 100%
 ; text-align : center
 ; color      : white
