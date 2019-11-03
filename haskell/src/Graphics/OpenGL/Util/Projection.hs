@@ -35,7 +35,7 @@ data OffAxisProjection =
 
 
 -- | Make an off-axis projection for a screen.
-projection :: forall a . (Epsilon a, MatrixComponent a, RealFloat a, Show a)
+projection :: forall a . (Epsilon a, MatrixComponent a, RealFloat a)
            => OffAxisProjection -- ^ The off-axis equations to use.
            -> Screen a          -- ^ The screen geometry.
            -> Point V3 a        -- ^ The eye position.
@@ -72,14 +72,6 @@ projection KooimaOffAxis Screen{..} eye near far =
     -- Move apex of frustum.
     translate . toVector3 $ zero .-. eye
 
-    print ("LR+LL+UL+EY+NE+FA", lowerRight, lowerLeft, upperLeft, eye, near, far)
-    print ("VR+VU+VN", vr, vu, vn)
-    print ("VA+VB+VC", va, vb, vc)
-    print ("TH", throw)
-    print ("SC+LE+RI+BO+RO", scaling, left, right, bottom, top)
-    print ("M", m)
-    (fetchProjection :: IO [[Double]]) >>= print
-
 -- Rewrite of VTK 6.3.0, \<<https://gitlab.kitware.com/vtk/vtk/blob/v6.3.0/Rendering/Core/vtkCamera.cxx#L414>\>, which does not assume a rectangular screen, in cleaner notation and using vector algebra.
 projection VTKOffAxis s@Screen{..} eye near far =
   do
@@ -112,6 +104,7 @@ projection VTKOffAxis s@Screen{..} eye near far =
     multMatrix =<< (newMatrix RowMajor $ concat m :: IO (GLmatrix a))
     -- Move apex of frustum.
     translate . toVector3 $ zero .-. eye
+
 
 -- | Retrieve the current projection matrix.
 fetchProjection :: forall a . (MatrixComponent a, RealFloat a)

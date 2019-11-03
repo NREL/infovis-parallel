@@ -12,7 +12,7 @@ module Graphics.OpenGL.Util.Setup (
 import Control.Monad (when, void)
 import Data.Default (Default(def))
 import Data.Maybe (isJust)
-import Graphics.OpenGL.Util.Projection (OffAxisProjection(..), projection)
+import Graphics.OpenGL.Util.Projection (OffAxisProjection(VTKOffAxis), projection)
 import Graphics.OpenGL.Util.Types (Display(..), PointOfView, Stereo(..), Viewer(..))
 import Graphics.Rendering.DLP (DlpEncoding, DlpEye(..))
 import Graphics.Rendering.DLP.Callbacks (DlpDisplay(..), dlpDisplayCallback)
@@ -74,7 +74,7 @@ setup debug title program Viewer{..} =
     return dlp
 
 
-dlpViewerDisplay :: (Conjugate a, Epsilon a, Fractional a, MatrixComponent a, Real a, RealFloat a, Show a)
+dlpViewerDisplay :: (Conjugate a, Epsilon a, Fractional a, MatrixComponent a, Real a, RealFloat a)
                  => DlpEncoding
                  -> Viewer a
                  -> IO (PointOfView a)
@@ -91,7 +91,7 @@ dlpViewerDisplay dlp Viewer{..} pov displayAction =
            viewport $=! (Position 0 0, wh)
            matrixMode $=! Projection
            loadIdentity
-           projection KooimaOffAxis screen (realToFrac <$> P eyePosition) nearPlane farPlane
+           projection VTKOffAxis screen (realToFrac <$> P eyePosition) nearPlane farPlane
            matrixMode $=! Modelview 0
            postRedisplay Nothing
       )
