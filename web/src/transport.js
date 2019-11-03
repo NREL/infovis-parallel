@@ -11,20 +11,41 @@ const DEBUG = false
 const noSending = true
 
 
+const statename = {
+  0 : "connecting"
+, 1 : "open"
+, 2 : "closing"
+, 3 : "closed"
+}
+
+
 function connect(url, handler, closer) {
+
   const connection = new WebSocket(url)
+
   connection.binaryType = "arraybuffer"
-  connection.onmessage =
-    function(event) {
+
+  connection.onerror = function(event) {
+    if (DEBUG) console.debug("WebSocket.onerror =", event)
+    window.alert("WebSocket error (state = \"" + statename[connection.readyState] + "\").")
+  }
+
+  connection.onclose = function(event) {
+    if (!event.wasClean)
+      window.alert("WebSocket connection lost.")
+    closer()
+  }
+
+  connection.onmessage = function(event) {
       const buffer = new Uint8Array(event.data)
       const request = proto.Infovis.Request.deserializeBinary(buffer)
       if (DEBUG) {
-        console.debug("receive: request =", buffer)
+        console.debug("WebSocket.onmessage: request =", buffer)
         window.theRequest = request
       }
       handler(connection, request)
     }
-  connection.onclose = closer
+
   return connection
 }
 
@@ -36,7 +57,7 @@ function disconnect(connection) {
 
 function send(connection, response) {
   if (DEBUG) {
-    console.debug("send: response =", response)
+    console.debug("WebSocket.send: response =", response)
   if (!noSending)
     window.theResponse = response
   }

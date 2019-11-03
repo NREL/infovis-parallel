@@ -21,9 +21,7 @@ function echoHandler(connection, request) {
 }
 
 
-function disconnectHandler(lostConnection) {
-  if (lostConnection)
-    window.alert("The WebSocket disconnected.")
+function disconnectHandler() {
   stopVisualizing()
 }
 
@@ -57,13 +55,10 @@ function startup() {
 
 
 function startVisualizing() {
-
-  isVisualizing = true
-
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler, disconnectHandler)
+  isVisualizing = true
   Visualizer.visualizeBuffers(theContext, configuration, requestQueue, keyQueue, Connection.send)
-
 }
 
 
