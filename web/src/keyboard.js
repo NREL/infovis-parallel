@@ -89,12 +89,18 @@ function interpret(y, graphics) {
 
   else if ((target != null) && (key in x.move)) {
     if (DEBUG) console.debug("interpret: target =", target)
-    const rotation = Rendering.Linear.fromEulerd(
+    const oldRotation = target.rotation
+    const incrementalRotation = Rendering.Linear.fromEulerd(
       vec3.scale(
         vec3.create()
       , x.move[key][1]
       , deltaRotation
       )
+    )
+    const newRotation = quat.multiply(
+      quat.create()
+    , oldRotation
+    , incrementalRotation
     )
     target.position = vec3.add(
       vec3.create()
@@ -106,16 +112,12 @@ function interpret(y, graphics) {
       )
     , vec3.scaleAndAdd(
         vec3.create()
-      , center
-      , vec3.transformQuat(vec3.create(), center, rotation)
+      , vec3.transformQuat(vec3.create(), center, oldRotation)
+      , vec3.transformQuat(vec3.create(), center, newRotation)
       , -1
       )
     )
-    target.rotation = quat.multiply(
-      quat.create()
-    , target.rotation
-    , rotation
-    )
+    target.rotation = newRotation
     if (DEBUG) console.debug("interpret: target' =", target)
   }
 
