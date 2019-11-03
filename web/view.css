@@ -43,8 +43,14 @@ a:active {
 ; top     : 15px
 }
 
-#uiMessage {
+#uiMessageArea {
   width      : 100%
+}
+
+#uiMessage0, #uiMessage1 {
+  position   : fixed
+; top        : 15px
+; width      : 100%
 ; text-align : center
 ; color      : white
 ; font-family: monospace

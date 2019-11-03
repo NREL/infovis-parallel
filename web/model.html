@@ -110,10 +110,12 @@
           <table>
             <tr>
               <td><button id="uiDisconnect" title="Disconnect from the WebSocket server." type="button" onclick="Controller.stopVisualizing()">disconnect</button></td>
-              <td id="uiMessage"> </td>
+              <td id="uiMessageArea"> </td>
               <td><button id="uiHelp" type="button" onclick="Controller.toggleHelp()">help</button></td>
             </tr>
           </table>
+          <div id="uiMessage0"> </div>
+          <div id="uiMessage1"> </div>
         </div>
         <canvas id="uiCanvas" width="640" height="480"></canvas>
     </div>

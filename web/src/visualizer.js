@@ -223,10 +223,16 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
         Rendering.Frames.draw(gl, graphics.manager )
         Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
 
-        const message = uiMessage.innerText
-        if (graphics.message != message)
-          uiMessage.innerText = graphics.message
+      }
 
+      for (let eye = 0; eye < 2; ++eye) {
+        const messageElement = document.getElementById("uiMessage" + eye)
+        messageElement.style.left  = ((eyes - 1) * eye * gl.canvas.width / 2) + "px"
+        messageElement.style.right = ((3 - eyes + eye) * gl.canvas.width / 2) + "px"
+        messageElement.style.width = ((3 - eyes) * 50) + "%"
+        const message = messageElement.innerText
+        if (graphics.message != message)
+          messageElement.innerText = graphics.message
       }
 
     }
