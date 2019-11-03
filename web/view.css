@@ -36,6 +36,10 @@ a:active {
 ; height  : 100%
 }
 
+#uiGithub {
+  text-align: right
+}
+
 #uiBanner {
   position: absolute
 ; left    : 15px
