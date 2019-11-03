@@ -27,12 +27,13 @@ function connect(url, handler, closer) {
 
   connection.onerror = function(event) {
     if (DEBUG) console.debug("WebSocket.onerror =", event)
-    window.alert("WebSocket error (state = \"" + statename[connection.readyState] + "\").")
+    if (connection.readyState != 3)
+      window.alert("WebSocket error (state = \"" + statename[connection.readyState] + "\").")
   }
 
   connection.onclose = function(event) {
     if (!event.wasClean)
-      window.alert("WebSocket connection lost.")
+      window.alert("WebSocket connection is lost.")
     closer()
   }
 
@@ -52,6 +53,9 @@ function connect(url, handler, closer) {
 
 function disconnect(connection) {
   connection.close(1000, "normal termination")
+  connection.onmessage = null
+  connection.onclose   = null
+  connection.onerror   = null
 }
 
 
