@@ -1,1 +1,1 @@
-../../../linux/Assets/Infovis/InfoScreen.cs
+../../../oculus/Assets/Infovis/InfoScreen.cs
