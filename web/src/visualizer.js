@@ -18,9 +18,6 @@ require("./gl-matrix")
 const DEBUG = false
 
 
-const forgetKeys = true
-
-
 const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
@@ -93,6 +90,66 @@ function makeLocation(positionRotation) {
 }
 
 
+function processRequest(gl, graphics, request) {
+
+  let dirty = false
+
+  if (DEBUG) console.debug("animation: request =", request)
+
+  if (request.getShow() != 0) {
+    if (DEBUG) console.debug("animate: show =", request.getShow())
+    graphics.manager.current = request.getShow()
+    dirty = true
+  }
+
+  if (request.getReset()) {
+    if (DEBUG) console.debug("animate: reset")
+    Rendering.Frames.reset(graphics.manager)
+  }
+
+  if (request.getUpsertList().length > 0) {
+    if (DEBUG) console.debug("animate: upsert", request.getUpsertList().length)
+    Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+  }
+
+  if (request.getDeleteList().length > 0) {
+    if (DEBUG) console.debug("anamiate: delete", request.getDeleteList().length)
+    Rendering.Frames.delete(request.getDeleteList(), graphics.manager)
+  }
+
+  if (request.hasViewloc()) {
+    const loc = request.getViewloc()
+    graphics.pov.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+    graphics.pov.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+    dirty = true
+    if (DEBUG) console.debug("animate: view =", graphics.pov)
+  }
+
+  if (request.hasToolloc()) {
+    const loc = request.getToolloc()
+    graphics.tool.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+    graphics.tool.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+    dirty = true
+    if (DEBUG) console.debug("animate: tool =", graphics.tool)
+  }
+
+  if (request.hasOffsetloc()) {
+    const loc = request.getOffsetloc()
+    graphics.offset.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
+    graphics.offset.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
+    if (DEBUG) console.debug("animate: offset =", graphics.offset)
+  }
+
+  if (request.getMessage() != "") {
+    graphics.message = request.getMessage()
+    if (DEBUG) console.debug("animate: message = '", graphics.message, "'")
+  }
+
+  return dirty
+
+}
+
+
 let isRunning = false
 
 
@@ -122,75 +179,16 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
       return
     }
 
-    const dirtyGraphics = keyQueue.length > 0 || requestQueue.length > 0
+    const dirtyRequest  = requestQueue.length > 0
+    let   dirtyResponse = keyQueue.length > 0
 
-    let dirtyResponse = false
-
-    while (keyQueue.length > 0) {
+    while (keyQueue.length > 0)
       Keyboard.interpret(keyQueue.pop(), graphics)
-      dirtyResponse = true
-    }
-    if (forgetKeys)
-      keyQueue.length = 0
 
-    while (requestQueue.length > 0) {
+    while (requestQueue.length > 0)
+      dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
 
-      const request = requestQueue.pop()
-
-      if (DEBUG) console.debug("animation: request =", request)
-
-      if (request.getShow() != 0) {
-        if (DEBUG) console.debug("animate: show =", request.getShow())
-        graphics.manager.current = request.getShow()
-        dirtyResponse = true
-     }
-
-      if (request.getReset()) {
-        if (DEBUG) console.debug("animate: reset")
-        Rendering.Frames.reset(graphics.manager)
-      }
-
-      if (request.getUpsertList().length > 0) {
-        if (DEBUG) console.debug("animate: upsert", request.getUpsertList().length)
-        Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
-      }
-
-      if (request.getDeleteList().length > 0) {
-        if (DEBUG) console.debug("anamiate: delete", request.getDeleteList().length)
-        Rendering.Frames.delete(request.getDeleteList(), graphics.manager)
-      }
-
-      if (request.hasViewloc()) {
-        const loc = request.getViewloc()
-        graphics.pov.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
-        graphics.pov.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-        dirtyResponse = true
-        if (DEBUG) console.debug("animate: view =", graphics.pov)
-      }
-
-      if (request.hasToolloc()) {
-        const loc = request.getToolloc()
-        graphics.tool.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
-        graphics.tool.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-        dirtyResponse = true
-        if (DEBUG) console.debug("animate: tool =", graphics.tool)
-      }
-
-      if (request.hasOffsetloc()) {
-        const loc = request.getOffsetloc()
-        graphics.offset.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
-        graphics.offset.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-        if (DEBUG) console.debug("animate: offset =", graphics.offset)
-      }
-
-      if (request.getMessage() != "") {
-        graphics.message = request.getMessage()
-        if (DEBUG) console.debug("animate: message = '", graphics.message, "'")
-      }
-
-    }
-
-    if (dirtyGraphics) {
+    if (dirtyRequest || dirtyResponse) {
 
       setupCanvas(gl)
 
@@ -224,7 +222,6 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
         Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
 
       }
-
       for (let eye = 0; eye < 2; ++eye) {
         const messageElement = document.getElementById("uiMessage" + eye)
         messageElement.style.left  = ((eyes - 1) * eye * gl.canvas.width / 2) + "px"
