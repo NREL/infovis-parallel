@@ -38,12 +38,13 @@ function rotationFromVectorPair(v1, v2) {
 
 
 function orthogonal(v) {
+  let result = null
   basis.forEach(function(e) {
     const u = vec3.cross(vec3.create(), v, e)
     if (!vec3.equals(u, zero))
-      return u
+      result = u
   })
-  return basis[0]
+  return result
 }
 
 
