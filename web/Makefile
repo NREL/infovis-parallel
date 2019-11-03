@@ -18,7 +18,7 @@ lint: model.html controller.js
 	tidy -quiet -o /dev/null model.html
 
 deploy: controller.js
-	gsutil -q -m cp -r -a public-read model.html view.css controller.js src gs://visualize.functionally.io/
+	gsutil -q -m cp -r -a public-read model.html view.css controller.js src images gs://visualize.functionally.io/
 
 install:
 	npm install webpack webpack-cli
