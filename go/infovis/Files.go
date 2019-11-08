@@ -33,7 +33,10 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
   go func() {
     for !this.exit {
       <-this.wake
-      this.mux.Lock() // FIXME: Lock mutex for a shorter time.
+      if verbose {
+        log.Printf("Files source %s has awoken.", this.label)
+      }
+      this.mux.Lock()
       for (this.index < len(this.files)) {
         file := this.files[this.index]
         this.index += 1
