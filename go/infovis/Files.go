@@ -34,7 +34,7 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
     for !this.exit {
       <-this.wake
       if verbose {
-        log.Printf("Files source %s has awoken.", this.label)
+        log.Printf("Files source %s has awoken.\n", this.label)
       }
       this.mux.Lock()
       for (this.index < len(this.files)) {

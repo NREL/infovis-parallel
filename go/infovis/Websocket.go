@@ -19,8 +19,8 @@ type Server struct {
 
 
 var upgrader = websocket.Upgrader{
-  ReadBufferSize : 8192                                          ,
-  WriteBufferSize: 8192                                          ,
+  ReadBufferSize : 16384                                         ,
+  WriteBufferSize: 16384                                         ,
   CheckOrigin    : func(request *http.Request) bool {return true},
 }
 
@@ -34,7 +34,7 @@ func NewServer(address string, root string, verbose bool) *Server {
   http.HandleFunc(root, this.makeHandler())
   go func() {
     if verbose {
-      log.Printf("Serving WebSockets on address %s%s.", address, this.root)
+      log.Printf("Serving WebSockets on address %s%s.\n", address, this.root)
     }
     log.Fatal(http.ListenAndServe(address, nil))
   }()
@@ -78,11 +78,11 @@ func (this *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
       _, buffer, err := conn.ReadMessage()
       if err != nil {
         if this.verbose {
-          log.Printf("WebSocket %s encountered %v.", label, err)
+          log.Printf("WebSocket %s encountered %v.\n", label, err)
         }
         break
       }
-      websocket.received(buffer)
+      websocket.received(&buffer)
     }
 
     websocket.removeConnection(conn)
@@ -122,11 +122,24 @@ func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
     for !this.exit {
       buffer := <-this.in
       this.mux.Lock()
-      for _, conn := range this.conns {
-        conn.WriteMessage(websocket.BinaryMessage, buffer)
-      }
+      conns := this.conns
       this.mux.Unlock()
+      for _, conn := range conns {
+        err := conn.WriteMessage(websocket.BinaryMessage, buffer)
+        if err != nil {
+          if verbose {
+            log.Printf("Removing Websocket connection for %s.\n", label)
+          }
+          this.removeConnection(conn)
+          continue
+        }
+      }
     }
+    if verbose {
+      log.Printf("WebSocket %s is closing.\n", label)
+    }
+    close(this.in)
+    close(this.out)
   }()
 
   return &this
@@ -153,8 +166,8 @@ func (this *Websocket) removeConnection(conn *websocket.Conn) {
 }
 
 
-func (this *Websocket) received(buffer []byte) {
-  this.out <- buffer
+func (this *Websocket) received(buffer *[]byte) {
+  this.out <- *buffer
 }
 
 
