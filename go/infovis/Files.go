@@ -35,23 +35,23 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
         file := this.files[this.index]
         this.index += 1
         if verbose {
-          log.Println("Files source", this.label, "reading", file, ".")
+          log.Printf("Files source %s is reading file %s.\n", this.label, file)
         }
         buffer, err := ioutil.ReadFile(file)
         if err != nil {
-          log.Println("Files source", this.label, "encountered", err, ".")
+          log.Printf("Files source %s encountered %v.\n", this.label, err)
           this.exit = true
           break
         }
         this.channel <- buffer
         if verbose {
-          log.Println("Files source", this.label, "sent", len(buffer), "bytes.")
+          log.Printf("Files source %s send %v bytes.\n", this.label, len(buffer))
         }
       }
       this.mux.Unlock()
     }
     if verbose {
-      log.Println("Files source", this.label, "closed.")
+      log.Printf("Files source %s is closing.\n", this.label)
     }
     close(this.channel)
   }()

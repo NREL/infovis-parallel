@@ -25,15 +25,18 @@ func NewPrinter(label Label, verbose bool) *Printer {
     for !this.exit {
       buffer, ok := <-this.channel
       if !ok {
+        if verbose {
+          log.Printf("Receive failed for printer %s\n.", this.label)
+        }
         this.exit = true
         continue
       }
       if verbose {
-        log.Println("Printer", this.label, "received", len(buffer), "bytes.")
+        log.Printf("Printer %s received %v bytes\n.", this.label, len(buffer))
       }
     }
     if verbose {
-      log.Println("Printer", this.label, " closed.")
+      log.Printf("Printer %s is closing.\n", this.label)
     }
     close(this.channel)
   }()

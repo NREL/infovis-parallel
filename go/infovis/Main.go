@@ -162,7 +162,7 @@ func Main() {
           if relay, ok := lookupRelay(relays, tokens[1]); ok {
             for _, label := range tokens[2:] {
               if source, ok := sources[label]; ok {
-                relay.AddSource(label, source)
+                relay.AddSource(label, source, verbose)
               }
               if sink, ok := sinks[label]; ok {
                 relay.AddSink(label, sink)

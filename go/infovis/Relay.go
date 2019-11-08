@@ -4,7 +4,6 @@ package infovis
 import (
   "log"
   "sync"
-  "time"
 )
 
 
@@ -12,6 +11,7 @@ type Relay struct {
   label   Label
   sources map[Label]Source
   sinks   map[Label]Sink
+  merge   ProtobufChannel
   exit    bool
   mux     sync.Mutex
 }
@@ -23,40 +23,24 @@ func NewRelay(label Label, verbose bool) *Relay {
     label  : label                 ,
     sources: make(map[Label]Source),
     sinks  : make(map[Label]Sink  ),
+    merge  : make(ProtobufChannel) ,
     exit   : false                 ,
   }
 
   go func() {
     for !this.exit {
-      var buffer []byte = nil
-      for buffer == nil {
-        for _, source := range this.Sources() {
-          select { // FIME: Remove this spin loop.
-            case buffer1, ok := <-*source.Out():
-              if !ok {
-                this.RemoveSource(source.Label())
-              } else {
-                buffer = buffer1
-                if verbose {
-                  log.Println("Relay", this.label, "read from", source.Label(), len(buffer), "bytes.")
-                }
-                goto End
-              }
-            case <-time.After(250 * time.Microsecond):
-          }
-        }
-      }
-      End:
+      buffer := <-this.merge
       for _, sink := range this.Sinks() {
         *sink.In() <- buffer
         if verbose {
-          log.Println("Relay", this.label, "wrote to", sink.Label(), len(buffer), "bytes.")
+          log.Printf("Relay %s wrote %v bytes to sink %s.\n", this.label, len(buffer), sink.Label())
         }
       }
     }
     if verbose {
-      log.Println("Relay", this.label, "closed.")
+      log.Printf("Relay %s is closing.\n", this.label)
     }
+    close(this.merge)
   }()
 
   return &this
@@ -108,10 +92,36 @@ func (this *Relay) SinkLabels() []Label {
 }
 
 
-func (this *Relay) AddSource(label Label, source Source) {
+func (this *Relay) AddSource(label Label, source Source, verbose bool) {
   this.mux.Lock()
   this.sources[label] = source
   this.mux.Unlock()
+  go func() {
+    for !this.exit {
+      buffer, ok := <-*source.Out()
+      if !ok {
+        if verbose {
+          log.Printf("Relay %s source %s was closed.\n", this.label, label)
+        }
+        return
+      } else {
+        this.mux.Lock()
+        _, ok := this.sources[label]
+        this.mux.Unlock()
+        if !ok {
+          if verbose {
+            log.Printf("Relay %s source %s is no longer connected.\n", this.label, label)
+            }
+          return
+        } else {
+          this.merge <- buffer
+          if verbose {
+            log.Printf("Relay %s read %v bytes from source %s.\n", this.label, len(buffer), label)
+          }
+        }
+      }
+    }
+  }()
 }
 
 
