@@ -2,7 +2,7 @@ package infovis
 
 
 import (
-  "fmt"
+  "log"
 )
 
 
@@ -29,11 +29,11 @@ func NewAbsorber(label Label, verbose bool) *Absorber {
         continue
       }
       if verbose {
-        fmt.Println("Absorber", this.label, "received", len(buffer), "bytes.")
+        log.Println("Absorber", this.label, "received", len(buffer), "bytes.")
       }
     }
     if verbose {
-      fmt.Println("Absorber", this.label, " closed.")
+      log.Println("Absorber", this.label, " closed.")
     }
     close(this.channel)
   }()

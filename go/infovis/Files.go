@@ -3,7 +3,7 @@ package infovis
 
 import (
   "io/ioutil"
-  "fmt"
+  "log"
   "sync"
 )
 
@@ -35,23 +35,23 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
         file := this.files[this.index]
         this.index += 1
         if verbose {
-          fmt.Println("Files source", this.label, "reading", file, ".")
+          log.Println("Files source", this.label, "reading", file, ".")
         }
         buffer, err := ioutil.ReadFile(file)
         if err != nil {
-          fmt.Println("Files source", this.label, "encountered", err, ".")
+          log.Println("Files source", this.label, "encountered", err, ".")
           this.exit = true
           break
         }
         this.channel <- buffer
         if verbose {
-          fmt.Println("Files source", this.label, "sent", len(buffer), "bytes.")
+          log.Println("Files source", this.label, "sent", len(buffer), "bytes.")
         }
       }
       this.mux.Unlock()
     }
     if verbose {
-      fmt.Println("Files source", this.label, "closed.")
+      log.Println("Files source", this.label, "closed.")
     }
     close(this.channel)
   }()

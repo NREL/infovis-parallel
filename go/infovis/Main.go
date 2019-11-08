@@ -121,12 +121,8 @@ func Main() {
         }
 
       case "relay":
-        if checkArguments(tokens, "The 'relay' command must have a source and a sink.", 3, true) {
-          if source, ok := lookupSource(sources, tokens[1]); ok {
-            if sink, ok := lookupSink(sinks, tokens[2]); ok {
-              go Relay(source, sink)
-            }
-          }
+        if checkArguments(tokens, "The 'relay' command must have no arguments.", 1, true) {
+          NewRelay(tokens[1], verbose)
         }
 
       case "exit":

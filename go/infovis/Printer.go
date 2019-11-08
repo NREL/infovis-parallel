@@ -2,7 +2,7 @@ package infovis
 
 
 import (
-  "fmt"
+  "log"
 )
 
 
@@ -29,11 +29,11 @@ func NewPrinter(label Label, verbose bool) *Printer {
         continue
       }
       if verbose {
-        fmt.Println("Printer", this.label, "received", len(buffer), "bytes.")
+        log.Println("Printer", this.label, "received", len(buffer), "bytes.")
       }
     }
     if verbose {
-      fmt.Println("Printer", this.label, " closed.")
+      log.Println("Printer", this.label, " closed.")
     }
     close(this.channel)
   }()
