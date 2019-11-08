@@ -15,21 +15,24 @@ type Files struct {
   index   int
   exit    bool
   mux     sync.Mutex
+  wake    chan bool
 }
 
 
 func NewFiles(label Label, files []string, verbose bool) *Files {
 
   var this = Files{
-    label  : label                ,
-    channel: make(ProtobufChannel),
-    files  : files                ,
-    index  : 0                    ,
-    exit   : false                ,
+    label  : label                 ,
+    channel: make(ProtobufChannel) ,
+    files  : files                 ,
+    index  : 0                     ,
+    exit   : false                 ,
+    wake   : make(chan bool)       ,
   }
 
   go func() {
     for !this.exit {
+      <-this.wake
       this.mux.Lock() // FIXME: Lock mutex for a shorter time.
       for (this.index < len(this.files)) {
         file := this.files[this.index]
@@ -56,6 +59,8 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
     close(this.channel)
   }()
 
+  this.wake <- true
+
   return &this
 
 }
@@ -65,6 +70,7 @@ func (this *Files) Append(files []string) {
   this.mux.Lock()
   this.files = append(this.files, files...)
   this.mux.Unlock()
+  this.wake <- true
 }
 
 
@@ -82,6 +88,7 @@ func (this *Files) Reset() {
   this.mux.Lock()
   this.index = 0
   this.mux.Unlock()
+  this.wake <- true
 }
 
 
