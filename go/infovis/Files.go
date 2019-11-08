@@ -3,7 +3,7 @@ package infovis
 
 import (
   "io/ioutil"
-  "log"
+  "fmt"
   "sync"
 )
 
@@ -18,7 +18,7 @@ type Files struct {
 }
 
 
-func NewFiles(label Label, files []string) *Files {
+func NewFiles(label Label, files []string, verbose bool) *Files {
 
   var this = Files{
     label  : label                ,
@@ -29,29 +29,31 @@ func NewFiles(label Label, files []string) *Files {
   }
 
   go func() {
-    for {
-      // FIXME: Lock mutex for a shorter time.
-      this.mux.Lock()
-      if this.exit {
-        this.mux.Unlock()
-        close(this.channel)
-        return
-      }
+    for !this.exit {
+      this.mux.Lock() // FIXME: Lock mutex for a shorter time.
       for (this.index < len(this.files)) {
         file := this.files[this.index]
         this.index += 1
+        if verbose {
+          fmt.Println("Files source", this.label, "reading", file, ".")
+        }
         buffer, err := ioutil.ReadFile(file)
-        log.Println("Files source", this.label, "read", file, ".")
         if err != nil {
-          log.Println("Fiels source", this.label, "encountered", err, ".")
+          fmt.Println("Files source", this.label, "encountered", err, ".")
           this.exit = true
           break
         }
         this.channel <- buffer
-        log.Println("Files source", this.label, "sent", len(buffer), "bytes.")
+        if verbose {
+          fmt.Println("Files source", this.label, "sent", len(buffer), "bytes.")
+        }
       }
       this.mux.Unlock()
     }
+    if verbose {
+      fmt.Println("Files source", this.label, "closed.")
+    }
+    close(this.channel)
   }()
 
   return &this
@@ -84,7 +86,10 @@ func (this *Files) Reset() {
 
 
 func (this *Files) Exit() {
-  this.mux.Lock()
   this.exit = true
-  this.mux.Unlock()
+}
+
+
+func (this *Files) Alive() bool {
+  return !this.exit
 }

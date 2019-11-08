@@ -2,7 +2,7 @@ package infovis
 
 
 import (
-  "log"
+  "fmt"
 )
 
 
@@ -13,7 +13,7 @@ type Printer struct {
 }
 
 
-func NewPrinter(label Label) *Printer {
+func NewPrinter(label Label, verbose bool) *Printer {
 
   var this = Printer {
     label  : label                ,
@@ -22,15 +22,19 @@ func NewPrinter(label Label) *Printer {
   }
 
   go func() {
-    for (!this.exit) {
+    for !this.exit {
       buffer, ok := <-this.channel
       if !ok {
         this.exit = true
         continue
       }
-      log.Println("Printer", this.label, "received", len(buffer), "bytes.")
+      if verbose {
+        fmt.Println("Printer", this.label, "received", len(buffer), "bytes.")
+      }
     }
-    log.Println("Printer", this.label, " closed.")
+    if verbose {
+      fmt.Println("Printer", this.label, " closed.")
+    }
     close(this.channel)
   }()
 
@@ -51,4 +55,9 @@ func (this *Printer) In() *ProtobufChannel {
 
 func (this *Printer) Exit() {
   this.exit = true
+}
+
+
+func (this *Printer) Alive() bool {
+  return !this.exit
 }

@@ -2,7 +2,7 @@ package infovis
 
 
 import (
-  "log"
+  "fmt"
 )
 
 
@@ -11,7 +11,7 @@ func Relay(source Source, sink Sink) {
   var out = sink.In()
   for {
     buffer := <-*in
-    log.Println("Relay", len(buffer), "bytes.")
+    fmt.Println("Relay", len(buffer), "bytes.")
     *out <- buffer
   }
 }

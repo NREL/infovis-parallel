@@ -2,7 +2,7 @@ package infovis
 
 
 import (
-  "log"
+  "fmt"
 )
 
 
@@ -13,7 +13,7 @@ type Absorber struct {
 }
 
 
-func NewAbsorber(label Label) *Absorber {
+func NewAbsorber(label Label, verbose bool) *Absorber {
 
   var this = Absorber {
     label  : label                ,
@@ -22,15 +22,19 @@ func NewAbsorber(label Label) *Absorber {
   }
 
   go func() {
-    for (!this.exit) {
+    for !this.exit {
       buffer, ok := <-this.channel
       if !ok {
         this.exit = true
         continue
       }
-      log.Println("Absorber", this.label, "received", len(buffer), "bytes.")
+      if verbose {
+        fmt.Println("Absorber", this.label, "received", len(buffer), "bytes.")
+      }
     }
-    log.Println("Absorber", this.label, " closed.")
+    if verbose {
+      fmt.Println("Absorber", this.label, " closed.")
+    }
     close(this.channel)
   }()
 
@@ -51,4 +55,9 @@ func (this *Absorber) In() *ProtobufChannel {
 
 func (this *Absorber) Exit() {
   this.exit = true
+}
+
+
+func (this *Absorber) Alive() bool {
+  return !this.exit
 }
