@@ -13,6 +13,7 @@ type Targets = map[Label]*ProtobufChannel
 type Source interface {
   Label() Label
   Out() *ProtobufChannel
+  Append(arguments []string)
   Reset()
   Exit()
   Alive() bool

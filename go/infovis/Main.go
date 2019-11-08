@@ -23,7 +23,7 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
 func lookupSource(sources map[Label]Source, label Label) (Source, bool) {
   source, ok := sources[label]
   if !ok {
-    fmt.Println("The source", label, "does not exist.")
+    fmt.Println("Source", label, "does not exist.")
     return nil, false
   } else {
     return source, true
@@ -34,10 +34,21 @@ func lookupSource(sources map[Label]Source, label Label) (Source, bool) {
 func lookupSink(sinks map[Label]Sink, label Label) (Sink, bool) {
   sink, ok := sinks[label]
   if !ok {
-    fmt.Println("The sink", label, "does not exist.")
+    fmt.Println("Sink", label, "does not exist.")
     return nil, false
   } else {
     return sink, true
+  }
+}
+
+
+func lookupRelay(relays map[Label]*Relay, label Label) (*Relay, bool) {
+  relay, ok := relays[label]
+  if !ok {
+    fmt.Println("Relay", label, "does not exist.")
+    return nil, false
+  } else {
+    return relay, true
   }
 }
 
@@ -47,6 +58,7 @@ func Main() {
   var verbose = false
   var sources = make(map[Label]Source)
   var sinks   = make(map[Label]Sink  )
+  var relays  = make(map[Label]*Relay )
 
   var reader = bufio.NewReader(os.Stdin)
 
@@ -56,7 +68,8 @@ func Main() {
 
     fmt.Print("> ")
     line, _ := reader.ReadString('\n')
-    tokens := tokenizer.Split(strings.TrimSuffix(line, "\n"), -1)
+    line = strings.TrimSuffix(line, "\n")
+    tokens := tokenizer.Split(line, -1)
 
     switch tokens[0] {
 
@@ -73,7 +86,7 @@ func Main() {
       case "sources":
         if checkArguments(tokens, "The 'sources' command takes no arguments.", 1, true) {
           for label, _ := range sources {
-            fmt.Print(label, " ")
+            fmt.Printf("%s ", label)
           }
           fmt.Println()
         }
@@ -81,7 +94,15 @@ func Main() {
       case "sinks":
         if checkArguments(tokens, "The 'sinks' command takes no arguments.", 1, true) {
           for label, _ := range sinks {
-            fmt.Print(label, " ")
+            fmt.Printf("%s", label)
+          }
+          fmt.Println()
+        }
+
+      case "relays":
+        if checkArguments(tokens, "The 'relays' command takes no arguments.", 1, true) {
+          for label, relay := range relays {
+            fmt.Printf("%s{%v,%v} ", label, relay.SourceLabels(), relay.SinkLabels())
           }
           fmt.Println()
         }
@@ -95,6 +116,10 @@ func Main() {
           if sink, ok := sinks[label]; ok {
             sink.Exit()
             delete(sinks, label)
+          }
+          if relay, ok := relays[label]; ok {
+            relay.Exit()
+            delete(relays, label)
           }
         }
 
@@ -120,13 +145,71 @@ func Main() {
           sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], verbose)
         }
 
+      case "append":
+        if checkArguments(tokens, "The 'file' command must name a file source.", 2, false) {
+          if source, ok := lookupSource(sources, tokens[1]); ok {
+            source.Append(tokens[2:])
+          }
+        }
+
       case "relay":
-        if checkArguments(tokens, "The 'relay' command must have no arguments.", 1, true) {
-          NewRelay(tokens[1], verbose)
+        if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) {
+          relays[tokens[1]] = NewRelay(tokens[1], verbose)
+        }
+
+      case "add":
+        if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
+          if relay, ok := lookupRelay(relays, tokens[1]); ok {
+            for _, label := range tokens[2:] {
+              if source, ok := sources[label]; ok {
+                relay.AddSource(label, source)
+              }
+              if sink, ok := sinks[label]; ok {
+                relay.AddSink(label, sink)
+              }
+            }
+          }
+        }
+
+      case "remove":
+        if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
+          if relay, ok := lookupRelay(relays, tokens[1]); ok {
+            for _, label := range tokens[2:] {
+              if _, ok := sources[label]; ok {
+                relay.RemoveSource(label)
+              }
+              if _, ok := sinks[label]; ok {
+                relay.RemoveSink(label)
+              }
+            }
+          }
         }
 
       case "exit":
         os.Exit(0)
+
+      case "help":
+        fmt.Println("verbose")
+        fmt.Println("silent")
+        fmt.Println("sources")
+        fmt.Println("sinks")
+        fmt.Println("relays")
+        fmt.Println("delete [source|sink|relay]...")
+        fmt.Println("reset [source]...")
+        fmt.Println("absorber 'sink'")
+        fmt.Println("printer 'sink'")
+        fmt.Println("files 'source' [filename]...")
+        fmt.Println("append 'source' [filename]...")
+        fmt.Println("relay 'relay'")
+        fmt.Println("add 'relay' [source|sink]...")
+        fmt.Println("remove 'relay' [source|sink]...")
+        fmt.Println("exit")
+        fmt.Println("help")
+
+      case "":
+
+      default:
+        fmt.Printf("Illegal command '%s'.\n", line)
 
     }
 
