@@ -46,8 +46,7 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
         buffer, err := ioutil.ReadFile(file)
         if err != nil {
           log.Printf("Files source %s encountered %v.\n", this.label, err)
-          this.exit = true
-          break
+          continue
         }
         this.channel <- buffer
         if verbose {
