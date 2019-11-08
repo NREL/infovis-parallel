@@ -204,6 +204,9 @@ func Main() {
           }
         }
 
+      case "filter":
+        fmt.Println("The 'filter' command is not yet implemented.")
+
       case "serve":
         if checkArguments(tokens, "The 'serve' command must have an address and a path.", 3, true) {
           server = NewServer(tokens[1], tokens[2], verbose)
@@ -215,6 +218,9 @@ func Main() {
           sources[tokens[1]] = websocket
           sinks[tokens[1]]   = websocket
         }
+
+      case "kafka":
+        fmt.Println("The 'kafka' command is not yet implemented.")
 
       case "exit":
         os.Exit(0)
