@@ -4,12 +4,17 @@ package infovis
 import (
   "log"
   "net/http"
+  "strings"
+  "sync"
   "github.com/gorilla/websocket"
 )
 
 
 type Server struct {
-  verbose bool
+  root       string
+  websockets map[Label]*Websocket
+  mux        sync.Mutex
+  verbose    bool
 }
 
 
@@ -20,40 +25,69 @@ var upgrader = websocket.Upgrader{
 }
 
 
-func handler(responseWriter http.ResponseWriter, request *http.Request) {
-
-  conn, err := upgrader.Upgrade(responseWriter, request, nil)
-  if err != nil {
-    log.Fatal(err)
-  }
-  defer conn.Close()
-
-  for {
-    _, _, err := conn.ReadMessage()
-    if err != nil {
-      log.Fatal(err)
-      return
-    }
-  }
-
-}
-
-
-const root = "/infovis/v2/"
-
-
-func NewServer(address string, verbose bool) *Server {
+func NewServer(address string, root string, verbose bool) *Server {
   var this = Server {
-    verbose: verbose,
+    root      : root                      ,
+    websockets: make(map[Label]*Websocket),
+    verbose   : verbose                   ,
   }
-  http.HandleFunc(root, handler)
+  http.HandleFunc(root, this.makeHandler())
   go func() {
     if verbose {
-      log.Printf("Serving WebSockets on address %s.", address)
+      log.Printf("Serving WebSockets on address %s%s.", address, this.root)
     }
     log.Fatal(http.ListenAndServe(address, nil))
   }()
   return &this
+}
+
+
+func (this *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
+  return func (responseWriter http.ResponseWriter, request *http.Request) {
+
+    conn, err := upgrader.Upgrade(responseWriter, request, nil)
+    if err != nil {
+      log.Fatal(err)
+    }
+    defer conn.Close()
+
+    if !strings.HasPrefix(request.URL.Path, this.root) {
+      if this.verbose {
+        log.Printf("Invalid WebSocket path %s\n.", request.URL.Path)
+      }
+      return
+    }
+
+    label := strings.TrimPrefix(request.URL.Path, this.root)
+    this.mux.Lock()
+    websocket, found := this.websockets[label]
+    this.mux.Unlock()
+    if !found {
+      if this.verbose {
+        log.Printf("No WebSocket for %s.\n", label)
+      }
+      return
+    }
+    if this.verbose {
+      log.Printf("WebSocket established for %s.\n", label)
+    }
+
+    websocket.addConnection(conn)
+
+    for !websocket.exit {
+      _, buffer, err := conn.ReadMessage()
+      if err != nil {
+        if this.verbose {
+          log.Printf("WebSocket %s encountered %v.", label, err)
+        }
+        break
+      }
+      websocket.received(buffer)
+    }
+
+    websocket.removeConnection(conn)
+
+  }
 }
 
 
@@ -63,18 +97,64 @@ type Websocket struct {
   out     ProtobufChannel
   exit    bool
   verbose bool
+  server  *Server
+  conns   []*websocket.Conn
+  mux     sync.Mutex
 }
 
 
 func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
+
   var this = Websocket {
-    label  : label                ,
-    in     : make(ProtobufChannel),
-    out    : make(ProtobufChannel),
-    exit   : false                ,
-    verbose: verbose              ,
+    label  : label                  ,
+    in     : make(ProtobufChannel)  ,
+    out    : make(ProtobufChannel)  ,
+    exit   : false                  ,
+    verbose: verbose                ,
+    server : server                 ,
   }
+
+  server.mux.Lock()
+  server.websockets[label] = &this
+  server.mux.Unlock()
+
+  go func() {
+    for !this.exit {
+      buffer := <-this.in
+      this.mux.Lock()
+      for _, conn := range this.conns {
+        conn.WriteMessage(websocket.BinaryMessage, buffer)
+      }
+      this.mux.Unlock()
+    }
+  }()
+
   return &this
+
+}
+
+
+func (this *Websocket) addConnection(conn *websocket.Conn) {
+  this.mux.Lock()
+  this.conns = append(this.conns, conn)
+  this.mux.Unlock()
+}
+
+
+func (this *Websocket) removeConnection(conn *websocket.Conn) {
+  this.mux.Lock()
+  for i, conn1 := range this.conns {
+    if conn == conn1 {
+      this.conns = append(this.conns[:i], this.conns[i+1:]...)
+      break
+    }
+  }
+  this.mux.Unlock()
+}
+
+
+func (this *Websocket) received(buffer []byte) {
+  this.out <- buffer
 }
 
 

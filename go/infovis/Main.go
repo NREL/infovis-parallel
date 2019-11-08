@@ -160,13 +160,21 @@ func Main() {
           relays[tokens[1]] = NewRelay(tokens[1], verbose)
         }
 
-      case "add":
+      case "add-source":
         if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
           if relay, ok := lookupRelay(relays, tokens[1]); ok {
             for _, label := range tokens[2:] {
               if source, ok := sources[label]; ok {
                 relay.AddSource(label, source, verbose)
               }
+            }
+          }
+        }
+
+      case "add-sink":
+        if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
+          if relay, ok := lookupRelay(relays, tokens[1]); ok {
+            for _, label := range tokens[2:] {
               if sink, ok := sinks[label]; ok {
                 relay.AddSink(label, sink)
               }
@@ -174,13 +182,21 @@ func Main() {
           }
         }
 
-      case "remove":
+      case "remove-source":
         if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
           if relay, ok := lookupRelay(relays, tokens[1]); ok {
             for _, label := range tokens[2:] {
               if _, ok := sources[label]; ok {
                 relay.RemoveSource(label)
               }
+            }
+          }
+        }
+
+      case "remove-sink":
+        if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
+          if relay, ok := lookupRelay(relays, tokens[1]); ok {
+            for _, label := range tokens[2:] {
               if _, ok := sinks[label]; ok {
                 relay.RemoveSink(label)
               }
@@ -189,8 +205,8 @@ func Main() {
         }
 
       case "serve":
-        if checkArguments(tokens, "The 'serve' command must have an address.", 2, true) {
-          server = NewServer(tokens[1], verbose)
+        if checkArguments(tokens, "The 'serve' command must have an address and a path.", 3, true) {
+          server = NewServer(tokens[1], tokens[2], verbose)
         }
 
       case "websocket":
@@ -216,9 +232,11 @@ func Main() {
         fmt.Println("files 'source' [filename]...")
         fmt.Println("append 'source' [filename]...")
         fmt.Println("relay 'relay'")
-        fmt.Println("add 'relay' [source|sink]...")
-        fmt.Println("remove 'relay' [source|sink]...")
-        fmt.Println("serve 'address'")
+        fmt.Println("add-source 'relay' [source]...")
+        fmt.Println("add-sink 'relay' [sink]...")
+        fmt.Println("remove-source 'relay' [source]...")
+        fmt.Println("remove-sink 'relay' [sink]...")
+        fmt.Println("serve 'address' 'path'")
         fmt.Println("websocket 'path'")
         fmt.Println("exit")
         fmt.Println("help")
