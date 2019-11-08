@@ -1,13 +1,10 @@
 package infovis
 
 
-type ProtobufChannel = chan []byte
-
-
 type Label = string
 
 
-type Targets = map[Label]*ProtobufChannel
+type ProtobufChannel = chan []byte
 
 
 type Source interface {

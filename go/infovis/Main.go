@@ -56,9 +56,12 @@ func lookupRelay(relays map[Label]*Relay, label Label) (*Relay, bool) {
 func Main() {
 
   var verbose = false
+
   var sources = make(map[Label]Source)
   var sinks   = make(map[Label]Sink  )
   var relays  = make(map[Label]*Relay )
+
+  var server  *Server = nil
 
   var reader = bufio.NewReader(os.Stdin)
 
@@ -185,6 +188,18 @@ func Main() {
           }
         }
 
+      case "serve":
+        if checkArguments(tokens, "The 'serve' command must have an address.", 2, true) {
+          server = NewServer(tokens[1], verbose)
+        }
+
+      case "websocket":
+        if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) {
+          websocket := NewWebsocket(server, tokens[1], verbose)
+          sources[tokens[1]] = websocket
+          sinks[tokens[1]]   = websocket
+        }
+
       case "exit":
         os.Exit(0)
 
@@ -203,6 +218,8 @@ func Main() {
         fmt.Println("relay 'relay'")
         fmt.Println("add 'relay' [source|sink]...")
         fmt.Println("remove 'relay' [source|sink]...")
+        fmt.Println("serve 'address'")
+        fmt.Println("websocket 'path'")
         fmt.Println("exit")
         fmt.Println("help")
 
