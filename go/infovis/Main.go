@@ -14,9 +14,8 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
   if exact && len(tokens) != count || len(tokens) < count {
     fmt.Println(message)
     return false
-  } else {
-    return true
   }
+  return true
 }
 
 
@@ -25,9 +24,8 @@ func lookupSource(sources *map[Label]Source, label Label) (Source, bool) {
   if !ok {
     fmt.Println("Source", label, "does not exist.")
     return nil, false
-  } else {
-    return source, true
   }
+  return source, true
 }
 
 
@@ -36,9 +34,8 @@ func lookupSink(sinks *map[Label]Sink, label Label) (Sink, bool) {
   if !ok {
     fmt.Println("Sink", label, "does not exist.")
     return nil, false
-  } else {
-    return sink, true
   }
+  return sink, true
 }
 
 
@@ -47,9 +44,8 @@ func lookupRelay(relays *map[Label]*Relay, label Label) (*Relay, bool) {
   if !ok {
     fmt.Println("Relay", label, "does not exist.")
     return nil, false
-  } else {
-    return relay, true
   }
+  return relay, true
 }
 
 
@@ -59,7 +55,7 @@ func Main() {
 
   var sources = make(map[Label]Source)
   var sinks   = make(map[Label]Sink  )
-  var relays  = make(map[Label]*Relay )
+  var relays  = make(map[Label]*Relay)
 
   var server  *Server = nil
 

@@ -104,21 +104,19 @@ func (this *Relay) AddSource(label Label, source Source, verbose bool) {
           log.Printf("Relay %s source %s was closed.\n", this.label, label)
         }
         return
-      } else {
-        this.mux.Lock()
-        _, ok := this.sources[label]
-        this.mux.Unlock()
-        if !ok {
-          if verbose {
-            log.Printf("Relay %s source %s is no longer connected.\n", this.label, label)
-            }
-          return
-        } else {
-          this.merge <- buffer
-          if verbose {
-            log.Printf("Relay %s read %v bytes from source %s.\n", this.label, len(buffer), label)
+      }
+      this.mux.Lock()
+      _, ok = this.sources[label]
+      this.mux.Unlock()
+      if !ok {
+        if verbose {
+          log.Printf("Relay %s source %s is no longer connected.\n", this.label, label)
           }
-        }
+        return
+      }
+      this.merge <- buffer
+      if verbose {
+        log.Printf("Relay %s read %v bytes from source %s.\n", this.label, len(buffer), label)
       }
     }
   }()
