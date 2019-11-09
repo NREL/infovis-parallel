@@ -16,7 +16,6 @@ type Connectable interface {
 type Source interface {
   Connectable
   Out() *ProtobufChannel
-  Append(arguments []string)
   Reset()
 }
 

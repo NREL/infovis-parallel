@@ -147,7 +147,11 @@ func Main() {
       case "append":
         if checkArguments(tokens, "The 'file' command must name a file source.", 2, false) {
           if source, ok := lookupSource(&sources, tokens[1]); ok {
-            source.Append(tokens[2:])
+            files, ok := source.(*Files)
+            if !ok {
+              fmt.Printf("The source %s is not a file source.\n", tokens[1])
+            }
+            files.Append(tokens[2:])
           }
         }
 
