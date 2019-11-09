@@ -8,6 +8,9 @@ import (
 )
 
 
+var empty struct{}
+
+
 type Files struct {
   label   Label
   channel ProtobufChannel
@@ -15,7 +18,7 @@ type Files struct {
   index   int
   exit    bool
   mux     sync.Mutex
-  wake    chan bool
+  wake    chan struct{}
 }
 
 
@@ -27,7 +30,7 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
     files  : files                 ,
     index  : 0                     ,
     exit   : false                 ,
-    wake   : make(chan bool)       ,
+    wake   : make(chan struct{})   ,
   }
 
   go func() {
@@ -61,7 +64,7 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
     close(this.channel)
   }()
 
-  this.wake <- true
+  this.wake <- empty
 
   return &this
 
@@ -72,7 +75,7 @@ func (this *Files) Append(files []string) {
   this.mux.Lock()
   this.files = append(this.files, files...)
   this.mux.Unlock()
-  this.wake <- true
+  this.wake <- empty
 }
 
 
@@ -90,7 +93,7 @@ func (this *Files) Reset() {
   this.mux.Lock()
   this.index = 0
   this.mux.Unlock()
-  this.wake <- true
+  this.wake <- empty
 }
 
 
