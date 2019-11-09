@@ -13,7 +13,7 @@ type Relay struct {
   sinks   map[Label]Sink
   merge   ProtobufChannel
   exit    bool
-  mux     sync.Mutex
+  mux     sync.RWMutex
 }
 
 
@@ -49,45 +49,45 @@ func NewRelay(label Label, verbose bool) *Relay {
 
 
 func (this *Relay) Sources() []Source {
-  this.mux.Lock()
+  this.mux.RLock()
   sources := make([]Source, 0, len(this.sources))
   for _, source := range this.sources {
     sources = append(sources, source)
   }
-  this.mux.Unlock()
+  this.mux.RUnlock()
   return sources
 }
 
 
 func (this *Relay) Sinks() []Sink {
-  this.mux.Lock()
+  this.mux.RLock()
   sinks := make([]Sink, 0, len(this.sinks))
   for _, sink := range this.sinks {
     sinks = append(sinks, sink)
   }
-  this.mux.Unlock()
+  this.mux.RUnlock()
   return sinks
 }
 
 
 func (this *Relay) SourceLabels() []Label {
-  this.mux.Lock()
+  this.mux.RLock()
   labels := make([]Label, 0, len(this.sources))
   for label, _ := range this.sources {
     labels = append(labels, label)
   }
-  this.mux.Unlock()
+  this.mux.RUnlock()
   return labels
 }
 
 
 func (this *Relay) SinkLabels() []Label {
-  this.mux.Lock()
+  this.mux.RLock()
   labels := make([]Label, 0, len(this.sinks))
   for label, _ := range this.sinks {
     labels = append(labels, label)
   }
-  this.mux.Unlock()
+  this.mux.RUnlock()
   return labels
 }
 
@@ -105,9 +105,9 @@ func (this *Relay) AddSource(label Label, source Source, verbose bool) {
         }
         return
       }
-      this.mux.Lock()
+      this.mux.RLock()
       _, ok = this.sources[label]
-      this.mux.Unlock()
+      this.mux.RUnlock()
       if !ok {
         if verbose {
           log.Printf("Relay %s source %s is no longer connected.\n", this.label, label)
