@@ -61,13 +61,11 @@ func InvertFilters(filters *[]Filter) (inversion []Filter) {
 }
 
 
-func filterBuffer(exclusions []Filter, buffer *[]byte, verbose bool) (*[]byte, bool) {
+func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
 
   request := Request{}
   if err := proto.Unmarshal(*buffer, &request); err != nil {
-    if verbose {
-      log.Printf("Filter %s failed to unmarshal buffer: %v.\n", err)
-    }
+    log.Printf("Filter %s failed to unmarshal buffer: %v.\n", err)
     return buffer, false
   }
 
@@ -92,9 +90,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte, verbose bool) (*[]byte, b
 
   bufferNew, err := proto.Marshal(&request)
   if err != nil {
-    if verbose {
-      log.Printf("Filter %s failed to marshal request %v: %v.\n", request, err)
-    }
+    log.Printf("Filter %s failed to marshal request %v: %v.\n", request, err)
     return buffer, false
   }
 
@@ -128,7 +124,7 @@ func ParseConversion(text string) (Conversion, bool) {
 }
 
 
-func convertBuffer(conversions []Conversion, buffer *[]byte, verbose bool) (*[]byte, bool) {
+func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
 
   if len(conversions) == 0 {
     return buffer, true
@@ -137,9 +133,7 @@ func convertBuffer(conversions []Conversion, buffer *[]byte, verbose bool) (*[]b
   request := Request{}
   response := Response{}
   if err := proto.Unmarshal(*buffer, &response); err != nil {
-    if verbose {
-      log.Printf("Converter %s failed to unmarshal buffer: %v.\n", err)
-    }
+    log.Printf("Converter %s failed to unmarshal buffer: %v.\n", err)
     return buffer, false
   }
 
@@ -158,9 +152,7 @@ func convertBuffer(conversions []Conversion, buffer *[]byte, verbose bool) (*[]b
 
   bufferNew, err := proto.Marshal(&request)
   if err != nil {
-    if verbose {
-      log.Printf("Converter %s failed to marshal request %v: %v.\n", request, err)
-    }
+    log.Printf("Converter %s failed to marshal request %v: %v.\n", request, err)
     return buffer, false
   }
 
@@ -194,11 +186,11 @@ func NewRelay(label Label, conversions []Conversion, filters []Filter, verbose b
   go func() {
     for !this.exit {
       buffer := <-this.merge
-      converted, ok := convertBuffer(conversions, &buffer, verbose)
+      converted, ok := convertBuffer(conversions, &buffer)
       if !ok {
         continue
       }
-      filtered, ok := filterBuffer(exclusions, converted, verbose)
+      filtered, ok := filterBuffer(exclusions, converted)
       for _, sink := range this.Sinks() {
         *sink.In() <- *filtered
         if verbose {
@@ -269,18 +261,14 @@ func (this *Relay) AddSource(label Label, source Source, verbose bool) {
     for !this.exit {
       buffer, ok := <-*source.Out()
       if !ok {
-        if verbose {
-          log.Printf("Relay %s source %s was closed.\n", this.label, label)
-        }
+        log.Printf("Relay %s source %s was closed.\n", this.label, label)
         return
       }
       this.mux.RLock()
       _, ok = this.sources[label]
       this.mux.RUnlock()
       if !ok {
-        if verbose {
-          log.Printf("Relay %s source %s is no longer connected.\n", this.label, label)
-          }
+        log.Printf("Relay %s source %s is no longer connected.\n", this.label, label)
         return
       }
       this.merge <- buffer

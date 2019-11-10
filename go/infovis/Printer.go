@@ -27,9 +27,7 @@ func NewPrinter(label Label, kind string, verbose bool) *Printer {
     for !this.exit {
       buffer, ok := <-this.channel
       if !ok {
-        if verbose {
-          log.Printf("Receive failed for printer %s\n.", this.label)
-        }
+        log.Printf("Receive failed for printer %s\n.", this.label)
         this.exit = true
         continue
       }
@@ -41,9 +39,7 @@ func NewPrinter(label Label, kind string, verbose bool) *Printer {
           request := Request{}
           err := proto.Unmarshal(buffer, &request)
           if err != nil {
-            if verbose {
-              log.Printf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
-            }
+            log.Printf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
             break
           }
           fmt.Printf("Printer %s received %s: %v.\n", label, kind, request)
@@ -51,9 +47,7 @@ func NewPrinter(label Label, kind string, verbose bool) *Printer {
           response := Response{}
           err := proto.Unmarshal(buffer, &response)
           if err != nil {
-            if verbose {
-              log.Printf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
-            }
+            log.Printf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
             break
           }
           fmt.Printf("Printer %s received %s: %v.\n", label, kind, response)

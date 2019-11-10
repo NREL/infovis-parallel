@@ -52,9 +52,7 @@ func (this *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
     defer conn.Close()
 
     if !strings.HasPrefix(request.URL.Path, this.root) {
-      if this.verbose {
-        log.Printf("Invalid WebSocket path %s\n.", request.URL.Path)
-      }
+      log.Printf("Invalid WebSocket path %s\n.", request.URL.Path)
       return
     }
 
@@ -77,9 +75,7 @@ func (this *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
     for !websocket.exit {
       _, buffer, err := conn.ReadMessage()
       if err != nil {
-        if this.verbose {
-          log.Printf("WebSocket %s encountered %v.\n", label, err)
-        }
+        log.Printf("WebSocket %s encountered %v.\n", label, err)
         break
       }
       websocket.received(&buffer)
@@ -127,9 +123,7 @@ func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
       for _, conn := range conns {
         err := conn.WriteMessage(websocket.BinaryMessage, buffer)
         if err != nil {
-          if verbose {
-            log.Printf("Removing Websocket connection for %s.\n", label)
-          }
+          log.Printf("Removing Websocket connection for %s.\n", label)
           this.removeConnection(conn)
           continue
         }

@@ -53,7 +53,7 @@ func NewFiles(label Label, files []string, verbose bool) *Files {
         }
         this.channel <- buffer
         if verbose {
-          log.Printf("Files source %s send %v bytes.\n", this.label, len(buffer))
+          log.Printf("Files source %s sent %v bytes.\n", this.label, len(buffer))
         }
       }
       this.mux.Unlock()

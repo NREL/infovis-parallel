@@ -25,9 +25,7 @@ func NewAbsorber(label Label, verbose bool) *Absorber {
     for !this.exit {
       buffer, ok := <-this.channel
       if !ok {
-        if verbose {
-          log.Printf("Receive failed for absorber %s.\n", this.label)
-        }
+        log.Printf("Receive failed for absorber %s.\n", this.label)
         this.exit = true
         continue
       }

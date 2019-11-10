@@ -151,7 +151,7 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
     case "sinks":
       if checkArguments(tokens, "The 'sinks' command takes no arguments.", 1, true) {
         for label, _ := range this.sinks {
-          fmt.Printf("%s", label)
+          fmt.Printf("%s ", label)
         }
         fmt.Println()
         return true
