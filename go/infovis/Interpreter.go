@@ -184,11 +184,12 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
           delete(interpreter.relays, label)
           found = true
         }
-        if found {
-          return true
+        if !found {
+          fmt.Printf("%s is neither a source, sink, or relay.\n", label)
+          return false
         }
-        fmt.Printf("%s is neither a source, sink, or relay.\n", label)
       }
+      return true
 
     case "reset":
       for _, label := range tokens[1:] {
