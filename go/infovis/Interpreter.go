@@ -231,7 +231,7 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "relay":
       if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && this.assertNoRelay(tokens[1]) {
-        this.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, this.verbose)
+        this.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{}, this.verbose)
         return true
       }
 
@@ -242,11 +242,26 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
           if conversion, ok := ParseConversion(token); ok {
             conversions = append(conversions, conversion)
           } else {
-            fmt.Printf("The text '%s' is not a valid conversion.\n", token)
+            fmt.Printf("The value '%s' is not a valid conversion.\n", token)
             return false
           }
         }
-        this.relays[tokens[1]] = NewRelay(tokens[1], conversions, this.verbose)
+        this.relays[tokens[1]] = NewRelay(tokens[1], conversions, []Filter{}, this.verbose)
+        return true
+      }
+
+    case "filter":
+      if checkArguments(tokens, "The 'filter' command must name a relay.", 2, false) && this.assertNoRelay(tokens[1]) {
+        filters := make([]Filter, 0, len(tokens) - 2)
+        for _, token := range tokens[2:] {
+          if filter, ok := ParseFilter(token); ok {
+            filters = append(filters, filter)
+          } else {
+            fmt.Printf("The value '%s' is not a valid filter.\n", token)
+            return false
+          }
+        }
+        this.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, filters, this.verbose)
         return true
       }
 
@@ -305,9 +320,6 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
         }
       }
       return true
-
-    case "filter":
-      fmt.Println("The 'filter' command is not yet implemented.")
 
     case "serve":
       if checkArguments(tokens, "The 'serve' command must have an address and a path.", 3, true) {
@@ -371,6 +383,7 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
       fmt.Println("append 'source' [filename]...")
       fmt.Println("relay 'relay'")
       fmt.Println("converter 'relay' [show] [view] [tool] [offset]")
+      fmt.Println("filter 'relay' [show] [message] [reset] [upsert] [delete] [view] [tool] [offset]")
       fmt.Println("add-source 'relay' [source]...")
       fmt.Println("add-sink 'relay' [sink]...")
       fmt.Println("remove-source 'relay' [source]...")

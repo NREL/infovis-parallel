@@ -8,6 +8,101 @@ import (
 )
 
 
+type Filter int
+
+const (
+  FilterShow    Filter = iota
+  FilterMessage
+  FilterReset
+  FilterUpsert
+  FilterDelete
+  FilterView
+  FilterTool
+  FilterOffset
+)
+
+var allFilters = []Filter{FilterShow, FilterMessage, FilterReset, FilterUpsert, FilterDelete, FilterView, FilterTool, FilterOffset}
+
+func ParseFilter(text string) (Filter, bool) {
+  switch text {
+    case "show":
+      return FilterShow, true
+    case "message":
+      return FilterMessage, true
+    case "reset":
+      return FilterReset, true
+    case "upsert":
+      return FilterUpsert, true
+    case "delete":
+      return FilterDelete, true
+    case "view":
+      return FilterView, true
+    case "tool":
+      return FilterTool, true
+    case "offset":
+      return FilterOffset, true
+    default:
+      return -1, false
+  }
+}
+
+func InvertFilters(filters *[]Filter) (inversion []Filter) {
+  var empty struct{}
+  selection := make(map[Filter]struct{})
+  for _, filter := range *filters {
+    selection[filter] = empty
+  }
+  for _, filter := range allFilters {
+    if _, ok := selection[filter]; !ok {
+      inversion = append(inversion, filter)
+    }
+  }
+  return
+}
+
+
+func filterBuffer(exclusions []Filter, buffer *[]byte, verbose bool) (*[]byte, bool) {
+
+  request := Request{}
+  if err := proto.Unmarshal(*buffer, &request); err != nil {
+    if verbose {
+      log.Printf("Filter %s failed to unmarshal buffer: %v.\n", err)
+    }
+    return buffer, false
+  }
+
+  for _, exclusion := range exclusions {
+    switch exclusion{
+      case FilterShow:
+        request.Show = 0
+      case FilterReset:
+        request.Reset_ = false
+      case FilterUpsert:
+        request.Upsert = []*Geometry{}
+      case FilterDelete:
+        request.Delete = []int64{}
+      case FilterView:
+        request.Viewloc = nil
+      case FilterTool:
+        request.Toolloc = nil
+      case FilterOffset:
+        request.Offsetloc = nil
+    }
+  }
+
+  bufferNew, err := proto.Marshal(&request)
+  if err != nil {
+    if verbose {
+      log.Printf("Filter %s failed to marshal request %v: %v.\n", request, err)
+    }
+    return buffer, false
+  }
+
+  return &bufferNew, true
+
+}
+
+
 type Conversion int
 
 const (
@@ -16,7 +111,6 @@ const (
   ConvertTool
   ConvertOffset
 )
-
 
 func ParseConversion(text string) (Conversion, bool) {
   switch text {
@@ -29,7 +123,7 @@ func ParseConversion(text string) (Conversion, bool) {
     case "offset":
       return ConvertOffset, true
     default:
-       return 0, false
+       return -1, false
   }
 }
 
@@ -85,7 +179,7 @@ type Relay struct {
 }
 
 
-func NewRelay(label Label, conversions []Conversion, verbose bool) *Relay {
+func NewRelay(label Label, conversions []Conversion, filters []Filter, verbose bool) *Relay {
 
   var this = Relay{
     label  : label                 ,
@@ -95,6 +189,8 @@ func NewRelay(label Label, conversions []Conversion, verbose bool) *Relay {
     exit   : false                 ,
   }
 
+  exclusions := InvertFilters(&filters)
+
   go func() {
     for !this.exit {
       buffer := <-this.merge
@@ -102,10 +198,11 @@ func NewRelay(label Label, conversions []Conversion, verbose bool) *Relay {
       if !ok {
         continue
       }
+      filtered, ok := filterBuffer(exclusions, converted, verbose)
       for _, sink := range this.Sinks() {
-        *sink.In() <- *converted
+        *sink.In() <- *filtered
         if verbose {
-          log.Printf("Relay %s wrote %v bytes to sink %s.\n", this.label, len(*converted), sink.Label())
+          log.Printf("Relay %s wrote %v bytes to sink %s.\n", this.label, len(*filtered), sink.Label())
         }
       }
     }
