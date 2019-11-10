@@ -261,7 +261,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
             return false
           }
         }
-        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, filters, interpreter.verbose)
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, InvertFilters(&filters), interpreter.verbose)
         return true
       }
 

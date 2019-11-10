@@ -171,7 +171,7 @@ type Relay struct {
 }
 
 
-func NewRelay(label Label, conversions []Conversion, filters []Filter, verbose bool) *Relay {
+func NewRelay(label Label, conversions []Conversion, exclusions []Filter, verbose bool) *Relay {
 
   var relay = Relay{
     label  : label                 ,
@@ -180,8 +180,6 @@ func NewRelay(label Label, conversions []Conversion, filters []Filter, verbose b
     merge  : make(ProtobufChannel) ,
     exit   : false                 ,
   }
-
-  exclusions := InvertFilters(&filters)
 
   go func() {
     for !relay.exit {

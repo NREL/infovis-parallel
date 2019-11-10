@@ -5,4 +5,5 @@ add-sink R P                          # Connect the printer to the relay.
 add-source R F                        # Connect the files to the relay.
 wait 4                                # Wait 4 seconds.
 reset F                               # Send the files again.
+wait 4                                # Wait 4 seconds.
 exit                                  # Exit.
