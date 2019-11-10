@@ -4,7 +4,33 @@ package infovis
 import (
   "log"
   "sync"
+  "github.com/golang/protobuf/proto"
 )
+
+
+type Conversion int
+
+const (
+  ConvertShow   Conversion = iota
+  ConvertView
+  ConvertTool
+  ConvertOffset
+)
+
+func ParseConversion(text string) (Conversion, bool) {
+  switch text {
+    case "show":
+      return ConvertShow, true
+    case "view":
+      return ConvertView, true
+    case "tool":
+      return ConvertTool, true
+    case "offset":
+      return ConvertOffset, true
+    default:
+       return 0, false
+  }
+}
 
 
 type Relay struct {
@@ -17,7 +43,7 @@ type Relay struct {
 }
 
 
-func NewRelay(label Label, verbose bool) *Relay {
+func NewRelay(label Label, conversions []Conversion, verbose bool) *Relay {
 
   var this = Relay{
     label  : label                 ,
@@ -30,6 +56,36 @@ func NewRelay(label Label, verbose bool) *Relay {
   go func() {
     for !this.exit {
       buffer := <-this.merge
+      if len(conversions) > 0 {
+        request := Request{}
+        response := Response{}
+        if err := proto.Unmarshal(buffer, &response); err != nil {
+          if verbose {
+            log.Printf("Converter %s failed to unmarshal buffer: %v.\n", err)
+          }
+          continue
+        }
+        for _, conversion := range conversions {
+          switch conversion {
+            case ConvertShow:
+              request.Show = response.Shown
+            case ConvertView:
+              request.Viewloc = response.Viewloc
+            case ConvertTool:
+              request.Toolloc = response.Toolloc
+            case ConvertOffset:
+              request.Offsetloc = response.Offsetloc
+          }
+        }
+        buffer1, err := proto.Marshal(&request)
+        if err != nil {
+          if verbose {
+            log.Printf("Converter %s failed to marshal request %v: %v.\n", request, err)
+          }
+          continue
+        }
+        buffer = buffer1
+      }
       for _, sink := range this.Sinks() {
         *sink.In() <- buffer
         if verbose {
