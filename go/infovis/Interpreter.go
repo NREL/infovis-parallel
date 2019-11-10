@@ -20,16 +20,18 @@ type Interpreter struct {
   relays    map[Label]*Relay
   server    *Server
   tokenizer *regexp.Regexp
+  commenter *regexp.Regexp
 }
 
 
 func NewInterpreter() *Interpreter {
   var this = Interpreter{
-    verbose  : false                   ,
-    sources  : make(map[Label]Source)  ,
-    sinks    : make(map[Label]Sink  )  ,
-    relays   : make(map[Label]*Relay)  ,
-    tokenizer: regexp.MustCompile(" +"),
+    verbose  : false                       ,
+    sources  : make(map[Label]Source)      ,
+    sinks    : make(map[Label]Sink  )      ,
+    relays   : make(map[Label]*Relay)      ,
+    tokenizer: regexp.MustCompile(" +")    ,
+    commenter: regexp.MustCompile(" *#.*$"),
   }
   return &this
 }
@@ -105,14 +107,19 @@ func (this *Interpreter) Repl() {
   var reader = bufio.NewReader(os.Stdin)
   for {
     fmt.Print("> ")
-    line, _ := reader.ReadString('\n')
+    line, ok := reader.ReadString('\n')
+    if ok != nil {
+      return
+    }
     this.InterpretLine(line)
   }
 }
 
 
 func (this *Interpreter) InterpretLine(line string) bool {
-  return this.InterpretTokens(this.tokenizer.Split(strings.TrimSuffix(line, "\n"), -1))
+  line = strings.TrimSuffix(line, "\n")
+  line = this.commenter.ReplaceAllLiteralString(line, "")
+  return this.InterpretTokens(this.tokenizer.Split(line, -1))
 }
 
 
