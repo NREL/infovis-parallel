@@ -3,5 +3,6 @@ files F ../protobuf/examples/axes.pbb # Load a file containing protocol buffers.
 relay R                               # Create a relay.
 add-sink R P                          # Connect the printer to the relay.
 add-source R F                        # Connect the files to the relay.
-wait 10                               # Wait 10 seconds.
+wait 4                                # Wait 4 seconds.
 reset F                               # Send the files again.
+exit                                  # Exit.

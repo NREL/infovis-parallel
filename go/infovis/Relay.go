@@ -17,6 +17,7 @@ const (
   ConvertOffset
 )
 
+
 func ParseConversion(text string) (Conversion, bool) {
   switch text {
     case "show":
@@ -30,6 +31,47 @@ func ParseConversion(text string) (Conversion, bool) {
     default:
        return 0, false
   }
+}
+
+
+func convertBuffer(conversions []Conversion, buffer *[]byte, verbose bool) (*[]byte, bool) {
+
+  if len(conversions) == 0 {
+    return buffer, true
+  }
+
+  request := Request{}
+  response := Response{}
+  if err := proto.Unmarshal(*buffer, &response); err != nil {
+    if verbose {
+      log.Printf("Converter %s failed to unmarshal buffer: %v.\n", err)
+    }
+    return buffer, false
+  }
+
+  for _, conversion := range conversions {
+    switch conversion {
+      case ConvertShow:
+        request.Show = response.Shown
+      case ConvertView:
+        request.Viewloc = response.Viewloc
+      case ConvertTool:
+        request.Toolloc = response.Toolloc
+      case ConvertOffset:
+        request.Offsetloc = response.Offsetloc
+    }
+  }
+
+  bufferNew, err := proto.Marshal(&request)
+  if err != nil {
+    if verbose {
+      log.Printf("Converter %s failed to marshal request %v: %v.\n", request, err)
+    }
+    return buffer, false
+  }
+
+  return &bufferNew, true
+
 }
 
 
@@ -56,40 +98,14 @@ func NewRelay(label Label, conversions []Conversion, verbose bool) *Relay {
   go func() {
     for !this.exit {
       buffer := <-this.merge
-      if len(conversions) > 0 {
-        request := Request{}
-        response := Response{}
-        if err := proto.Unmarshal(buffer, &response); err != nil {
-          if verbose {
-            log.Printf("Converter %s failed to unmarshal buffer: %v.\n", err)
-          }
-          continue
-        }
-        for _, conversion := range conversions {
-          switch conversion {
-            case ConvertShow:
-              request.Show = response.Shown
-            case ConvertView:
-              request.Viewloc = response.Viewloc
-            case ConvertTool:
-              request.Toolloc = response.Toolloc
-            case ConvertOffset:
-              request.Offsetloc = response.Offsetloc
-          }
-        }
-        buffer1, err := proto.Marshal(&request)
-        if err != nil {
-          if verbose {
-            log.Printf("Converter %s failed to marshal request %v: %v.\n", request, err)
-          }
-          continue
-        }
-        buffer = buffer1
+      converted, ok := convertBuffer(conversions, &buffer, verbose)
+      if !ok {
+        continue
       }
       for _, sink := range this.Sinks() {
-        *sink.In() <- buffer
+        *sink.In() <- *converted
         if verbose {
-          log.Printf("Relay %s wrote %v bytes to sink %s.\n", this.label, len(buffer), sink.Label())
+          log.Printf("Relay %s wrote %v bytes to sink %s.\n", this.label, len(*converted), sink.Label())
         }
       }
     }
