@@ -10,6 +10,26 @@ import (
 )
 
 
+type Interpreter struct {
+  verbose bool
+  sources map[Label]Source
+  sinks   map[Label]Sink
+  relays  map[Label]*Relay
+  server  *Server
+}
+
+
+func NewInterpreter() *Interpreter {
+  var this = Interpreter{
+    verbose: false                 ,
+    sources: make(map[Label]Source),
+    sinks  : make(map[Label]Sink  ),
+    relays : make(map[Label]*Relay),
+  }
+  return &this
+}
+
+
 func checkArguments(tokens []string, message string, count int, exact bool) bool {
   if exact && len(tokens) != count || len(tokens) < count {
     fmt.Println(message)
@@ -19,8 +39,8 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
 }
 
 
-func lookupSource(sources *map[Label]Source, label Label) (Source, bool) {
-  source, ok := (*sources)[label]
+func (this *Interpreter) lookupSource(label Label) (Source, bool) {
+  source, ok := this.sources[label]
   if !ok {
     fmt.Printf("Source %s does not exist.\n", label)
     return nil, false
@@ -29,8 +49,8 @@ func lookupSource(sources *map[Label]Source, label Label) (Source, bool) {
 }
 
 
-func lookupSink(sinks *map[Label]Sink, label Label) (Sink, bool) {
-  sink, ok := (*sinks)[label]
+func (this *Interpreter) lookupSink(label Label) (Sink, bool) {
+  sink, ok := this.sinks[label]
   if !ok {
     fmt.Printf("Sink %s does not exist.\n", label)
     return nil, false
@@ -39,8 +59,8 @@ func lookupSink(sinks *map[Label]Sink, label Label) (Sink, bool) {
 }
 
 
-func lookupRelay(relays *map[Label]*Relay, label Label) (*Relay, bool) {
-  relay, ok := (*relays)[label]
+func (this *Interpreter) lookupRelay(label Label) (*Relay, bool) {
+  relay, ok := this.relays[label]
   if !ok {
     fmt.Printf("Relay %s does not exist.\n", label)
     return nil, false
@@ -49,15 +69,7 @@ func lookupRelay(relays *map[Label]*Relay, label Label) (*Relay, bool) {
 }
 
 
-func Main() {
-
-  var verbose = false
-
-  var sources = make(map[Label]Source)
-  var sinks   = make(map[Label]Sink  )
-  var relays  = make(map[Label]*Relay)
-
-  var server  *Server = nil
+func (this *Interpreter) Repl() {
 
   var reader = bufio.NewReader(os.Stdin)
 
@@ -74,17 +86,17 @@ func Main() {
 
       case "verbose":
         if checkArguments(tokens, "The 'verbose' command takes no arguments.", 1, true) {
-          verbose = true
+          this.verbose = true
         }
 
       case "silent":
         if checkArguments(tokens, "The 'silent' command takes no arguments.", 1, true) {
-          verbose = false
+          this.verbose = false
         }
 
       case "sources":
         if checkArguments(tokens, "The 'sources' command takes no arguments.", 1, true) {
-          for label, _ := range sources {
+          for label, _ := range this.sources {
             fmt.Printf("%s ", label)
           }
           fmt.Println()
@@ -92,7 +104,7 @@ func Main() {
 
       case "sinks":
         if checkArguments(tokens, "The 'sinks' command takes no arguments.", 1, true) {
-          for label, _ := range sinks {
+          for label, _ := range this.sinks {
             fmt.Printf("%s", label)
           }
           fmt.Println()
@@ -100,7 +112,7 @@ func Main() {
 
       case "relays":
         if checkArguments(tokens, "The 'relays' command takes no arguments.", 1, true) {
-          for label, relay := range relays {
+          for label, relay := range this.relays {
             fmt.Printf("%s{%v,%v} ", label, relay.SourceLabels(), relay.SinkLabels())
           }
           fmt.Println()
@@ -109,19 +121,19 @@ func Main() {
       case "delete":
         for _, label := range tokens[1:] {
           var found = false
-          if source, ok := sources[label]; ok {
+          if source, ok := this.sources[label]; ok {
             source.Exit()
-            delete(sources, label)
+            delete(this.sources, label)
             found = true
           }
-          if sink, ok := sinks[label]; ok {
+          if sink, ok := this.sinks[label]; ok {
             sink.Exit()
-            delete(sinks, label)
+            delete(this.sinks, label)
             found = true
           }
-          if relay, ok := relays[label]; ok {
+          if relay, ok := this.relays[label]; ok {
             relay.Exit()
-            delete(relays, label)
+            delete(this.relays, label)
             found = true
           }
           if !found {
@@ -131,29 +143,29 @@ func Main() {
 
       case "reset":
         for _, label := range tokens[1:] {
-          if source, ok := lookupSource(&sources, label); ok {
+          if source, ok := this.lookupSource(label); ok {
             source.Reset()
           }
         }
 
       case "absorber":
         if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) {
-          sinks[tokens[1]] = NewAbsorber(tokens[1], verbose)
+          this.sinks[tokens[1]] = NewAbsorber(tokens[1], this.verbose)
         }
 
       case "printer":
         if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) {
-          sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], verbose)
+          this.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], this.verbose)
         }
 
       case "files":
         if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) {
-          sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], verbose)
+          this.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], this.verbose)
         }
 
       case "append":
         if checkArguments(tokens, "The 'file' command must name a file source.", 2, false) {
-          if source, ok := lookupSource(&sources, tokens[1]); ok {
+          if source, ok := this.lookupSource(tokens[1]); ok {
             files, ok := source.(*Files)
             if !ok {
               fmt.Printf("The source %s is not a file source.\n", tokens[1])
@@ -164,15 +176,15 @@ func Main() {
 
       case "relay":
         if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) {
-          relays[tokens[1]] = NewRelay(tokens[1], verbose)
+          this.relays[tokens[1]] = NewRelay(tokens[1], this.verbose)
         }
 
       case "add-source":
         if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
-          if relay, ok := lookupRelay(&relays, tokens[1]); ok {
+          if relay, ok := this.lookupRelay(tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if source, ok := lookupSource(&sources, label); ok {
-                relay.AddSource(label, source, verbose)
+              if source, ok := this.lookupSource(label); ok {
+                relay.AddSource(label, source, this.verbose)
               }
             }
           }
@@ -180,9 +192,9 @@ func Main() {
 
       case "add-sink":
         if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
-          if relay, ok := lookupRelay(&relays, tokens[1]); ok {
+          if relay, ok := this.lookupRelay(tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if sink, ok := lookupSink(&sinks, label); ok {
+              if sink, ok := this.lookupSink(label); ok {
                 relay.AddSink(label, sink)
               }
             }
@@ -191,9 +203,9 @@ func Main() {
 
       case "remove-source":
         if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
-          if relay, ok := lookupRelay(&relays, tokens[1]); ok {
+          if relay, ok := this.lookupRelay(tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if _, ok := lookupSource(&sources, label); ok {
+              if _, ok := this.lookupSource(label); ok {
                 relay.RemoveSource(label)
               }
             }
@@ -202,9 +214,9 @@ func Main() {
 
       case "remove-sink":
         if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
-          if relay, ok := lookupRelay(&relays, tokens[1]); ok {
+          if relay, ok := this.lookupRelay(tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if _, ok := lookupSink(&sinks, label); ok {
+              if _, ok := this.lookupSink(label); ok {
                 relay.RemoveSink(label)
               }
             }
@@ -216,14 +228,14 @@ func Main() {
 
       case "serve":
         if checkArguments(tokens, "The 'serve' command must have an address and a path.", 3, true) {
-          server = NewServer(tokens[1], tokens[2], verbose)
+          this.server = NewServer(tokens[1], tokens[2], this.verbose)
         }
 
       case "websocket":
         if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) {
-          websocket := NewWebsocket(server, tokens[1], verbose)
-          sources[tokens[1]] = websocket
-          sinks[tokens[1]]   = websocket
+          websocket := NewWebsocket(this.server, tokens[1], this.verbose)
+          this.sources[tokens[1]] = websocket
+          this.sinks[tokens[1]]   = websocket
         }
 
       case "kafka":

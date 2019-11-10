@@ -7,5 +7,5 @@ import (
 
 
 func main() {
-  infovis.Main()
+  infovis.NewInterpreter().Repl()
 }
