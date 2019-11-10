@@ -12,96 +12,96 @@ var empty struct{}
 
 
 type Files struct {
-  label   Label
-  channel ProtobufChannel
-  files   []string
-  index   int
-  exit    bool
-  mux     sync.Mutex
-  wake    chan struct{}
+  label     Label
+  channel   ProtobufChannel
+  filenames []string
+  index     int
+  exit      bool
+  mux       sync.Mutex
+  wake      chan struct{}
 }
 
 
-func NewFiles(label Label, files []string, verbose bool) *Files {
+func NewFiles(label Label, filenames []string, verbose bool) *Files {
 
-  var this = Files{
-    label  : label                 ,
-    channel: make(ProtobufChannel) ,
-    files  : files                 ,
-    index  : 0                     ,
-    exit   : false                 ,
-    wake   : make(chan struct{})   ,
+  var files = Files{
+    label    : label                 ,
+    channel  : make(ProtobufChannel) ,
+    filenames: filenames                 ,
+    index    : 0                     ,
+    exit     : false                 ,
+    wake     : make(chan struct{})   ,
   }
 
   go func() {
-    for !this.exit {
-      <-this.wake
+    for !files.exit {
+      <-files.wake
       if verbose {
-        log.Printf("Files source %s has awoken.\n", this.label)
+        log.Printf("Files source %s has awoken.\n", files.label)
       }
-      this.mux.Lock()
-      for (this.index < len(this.files)) {
-        file := this.files[this.index]
-        this.index += 1
+      files.mux.Lock()
+      for (files.index < len(files.filenames)) {
+        filename := files.filenames[files.index]
+        files.index++
         if verbose {
-          log.Printf("Files source %s is reading file %s.\n", this.label, file)
+          log.Printf("Files source %s is reading file %s.\n", files.label, filename)
         }
-        buffer, err := ioutil.ReadFile(file)
+        buffer, err := ioutil.ReadFile(filename)
         if err != nil {
-          log.Printf("Files source %s encountered %v.\n", this.label, err)
+          log.Printf("Files source %s encountered %v.\n", files.label, err)
           continue
         }
-        this.channel <- buffer
+        files.channel <- buffer
         if verbose {
-          log.Printf("Files source %s sent %v bytes.\n", this.label, len(buffer))
+          log.Printf("Files source %s sent %v bytes.\n", files.label, len(buffer))
         }
       }
-      this.mux.Unlock()
+      files.mux.Unlock()
     }
     if verbose {
-      log.Printf("Files source %s is closing.\n", this.label)
+      log.Printf("Files source %s is closing.\n", files.label)
     }
-    close(this.channel)
+    close(files.channel)
   }()
 
-  this.wake <- empty
+  files.wake <- empty
 
-  return &this
+  return &files
 
 }
 
 
-func (this *Files) Append(files []string) {
-  this.mux.Lock()
-  this.files = append(this.files, files...)
-  this.mux.Unlock()
-  this.wake <- empty
+func (files *Files) Append(filenames []string) {
+  files.mux.Lock()
+  files.filenames = append(files.filenames, filenames...)
+  files.mux.Unlock()
+  files.wake <- empty
 }
 
 
-func (this *Files) Label() Label {
-  return this.label
+func (files *Files) Label() Label {
+  return files.label
 }
 
 
-func (this *Files) Out() *ProtobufChannel {
-  return &this.channel
+func (files *Files) Out() *ProtobufChannel {
+  return &files.channel
 }
 
 
-func (this *Files) Reset() {
-  this.mux.Lock()
-  this.index = 0
-  this.mux.Unlock()
-  this.wake <- empty
+func (files *Files) Reset() {
+  files.mux.Lock()
+  files.index = 0
+  files.mux.Unlock()
+  files.wake <- empty
 }
 
 
-func (this *Files) Exit() {
-  this.exit = true
+func (files *Files) Exit() {
+  files.exit = true
 }
 
 
-func (this *Files) Alive() bool {
-  return !this.exit
+func (files *Files) Alive() bool {
+  return !files.exit
 }

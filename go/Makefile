@@ -13,6 +13,7 @@ go-infovis: $(SRCS)
 
 lint: $(SRCS)
 	GOPATH= golint infovis/*.go
+	GOPATH= golint main.go
 
 clean:
 	rm go-infovis

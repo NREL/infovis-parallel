@@ -17,22 +17,22 @@ type Printer struct {
 
 func NewPrinter(label Label, kind string, verbose bool) *Printer {
 
-  var this = Printer {
+  var printer = Printer {
     label  : label                ,
     channel: make(ProtobufChannel),
     exit   : false                ,
   }
 
   go func() {
-    for !this.exit {
-      buffer, ok := <-this.channel
+    for !printer.exit {
+      buffer, ok := <-printer.channel
       if !ok {
-        log.Printf("Receive failed for printer %s\n.", this.label)
-        this.exit = true
+        log.Printf("Receive failed for printer %s\n.", printer.label)
+        printer.exit = true
         continue
       }
       if verbose {
-        log.Printf("Printer %s received %v bytes\n.", this.label, len(buffer))
+        log.Printf("Printer %s received %v bytes\n.", printer.label, len(buffer))
       }
       switch kind {
         case "Request":
@@ -54,31 +54,31 @@ func NewPrinter(label Label, kind string, verbose bool) *Printer {
       }
     }
     if verbose {
-      log.Printf("Printer %s is closing.\n", this.label)
+      log.Printf("Printer %s is closing.\n", printer.label)
     }
-    close(this.channel)
+    close(printer.channel)
   }()
 
-  return &this
+  return &printer
 
 }
 
 
-func (this *Printer) Label() Label {
-  return this.label
+func (printer *Printer) Label() Label {
+  return printer.label
 }
 
 
-func (this *Printer) In() *ProtobufChannel {
-  return &this.channel
+func (printer *Printer) In() *ProtobufChannel {
+  return &printer.channel
 }
 
 
-func (this *Printer) Exit() {
-  this.exit = true
+func (printer *Printer) Exit() {
+  printer.exit = true
 }
 
 
-func (this *Printer) Alive() bool {
-  return !this.exit
+func (printer *Printer) Alive() bool {
+  return !printer.exit
 }

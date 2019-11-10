@@ -25,7 +25,7 @@ type Interpreter struct {
 
 
 func NewInterpreter() *Interpreter {
-  var this = Interpreter{
+  var interpreter = Interpreter{
     verbose  : false                       ,
     sources  : make(map[Label]Source)      ,
     sinks    : make(map[Label]Sink  )      ,
@@ -33,7 +33,7 @@ func NewInterpreter() *Interpreter {
     tokenizer: regexp.MustCompile(" +")    ,
     commenter: regexp.MustCompile(" *#.*$"),
   }
-  return &this
+  return &interpreter
 }
 
 
@@ -46,8 +46,8 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
 }
 
 
-func (this *Interpreter) lookupSource(label Label) (Source, bool) {
-  source, ok := this.sources[label];
+func (interpreter *Interpreter) lookupSource(label Label) (Source, bool) {
+  source, ok := interpreter.sources[label];
   if !ok {
     fmt.Printf("Source %s does not exist.\n", label)
     return nil, false
@@ -56,8 +56,8 @@ func (this *Interpreter) lookupSource(label Label) (Source, bool) {
 }
 
 
-func (this *Interpreter) lookupSink(label Label) (Sink, bool) {
-  sink, ok := this.sinks[label]
+func (interpreter *Interpreter) lookupSink(label Label) (Sink, bool) {
+  sink, ok := interpreter.sinks[label]
   if !ok {
     fmt.Printf("Sink %s does not exist.\n", label)
     return nil, false
@@ -66,8 +66,8 @@ func (this *Interpreter) lookupSink(label Label) (Sink, bool) {
 }
 
 
-func (this *Interpreter) lookupRelay(label Label) (*Relay, bool) {
-  relay, ok := this.relays[label]
+func (interpreter *Interpreter) lookupRelay(label Label) (*Relay, bool) {
+  relay, ok := interpreter.relays[label]
   if !ok {
     fmt.Printf("Relay %s does not exist.\n", label)
     return nil, false
@@ -76,8 +76,8 @@ func (this *Interpreter) lookupRelay(label Label) (*Relay, bool) {
 }
 
 
-func (this *Interpreter) assertNoSource(label Label) bool {
-  if _, ok := this.sources[label]; ok {
+func (interpreter *Interpreter) assertNoSource(label Label) bool {
+  if _, ok := interpreter.sources[label]; ok {
     fmt.Printf("Source %s already exists.\n", label)
     return false
   }
@@ -85,8 +85,8 @@ func (this *Interpreter) assertNoSource(label Label) bool {
 }
 
 
-func (this *Interpreter) assertNoSink(label Label) bool {
-  if _, ok := this.sinks[label]; ok {
+func (interpreter *Interpreter) assertNoSink(label Label) bool {
+  if _, ok := interpreter.sinks[label]; ok {
     fmt.Printf("Sink %s already exists.\n", label)
     return false
   }
@@ -94,8 +94,8 @@ func (this *Interpreter) assertNoSink(label Label) bool {
 }
 
 
-func (this *Interpreter) assertNoRelay(label Label) bool {
-  if _, ok := this.relays[label]; ok {
+func (interpreter *Interpreter) assertNoRelay(label Label) bool {
+  if _, ok := interpreter.relays[label]; ok {
     fmt.Printf("Relay %s already exists.\n", label)
     return false
   }
@@ -103,7 +103,7 @@ func (this *Interpreter) assertNoRelay(label Label) bool {
 }
 
 
-func (this *Interpreter) Repl() {
+func (interpreter *Interpreter) Repl() {
   var reader = bufio.NewReader(os.Stdin)
   for {
     fmt.Print("> ")
@@ -111,37 +111,37 @@ func (this *Interpreter) Repl() {
     if ok != nil {
       return
     }
-    this.InterpretLine(line)
+    interpreter.InterpretLine(line)
   }
 }
 
 
-func (this *Interpreter) InterpretLine(line string) bool {
+func (interpreter *Interpreter) InterpretLine(line string) bool {
   line = strings.TrimSuffix(line, "\n")
-  line = this.commenter.ReplaceAllLiteralString(line, "")
-  return this.InterpretTokens(this.tokenizer.Split(line, -1))
+  line = interpreter.commenter.ReplaceAllLiteralString(line, "")
+  return interpreter.InterpretTokens(interpreter.tokenizer.Split(line, -1))
 }
 
 
-func (this *Interpreter) InterpretTokens(tokens []string) bool {
+func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
   switch tokens[0] {
 
     case "verbose":
       if checkArguments(tokens, "The 'verbose' command takes no arguments.", 1, true) {
-        this.verbose = true
+        interpreter.verbose = true
         return true
       }
 
     case "silent":
       if checkArguments(tokens, "The 'silent' command takes no arguments.", 1, true) {
-        this.verbose = false
+        interpreter.verbose = false
         return true
       }
 
     case "sources":
       if checkArguments(tokens, "The 'sources' command takes no arguments.", 1, true) {
-        for label, _ := range this.sources {
+        for label := range interpreter.sources {
           fmt.Printf("%s ", label)
         }
         fmt.Println()
@@ -150,7 +150,7 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "sinks":
       if checkArguments(tokens, "The 'sinks' command takes no arguments.", 1, true) {
-        for label, _ := range this.sinks {
+        for label := range interpreter.sinks {
           fmt.Printf("%s ", label)
         }
         fmt.Println()
@@ -159,7 +159,7 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "relays":
       if checkArguments(tokens, "The 'relays' command takes no arguments.", 1, true) {
-        for label, relay := range this.relays {
+        for label, relay := range interpreter.relays {
           fmt.Printf("%s{%v,%v} ", label, relay.SourceLabels(), relay.SinkLabels())
         }
         fmt.Println()
@@ -169,19 +169,19 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
     case "delete":
       for _, label := range tokens[1:] {
         var found = false
-        if source, ok := this.sources[label]; ok {
+        if source, ok := interpreter.sources[label]; ok {
           source.Exit()
-          delete(this.sources, label)
+          delete(interpreter.sources, label)
           found = true
         }
-        if sink, ok := this.sinks[label]; ok {
+        if sink, ok := interpreter.sinks[label]; ok {
           sink.Exit()
-          delete(this.sinks, label)
+          delete(interpreter.sinks, label)
           found = true
         }
-        if relay, ok := this.relays[label]; ok {
+        if relay, ok := interpreter.relays[label]; ok {
           relay.Exit()
-          delete(this.relays, label)
+          delete(interpreter.relays, label)
           found = true
         }
         if found {
@@ -192,7 +192,7 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "reset":
       for _, label := range tokens[1:] {
-        if source, ok := this.lookupSource(label); ok {
+        if source, ok := interpreter.lookupSource(label); ok {
           source.Reset()
         } else {
           return false
@@ -201,26 +201,26 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
       return true
 
     case "absorber":
-      if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) && this.assertNoSink(tokens[1]) {
-        this.sinks[tokens[1]] = NewAbsorber(tokens[1], this.verbose)
+      if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) && interpreter.assertNoSink(tokens[1]) {
+        interpreter.sinks[tokens[1]] = NewAbsorber(tokens[1], interpreter.verbose)
         return true
       }
 
     case "printer":
-      if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) && this.assertNoSink(tokens[1]) {
-        this.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], this.verbose)
+      if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) && interpreter.assertNoSink(tokens[1]) {
+        interpreter.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], interpreter.verbose)
         return true
       }
 
     case "files":
-      if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && this.assertNoSource(tokens[1]) {
-        this.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], this.verbose)
+      if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && interpreter.assertNoSource(tokens[1]) {
+        interpreter.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], interpreter.verbose)
         return true
       }
 
     case "append":
       if checkArguments(tokens, "The 'file' command must name a file source.", 2, false) {
-        if source, ok := this.lookupSource(tokens[1]); ok {
+        if source, ok := interpreter.lookupSource(tokens[1]); ok {
           if files, ok := source.(*Files); ok {
             files.Append(tokens[2:])
             return true
@@ -230,13 +230,13 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
       }
 
     case "relay":
-      if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && this.assertNoRelay(tokens[1]) {
-        this.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{}, this.verbose)
+      if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && interpreter.assertNoRelay(tokens[1]) {
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{}, interpreter.verbose)
         return true
       }
 
     case "converter":
-      if checkArguments(tokens, "The 'converter' command must name a relay.", 2, false) && this.assertNoRelay(tokens[1]) {
+      if checkArguments(tokens, "The 'converter' command must name a relay.", 2, false) && interpreter.assertNoRelay(tokens[1]) {
         conversions := make([]Conversion, 0, len(tokens) - 2)
         for _, token := range tokens[2:] {
           if conversion, ok := ParseConversion(token); ok {
@@ -246,12 +246,12 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
             return false
           }
         }
-        this.relays[tokens[1]] = NewRelay(tokens[1], conversions, []Filter{}, this.verbose)
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], conversions, []Filter{}, interpreter.verbose)
         return true
       }
 
     case "filter":
-      if checkArguments(tokens, "The 'filter' command must name a relay.", 2, false) && this.assertNoRelay(tokens[1]) {
+      if checkArguments(tokens, "The 'filter' command must name a relay.", 2, false) && interpreter.assertNoRelay(tokens[1]) {
         filters := make([]Filter, 0, len(tokens) - 2)
         for _, token := range tokens[2:] {
           if filter, ok := ParseFilter(token); ok {
@@ -261,16 +261,16 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
             return false
           }
         }
-        this.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, filters, this.verbose)
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, filters, interpreter.verbose)
         return true
       }
 
     case "add-source":
       if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
-        if relay, ok := this.lookupRelay(tokens[1]); ok {
+        if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
-            if source, ok := this.lookupSource(label); ok {
-              relay.AddSource(label, source, this.verbose)
+            if source, ok := interpreter.lookupSource(label); ok {
+              relay.AddSource(label, source, interpreter.verbose)
             } else {
               return false
             }
@@ -281,9 +281,9 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "add-sink":
       if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
-        if relay, ok := this.lookupRelay(tokens[1]); ok {
+        if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
-            if sink, ok := this.lookupSink(label); ok {
+            if sink, ok := interpreter.lookupSink(label); ok {
               relay.AddSink(label, sink)
             } else {
               return false
@@ -295,9 +295,9 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "remove-source":
       if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
-        if relay, ok := this.lookupRelay(tokens[1]); ok {
+        if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
-            if _, ok := this.lookupSource(label); ok {
+            if _, ok := interpreter.lookupSource(label); ok {
               relay.RemoveSource(label)
             } else {
               return false
@@ -309,9 +309,9 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "remove-sink":
       if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
-        if relay, ok := this.lookupRelay(tokens[1]); ok {
+        if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
-            if _, ok := this.lookupSink(label); ok {
+            if _, ok := interpreter.lookupSink(label); ok {
               relay.RemoveSink(label)
             } else {
               return false
@@ -323,15 +323,15 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "serve":
       if checkArguments(tokens, "The 'serve' command must have an address and a path.", 3, true) {
-        this.server = NewServer(tokens[1], tokens[2], this.verbose)
+        interpreter.server = NewServer(tokens[1], tokens[2], interpreter.verbose)
         return true
       }
 
     case "websocket":
-      if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) && this.assertNoSource(tokens[1]) && this.assertNoSink(tokens[1]) {
-        websocket := NewWebsocket(this.server, tokens[1], this.verbose)
-        this.sources[tokens[1]] = websocket
-        this.sinks[tokens[1]]   = websocket
+      if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) && interpreter.assertNoSource(tokens[1]) && interpreter.assertNoSink(tokens[1]) {
+        websocket := NewWebsocket(interpreter.server, tokens[1], interpreter.verbose)
+        interpreter.sources[tokens[1]] = websocket
+        interpreter.sinks[tokens[1]]   = websocket
         return true
       }
 
@@ -346,10 +346,10 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
           return false
         }
         for _, line := range strings.Split(string(content), "\n") {
-          if this.verbose {
+          if interpreter.verbose {
             fmt.Printf(">> %s\n", line)
           }
-          if !this.InterpretLine(line) {
+          if !interpreter.InterpretLine(line) {
             return false
           }
         }

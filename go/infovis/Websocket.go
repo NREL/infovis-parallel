@@ -26,23 +26,23 @@ var upgrader = websocket.Upgrader{
 
 
 func NewServer(address string, root string, verbose bool) *Server {
-  var this = Server {
+  var server = Server {
     root      : root                      ,
     websockets: make(map[Label]*Websocket),
     verbose   : verbose                   ,
   }
-  http.HandleFunc(root, this.makeHandler())
+  http.HandleFunc(root, server.makeHandler())
   go func() {
     if verbose {
-      log.Printf("Serving WebSockets on address %s%s.\n", address, this.root)
+      log.Printf("Serving WebSockets on address %s%s.\n", address, server.root)
     }
     log.Fatal(http.ListenAndServe(address, nil))
   }()
-  return &this
+  return &server
 }
 
 
-func (this *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
+func (server *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
   return func (responseWriter http.ResponseWriter, request *http.Request) {
 
     conn, err := upgrader.Upgrade(responseWriter, request, nil)
@@ -51,22 +51,22 @@ func (this *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
     }
     defer conn.Close()
 
-    if !strings.HasPrefix(request.URL.Path, this.root) {
+    if !strings.HasPrefix(request.URL.Path, server.root) {
       log.Printf("Invalid WebSocket path %s\n.", request.URL.Path)
       return
     }
 
-    label := strings.TrimPrefix(request.URL.Path, this.root)
-    this.mux.Lock()
-    websocket, found := this.websockets[label]
-    this.mux.Unlock()
+    label := strings.TrimPrefix(request.URL.Path, server.root)
+    server.mux.Lock()
+    websocket, found := server.websockets[label]
+    server.mux.Unlock()
     if !found {
-      if this.verbose {
+      if server.verbose {
         log.Printf("No WebSocket for %s.\n", label)
       }
       return
     }
-    if this.verbose {
+    if server.verbose {
       log.Printf("WebSocket established for %s.\n", label)
     }
 
@@ -101,7 +101,7 @@ type Websocket struct {
 
 func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
 
-  var this = Websocket {
+  var socket = Websocket {
     label  : label                  ,
     in     : make(ProtobufChannel)  ,
     out    : make(ProtobufChannel)  ,
@@ -111,20 +111,20 @@ func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
   }
 
   server.mux.Lock()
-  server.websockets[label] = &this
+  server.websockets[label] = &socket
   server.mux.Unlock()
 
   go func() {
-    for !this.exit {
-      buffer := <-this.in
-      this.mux.Lock()
-      conns := this.conns
-      this.mux.Unlock()
+    for !socket.exit {
+      buffer := <-socket.in
+      socket.mux.Lock()
+      conns := socket.conns
+      socket.mux.Unlock()
       for _, conn := range conns {
         err := conn.WriteMessage(websocket.BinaryMessage, buffer)
         if err != nil {
           log.Printf("Removing Websocket connection for %s.\n", label)
-          this.removeConnection(conn)
+          socket.removeConnection(conn)
           continue
         }
       }
@@ -132,67 +132,67 @@ func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
     if verbose {
       log.Printf("WebSocket %s is closing.\n", label)
     }
-    close(this.in)
-    close(this.out)
+    close(socket.in)
+    close(socket.out)
   }()
 
-  return &this
+  return &socket
 
 }
 
 
-func (this *Websocket) addConnection(conn *websocket.Conn) {
-  this.mux.Lock()
-  this.conns = append(this.conns, conn)
-  this.mux.Unlock()
+func (socket *Websocket) addConnection(conn *websocket.Conn) {
+  socket.mux.Lock()
+  socket.conns = append(socket.conns, conn)
+  socket.mux.Unlock()
 }
 
 
-func (this *Websocket) removeConnection(conn *websocket.Conn) {
-  this.mux.Lock()
-  for i, conn1 := range this.conns {
+func (socket *Websocket) removeConnection(conn *websocket.Conn) {
+  socket.mux.Lock()
+  for i, conn1 := range socket.conns {
     if conn == conn1 {
-      this.conns = append(this.conns[:i], this.conns[i+1:]...)
+      socket.conns = append(socket.conns[:i], socket.conns[i+1:]...)
       break
     }
   }
-  this.mux.Unlock()
+  socket.mux.Unlock()
 }
 
 
-func (this *Websocket) received(buffer *[]byte) {
-  this.out <- *buffer
+func (socket *Websocket) received(buffer *[]byte) {
+  socket.out <- *buffer
 }
 
 
-func (this *Websocket) Label() Label {
-  return this.label
+func (socket *Websocket) Label() Label {
+  return socket.label
 }
 
 
-func (this *Websocket) In() *ProtobufChannel {
-  return &this.in
+func (socket *Websocket) In() *ProtobufChannel {
+  return &socket.in
 }
 
 
-func (this *Websocket) Out() *ProtobufChannel {
-  return &this.out
+func (socket *Websocket) Out() *ProtobufChannel {
+  return &socket.out
 }
 
 
-func (this *Websocket) Append(arguments []string) {
+func (socket *Websocket) Append(arguments []string) {
 }
 
 
-func (this *Websocket) Reset() {
+func (socket *Websocket) Reset() {
 }
 
 
-func (this *Websocket) Exit() {
-  this.exit = true
+func (socket *Websocket) Exit() {
+  socket.exit = true
 }
 
 
-func (this *Websocket) Alive() bool {
-  return !this.exit
+func (socket *Websocket) Alive() bool {
+  return !socket.exit
 }

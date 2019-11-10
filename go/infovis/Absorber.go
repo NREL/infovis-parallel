@@ -15,50 +15,50 @@ type Absorber struct {
 
 func NewAbsorber(label Label, verbose bool) *Absorber {
 
-  var this = Absorber {
+  var absorber = Absorber {
     label  : label                ,
     channel: make(ProtobufChannel),
     exit   : false                ,
   }
 
   go func() {
-    for !this.exit {
-      buffer, ok := <-this.channel
+    for !absorber.exit {
+      buffer, ok := <-absorber.channel
       if !ok {
-        log.Printf("Receive failed for absorber %s.\n", this.label)
-        this.exit = true
+        log.Printf("Receive failed for absorber %s.\n", absorber.label)
+        absorber.exit = true
         continue
       }
       if verbose {
-        log.Printf("Absorber %s received %v bytes.\n", this.label, len(buffer))
+        log.Printf("Absorber %s received %v bytes.\n", absorber.label, len(buffer))
       }
     }
     if verbose {
-      log.Printf("Absorber %s is closing.\n", this.label)
+      log.Printf("Absorber %s is closing.\n", absorber.label)
     }
-    close(this.channel)
+    close(absorber.channel)
   }()
 
-  return &this
+  return &absorber
 
 }
 
 
-func (this *Absorber) Label() Label {
-  return this.label
+func (absorber *Absorber) Label() Label {
+  return absorber.label
 }
 
 
-func (this *Absorber) In() *ProtobufChannel {
-  return &this.channel
+func (absorber *Absorber) In() *ProtobufChannel {
+  return &absorber.channel
 }
 
 
-func (this *Absorber) Exit() {
-  this.exit = true
+func (absorber *Absorber) Exit() {
+  absorber.exit = true
 }
 
 
-func (this *Absorber) Alive() bool {
-  return !this.exit
+func (absorber *Absorber) Alive() bool {
+  return !absorber.exit
 }

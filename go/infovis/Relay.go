@@ -173,7 +173,7 @@ type Relay struct {
 
 func NewRelay(label Label, conversions []Conversion, filters []Filter, verbose bool) *Relay {
 
-  var this = Relay{
+  var relay = Relay{
     label  : label                 ,
     sources: make(map[Label]Source),
     sinks  : make(map[Label]Sink  ),
@@ -184,128 +184,128 @@ func NewRelay(label Label, conversions []Conversion, filters []Filter, verbose b
   exclusions := InvertFilters(&filters)
 
   go func() {
-    for !this.exit {
-      buffer := <-this.merge
+    for !relay.exit {
+      buffer := <-relay.merge
       converted, ok := convertBuffer(conversions, &buffer)
       if !ok {
         continue
       }
       filtered, ok := filterBuffer(exclusions, converted)
-      for _, sink := range this.Sinks() {
+      for _, sink := range relay.Sinks() {
         *sink.In() <- *filtered
         if verbose {
-          log.Printf("Relay %s wrote %v bytes to sink %s.\n", this.label, len(*filtered), sink.Label())
+          log.Printf("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), sink.Label())
         }
       }
     }
     if verbose {
-      log.Printf("Relay %s is closing.\n", this.label)
+      log.Printf("Relay %s is closing.\n", relay.label)
     }
-    close(this.merge)
+    close(relay.merge)
   }()
 
-  return &this
+  return &relay
 
 }
 
 
-func (this *Relay) Sources() []Source {
-  this.mux.RLock()
-  sources := make([]Source, 0, len(this.sources))
-  for _, source := range this.sources {
+func (relay *Relay) Sources() []Source {
+  relay.mux.RLock()
+  sources := make([]Source, 0, len(relay.sources))
+  for _, source := range relay.sources {
     sources = append(sources, source)
   }
-  this.mux.RUnlock()
+  relay.mux.RUnlock()
   return sources
 }
 
 
-func (this *Relay) Sinks() []Sink {
-  this.mux.RLock()
-  sinks := make([]Sink, 0, len(this.sinks))
-  for _, sink := range this.sinks {
+func (relay *Relay) Sinks() []Sink {
+  relay.mux.RLock()
+  sinks := make([]Sink, 0, len(relay.sinks))
+  for _, sink := range relay.sinks {
     sinks = append(sinks, sink)
   }
-  this.mux.RUnlock()
+  relay.mux.RUnlock()
   return sinks
 }
 
 
-func (this *Relay) SourceLabels() []Label {
-  this.mux.RLock()
-  labels := make([]Label, 0, len(this.sources))
-  for label, _ := range this.sources {
+func (relay *Relay) SourceLabels() []Label {
+  relay.mux.RLock()
+  labels := make([]Label, 0, len(relay.sources))
+  for label := range relay.sources {
     labels = append(labels, label)
   }
-  this.mux.RUnlock()
+  relay.mux.RUnlock()
   return labels
 }
 
 
-func (this *Relay) SinkLabels() []Label {
-  this.mux.RLock()
-  labels := make([]Label, 0, len(this.sinks))
-  for label, _ := range this.sinks {
+func (relay *Relay) SinkLabels() []Label {
+  relay.mux.RLock()
+  labels := make([]Label, 0, len(relay.sinks))
+  for label := range relay.sinks {
     labels = append(labels, label)
   }
-  this.mux.RUnlock()
+  relay.mux.RUnlock()
   return labels
 }
 
 
-func (this *Relay) AddSource(label Label, source Source, verbose bool) {
-  this.mux.Lock()
-  this.sources[label] = source
-  this.mux.Unlock()
+func (relay *Relay) AddSource(label Label, source Source, verbose bool) {
+  relay.mux.Lock()
+  relay.sources[label] = source
+  relay.mux.Unlock()
   go func() {
-    for !this.exit {
+    for !relay.exit {
       buffer, ok := <-*source.Out()
       if !ok {
-        log.Printf("Relay %s source %s was closed.\n", this.label, label)
+        log.Printf("Relay %s source %s was closed.\n", relay.label, label)
         return
       }
-      this.mux.RLock()
-      _, ok = this.sources[label]
-      this.mux.RUnlock()
+      relay.mux.RLock()
+      _, ok = relay.sources[label]
+      relay.mux.RUnlock()
       if !ok {
-        log.Printf("Relay %s source %s is no longer connected.\n", this.label, label)
+        log.Printf("Relay %s source %s is no longer connected.\n", relay.label, label)
         return
       }
-      this.merge <- buffer
+      relay.merge <- buffer
       if verbose {
-        log.Printf("Relay %s read %v bytes from source %s.\n", this.label, len(buffer), label)
+        log.Printf("Relay %s read %v bytes from source %s.\n", relay.label, len(buffer), label)
       }
     }
   }()
 }
 
 
-func (this *Relay) AddSink(label Label, sink Sink) {
-  this.mux.Lock()
-  this.sinks[label] = sink
-  this.mux.Unlock()
+func (relay *Relay) AddSink(label Label, sink Sink) {
+  relay.mux.Lock()
+  relay.sinks[label] = sink
+  relay.mux.Unlock()
 }
 
 
-func (this *Relay) RemoveSource(label Label) {
-  this.mux.Lock()
-  delete(this.sources, label)
-  this.mux.Unlock()
+func (relay *Relay) RemoveSource(label Label) {
+  relay.mux.Lock()
+  delete(relay.sources, label)
+  relay.mux.Unlock()
 }
 
 
-func (this *Relay) RemoveSink(label Label) {
-  this.mux.Lock()
-  delete(this.sinks, label)
-  this.mux.Unlock()
+func (relay *Relay) RemoveSink(label Label) {
+  relay.mux.Lock()
+  delete(relay.sinks, label)
+  relay.mux.Unlock()
 }
 
 
-func (this *Relay) Exit() {
-  this.exit = true
+func (relay *Relay) Exit() {
+  relay.exit = true
 }
 
 
-func (this *Relay) Alive() bool {
-  return !this.exit
+func (relay *Relay) Alive() bool {
+  return !relay.exit
 }
