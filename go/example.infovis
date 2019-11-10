@@ -1,0 +1,7 @@
+printer P Request
+files F ../protobuf/examples/axes.pbb
+relay R
+add-sink R P
+add-source R F
+wait 10
+reset F
