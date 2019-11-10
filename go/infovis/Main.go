@@ -22,7 +22,7 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
 func lookupSource(sources *map[Label]Source, label Label) (Source, bool) {
   source, ok := (*sources)[label]
   if !ok {
-    fmt.Println("Source", label, "does not exist.")
+    fmt.Printf("Source %s does not exist.\n", label)
     return nil, false
   }
   return source, true
@@ -32,7 +32,7 @@ func lookupSource(sources *map[Label]Source, label Label) (Source, bool) {
 func lookupSink(sinks *map[Label]Sink, label Label) (Sink, bool) {
   sink, ok := (*sinks)[label]
   if !ok {
-    fmt.Println("Sink", label, "does not exist.")
+    fmt.Printf("Sink %s does not exist.\n", label)
     return nil, false
   }
   return sink, true
@@ -42,7 +42,7 @@ func lookupSink(sinks *map[Label]Sink, label Label) (Sink, bool) {
 func lookupRelay(relays *map[Label]*Relay, label Label) (*Relay, bool) {
   relay, ok := (*relays)[label]
   if !ok {
-    fmt.Println("Relay", label, "does not exist.")
+    fmt.Printf("Relay %s does not exist.\n", label)
     return nil, false
   }
   return relay, true
@@ -108,23 +108,30 @@ func Main() {
 
       case "delete":
         for _, label := range tokens[1:] {
+          var found = false
           if source, ok := sources[label]; ok {
             source.Exit()
             delete(sources, label)
+            found = true
           }
           if sink, ok := sinks[label]; ok {
             sink.Exit()
             delete(sinks, label)
+            found = true
           }
           if relay, ok := relays[label]; ok {
             relay.Exit()
             delete(relays, label)
+            found = true
+          }
+          if !found {
+            fmt.Printf("%s is neither a source, sink, or relay.\n", label)
           }
         }
 
       case "reset":
         for _, label := range tokens[1:] {
-          if source, ok := sources[label]; ok {
+          if source, ok := lookupSource(&sources, label); ok {
             source.Reset()
           }
         }
@@ -164,7 +171,7 @@ func Main() {
         if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
           if relay, ok := lookupRelay(&relays, tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if source, ok := sources[label]; ok {
+              if source, ok := lookupSource(&sources, label); ok {
                 relay.AddSource(label, source, verbose)
               }
             }
@@ -175,7 +182,7 @@ func Main() {
         if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
           if relay, ok := lookupRelay(&relays, tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if sink, ok := sinks[label]; ok {
+              if sink, ok := lookupSink(&sinks, label); ok {
                 relay.AddSink(label, sink)
               }
             }
@@ -186,7 +193,7 @@ func Main() {
         if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
           if relay, ok := lookupRelay(&relays, tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if _, ok := sources[label]; ok {
+              if _, ok := lookupSource(&sources, label); ok {
                 relay.RemoveSource(label)
               }
             }
@@ -197,7 +204,7 @@ func Main() {
         if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
           if relay, ok := lookupRelay(&relays, tokens[1]); ok {
             for _, label := range tokens[2:] {
-              if _, ok := sinks[label]; ok {
+              if _, ok := lookupSink(&sinks, label); ok {
                 relay.RemoveSink(label)
               }
             }
