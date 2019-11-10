@@ -322,8 +322,8 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
       }
       return true
 
-    case "sleep":
-      if checkArguments(tokens, "The 'sleep' command must specify the number of seconds.", 2, true) {
+    case "wait":
+      if checkArguments(tokens, "The 'wait' command must specify the number of seconds.", 2, true) {
         delay, err := strconv.ParseUint(tokens[1], 10, 32)
         if err == nil {
           time.Sleep(time.Duration(delay) * time.Second)
@@ -355,7 +355,7 @@ func (this *Interpreter) InterpretTokens(tokens []string) bool {
       fmt.Println("serve 'address' 'path'")
       fmt.Println("websocket 'path'")
       fmt.Println("script [file]...")
-      fmt.Println("sleep 'seconds'")
+      fmt.Println("wait 'seconds'")
       fmt.Println("exit")
       fmt.Println("help")
       return true
