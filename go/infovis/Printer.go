@@ -2,7 +2,9 @@ package infovis
 
 
 import (
+  "fmt"
   "log"
+  "github.com/golang/protobuf/proto"
 )
 
 
@@ -13,7 +15,7 @@ type Printer struct {
 }
 
 
-func NewPrinter(label Label, verbose bool) *Printer {
+func NewPrinter(label Label, kind string, verbose bool) *Printer {
 
   var this = Printer {
     label  : label                ,
@@ -33,6 +35,28 @@ func NewPrinter(label Label, verbose bool) *Printer {
       }
       if verbose {
         log.Printf("Printer %s received %v bytes\n.", this.label, len(buffer))
+      }
+      switch kind {
+        case "Request":
+          request := Request{}
+          err := proto.Unmarshal(buffer, &request)
+          if err != nil {
+            if verbose {
+              log.Printf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
+            }
+            break
+          }
+          fmt.Printf("Printer %s received %s: %v.\n", label, kind, request)
+        case "Response":
+          response := Response{}
+          err := proto.Unmarshal(buffer, &response)
+          if err != nil {
+            if verbose {
+              log.Printf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
+            }
+            break
+          }
+          fmt.Printf("Printer %s received %s: %v.\n", label, kind, response)
       }
     }
     if verbose {

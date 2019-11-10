@@ -135,8 +135,8 @@ func Main() {
         }
 
       case "printer":
-        if checkArguments(tokens, "The 'printer' command must name a channel.", 2, true) {
-          sinks[tokens[1]] = NewPrinter(tokens[1], verbose)
+        if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) {
+          sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], verbose)
         }
 
       case "files":

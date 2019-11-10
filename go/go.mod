@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/DataDog/zstd v1.4.1 // indirect
-	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/websocket v1.4.1
 	github.com/pierrec/lz4 v2.3.0+incompatible // indirect
 	github.com/segmentio/kafka-go v0.3.4 // indirect
