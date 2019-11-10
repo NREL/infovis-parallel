@@ -24,6 +24,7 @@ module InfoVis.Parallel.ProtoBuf (
 , deselect
 , viewGet
 , toolGet
+, offsetGet
 , depressed
 , pressed
 , released
@@ -191,10 +192,11 @@ data Response =
   , deselect'  :: Packed    6 (Value   Identifier     )
   , viewloc'   :: Optional  7 (Message LocationPB     )
   , toolloc'   :: Optional  8 (Message LocationPB     )
-  , depressed' :: Optional  9 (Value   (Fixed Buttons))
-  , pressed'   :: Optional 10 (Value   (Fixed Buttons))
-  , released'  :: Optional 11 (Value   (Fixed Buttons))
-  , analog'    :: Packed   12 (Value   Double         )
+  , offsetloc' :: Optional  9 (Message LocationPB     )
+  , depressed' :: Optional 10 (Value   (Fixed Buttons))
+  , pressed'   :: Optional 11 (Value   (Fixed Buttons))
+  , released'  :: Optional 12 (Value   (Fixed Buttons))
+  , analog'    :: Packed   13 (Value   Double         )
   }
     deriving (Generic, Show)
 
@@ -210,6 +212,7 @@ instance Default Response where
     , deselect'  = putField def
     , viewloc'   = putField def
     , toolloc'   = putField def
+    , offsetloc' = putField def
     , depressed' = putField def
     , pressed'   = putField def
     , released'  = putField def
@@ -229,6 +232,7 @@ instance FromJSON Response where
         deselect'  <- putField . fromMaybe def                               <$> v .:? "deselect"
         viewloc'   <- putField . fmap fromPositionRotation                   <$> v .:? "viewloc"
         toolloc'   <- putField . fmap fromPositionRotation                   <$> v .:? "toolloc"
+        offsetloc' <- putField . fmap fromPositionRotation                   <$> v .:? "offsetloc"
         depressed' <- putField . fmap (fromIntegral :: Int -> Fixed Buttons) <$> v .:? "depressed"
         pressed'   <- putField . fmap (fromIntegral :: Int -> Fixed Buttons) <$> v .:? "pressed"
         released'  <- putField . fmap (fromIntegral :: Int -> Fixed Buttons) <$> v .:? "released"
@@ -246,6 +250,7 @@ instance ToJSON Response where
      . option           "deselect"       (                                           getField deselect' )
      . maybe id ((:) . ("viewloc"   .=)) (toPositionRotation                     <$> getField viewloc'  )
      . maybe id ((:) . ("toolloc"   .=)) (toPositionRotation                     <$> getField toolloc'  )
+     . maybe id ((:) . ("offsetloc" .=)) (toPositionRotation                     <$> getField offsetloc')
      . maybe id ((:) . ("depressed" .=)) ((fromIntegral :: Fixed Buttons -> Int) <$> getField depressed')
      . maybe id ((:) . ("pressed"   .=)) ((fromIntegral :: Fixed Buttons -> Int) <$> getField pressed'  )
      . maybe id ((:) . ("released"  .=)) ((fromIntegral :: Fixed Buttons -> Int) <$> getField released' )
@@ -319,6 +324,13 @@ toolGet =
   lens
     (fmap toPositionRotation . getField . (toolloc' :: Response -> Optional 8 (Message LocationPB)))
     (\s x -> (s :: Response) {toolloc' = putField $ fromPositionRotation <$> x})
+
+
+offsetGet :: Lens' Response (Maybe PositionRotation)
+offsetGet =
+  lens
+    (fmap toPositionRotation . getField . (offsetloc' :: Response -> Optional 9 (Message LocationPB)))
+    (\s x -> (s :: Response) {offsetloc' = putField $ fromPositionRotation <$> x})
 
 
 depressed :: Lens' Response Buttons

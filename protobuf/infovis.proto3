@@ -55,8 +55,9 @@ message Response {
   repeated int64  deselect  =  6;
   Location        viewloc   =  7;
   Location        toolloc   =  8;
-  fixed32         depressed =  9;
-  fixed32         pressed   = 10;
-  fixed32         released  = 11;
-  repeated double analog    = 12;
+  Location        offsetloc =  9;
+  fixed32         depressed = 10;
+  fixed32         pressed   = 11;
+  fixed32         released  = 12;
+  repeated double analog    = 13;
 }

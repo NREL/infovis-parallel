@@ -237,8 +237,9 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
     if (dirtyResponse) {
       const response = new proto.Infovis.Response()
       response.setShown(graphics.manager.current)
-      response.setViewloc  (makeLocation(graphics.pov ))
-      response.setToolloc  (makeLocation(graphics.tool))
+      response.setViewloc   (makeLocation(graphics.pov   ))
+      response.setToolloc   (makeLocation(graphics.tool  ))
+      response.setOffsetloc (makeLocation(graphics.offset))
       respond(response)
     }
 

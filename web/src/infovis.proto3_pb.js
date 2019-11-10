@@ -1311,7 +1311,7 @@ proto.Infovis.Request.prototype.hasOffsetloc = function() {
  * @private {!Array<number>}
  * @const
  */
-proto.Infovis.Response.repeatedFields_ = [3,4,5,6,12];
+proto.Infovis.Response.repeatedFields_ = [3,4,5,6,13];
 
 
 
@@ -1350,10 +1350,11 @@ proto.Infovis.Response.toObject = function(includeInstance, msg) {
     deselectList: jspb.Message.getRepeatedField(msg, 6),
     viewloc: (f = msg.getViewloc()) && proto.Infovis.Location.toObject(includeInstance, f),
     toolloc: (f = msg.getToolloc()) && proto.Infovis.Location.toObject(includeInstance, f),
-    depressed: jspb.Message.getFieldWithDefault(msg, 9, 0),
-    pressed: jspb.Message.getFieldWithDefault(msg, 10, 0),
-    released: jspb.Message.getFieldWithDefault(msg, 11, 0),
-    analogList: jspb.Message.getRepeatedFloatingPointField(msg, 12)
+    offsetloc: (f = msg.getOffsetloc()) && proto.Infovis.Location.toObject(includeInstance, f),
+    depressed: jspb.Message.getFieldWithDefault(msg, 10, 0),
+    pressed: jspb.Message.getFieldWithDefault(msg, 11, 0),
+    released: jspb.Message.getFieldWithDefault(msg, 12, 0),
+    analogList: jspb.Message.getRepeatedFloatingPointField(msg, 13)
   };
 
   if (includeInstance) {
@@ -1425,18 +1426,23 @@ proto.Infovis.Response.deserializeBinaryFromReader = function(msg, reader) {
       msg.setToolloc(value);
       break;
     case 9:
-      var value = /** @type {number} */ (reader.readFixed32());
-      msg.setDepressed(value);
+      var value = new proto.Infovis.Location;
+      reader.readMessage(value,proto.Infovis.Location.deserializeBinaryFromReader);
+      msg.setOffsetloc(value);
       break;
     case 10:
       var value = /** @type {number} */ (reader.readFixed32());
-      msg.setPressed(value);
+      msg.setDepressed(value);
       break;
     case 11:
       var value = /** @type {number} */ (reader.readFixed32());
-      msg.setReleased(value);
+      msg.setPressed(value);
       break;
     case 12:
+      var value = /** @type {number} */ (reader.readFixed32());
+      msg.setReleased(value);
+      break;
+    case 13:
       var value = /** @type {!Array<number>} */ (reader.readPackedDouble());
       msg.setAnalogList(value);
       break;
@@ -1527,31 +1533,39 @@ proto.Infovis.Response.serializeBinaryToWriter = function(message, writer) {
       proto.Infovis.Location.serializeBinaryToWriter
     );
   }
-  f = message.getDepressed();
-  if (f !== 0) {
-    writer.writeFixed32(
+  f = message.getOffsetloc();
+  if (f != null) {
+    writer.writeMessage(
       9,
-      f
+      f,
+      proto.Infovis.Location.serializeBinaryToWriter
     );
   }
-  f = message.getPressed();
+  f = message.getDepressed();
   if (f !== 0) {
     writer.writeFixed32(
       10,
       f
     );
   }
-  f = message.getReleased();
+  f = message.getPressed();
   if (f !== 0) {
     writer.writeFixed32(
       11,
       f
     );
   }
+  f = message.getReleased();
+  if (f !== 0) {
+    writer.writeFixed32(
+      12,
+      f
+    );
+  }
   f = message.getAnalogList();
   if (f.length > 0) {
     writer.writePackedDouble(
-      12,
+      13,
       f
     );
   }
@@ -1783,62 +1797,95 @@ proto.Infovis.Response.prototype.hasToolloc = function() {
 
 
 /**
- * optional fixed32 depressed = 9;
- * @return {number}
+ * optional Location offsetloc = 9;
+ * @return {?proto.Infovis.Location}
  */
-proto.Infovis.Response.prototype.getDepressed = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+proto.Infovis.Response.prototype.getOffsetloc = function() {
+  return /** @type{?proto.Infovis.Location} */ (
+    jspb.Message.getWrapperField(this, proto.Infovis.Location, 9));
 };
 
 
-/** @param {number} value */
-proto.Infovis.Response.prototype.setDepressed = function(value) {
-  jspb.Message.setProto3IntField(this, 9, value);
+/** @param {?proto.Infovis.Location|undefined} value */
+proto.Infovis.Response.prototype.setOffsetloc = function(value) {
+  jspb.Message.setWrapperField(this, 9, value);
 };
 
 
 /**
- * optional fixed32 pressed = 10;
+ * Clears the message field making it undefined.
+ */
+proto.Infovis.Response.prototype.clearOffsetloc = function() {
+  this.setOffsetloc(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.Infovis.Response.prototype.hasOffsetloc = function() {
+  return jspb.Message.getField(this, 9) != null;
+};
+
+
+/**
+ * optional fixed32 depressed = 10;
  * @return {number}
  */
-proto.Infovis.Response.prototype.getPressed = function() {
+proto.Infovis.Response.prototype.getDepressed = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 10, 0));
 };
 
 
 /** @param {number} value */
-proto.Infovis.Response.prototype.setPressed = function(value) {
+proto.Infovis.Response.prototype.setDepressed = function(value) {
   jspb.Message.setProto3IntField(this, 10, value);
 };
 
 
 /**
- * optional fixed32 released = 11;
+ * optional fixed32 pressed = 11;
  * @return {number}
  */
-proto.Infovis.Response.prototype.getReleased = function() {
+proto.Infovis.Response.prototype.getPressed = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
 };
 
 
 /** @param {number} value */
-proto.Infovis.Response.prototype.setReleased = function(value) {
+proto.Infovis.Response.prototype.setPressed = function(value) {
   jspb.Message.setProto3IntField(this, 11, value);
 };
 
 
 /**
- * repeated double analog = 12;
+ * optional fixed32 released = 12;
+ * @return {number}
+ */
+proto.Infovis.Response.prototype.getReleased = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+};
+
+
+/** @param {number} value */
+proto.Infovis.Response.prototype.setReleased = function(value) {
+  jspb.Message.setProto3IntField(this, 12, value);
+};
+
+
+/**
+ * repeated double analog = 13;
  * @return {!Array<number>}
  */
 proto.Infovis.Response.prototype.getAnalogList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 12));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedFloatingPointField(this, 13));
 };
 
 
 /** @param {!Array<number>} value */
 proto.Infovis.Response.prototype.setAnalogList = function(value) {
-  jspb.Message.setField(this, 12, value || []);
+  jspb.Message.setField(this, 13, value || []);
 };
 
 
@@ -1847,7 +1894,7 @@ proto.Infovis.Response.prototype.setAnalogList = function(value) {
  * @param {number=} opt_index
  */
 proto.Infovis.Response.prototype.addAnalog = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 12, value, opt_index);
+  jspb.Message.addToRepeatedField(this, 13, value, opt_index);
 };
 
 

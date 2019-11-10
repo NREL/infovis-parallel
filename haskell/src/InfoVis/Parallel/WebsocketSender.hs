@@ -30,7 +30,7 @@ import Data.ByteString.Base64 (encode)
 import Data.Char (intToDigit)
 import Data.List.Split (chunksOf)
 import InfoVis (SeverityLog, withLogger)
-import InfoVis.Parallel.ProtoBuf (Response, analog, depressed, deselect, frameShown, hover, message, pressed, released, select, toolGet, unhover, viewGet)
+import InfoVis.Parallel.ProtoBuf (Response, analog, depressed, deselect, frameShown, hover, message, offsetGet, pressed, released, select, toolGet, unhover, viewGet)
 import Network.WebSockets (receiveData, runClient, sendBinaryData, sendTextData, sendClose)
 import Numeric (showIntAtBase)
 
@@ -86,6 +86,7 @@ sendBuffers host port path sendText buffers =
                 fullShow   "Deselect: "              $ x ^. deselect
                 justShow   "View: "                  $ x ^. viewGet
                 justShow   "Tool: "                  $ x ^. toolGet
+                justShow   "Offset: "                $ x ^. offsetGet
                 binaryShow "Depressed: "             $ x ^. depressed
                 binaryShow "Pressed:   "             $ x ^. pressed
                 binaryShow "Released:  "             $ x ^. released
