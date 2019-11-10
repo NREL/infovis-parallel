@@ -69,19 +69,53 @@ func (this *Interpreter) lookupRelay(label Label) (*Relay, bool) {
 }
 
 
+func (this *Interpreter) sourceExists(label Label) bool {
+  _, ok := this.sources[label]
+  if ok {
+    fmt.Printf("Source %s already exists.\n", label)
+    return false
+  }
+  return true
+}
+
+
+func (this *Interpreter) sinkExists(label Label) bool {
+  _, ok := this.sinks[label]
+  if ok {
+    fmt.Printf("Sink %s already exists.\n", label)
+    return false
+  }
+  return true
+}
+
+
+func (this *Interpreter) relayExists(label Label) bool {
+  _, ok := this.relays[label]
+  if ok {
+    fmt.Printf("Relay %s already exists.\n", label)
+    return false
+  }
+  return true
+}
+
+
 func (this *Interpreter) Repl() {
 
   var reader = bufio.NewReader(os.Stdin)
   var tokenizer = regexp.MustCompile(" +")
 
   for {
+
     fmt.Print("> ")
     line, _ := reader.ReadString('\n')
+
     line = strings.TrimSuffix(line, "\n")
     tokens := tokenizer.Split(line, -1)
+
     if !this.Interpret(tokens) {
       fmt.Printf("Illegal command '%s'.\n", tokens)
     }
+
   }
 }
 
@@ -155,17 +189,17 @@ func (this *Interpreter) Interpret(tokens []string) bool {
       }
 
     case "absorber":
-      if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) {
+      if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) && !this.sinkExists(tokens[1]) {
         this.sinks[tokens[1]] = NewAbsorber(tokens[1], this.verbose)
       }
 
     case "printer":
-      if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) {
+      if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) && !this.sinkExists(tokens[1]) {
         this.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], this.verbose)
       }
 
     case "files":
-      if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) {
+      if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && !this.sourceExists(tokens[1]) {
         this.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], this.verbose)
       }
 
@@ -181,7 +215,7 @@ func (this *Interpreter) Interpret(tokens []string) bool {
       }
 
     case "relay":
-      if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) {
+      if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && !this.relayExists(tokens[1]) {
         this.relays[tokens[1]] = NewRelay(tokens[1], this.verbose)
       }
 
@@ -238,7 +272,7 @@ func (this *Interpreter) Interpret(tokens []string) bool {
       }
 
     case "websocket":
-      if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) {
+      if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) && !this.sourceExists(tokens[1]) && !this.sinkExists(tokens[1]) {
         websocket := NewWebsocket(this.server, tokens[1], this.verbose)
         this.sources[tokens[1]] = websocket
         this.sinks[tokens[1]]   = websocket
