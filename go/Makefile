@@ -11,6 +11,9 @@ all: go-infovis
 go-infovis: $(SRCS)
 	GOPATH= go build -o $@ .
 
+setcap: go-infovis
+	sudo setcap 'cap_net_bind_service=+ep' $@
+
 lint: $(SRCS)
 	GOPATH= golint infovis/*.go
 	GOPATH= golint main.go
@@ -23,4 +26,4 @@ run: go-infovis
 
 .SUFFIXES:
 
-.PHONY: all clean lint run
+.PHONY: all clean lint run setcap
