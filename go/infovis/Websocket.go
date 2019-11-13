@@ -102,12 +102,12 @@ type Websocket struct {
 func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
 
   var socket = Websocket {
-    label  : label                  ,
-    in     : make(ProtobufChannel)  ,
-    out    : make(ProtobufChannel)  ,
-    exit   : false                  ,
-    verbose: verbose                ,
-    server : server                 ,
+    label  : label                ,
+    in     : make(ProtobufChannel),
+    out    : make(ProtobufChannel),
+    exit   : false                ,
+    verbose: verbose              ,
+    server : server               ,
   }
 
   server.mux.Lock()
