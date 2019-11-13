@@ -4,6 +4,7 @@ package infovis
 import (
   "io/ioutil"
   "log"
+  "path/filepath"
   "sync"
 )
 
@@ -24,13 +25,15 @@ type Files struct {
 
 func NewFiles(label Label, filenames []string, verbose bool) *Files {
 
+  filenames1 := unglob(filenames)
+
   var files = Files{
-    label    : label                 ,
-    channel  : make(ProtobufChannel) ,
-    filenames: filenames                 ,
-    index    : 0                     ,
-    exit     : false                 ,
-    wake     : make(chan struct{})   ,
+    label    : label                ,
+    channel  : make(ProtobufChannel),
+    filenames: filenames1           ,
+    index    : 0                    ,
+    exit     : false                ,
+    wake     : make(chan struct{})  ,
   }
 
   go func() {
@@ -72,8 +75,9 @@ func NewFiles(label Label, filenames []string, verbose bool) *Files {
 
 
 func (files *Files) Append(filenames []string) {
+  filenames1 := unglob(filenames)
   files.mux.Lock()
-  files.filenames = append(files.filenames, filenames...)
+  files.filenames = append(files.filenames, filenames1...)
   files.mux.Unlock()
   files.wake <- empty
 }
@@ -104,4 +108,18 @@ func (files *Files) Exit() {
 
 func (files *Files) Alive() bool {
   return !files.exit
+}
+
+
+func unglob(filenames []string) []string {
+  var result []string
+  for _, filename := range filenames {
+    matches, err := filepath.Glob(filename)
+    if err != nil {
+      log.Printf("Invalid glob pattern '%s': %v.", filename, err)
+      continue
+    }
+    result = append(result, matches...)
+  }
+  return result
 }
