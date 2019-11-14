@@ -1,10 +1,4 @@
 
-'use strict';
-
-
-require("../gl-matrix")
-
-
 const mat4 = glMatrix.mat4
 
 
@@ -52,7 +46,7 @@ void main(void) {
 }`
 
 
-function compileAndLink(gl, vertexShader, fragmentShader) {
+export function compileAndLink(gl, vertexShader, fragmentShader) {
 
   function makeShader(name, type, source) {
     const shader = gl.createShader(type)
@@ -74,7 +68,7 @@ function compileAndLink(gl, vertexShader, fragmentShader) {
 }
 
 
-function prepareShapeProgram(gl) {
+export function prepareShapeProgram(gl) {
   const program = compileAndLink(gl, vertexShaderSource, fragmentShaderSource)
   return {
     program              : program
@@ -94,13 +88,13 @@ function prepareShapeProgram(gl) {
 }
 
 
-function selectShapeProgram(gl, shapeProgram) {
+export function selectShapeProgram(gl, shapeProgram) {
   if (DEBUG) console.debug("selectShapeProgram")
   gl.useProgram(shapeProgram == null ? null : shapeProgram.program)
 }
 
 
-function setProjectionModelView(gl, shapeProgram, projection, modelView) {
+export function setProjectionModelView(gl, shapeProgram, projection, modelView) {
 
   const pmv = mat4.multiply(mat4.create(), projection, modelView)
 
@@ -114,31 +108,31 @@ function setProjectionModelView(gl, shapeProgram, projection, modelView) {
 }
 
 
-function bindMesh(gl, shapeProgram, bufferObject) {
+export function bindMesh(gl, shapeProgram, bufferObject) {
   if (DEBUG) console.debug("bindMesh: meshDescription =", shapeProgram.meshDescription)
   bindAttributes(gl, false, shapeProgram.meshLocation, shapeProgram.meshDescription, bufferObject)
 }
 
 
-function bindPositions(gl, shapeProgram, bufferObject) {
+export function bindPositions(gl, shapeProgram, bufferObject) {
   if (DEBUG) console.debug("bindPositions: meshDescription =", shapeProgram.positionsDescription)
   bindAttributes(gl, true, shapeProgram.positionsLocation, shapeProgram.positionsDescription, bufferObject)
 }
 
 
-function bindRotations(gl, shapeProgram, bufferObject) {
+export function bindRotations(gl, shapeProgram, bufferObject) {
   if (DEBUG) console.debug("bindRotations: meshDescription =", shapeProgram.rotationsDescription)
   bindAttributes(gl, true, shapeProgram.rotationsLocation, shapeProgram.rotationsDescription, bufferObject)
 }
 
 
-function bindScales(gl, shapeProgram, bufferObject) {
+export function bindScales(gl, shapeProgram, bufferObject) {
   if (DEBUG) console.debug("bindScales: meshDescription =", shapeProgram.scalesDescription)
   bindAttributes(gl, true, shapeProgram.scalesLocation, shapeProgram.scalesDescription, bufferObject)
 }
 
 
-function bindColors(gl, shapeProgram, bufferObject) {
+export function bindColors(gl, shapeProgram, bufferObject) {
   if (DEBUG) console.debug("bindColors: meshDescription =", shapeProgram.colorsDescription)
   bindAttributes(gl, true, shapeProgram.colorsLocation, shapeProgram.colorsDescription, bufferObject)
 }
@@ -165,7 +159,7 @@ function bindAttributes(gl, instanced, location, description, buffer) {
 }
 
 
-function unbindAttributes(gl, program) {
+export function unbindAttributes(gl, program) {
 
   gl.disableVertexAttribArray(program.meshLocation)
 
@@ -180,18 +174,4 @@ function unbindAttributes(gl, program) {
     gl.disableVertexAttribArray(location)
   })
 
-}
-
-
-module.exports = {
-  compileAndLink         : compileAndLink
-, prepareShapeProgram    : prepareShapeProgram
-, selectShapeProgram     : selectShapeProgram
-, setProjectionModelView : setProjectionModelView
-, bindMesh               : bindMesh
-, bindPositions          : bindPositions
-, bindRotations          : bindRotations
-, bindScales             : bindScales
-, bindColors             : bindColors
-, unbindAttributes       : unbindAttributes
 }

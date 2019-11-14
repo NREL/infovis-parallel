@@ -1,10 +1,5 @@
 
-'use strict'
-
-
-const Program = require("./program")
-
-require("../gl-matrix")
+import * as Program from "./program"
 
 
 const mat4 = glMatrix.mat4
@@ -14,7 +9,7 @@ const vec3 = glMatrix.vec3
 const DEBUG = false
 
 
-function makePixmap(
+export function makePixmap(
   text
 , textColor       = DEBUG ? "white" : "#FFFF0080" // CSS color
 , textHeight      = 75                            // px
@@ -78,7 +73,7 @@ void main(void) {
 let theShaders = null
 
 
-function ensureShaders(gl) {
+export function ensureShaders(gl) {
 
   if (theShaders != null)
     return
@@ -132,7 +127,7 @@ function ensureShaders(gl) {
 }
 
 
-function drawText(gl, imageData, points, size, perspective, modelView) {
+export function drawText(gl, imageData, points, size, perspective, modelView) {
 
     const pmv = mat4.multiply(mat4.create(), perspective, modelView)
 
@@ -197,11 +192,4 @@ function drawText(gl, imageData, points, size, perspective, modelView) {
 
     gl.useProgram(null)
 
-}
-
-
-module.exports = {
-  ensureShaders : ensureShaders
-, makePixmap    : makePixmap
-, drawText      : drawText
 }

@@ -1,8 +1,5 @@
 
-'use strict';
-
-
-const Transport = require("./transport")
+import * as Transport from "./transport"
 
 
 const DEBUG = false
@@ -11,7 +8,7 @@ const DEBUG = false
 let theConnection = null
 
 
-function updateButtons() {
+export function updateButtons() {
   uiConnector.style.visibility = theConnection == null ? "visible" : "hidden"
   uiVisualize.style.visibility = theConnection != null ? "visible" : "hidden"
 }
@@ -24,7 +21,7 @@ function disconnected(handler) {
 }
 
 
-function reconnect(configuration, handler, disconnector) {
+export function reconnect(configuration, handler, disconnector) {
   const url = configuration.server.address
   if (DEBUG) console.debug("reconnect: url =", url)
   theConnection = Transport.connect(
@@ -40,12 +37,12 @@ function reconnect(configuration, handler, disconnector) {
 }
 
 
-function send(buffer) {
+export function send(buffer) {
   Transport.send(theConnection, buffer)
 }
 
 
-function unconnect() {
+export function unconnect() {
   if (DEBUG) console.debug("unconnect")
   if (theConnection != null) {
     const oldConnection = theConnection
@@ -56,10 +53,6 @@ function unconnect() {
 }
 
 
-module.exports = {
-  current       : () => theConnection
-, reconnect     : reconnect
-, unconnect     : unconnect
-, send          : send
-, updateButtons : updateButtons
+export function current() {
+  return theConnection
 }

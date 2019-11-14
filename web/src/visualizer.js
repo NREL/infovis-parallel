@@ -1,18 +1,11 @@
 
-'use strict';
-
-const Keyboard = require("./keyboard")
-const Rendering = {
-  Frames     : require("./rendering/frames"    )
-, Linear     : require("./rendering/linear"    )
-, Program    : require("./rendering/program"   )
-, Projection : require("./rendering/projection")
-, Selector   : require("./rendering/selector"  )
-, Text       : require("./rendering/text"      )
-}
-
-
-require("./gl-matrix")
+import * as Frames     from "./rendering/frames"
+import * as Keyboard   from "./keyboard"
+import * as Linear     from "./rendering/linear"
+import * as Program    from "./rendering/program"
+import * as Projection from "./rendering/projection"
+import * as Selector   from "./rendering/selector"
+import * as Text       from "./rendering/text"
 
 
 const DEBUG = false
@@ -25,7 +18,7 @@ const vec3 = glMatrix.vec3
 const zero = vec3.fromValues(0, 0, 0)
 
 
-function setupCanvas(gl, useBlending = !DEBUG, useCulling = !DEBUG) {
+export function setupCanvas(gl, useBlending = !DEBUG, useCulling = !DEBUG) {
 
   if (DEBUG) console.debug("setupCanvas")
 
@@ -57,10 +50,10 @@ let theSelector = null
 
 function ensureManager(gl) {
   if (theManager == null)
-    theManager = Rendering.Frames.createManager(gl)
+    theManager = Frames.createManager(gl)
   if (theSelector == null)
-    theSelector = Rendering.Selector.create(gl, theManager.program)
-  Rendering.Frames.destroyManager(gl, theManager)
+    theSelector = Selector.create(gl, theManager.program)
+  Frames.destroyManager(gl, theManager)
 }
 
 
@@ -71,7 +64,7 @@ function initializeGraphics(gl, initialViewer, initialTool) {
   , selector : theSelector
   , pov      : initialViewer
   , tool     : initialTool
-  , offset   : {position: zero, rotation: Rendering.Linear.fromEulerd(zero)}
+  , offset   : {position: zero, rotation: Linear.fromEulerd(zero)}
   , message  : ""
   }
 }
@@ -104,17 +97,17 @@ function processRequest(gl, graphics, request) {
 
   if (request.getReset()) {
     if (DEBUG) console.debug("animate: reset")
-    Rendering.Frames.reset(graphics.manager)
+    Frames.reset(graphics.manager)
   }
 
   if (request.getUpsertList().length > 0) {
     if (DEBUG) console.debug("animate: upsert", request.getUpsertList().length)
-    Rendering.Frames.insert(gl, request.getUpsertList(), graphics.manager)
+    Frames.insert(gl, request.getUpsertList(), graphics.manager)
   }
 
   if (request.getDeleteList().length > 0) {
     if (DEBUG) console.debug("anamiate: delete", request.getDeleteList().length)
-    Rendering.Frames.delete(request.getDeleteList(), graphics.manager)
+    Frames.deletE(request.getDeleteList(), graphics.manager)
   }
 
   if (request.hasViewloc()) {
@@ -153,7 +146,7 @@ function processRequest(gl, graphics, request) {
 let isRunning = false
 
 
-function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
+export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
 
   isRunning = true
 
@@ -161,15 +154,15 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
     gl
   , {
       position: configuration.initial.view.position
-    , rotation: Rendering.Linear.fromEulerd(configuration.initial.view.orientation)
+    , rotation: Linear.fromEulerd(configuration.initial.view.orientation)
     }
   , {
       position: configuration.initial.tool.position
-    , rotation: Rendering.Linear.fromEulerd(configuration.initial.tool.orientation)
+    , rotation: Linear.fromEulerd(configuration.initial.tool.orientation)
     }
   )
 
-  Rendering.Text.ensureShaders(gl)
+  Text.ensureShaders(gl)
 
   function animation(timestamp) {
 
@@ -192,8 +185,8 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
 
       setupCanvas(gl)
 
-      Rendering.Frames.prepare(gl, graphics.manager)
-      Rendering.Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
+      Frames.prepare(gl, graphics.manager)
+      Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
 
       const eyes = configuration.display.stereo ? 2 : 1
       for (let eye = 0; eye < eyes; ++eye) {
@@ -215,11 +208,11 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
         , vec3.transformQuat(vec3.create(), eyeOffset, graphics.pov.rotation)
         )
 
-        graphics.manager.projection = Rendering.Projection.projection(configuration.display, eyePosition)
-        graphics.manager.modelView = Rendering.Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+        graphics.manager.projection = Projection.projection(configuration.display, eyePosition)
+        graphics.manager.modelView = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
 
-        Rendering.Frames.draw(gl, graphics.manager )
-        Rendering.Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
+        Frames.draw(gl, graphics.manager )
+        Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
 
       }
       for (let eye = 0; eye < 2; ++eye) {
@@ -251,8 +244,6 @@ function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
 }
 
 
-module.exports = {
-  setupCanvas      : setupCanvas
-, visualizeBuffers : visualizeBuffers
-, stop             : function() {isRunning = false}
+export function stop() {
+  isRunning = false
 }

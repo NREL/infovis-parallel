@@ -1,10 +1,7 @@
 
-'use strict';
-
-
-const Configuration = require("./configuration")
-const Connection    = require("./connection"   )
-const Visualizer    = require("./visualizer"   )
+import * as Configuration from "./configuration"
+import * as Connection    from "./connection"
+import * as Visualizer    from "./visualizer"
 
 
 const requestQueue = []
@@ -36,7 +33,7 @@ function keyHandler(event) {
 }
 
 
-function startup() {
+export function startup() {
 
   document.addEventListener("keydown", keyHandler)
 
@@ -54,7 +51,7 @@ function startup() {
 }
 
 
-function startVisualizing() {
+export function startVisualizing() {
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler, disconnectHandler)
   isVisualizing = true
@@ -62,22 +59,13 @@ function startVisualizing() {
 }
 
 
-function stopVisualizing() {
+export function stopVisualizing() {
   Connection.unconnect()
   Visualizer.stop()
   isVisualizing = false
 }
 
 
-function toggleHelp() {
+export function toggleHelp() {
   uiKeyboard.style.visibility = uiKeyboard.style.visibility == "visible" ? "hidden" : "visible"
-}
-
-
-module.exports = {
-  Configuration    : Configuration
-, startVisualizing : startVisualizing
-, startup          : startup
-, stopVisualizing  : stopVisualizing
-, toggleHelp       : toggleHelp
 }

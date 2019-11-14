@@ -1,8 +1,6 @@
 
-'use strict';
-
-
-require("./infovis.proto3_pb")
+require("./google-protobuf.js"  )
+require("./infovis.proto3_pb.js")
 
 
 const DEBUG = false
@@ -19,7 +17,7 @@ const statename = {
 }
 
 
-function connect(url, handler, closer) {
+export function connect(url, handler, closer) {
 
   const connection = new WebSocket(url)
 
@@ -51,7 +49,7 @@ function connect(url, handler, closer) {
 }
 
 
-function disconnect(connection) {
+export function disconnect(connection) {
   connection.close(1000, "normal termination")
   connection.onmessage = null
   connection.onclose   = null
@@ -59,18 +57,11 @@ function disconnect(connection) {
 }
 
 
-function send(connection, response) {
+export function send(connection, response) {
   if (DEBUG) {
     console.debug("WebSocket.send: response =", response)
   if (!noSending)
     window.theResponse = response
   }
   connection.send(response.serializeBinary())
-}
-
-
-module.exports = {
-  connect    : connect
-, disconnect : disconnect
-, send       : send
 }

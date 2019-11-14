@@ -1,10 +1,4 @@
 
-'use strict';
-
-
-require("../gl-matrix")
-
-
 const mat3 = glMatrix.mat4
 const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
@@ -25,7 +19,7 @@ const basis = [
 ]
 
 
-function rotationFromVectorPair(v1, v2) {
+export function rotationFromVectorPair(v1, v2) {
   const v1n = vec3.normalize(vec3.create(), v1)
   const v2n = vec3.normalize(vec3.create(), v2)
   const v12 = vec3.add(vec3.create(), v1n, v2n)
@@ -37,7 +31,7 @@ function rotationFromVectorPair(v1, v2) {
 }
 
 
-function orthogonal(v) {
+export function orthogonal(v) {
   let result = null
   basis.forEach(function(e) {
     const u = vec3.cross(vec3.create(), v, e)
@@ -48,13 +42,13 @@ function orthogonal(v) {
 }
 
 
-function projectPlane(v, u) {
+export function projectPlane(v, u) {
   const un = vec3.normalize(vec3.create(), u)
   return vec3.scaleAndAdd(vec3.create(), v, un, - vec3.dot(v, un))
 }
 
 
-function rotationFromVectorPairs(u0, v0, u2, v2) {
+export function rotationFromVectorPairs(u0, v0, u2, v2) {
   const q2 = rotationFromVectorPair(u0, u2)
   const v1 = vec3.transformQuat(vec3.create(), v2, quat.conjugate(quat.create(), q2))
   const v0p = vec3.normalize(vec3.create(), projectPlane(v0, u0))
@@ -64,7 +58,7 @@ function rotationFromVectorPairs(u0, v0, u2, v2) {
 }
 
 
-function rotationFromPlane(xAxis, yAxis, origin, xPoint, yPoint) {
+export function rotationFromPlane(xAxis, yAxis, origin, xPoint, yPoint) {
   return rotationFromVectorPairs(
     xAxis
   , yAxis
@@ -74,17 +68,17 @@ function rotationFromPlane(xAxis, yAxis, origin, xPoint, yPoint) {
 }
 
 
-function fromEulerd(v) {
+export function fromEulerd(v) {
   return quat.fromEuler(quat.create(), v[0], v[1], v[2])
 }
 
 
-function fromEuler(v) {
+export function fromEuler(v) {
   return fromEuler(vec3.scale(vec3.create(), v, 180 / Math.PI))
 }
 
 
-function toEuler(q) {
+export function toEuler(q) {
   const x = q[0]
   const y = q[1]
   const z = q[2]
@@ -96,35 +90,35 @@ function toEuler(q) {
 }
 
 
-function toEulerd(q) {
+export function toEulerd(q) {
   return vec3.scale(vec3.create(), toEuler(q), 180 / Math.PI)
 }
 
 
-function distanceToPoint(po, ps) {
+export function distanceToPoint(po, ps) {
   return vec3.distance(po, ps)
 }
 
 
-function distanceToSegment(po, pu, ps) {
+export function distanceToSegment(po, pu, ps) {
   const [abg, uvw] = boxCoordinates(po, pu, null, null, ps)
   return vec3.length(distanceOnSegment(uvw, abg))
 }
 
 
-function distanceToRectangle(po, pu, pv, ps) {
+export function distanceToRectangle(po, pu, pv, ps) {
   const [abg, uvw] = boxCoordinates(po, pu, pv, null, ps)
   return vec3.length(distanceOnSegment(uvw, abg))
 }
 
 
-function distanceToBox(po, pu, pv, pw, ps) {
+export function distanceToBox(po, pu, pv, pw, ps) {
   const [abg, uvw] = boxCoordinates(po, pu, pv, pw, ps)
   return vec3.length(distanceOnSegment(uvw, abg))
 }
 
 
-function distanceOnSegment(un, alpha) {
+export function distanceOnSegment(un, alpha) {
   if (alpha <= 0)
     return - alpha
   if (alpha >= un)
@@ -133,7 +127,7 @@ function distanceOnSegment(un, alpha) {
 }
 
 
-function boxCoordinates(po, pu, pv, pw, ps) {
+export function boxCoordinates(po, pu, pv, pw, ps) {
   const s = vec3.scaleAndAdd(vec3.create(), ps, po, -1)
   const u = vec3.scaleAndAdd(vec3.create(), pu, po, -1)
   let e = basis[0]
@@ -175,26 +169,6 @@ const toPoint = vec3.fromValues
 const toVector3 = vec3.fromValues
 
 
-function toQuaternion(w, x, y, z) {
+export function toQuaternion(w, x, y, z) {
   return quat.fromValues(x, y, z, w)
-}
-
-
-module.exports = {
-  orthogonal              : orthogonal
-, rotationFromVectorPair  : rotationFromVectorPair
-, projectPlane            : projectPlane
-, rotationFromVectorPairs : rotationFromVectorPairs
-, rotationFromPlane       : rotationFromPlane
-, fromEuler               : fromEuler
-, fromEulerd              : fromEulerd
-, toEuler                 : toEuler
-, toEulerd                : toEulerd
-, distanceToPoint         : distanceToPoint
-, distanceToSegment       : distanceToSegment
-, distanceToRectangle     : distanceToRectangle
-, distanceToBox           : distanceToBox
-, toPoint                 : toPoint
-, toVector3               : toVector3
-, toQuaternion            : toQuaternion
 }

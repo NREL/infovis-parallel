@@ -1,13 +1,6 @@
 
-"use strict";
-
-
-const Rendering = {
-  Frames : require("./rendering/frames")
-, Linear : require("./rendering/linear")
-}
-
-require("./gl-matrix")
+import * as Frames from "./rendering/frames"
+import * as Linear from "./rendering/linear"
 
 
 const quat = glMatrix.quat
@@ -50,7 +43,7 @@ const x = {
 }
 
 
-function interpret(y, graphics) {
+export function interpret(y, graphics) {
 
   const key   = y.key
   const shift = y.shift
@@ -68,7 +61,7 @@ function interpret(y, graphics) {
     deltaPosition = x.deltaToolPosition
   }
 
-  const frames = Rendering.Frames.listFrames(graphics.manager)
+  const frames = Frames.listFrames(graphics.manager)
   const minFrame = Math.min(...frames)
   const maxFrame = Math.max(...frames)
 
@@ -90,7 +83,7 @@ function interpret(y, graphics) {
   else if ((target != null) && (key in x.move)) {
     if (DEBUG) console.debug("interpret: target =", target)
     const oldRotation = target.rotation
-    const incrementalRotation = Rendering.Linear.fromEulerd(
+    const incrementalRotation = Linear.fromEulerd(
       vec3.scale(
         vec3.create()
       , x.move[key][1]
@@ -121,9 +114,4 @@ function interpret(y, graphics) {
     if (DEBUG) console.debug("interpret: target' =", target)
   }
 
-}
-
-
-module.exports = {
-  interpret: interpret
 }

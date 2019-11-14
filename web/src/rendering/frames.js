@@ -1,15 +1,10 @@
 
-'use strict';
-
-
-const Buffers  = require("./buffers" )
-const Geometry = require("./geometry")
-const Linear   = require("./linear"  )
-const Program  = require("./program" )
-const Shapes   = require("./shapes"  )
-const Text     = require("./text"    )
-
-require("../gl-matrix")
+import * as Buffers  from "./buffers"
+import * as Geometry from "./geometry"
+import * as Linear   from "./linear"
+import * as Program  from "./program"
+import      Shapes   from "./shapes"
+import * as Text     from "./text"
 
 
 const DEBUG = false
@@ -20,12 +15,12 @@ const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
 
-function listFrames(manager) {
+export function listFrames(manager) {
   return Array.from(manager.frames.keys())
 }
 
 
-function createManager(gl) {
+export function createManager(gl) {
   return {
     program    : Program.prepareShapeProgram(gl)
   , frames     : new Map()
@@ -36,18 +31,18 @@ function createManager(gl) {
 }
 
 
-function destroyManager(gl, manager) {
+export function destroyManager(gl, manager) {
   manager.frames.forEach((frame, _) => destroyFrame(gl, frame))
   manager.frames = new Map()
 }
 
 
-function reset(manager) {
+export function reset(manager) {
   manager.frames.forEach((frame, _) => resetFrame(frame))
 }
 
 
-function insert(gl, deltaGeometries, manager) {
+export function insert(gl, deltaGeometries, manager) {
   deltaGeometries.forEach((deltaGeometry) => insert1(gl, manager, deltaGeometry))
 }
 
@@ -62,17 +57,17 @@ function insert1(gl, manager, deltaGeometry) {
 }
 
 
-function delete0(identifiers, manager) {
+export function deletE(identifiers, manager) {
   manager.frames.forEach((frame, _) => deleteFrame(frame, identifiers))
 }
 
 
-function prepare(gl, manager) {
+export function prepare(gl, manager) {
   manager.frames.forEach((frame, f) => {if (DEBUG) console.debug("prepare: frame =", f); prepareFrame(gl, frame)})
 }
 
 
-function draw(gl, manager) {
+export function draw(gl, manager) {
   if (manager.frames.has(manager.current)) {
     if (DEBUG) console.debug("draw: frame =", manager.current)
     drawFrame(gl, manager.frames.get(manager.current), manager.projection, manager.modelView)
@@ -366,16 +361,4 @@ function updateDisplay(identifier, geometry, shapeBuffer) {
   Buffers.updateScales   (identifier, scales   , shapeBuffer)
   Buffers.updateColor    (identifier, color    , shapeBuffer)
 
-}
-
-
-module.exports = {
-  createManager  : createManager
-, destroyManager : destroyManager
-, listFrames     : listFrames
-, insert         : insert
-, delete         : delete0
-, reset          : reset
-, prepare        : prepare
-, draw           : draw
 }

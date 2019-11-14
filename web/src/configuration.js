@@ -1,7 +1,4 @@
 
-'use strict';
-
-
 const CONFIGURATION_KEY = "configuration"
 
 
@@ -128,13 +125,13 @@ function put() {
 }
 
 
-function store() {
+export function store() {
   get()
   localStorage.setItem(CONFIGURATION_KEY, JSON.stringify(theConfiguration))
 }
 
 
-function retrieve() {
+export function reset() {
   theConfiguration = localStorage.getItem(CONFIGURATION_KEY) == null ?
     defaultConfiguration()                                           :
     JSON.parse(localStorage.getItem(CONFIGURATION_KEY))
@@ -142,7 +139,7 @@ function retrieve() {
 }
 
 
-function load() {
+export function load() {
   const input = document.createElement("input")
   input.accept = "application/json"
   input.type = "file"
@@ -160,17 +157,23 @@ function load() {
 }
 
 
-function download() {
+export function download() {
   uiDownload.href = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(theConfiguration))
 }
 
 
-module.exports = {
-  current  : function() {       return theConfiguration}
-, update   : function() {get(); return theConfiguration}
-, compute  : function() {theConfiguration = defaultConfiguration(); put()}
-, reset    : retrieve
-, load     : load
-, save     : store
-, download : download
+export function current() {
+  return theConfiguration
+}
+
+
+export function update() {
+  get()
+  return theConfiguration
+}
+
+
+export function compute() {
+  theConfiguration = defaultConfiguration()
+  put()
 }

@@ -1,10 +1,4 @@
 
-'use strict';
-
-
-require("../gl-matrix")
-
-
 const vec3 = glMatrix.vec3
 
 
@@ -227,7 +221,7 @@ function fromQuads(vs) {
 }
 
 
-module.exports = {
+export default {
   box         : function(x, y, z   ) {return fromQuads(box      (x, y, z   ))}
 , cube        : function(d         ) {return fromQuads(cube     (d         ))}
 , tube        : function(l, d      ) {return fromQuads(tube     (l, d      ))}

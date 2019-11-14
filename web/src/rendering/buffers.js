@@ -1,10 +1,5 @@
 
-'use strict';
-
-
-const Program = require("./program")
-
-require("../gl-matrix")
+import * as Program from "./program"
 
 
 const DEBUG = false
@@ -43,12 +38,12 @@ const colorsLens = {
 }
 
 
-function hasIdentifier(shapeBuffer, identifier) {
+export function hasIdentifier(shapeBuffer, identifier) {
   return shapeBuffer.locationses.has(identifier)
 }
 
 
-function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
+export function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
   return {
     shapeProgram     : shapeProgram
   , primitiveMode    : primitiveMode
@@ -71,7 +66,7 @@ function createShapeBuffer(gl, shapeProgram, primitiveMode, primitives) {
 }
 
 
-function destroyShapeBuffer(gl, shapeBuffer) {
+export function destroyShapeBuffer(gl, shapeBuffer) {
   gl.deleteBuffer(shapeBuffer.mesh)
   if (shapeBuffer.size == 0)
     return
@@ -84,7 +79,7 @@ function destroyShapeBuffer(gl, shapeBuffer) {
 }
 
 
-function insertPositions(identifier, positions, shapeBuffer) {
+export function insertPositions(identifier, positions, shapeBuffer) {
   positions.map((position) => insertPosition(shapeBuffer, identifier, position))
 }
 
@@ -114,19 +109,19 @@ function insertPosition(shapeBuffer, identifier, vertex) {
 }
 
 
-function updatePositions(identifier, positions, shapeBuffer) {
+export function updatePositions(identifier, positions, shapeBuffer) {
   if (DEBUG) console.debug("updatePositions: identifier =", identifier, ", positions =", positions)
   updateAttributes(positionsLens, identifier, positions, shapeBuffer)
 }
 
 
-function updateRotations(identifier, rotations, shapeBuffer) {
+export function updateRotations(identifier, rotations, shapeBuffer) {
   if (DEBUG) console.debug("updateRotations: identifier =", identifier, ", rotations =", rotations)
   updateAttributes(rotationsLens, identifier, rotations, shapeBuffer)
 }
 
 
-function updateScales(identifier, scales, shapeBuffer) {
+export function updateScales(identifier, scales, shapeBuffer) {
   if (DEBUG) console.debug("updateScales: identifier =", identifier, ", scales =", scales)
   updateAttributes(scalesLens, identifier, scales, shapeBuffer)
 }
@@ -143,7 +138,7 @@ function updateAttributes(field, identifier, values, shapeBuffer) {
 }
 
 
-function updateColor(identifier, color, shapeBuffer) {
+export function updateColor(identifier, color, shapeBuffer) {
   if (DEBUG) console.debug("updateColor: identifier =", identifier, ", color =", color)
   updateAttribute(colorsLens, identifier, color, shapeBuffer)
 }
@@ -159,7 +154,7 @@ function updateAttribute(field, identifier, value, shapeBuffer) {
 }
 
 
-function deleteInstance(shapeBuffer, identifier) {
+export function deleteInstance(shapeBuffer, identifier) {
   if (shapeBuffer.locationses.has(identifier)) {
     const locations = shapeBuffer.locationses
     locations.forEach(function(location) {
@@ -171,7 +166,7 @@ function deleteInstance(shapeBuffer, identifier) {
 }
 
 
-function prepareShapeBuffer(gl, shapeBuffer) {
+export function prepareShapeBuffer(gl, shapeBuffer) {
 
   if (DEBUG) console.debug("prepareShapeBuffer")
 
@@ -244,7 +239,7 @@ function expandShapeBuffer(gl, shapeBuffer) {
 }
 
 
-function drawInstances(gl, shapeBuffer, projection, modelView) {
+export function drawInstances(gl, shapeBuffer, projection, modelView) {
 
   if (shapeBuffer.size == 0)
     return
@@ -348,19 +343,4 @@ function expandBuffer(gl, description, oldSize, newSize, oldBufferObject) {
 
   return newBufferObject
 
-}
-
-
-module.exports = {
-  createShapeBuffer  : createShapeBuffer
-, prepareShapeBuffer : prepareShapeBuffer
-, destroyShapeBuffer : destroyShapeBuffer
-, hasIdentifier      : hasIdentifier
-, insertPositions    : insertPositions
-, updatePositions    : updatePositions
-, updateRotations    : updateRotations
-, updateScales       : updateScales
-, updateColor        : updateColor
-, deleteInstance     : deleteInstance
-, drawInstances      : drawInstances
 }

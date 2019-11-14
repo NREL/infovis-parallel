@@ -1,15 +1,9 @@
 
-'use strict';
-
-
-require("../gl-matrix")
-
-
 const mat4 = glMatrix.mat4
 const vec3 = glMatrix.vec3
 
 
-function projectionKooimaOffAxis(display, eye) {
+export function projection(display, eye) {
 
   const near       = display.nearPlane
   const far        = display.farPlane
@@ -52,12 +46,6 @@ function projectionKooimaOffAxis(display, eye) {
 }
 
 
-function modelView(offsetPosition, offsetRotation) {
+export function modelView(offsetPosition, offsetRotation) {
   return mat4.fromRotationTranslation(mat4.create(), offsetRotation, offsetPosition)
-}
-
-
-module.exports = {
-  projection      : projectionKooimaOffAxis
-, modelView       : modelView
 }

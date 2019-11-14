@@ -1,21 +1,15 @@
 
-'use strict';
-
-
-require("../gl-matrix")
-
-
 const vec3 = glMatrix.vec3
 
 
-const GLYPH_Cube     = 0
-const GLYPH_Sphere   = 1
+export const GLYPH_Cube     = 0
+export const GLYPH_Sphere   = 1
 
-const GLYPH_Box      = 0
-const GLYPH_Cylinder = 1
+export const GLYPH_Box      = 0
+export const GLYPH_Cylinder = 1
 
 
-function defaultGeometry() {
+export function defaultGeometry() {
   return {
     shape: {
       points: []
@@ -35,35 +29,35 @@ const MASK_Text =  8
 const MASK_Glyp = 16
 
 
-function deltaPosition(deltaGeometry) {
+export function deltaPosition(deltaGeometry) {
   return (deltaGeometry.getMask() & MASK_Posn) != 0
 }
 
-function deltaSize(deltaGeometry) {
+export function deltaSize(deltaGeometry) {
   return (deltaGeometry.getMask() & MASK_Size) != 0
 }
 
-function deltaColor(deltaGeometry) {
+export function deltaColor(deltaGeometry) {
   return (deltaGeometry.getMask() & MASK_Colr) != 0
 }
 
-function deltaText(deltaGeometry) {
+export function deltaText(deltaGeometry) {
   return (deltaGeometry.getMask() & MASK_Text) != 0
 }
 
-function deltaGlyph(deltaGeometry) {
+export function deltaGlyph(deltaGeometry) {
   return (deltaGeometry.getMask() & MASK_Glyp) != 0
 }
 
 
-const GEOMETRY_Points     = 1
-const GEOMETRY_Polylines  = 2
-const GEOMETRY_Rectangles = 3
-const GEOMETRY_Label      = 4
-const GEOMETRY_Axis       = 5
+export const GEOMETRY_Points     = 1
+export const GEOMETRY_Polylines  = 2
+export const GEOMETRY_Rectangles = 3
+export const GEOMETRY_Label      = 4
+export const GEOMETRY_Axis       = 5
 
 
-function merge(geometry, deltaGeometry) {
+export function merge(geometry, deltaGeometry) {
 
   const mask = deltaGeometry.getMask()
 
@@ -168,29 +162,26 @@ function merge(geometry, deltaGeometry) {
 }
 
 
-module.exports = {
+export function hasAxis(geometry) {
+  return "axis" in geometry.shape
+}
 
-  GEOMETRY_Points     : GEOMETRY_Points
-, GEOMETRY_Polylines  : GEOMETRY_Polylines
-, GEOMETRY_Rectangles : GEOMETRY_Rectangles
-, GEOMETRY_Label      : GEOMETRY_Label
-, GEOMETRY_Axis       : GEOMETRY_Axis
 
-, GLYPH_Cube          : GLYPH_Cube
-, GLYPH_Sphere        : GLYPH_Sphere
-, GLYPH_Box           : GLYPH_Box
-, GLYPH_Cylinder      : GLYPH_Cylinder
+export function hasLabel(geometry) {
+  return "label" in geometry.shape
+}
 
-, defaultGeometry     : defaultGeometry
-, deltaColor          : deltaColor
-, deltaGlyph          : deltaGlyph
-, deltaPosition       : deltaPosition
-, deltaSize           : deltaSize
-, deltaText           : deltaText
-, hasAxis             : (geometry) => "axis"       in geometry.shape
-, hasLabel            : (geometry) => "label"      in geometry.shape
-, hasPoints           : (geometry) => "points"     in geometry.shape
-, hasPolylines        : (geometry) => "polylines"  in geometry.shape
-, hasRectangles       : (geometry) => "rectangles" in geometry.shape
-, merge               : merge
+
+export function hasPoints(geometry) {
+  return "points" in geometry.shape
+}
+
+
+export function hasPolylines(geometry) {
+  return "polylines" in geometry.shape
+}
+
+
+export function hasRectangles(geometry) {
+  return "rectangles" in geometry.shape
 }

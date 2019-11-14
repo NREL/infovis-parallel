@@ -1,11 +1,6 @@
 
-'use strict';
-
-
-const Buffers  = require("./buffers"   )
-const Shapes   = require("./shapes"    )
-
-require("../gl-matrix")
+import * as Buffers from "./buffers"
+import      Shapes  from "./shapes"
 
 
 const quat = glMatrix.quat
@@ -15,7 +10,7 @@ const vec3 = glMatrix.vec3
 const DEBUG = false
 
 
-function createSelector(gl, shapeProgram) {
+export function create(gl, shapeProgram) {
   if (DEBUG) console.debug("createSelector")
   const shapeBuffer = Buffers.createShapeBuffer(gl, shapeProgram, gl.TRIANGLES, Shapes.cone(1, 1))
   Buffers.insertPositions(1, [vec3.fromValues(0, 0, 0)         ], shapeBuffer)
@@ -26,7 +21,7 @@ function createSelector(gl, shapeProgram) {
 }
 
 
-function prepareSelector(gl, shapeBuffer, position, rotation) {
+export function prepare(gl, shapeBuffer, position, rotation) {
   if (DEBUG) console.debug("prepareSelector: position =", position, ", rotation =", rotation)
   Buffers.updatePositions(1, [position], shapeBuffer)
   Buffers.updateRotations(1, [rotation], shapeBuffer)
@@ -34,14 +29,7 @@ function prepareSelector(gl, shapeBuffer, position, rotation) {
 }
 
 
-function drawSelector(gl, shapeBuffer, projection, modelView) {
+export function draw(gl, shapeBuffer, projection, modelView) {
   if (DEBUG) console.debug("drawSelector")
   Buffers.drawInstances(gl, shapeBuffer, projection, modelView)
-}
-
-
-module.exports = {
-  create  : createSelector
-, prepare : prepareSelector
-, draw    : drawSelector
 }
