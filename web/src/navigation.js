@@ -21,9 +21,9 @@ const x = {
 , setFrames              : {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
 , offset                 : {shift: false}
 , tool                   : {shift: true }
-, deltaOffsetPosition    : 0.0080
-, deltaToolPosition      : 0.0040
-, deltaRotation          : 0.4000
+, deltaOffsetPosition    : 0.0050
+, deltaToolPosition      : 0.0050
+, deltaRotation          : 0.2500
 , move                   : {
                              ArrowRight: [vec3.fromValues( 1,  0,  0), vec3.fromValues( 0,  0,  0)]
                            , ArrowLeft : [vec3.fromValues(-1,  0,  0), vec3.fromValues( 0,  0,  0)]
@@ -168,7 +168,7 @@ export function interpretGamepad(graphics) {
     dirty = true
   }
 
-  const retardation = 0.50
+  const retardation = 0.75
   const scalePosition = retardation * (toolMode ? x.deltaToolPosition : x.deltaOffsetPosition)
   const scaleRotation = retardation * x.deltaRotation
 
