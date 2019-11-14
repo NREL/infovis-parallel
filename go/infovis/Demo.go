@@ -12,9 +12,9 @@ import (
 func Demo(address string, path string, globs []string) {
 
   var upgrader = websocket.Upgrader{
-    ReadBufferSize : 16384                                   ,
-    WriteBufferSize: 16384                                   ,
-    CheckOrigin    : func(r *http.Request) bool {return true},
+    ReadBufferSize : 16384                                         ,
+    WriteBufferSize: 16384                                         ,
+    CheckOrigin    : func(request *http.Request) bool {return true},
   }
 
   var handler = func(responseWriter http.ResponseWriter, request *http.Request) {

@@ -180,10 +180,6 @@ func (socket *Websocket) Out() *ProtobufChannel {
 }
 
 
-func (socket *Websocket) Append(arguments []string) {
-}
-
-
 func (socket *Websocket) Reset() {
 }
 

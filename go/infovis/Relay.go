@@ -63,9 +63,13 @@ func InvertFilters(filters *[]Filter) (inversion []Filter) {
 
 func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
 
+  if len(exclusions) == 0 {
+    return buffer, true
+  }
+
   request := Request{}
   if err := proto.Unmarshal(*buffer, &request); err != nil {
-    log.Printf("Filter %s failed to unmarshal buffer: %v.\n", err)
+    log.Printf("Filter failed to unmarshal buffer: %v.\n", err)
     return buffer, false
   }
 

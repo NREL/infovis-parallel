@@ -337,7 +337,11 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       }
 
     case "kafka":
-      fmt.Println("The 'kafka' command is not yet implemented.")
+      if checkArguments(tokens, "The 'kafka' command must have an address, whether to start at the earliest offset, and a topic.", 4, true) && interpreter.assertNoSource(tokens[3]) && interpreter.assertNoSink(tokens[3]) {
+        kafka := NewKafka(tokens[3], tokens[1], tokens[2] == "true", interpreter.verbose)
+        interpreter.sources[tokens[3]] = kafka
+        interpreter.sinks[tokens[3]]   = kafka
+      }
 
     case "script":
       for _, file := range tokens[1:] {
@@ -391,6 +395,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       fmt.Println("remove-sink 'relay' [sink]...")
       fmt.Println("serve 'address' 'path'")
       fmt.Println("websocket 'path'")
+      fmt.Println("kafka 'address' [true|false] 'topic'")
       fmt.Println("script [file]...")
       fmt.Println("wait 'seconds'")
       fmt.Println("exit")
