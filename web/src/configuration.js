@@ -125,7 +125,7 @@ function put() {
 }
 
 
-export function store() {
+export function save() {
   get()
   localStorage.setItem(CONFIGURATION_KEY, JSON.stringify(theConfiguration))
 }

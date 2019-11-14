@@ -4,6 +4,21 @@ import * as Connection    from "./connection"
 import * as Visualizer    from "./visualizer"
 
 
+export function load() {
+  Configuration.load()
+}
+
+
+export function save() {
+  Configuration.save()
+}
+
+
+export function reset() {
+  Configuration.reset()
+}
+
+
 const requestQueue = []
 
 const keyQueue = []
