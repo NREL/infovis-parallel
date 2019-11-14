@@ -126,19 +126,18 @@ export function interpretGamepad(graphics) {
   const now = Date.now()
   const vetoPeriod = 300
   const vetoButtons = now - lastButton <= vetoPeriod
+
+  const startPeriod = 3000
+  if (!started) {
+    if (now - lastButton > startPeriod)
+      started = true
+    else
+      return false
+  }
     
   const frames = Frames.listFrames(graphics.manager)
   const minFrame = Math.min(...frames)
   const maxFrame = Math.max(...frames)
-
-  if (!started) {
-    if (gamepad.buttons[11].pressed) {// start button
-      lastButton = now
-      started = true
-      return true
-    } else
-      return false
-  }
 
   let dirty = false
 
