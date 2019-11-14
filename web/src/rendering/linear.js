@@ -163,12 +163,6 @@ export function boxCoordinates(po, pu, pv, pw, ps) {
 }
 
 
-const toPoint = vec3.fromValues
-
-
-const toVector3 = vec3.fromValues
-
-
 export function toQuaternion(w, x, y, z) {
   return quat.fromValues(x, y, z, w)
 }

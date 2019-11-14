@@ -2,7 +2,6 @@
 import * as Frames     from "./rendering/frames"
 import * as Navigation from "./navigation"
 import * as Linear     from "./rendering/linear"
-import * as Program    from "./rendering/program"
 import * as Projection from "./rendering/projection"
 import * as Selector   from "./rendering/selector"
 import * as Text       from "./rendering/text"
