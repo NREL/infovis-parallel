@@ -212,8 +212,8 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
         graphics.manager.projection = Projection.projection(configuration.display, eyePosition)
         graphics.manager.modelView = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
 
-        Frames.draw(gl, graphics.manager )
         Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
+        Frames.draw(gl, graphics.manager )
 
       }
       for (let eye = 0; eye < 2; ++eye) {
