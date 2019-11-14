@@ -21,9 +21,9 @@ const x = {
 , setFrames              : {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
 , offset                 : {shift: false}
 , tool                   : {shift: true }
-, deltaOffsetPosition    : 0.0100
-, deltaToolPosition      : 0.0050
-, deltaRotation          : 0.5000
+, deltaOffsetPosition    : 0.0080
+, deltaToolPosition      : 0.0040
+, deltaRotation          : 0.4000
 , move                   : {
                              ArrowRight: [vec3.fromValues( 1,  0,  0), vec3.fromValues( 0,  0,  0)]
                            , ArrowLeft : [vec3.fromValues(-1,  0,  0), vec3.fromValues( 0,  0,  0)]
@@ -142,13 +142,13 @@ export function interpretGamepad(graphics) {
 
   let dirty = false
 
-  if (!vetoButtons && gamepad.buttons[7].pressed) { // right sholder button
+  if (!vetoButtons && gamepad.buttons[7].pressed) { // right (R1) shoulder button
     graphics.manager.current = Math.min(graphics.manager.current + 1, maxFrame)
     lastButton = now
     dirty = true
   }
 
-  if (!vetoButtons && gamepad.buttons[6].pressed) { // left shoulder button
+  if (!vetoButtons && gamepad.buttons[6].pressed) { // left (L1) shoulder button
     graphics.manager.current = Math.max(graphics.manager.current - 1, minFrame)
     lastButton = now
     dirty = true
@@ -168,7 +168,7 @@ export function interpretGamepad(graphics) {
     dirty = true
   }
 
-  const retardation = 0.35
+  const retardation = 0.50
   const scalePosition = retardation * (toolMode ? x.deltaToolPosition : x.deltaOffsetPosition)
   const scaleRotation = retardation * x.deltaRotation
 
