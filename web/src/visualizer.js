@@ -1,6 +1,6 @@
 
 import * as Frames     from "./rendering/frames"
-import * as Keyboard   from "./keyboard"
+import * as Navigation from "./navigation"
 import * as Linear     from "./rendering/linear"
 import * as Program    from "./rendering/program"
 import * as Projection from "./rendering/projection"
@@ -175,8 +175,10 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     const dirtyRequest  = requestQueue.length > 0
     let   dirtyResponse = keyQueue.length > 0
 
+    dirtyResponse |= Navigation.interpretGamepad(graphics)
+
     while (keyQueue.length > 0)
-      Keyboard.interpret(keyQueue.pop(), graphics)
+      Navigation.interpretKeyboard(keyQueue.pop(), graphics)
 
     while (requestQueue.length > 0)
       dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
