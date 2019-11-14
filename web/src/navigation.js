@@ -188,7 +188,7 @@ export function interpretGamepad(graphics) {
 
   updatePositionRotation(
     toolMode ? graphics.tool : graphics.offset
-  , deltaPosition
+  , deltaPosition //toolMode ? vec3.transformQuat(vec3.create(), deltaPosition, graphics.tool.rotation) : deltaPosition
   , deltaRotation
   )
 
@@ -204,10 +204,10 @@ function updatePositionRotation(target, deltaPosition, deltaRotation) {
   const oldRotation = target.rotation
   const incrementalRotation = Linear.fromEulerd(deltaRotation)
 
-  const newRotation = quat.multiply(
+  let newRotation = quat.multiply(
     quat.create()
-  , oldRotation
   , incrementalRotation
+  , oldRotation
   )
 
   target.position = vec3.add(
