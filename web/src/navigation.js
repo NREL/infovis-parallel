@@ -12,8 +12,6 @@ const DEBUG = false
 
 const zero = vec3.fromValues(0, 0, 0)
 
-const noRotation = quat.fromValues(0, 0, 0, 1)
-
 const center = vec3.fromValues(0.5, 0.5, 0.5)
 
 
@@ -34,11 +32,17 @@ const x = {
                            , PageUp    : [vec3.fromValues( 0,  1,  0), vec3.fromValues( 0,  0,  0)]
                            , PageDown  : [vec3.fromValues( 0, -1,  0), vec3.fromValues( 0,  0,  0)]
                            , k         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 1,  0,  0)]
+                           , K         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 1,  0,  0)]
                            , j         : [vec3.fromValues( 0,  0,  0), vec3.fromValues(-1,  0,  0)] 
+                           , J         : [vec3.fromValues( 0,  0,  0), vec3.fromValues(-1,  0,  0)] 
                            , u         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0,  1,  0)]
+                           , U         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0,  1,  0)]
                            , n         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0, -1,  0)]
+                           , N         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0, -1,  0)]
                            , h         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0,  0,  1)]
+                           , H         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0,  0,  1)]
                            , l         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0,  0, -1)]
+                           , L         : [vec3.fromValues( 0,  0,  0), vec3.fromValues( 0,  0, -1)]
                            }
 , resetOffset            : '.'
 , resetTool              : ','
@@ -85,12 +89,19 @@ export function interpretKeyboard(y, graphics) {
     graphics.tool = {...x.initialTool}
 
   else if ((target != null) && (key in x.move)) {
-    updatePositionRotation(
-      target
-    , vec3.scale(vec3.create(), x.move[key][0], deltaPosition)
-    , vec3.scale(vec3.create(), x.move[key][1], deltaRotation)
-    , target == graphics.tool ? graphics.offset.rotation : noRotation
-    )
+    if (target == graphics.tool)
+      updateTool(
+        target
+      , vec3.scale(vec3.create(), x.move[key][0], deltaPosition)
+      , vec3.scale(vec3.create(), x.move[key][1], deltaRotation)
+      , graphics.offset.rotation
+      )
+    else
+      updateOffset(
+        target
+      , vec3.scale(vec3.create(), x.move[key][0], deltaPosition)
+      , vec3.scale(vec3.create(), x.move[key][1], deltaRotation)
+      )
   }
 
 }
@@ -189,21 +200,28 @@ export function interpretGamepad(graphics) {
   if (vec3.equals(deltaPosition, zero) && vec3.equals(deltaRotation, zero))
     return dirty
 
-  updatePositionRotation(
-    toolMode ? graphics.tool : graphics.offset
-  , deltaPosition
-  , deltaRotation
-  , toolMode ? graphics.offset.rotation : noRotation
-  )
+  if (toolMode)
+    updateTool(
+      graphics.tool
+    , deltaPosition
+    , deltaRotation
+    , graphics.offset.rotation
+    )
+  else
+    updateOffset(
+      graphics.offset
+    , deltaPosition
+    , deltaRotation
+    )
 
   return true
 
 }
 
 
-function updatePositionRotation(target, deltaPosition, deltaRotation, extraRotation) {
+function updateOffset(target, deltaPosition, deltaRotation) {
 
-  if (DEBUG) console.debug("interpret: target =", target)
+  if (DEBUG) console.debug("updateOffset: target =", target)
 
   const oldRotation = target.rotation
   const incrementalRotation = Linear.fromEulerd(deltaRotation)
@@ -219,14 +237,7 @@ function updatePositionRotation(target, deltaPosition, deltaRotation, extraRotat
   , vec3.add(
       vec3.create()
     , target.position
-    , vec3.transformQuat(
-        vec3.create()
-      , deltaPosition
-      , quat.invert(
-          quat.create()
-        , extraRotation
-        )
-      )
+    , deltaPosition
     )
   , vec3.scaleAndAdd(
       vec3.create()
@@ -238,6 +249,50 @@ function updatePositionRotation(target, deltaPosition, deltaRotation, extraRotat
 
   target.rotation = newRotation
 
-  if (DEBUG) console.debug("interpret: target' =", target)
+  if (DEBUG) console.debug("updateOffset: target' =", target)
+
+}
+
+
+function updateTool(target, deltaPosition, deltaRotation, extraRotation) {
+
+  if (DEBUG) console.debug("updateTool: target =", target)
+
+  const oldRotation = target.rotation
+  const incrementalRotation = Linear.fromEulerd(deltaRotation)
+
+  let newRotation = quat.multiply(
+    quat.create()
+  , quat.multiply(
+      quat.create()
+    , quat.multiply(
+        quat.create()
+      , quat.invert(
+          quat.create()
+        , extraRotation
+        )
+      , incrementalRotation
+      )
+    , extraRotation
+    )
+  , oldRotation
+  )
+
+  target.position = vec3.add(
+    vec3.create()
+  , target.position
+  , vec3.transformQuat(
+      vec3.create()
+    , deltaPosition
+    , quat.invert(
+        quat.create()
+      , extraRotation
+      )
+    )
+  )
+
+  target.rotation = newRotation
+
+  if (DEBUG) console.debug("updateTool: target' =", target)
 
 }
