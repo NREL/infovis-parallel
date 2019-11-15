@@ -21,9 +21,9 @@ const x = {
 , setFrames              : {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
 , offset                 : {shift: false}
 , tool                   : {shift: true }
-, deltaOffsetPosition    : 0.0050
-, deltaToolPosition      : 0.0050
-, deltaRotation          : 0.2500
+, deltaOffsetPosition    : 0.0075
+, deltaToolPosition      : 0.0075
+, deltaRotation          : 0.5000
 , move                   : {
                              ArrowRight: [vec3.fromValues( 1,  0,  0), vec3.fromValues( 0,  0,  0)]
                            , ArrowLeft : [vec3.fromValues(-1,  0,  0), vec3.fromValues( 0,  0,  0)]
