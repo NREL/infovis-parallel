@@ -12,6 +12,8 @@ const DEBUG = false
 
 const zero = vec3.fromValues(0, 0, 0)
 
+const noRotation = quat.fromValues(0, 0, 0, 1)
+
 const center = vec3.fromValues(0.5, 0.5, 0.5)
 
 
@@ -87,6 +89,7 @@ export function interpretKeyboard(y, graphics) {
       target
     , vec3.scale(vec3.create(), x.move[key][0], deltaPosition)
     , vec3.scale(vec3.create(), x.move[key][1], deltaRotation)
+    , target == graphics.tool ? graphics.offset.rotation : noRotation
     )
   }
 
@@ -188,8 +191,9 @@ export function interpretGamepad(graphics) {
 
   updatePositionRotation(
     toolMode ? graphics.tool : graphics.offset
-  , deltaPosition //toolMode ? vec3.transformQuat(vec3.create(), deltaPosition, graphics.tool.rotation) : deltaPosition
+  , deltaPosition
   , deltaRotation
+  , toolMode ? graphics.offset.rotation : noRotation
   )
 
   return true
@@ -197,7 +201,7 @@ export function interpretGamepad(graphics) {
 }
 
 
-function updatePositionRotation(target, deltaPosition, deltaRotation) {
+function updatePositionRotation(target, deltaPosition, deltaRotation, extraRotation) {
 
   if (DEBUG) console.debug("interpret: target =", target)
 
@@ -215,7 +219,14 @@ function updatePositionRotation(target, deltaPosition, deltaRotation) {
   , vec3.add(
       vec3.create()
     , target.position
-    , deltaPosition
+    , vec3.transformQuat(
+        vec3.create()
+      , deltaPosition
+      , quat.invert(
+          quat.create()
+        , extraRotation
+        )
+      )
     )
   , vec3.scaleAndAdd(
       vec3.create()
