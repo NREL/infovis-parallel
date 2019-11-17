@@ -65,6 +65,7 @@
   , "WebVRPolyfill"     : "readonly"
 
   , "uiAddress"         : "readonly"
+  , "uiBody"            : "readonly"
   , "uiCanvas"          : "readonly"
   , "uiConnector"       : "readonly"
   , "uiDownload"        : "readonly"

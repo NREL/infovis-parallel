@@ -9,6 +9,7 @@ let theConnection = null
 
 
 export function updateButtons() {
+  uiBody.style.overflow        = theConnection == null ? "visible" : "hidden"
   uiConnector.style.visibility = theConnection == null ? "visible" : "hidden"
   uiVisualize.style.visibility = theConnection != null ? "visible" : "hidden"
 }
