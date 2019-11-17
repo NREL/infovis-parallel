@@ -127,7 +127,7 @@ export function ensureShaders(gl) {
 }
 
 
-export function drawText(gl, imageData, points, size, perspective, modelView) {
+export function drawText(gl, imageData, points, size, perspective, modelView, centered = false) {
 
     const pmv = mat4.multiply(mat4.create(), perspective, modelView)
 
@@ -143,6 +143,14 @@ export function drawText(gl, imageData, points, size, perspective, modelView) {
     const h1 = vec3.add(vec3.create(), o, oh)
     const v1 = vec3.add(vec3.create(), o, ov)
     const c  = vec3.add(vec3.create(), o, vec3.add(vec3.create(), oh, ov))
+
+    if (centered) {
+      const delta = vec3.scale(vec3.create(), vec3.add(vec3.create(), oh, ov), -0.5)
+      vec3.add(o , o , delta)
+      vec3.add(h1, h1, delta)
+      vec3.add(v1, v1, delta)
+      vec3.add(c , c , delta)
+    }
 
     const corners = [
        o[0],  o[1],  o[2]

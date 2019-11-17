@@ -141,7 +141,7 @@ function processRequest(gl, graphics, request) {
 
   if (request.getMessage() != "") {
     graphics.message.text = request.getMessage()
-    graphics.message.image = Text.makePixmap(graphics.message.text, "white")
+    graphics.message.image = Text.makePixmap(graphics.message.text, "white", 150)
     if (DEBUG) console.debug("processRequest: message = '", graphics.message.text, "'")
   }
 
@@ -264,14 +264,11 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
         Text.drawText(
           gl
         , graphics.message.image
-        , [
-            vec3.fromValues(-0.9, -0.9, 0)
-          , vec3.fromValues( 1.0, -0.9, 0)
-          , vec3.fromValues(-0.9,  0.0, 0)
-          ]
+        , [vec3.fromValues(0, 0, 0), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0)]
         , 0.075
         , mat4.create()
         , mat4.create()
+        , true
         )
 
         Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)

@@ -51,16 +51,6 @@ a:active {
   width      : 100%
 }
 
-#uiMessage0, #uiMessage1 {
-  position   : absolute
-; width      : 100%
-; text-align : center
-; color      : white
-; font-family: monospace
-; font-weight: bold
-; font-size  : large
-}
-
 #uiKeyboard {
   position        : absolute
 ; left            : 0px
