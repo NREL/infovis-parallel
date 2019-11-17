@@ -15,6 +15,12 @@ const mat4 = glMatrix.mat4
 const vec3 = glMatrix.vec3
 
 
+new WebVRPolyfill()
+
+
+const usePOV = false
+
+
 const zero = vec3.fromValues(0, 0, 0)
 
 
@@ -158,8 +164,6 @@ export function setupVR(action) {
 let isRunning = false
 
 
-let ONCE = true
-
 export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond, useVR) {
 
   if (vrDisplay != null) {
@@ -220,8 +224,11 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
           vrDisplay.getFrameData(frameData)
 
           graphics.manager.projection = eye == 0 ? frameData.leftProjectionMatrix : frameData.rightProjectionMatrix
-
-          const view                  = eye == 0 ? frameData.leftViewMatrix       : frameData.rightViewMatrix
+          const view = mat4.multiply(
+            mat4.create()
+          , eye == 0 ? frameData.leftViewMatrix : frameData.rightViewMatrix
+          , usePOV ? Projection.modelView(graphics.pov.position, graphics.pov.rotation) : mat4.create()
+          )
           const model = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
           graphics.manager.modelView = mat4.multiply(mat4.create(), model, view)
 

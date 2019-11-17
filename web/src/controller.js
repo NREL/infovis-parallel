@@ -4,9 +4,6 @@ import * as Connection    from "./connection"
 import * as Visualizer    from "./visualizer"
 
 
-const polyfill = new WebVRPolyfill()
-
-
 export function load() {
   Configuration.load()
 }
