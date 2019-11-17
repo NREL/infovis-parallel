@@ -261,15 +261,16 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
         }
 
-        Text.drawText(
-          gl
-        , graphics.message.image
-        , [vec3.fromValues(0, 0, 0), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0)]
-        , 0.075
-        , mat4.create()
-        , mat4.create()
-        , true
-        )
+        if (!(new RegExp("^ *$")).test(graphics.message.text))
+          Text.drawText(
+            gl
+          , graphics.message.image
+          , [vec3.fromValues(0, 0, 0), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0)]
+          , 0.075
+          , mat4.create()
+          , mat4.create()
+          , true
+          )
 
         Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
         Frames.draw(gl, graphics.manager )
