@@ -166,7 +166,7 @@ let isRunning = false
 
 export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
 
-  const useVR = uiVR.checked
+  const useVR = configuration.display.mode == "webvr"
 
   if (vrDisplay != null) {
     vrDisplay.depthNear = configuration.display.nearPlane
@@ -215,7 +215,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       Frames.prepare(gl, graphics.manager)
       Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
 
-      const eyes = useVR || configuration.display.stereo ? 2 : 1
+      const eyes = useVR || configuration.display.mode == "stereo" ? 2 : 1
       for (let eye = 0; eye < eyes; ++eye) {
 
         gl.viewport((eyes - 1) * eye * gl.canvas.width / 2, 0, gl.canvas.width / eyes, gl.canvas.height)

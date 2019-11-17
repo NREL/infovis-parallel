@@ -185,7 +185,7 @@ export function compute() {
 
 export function updatePanel() {
 
-  if (uiVR.disabled) {
+  if (uiVR.disabled && uiVR.checked) {
     uiMono.checked   = true
     uiStereo.checked = false
     uiVR.checked     = false
