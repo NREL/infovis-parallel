@@ -95,8 +95,7 @@ export function startVisualizing() {
     configuration  ,
     requestQueue   ,
     keyQueue       ,
-    Connection.send,
-    uiVR.checked
+    Connection.send
   )
 }
 

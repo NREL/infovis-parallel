@@ -164,7 +164,9 @@ export function setupVR(action) {
 let isRunning = false
 
 
-export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond, useVR) {
+export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
+
+  const useVR = uiVR.checked
 
   if (vrDisplay != null) {
     vrDisplay.depthNear = configuration.display.nearPlane
@@ -206,7 +208,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     while (requestQueue.length > 0)
       dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
 
-    if (dirtyRequest || dirtyResponse) {
+    if (useVR || dirtyRequest || dirtyResponse) {
 
       setupCanvas(gl)
 

@@ -136,7 +136,7 @@ export function interpretGamepad(graphics) {
 
   const gamepads = navigator.getGamepads()
   if (gamepad == null || gamepads.length <= gamepad.index || gamepads[gamepad.index].id != gamepad.id)
-    return true
+    return false
   gamepad = gamepads[gamepad.index]
 
   const now = Date.now()
