@@ -157,24 +157,24 @@ export function interpretGamepad(graphics) {
 
   let dirty = false
 
-  if (!vetoButtons && gamepad.buttons[7].pressed) { // right (R1) shoulder button
+  if (!vetoButtons && gamepad.buttons[5].pressed) { // R2 button
     graphics.manager.current = Math.min(graphics.manager.current + 1, maxFrame)
     lastButton = now
     dirty = true
   }
 
-  if (!vetoButtons && gamepad.buttons[6].pressed) { // left (L1) shoulder button
+  if (!vetoButtons && gamepad.buttons[4].pressed) { // L2 button
     graphics.manager.current = Math.max(graphics.manager.current - 1, minFrame)
     lastButton = now
     dirty = true
   }
 
-  if (!vetoButtons && gamepad.buttons[10].pressed) { // select button
+  if (!vetoButtons && gamepad.buttons[6].pressed) { // L1 button
     toolMode = !toolMode
     lastButton = now
   }
 
-  if (!vetoButtons && gamepad.buttons[11].pressed) { // start button
+  if (!vetoButtons && gamepad.buttons[7].pressed) { // R2 button
     if (toolMode)
       graphics.tool = {...x.initialTool}
     else
