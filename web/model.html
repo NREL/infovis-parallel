@@ -102,9 +102,11 @@
           <td><input id="uiToolOrientationZ" title="Orientation of the selection tool (z coordinate)."type="number" step="0.01"/></td>
         </tr>
       </table>
-      <p><em>Data are typically bounded by the unit cube, <code>[0,1] &#x00D7; [0,1] &#x00D7; [0,1]</code>, so choose the units of measure for distances and coordinates accordingly.</em></p>
-      <br/>
-      <p><em>Tested on Chrome version 72.</em></p>
+      <hr/>
+      <ul>
+        <li>Data are typically bounded by the unit cube, <code>[0,1] &#x00D7; [0,1] &#x00D7; [0,1]</code>, so choose the units of measure for distances and coordinates accordingly.</li>
+        <li>Tested on the following browsers: Chrome 72, Firefox 69, and Oculus 6.2.</li>
+      </ul>
     </div>
     <div id="uiScratch">
       <canvas id="uiTexture"></canvas>
@@ -114,7 +116,7 @@
           <p><strong><em>Keyboard:</em></strong> <strong>&#x21E7;</strong> <em>move/rotate tool</em> | <strong>.</strong> <em>reset view</em> | <strong>,</strong> <em>reset tool</em> | <strong>1&#x2013;9</strong> <em>select frame</em> | <strong>+</strong> <em>next frame</em> | <strong>&#x002D;</strong> <em>previous frame</em></p>
           <p>Move: &#x2192; <em>rightward</em> | &#x2190; <em>leftward</em> | &#x2191; <em>forward</em> | &#x2193; <em>backward</em> | &#x21DE; <em>upward</em> | &#x21DF; <em>downward</em></p>
           <p>Rotate: <strong>k</strong> <em>forward</em> | <strong>j</strong> <em>backward</em> | <strong>u</strong> <em>clockwise</em> | <strong>d</strong> <em>counterclockwise</em> | <strong>h</strong> <em>leftward</em> | <strong>l</strong> <em>rightward</em></p>
-          <p><strong><em>Gamepad:</em></strong> <strong>L1</strong> <em>toggle view/tool</em> | <strong>R1</strong> <em>reset</em> | <strong>L2</strong> <em>previous frame</em> | <strong>R2</strong> <em>next frame</em> | <strong>joysticks and d-pad</strong> <em>move and rotate</em></p>
+          <p><strong><em>Gamepad:</em></strong> <strong>select</strong> <em>toggle view/tool</em> | <strong>start</strong> <em>reset</em> | <strong>L1</strong> <em>previous frame</em> | <strong>R1</strong> <em>next frame</em> | <strong>joysticks and d-pad</strong> <em>move and rotate</em></p>
         </div>
         <div id="uiBanner">
           <table>
