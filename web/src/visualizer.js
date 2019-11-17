@@ -71,7 +71,7 @@ function initializeGraphics(gl, initialViewer, initialTool) {
   , pov      : initialViewer
   , tool     : initialTool
   , offset   : {position: zero, rotation: Linear.fromEulerd(zero)}
-  , message  : ""
+  , message  : {text: "", image: Text.makePixmap("")}
   }
 }
 
@@ -140,8 +140,9 @@ function processRequest(gl, graphics, request) {
   }
 
   if (request.getMessage() != "") {
-    graphics.message = request.getMessage()
-    if (DEBUG) console.debug("processRequest: message = '", graphics.message, "'")
+    graphics.message.text = request.getMessage()
+    graphics.message.image = Text.makePixmap(graphics.message.text, "white")
+    if (DEBUG) console.debug("processRequest: message = '", graphics.message.text, "'")
   }
 
   return dirty
@@ -225,8 +226,9 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
           const frameData = new VRFrameData()
           vrDisplay.getFrameData(frameData)
 
-          graphics.pov.position = frameData.pose.position
-          graphics.pov.rotation = frameData.pose.orientation
+          const pose = frameData.pose
+          graphics.pov.position = pose.position    != null ? pose.position    : vec3.create()
+          graphics.pov.rotation = pose.orientation != null ? pose.orientation : quat.create()
 
           graphics.manager.projection = eye == 0 ? frameData.leftProjectionMatrix : frameData.rightProjectionMatrix
           const view = mat4.multiply(
@@ -259,19 +261,22 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
         }
 
+        Text.drawText(
+          gl
+        , graphics.message.image
+        , [
+            vec3.fromValues(-0.9, -0.9, 0)
+          , vec3.fromValues( 1.0, -0.9, 0)
+          , vec3.fromValues(-0.9,  0.0, 0)
+          ]
+        , 0.075
+        , mat4.create()
+        , mat4.create()
+        )
+
         Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
         Frames.draw(gl, graphics.manager )
 
-      }
-
-      for (let eye = 0; eye < 2; ++eye) {
-        const messageElement = document.getElementById("uiMessage" + eye)
-        messageElement.style.left  = ((eyes - 1) * eye * gl.canvas.width / 2) + "px"
-        messageElement.style.right = ((3 - eyes + eye) * gl.canvas.width / 2) + "px"
-        messageElement.style.width = ((3 - eyes) * 50) + "%"
-        const message = messageElement.innerText
-        if (graphics.message != message)
-          messageElement.innerText = graphics.message
       }
 
     }
