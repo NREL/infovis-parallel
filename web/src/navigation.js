@@ -117,6 +117,8 @@ let lastButton = Date.now()
 
 
 window.addEventListener("gamepadconnected", function(e) {
+  if (e.gamepad.buttons.length < 12 || e.gamepad.axes.length < 8)
+    return
   gamepad = e.gamepad
   if (DEBUG)
     console.debug("Connected to gamepad %s.", gamepad.id)
