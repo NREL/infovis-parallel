@@ -23,7 +23,7 @@
           <th colspan="4">Persistence</th>
         </tr>
         <tr>
-          <td><a id="uiDownload" title="Download configuration file in JSON format." href="data:application/json;charset=utf-8,%7B%7D" download="configuration.json" onclick="Controller.Configuration.download()">Configuration:</a></td>
+          <td><a id="uiDownload" title="Download configuration file in JSON format." href="data:application/json;charset=utf-8,%7B%7D" download="configuration.json" onclick="Controller.download()">Configuration:</a></td>
           <td><button id="uiLoad"  title="Upload configuration file in JSON format." type="button" onclick="Controller.load()" >load</button></td>
           <td><button id="uiSave"  title="Store configuration for later recall."     type="button" onclick="Controller.save()" >save</button></td>
           <td><button id="uiReset" title="Recall previously stored configuration."   type="button" onclick="Controller.reset()">recall</button></td>
@@ -40,9 +40,9 @@
         </tr>
         <tr>
             <td>Mode</td>
-            <td><input id="uiMono"   title="Whether to render the display monoscopically."         type="radio" name="mode" checked="checked"/>Monoscopic</td>
-            <td><input id="uiStereo" title="Whether to render the display in side-by-side stereo." type="radio" name="mode"                  />Stereoscopictd</td>
-            <td><input id="uiVR"     title="Whether to render the display in VR."                  type="radio" name="mode"                  />WebVR</td>
+            <td><input id="uiMono"   title="Whether to render the display monoscopically."         type="radio" name="mode" checked="checked" onclick="Controller.updatePanel()"/>Monoscopic</td>
+            <td><input id="uiStereo" title="Whether to render the display in side-by-side stereo." type="radio" name="mode"                   onclick="Controller.updatePanel()"/>Stereoscopic</td>
+            <td><input id="uiVR"     title="Whether to render the display in WebVR."               type="radio" name="mode"                   onclick="Controller.updatePanel()"/>WebVR</td>
         </tr>
         <tr>
           <td>Eye&nbsp;separation:</td>

@@ -198,7 +198,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     const dirtyRequest  = requestQueue.length > 0
     let   dirtyResponse = keyQueue.length > 0
 
-    dirtyResponse |= true || Navigation.interpretGamepad(graphics)
+    dirtyResponse |= Navigation.interpretGamepad(graphics)
 
     while (keyQueue.length > 0)
       Navigation.interpretKeyboard(keyQueue.pop(), graphics)

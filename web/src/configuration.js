@@ -13,7 +13,7 @@ function defaultConfiguration(w = window.innerWidth, h = window.innerHeight) {
       address        : "ws://104.198.152.159:42042/infovis/v4/demo"
     }
   , display          : {
-      stereo         : false
+      mode           : "mono"
     , eyeSeparation  : [0.10, 0, 0]
     , nearPlane      : 0.01
     , farPlane       : 100
@@ -45,7 +45,8 @@ function get() {
 
   configuration.server.address = uiAddress.value
 
-  configuration.display.stereo    =            uiStereo.checked
+  configuration.display.mode = uiStereo.checked ? "stereo" : (uiVR.checked ? "webvr" : "mono")
+
   configuration.display.nearPlane = parseFloat(uiNearPlane.value)
   configuration.display.farPlane  = parseFloat(uiFarPlane.value )
 
@@ -88,7 +89,10 @@ function put() {
 
   uiAddress.value = theConfiguration.server.address
 
-  uiStereo.checked  = theConfiguration.display.stereo
+  uiStereo.checked  = theConfiguration.display.mode == "stereo"
+  uiVR.checked      = theConfiguration.display.mode == "webvr"
+  uiMono.checked    = !uiStereo.checked && !uiVR.checked
+
   uiNearPlane.value = theConfiguration.display.nearPlane
   uiFarPlane.value  = theConfiguration.display.farPlane
 
@@ -176,4 +180,41 @@ export function update() {
 export function compute() {
   theConfiguration = defaultConfiguration()
   put()
+}
+
+
+export function updatePanel() {
+
+  if (uiVR.disabled) {
+    uiMono.checked   = true
+    uiStereo.checked = false
+    uiVR.checked     = false
+  }
+
+  const isStereo = uiStereo.checked
+  const isVR     = uiVR.checked
+
+  uiEyeSeparationX.disabled = !isStereo
+  uiEyeSeparationY.disabled = !isStereo
+  uiEyeSeparationZ.disabled = !isStereo
+
+  uiLowerLeftX.disabled = isVR
+  uiLowerLeftY.disabled = isVR
+  uiLowerLeftZ.disabled = isVR
+
+  uiLowerRightX.disabled = isVR
+  uiLowerRightY.disabled = isVR
+  uiLowerRightZ.disabled = isVR
+
+  uiUpperLeftX.disabled = isVR
+  uiUpperLeftY.disabled = isVR
+  uiUpperLeftZ.disabled = isVR
+
+  uiViewPositionX.disabled = isVR
+  uiViewPositionY.disabled = isVR
+  uiViewPositionZ.disabled = isVR
+  uiViewOrientationX.disabled = isVR
+  uiViewOrientationY.disabled = isVR
+  uiViewOrientationZ.disabled = isVR
+
 }

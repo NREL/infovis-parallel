@@ -4,8 +4,14 @@ import * as Connection    from "./connection"
 import * as Visualizer    from "./visualizer"
 
 
+export function download() {
+  Configuration.download()
+}
+
+
 export function load() {
   Configuration.load()
+  Configuration.updatePanel()
 }
 
 
@@ -16,6 +22,12 @@ export function save() {
 
 export function reset() {
   Configuration.reset()
+  Configuration.updatePanel()
+}
+
+
+export function updatePanel() {
+  Configuration.updatePanel()
 }
 
 
@@ -63,7 +75,10 @@ export function startup() {
   Configuration.compute()
   Connection.updateButtons()
 
-  Visualizer.setupVR(function(hasVR) {uiVR.disabled = !hasVR})
+  Visualizer.setupVR(function(hasVR) {
+    uiVR.disabled = !hasVR
+    Configuration.updatePanel()
+  })
 
 }
 
