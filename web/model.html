@@ -3,8 +3,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="view.css" type="text/css" rel="stylesheet"/>
-    <script src="lib/gl-matrix.js" type="application/javascript"> </script>
-    <script src="controller.js" type="application/javascript"> </script>
+    <script src="lib/gl-matrix.js"      type="application/javascript"> </script>
+    <script src="lib/webvr-polyfill.js" type="application/javascript"> </script>
+    <script src="controller.js"         type="application/javascript"> </script>
     <title>InfoVis Parallel</title>
   </head>
   <body onload="Controller.startup()">
@@ -38,9 +39,10 @@
           <th colspan="4">Display</th>
         </tr>
         <tr>
-            <td>Stereo?</td>
-            <td><input id="uiStereo" title="Whether to render the display in side-by-side stereo." type="checkbox"/></td>
-            <td colspan="2"/>
+            <td>Mode</td>
+            <td><input id="uiMono"   title="Whether to render the display monoscopically."         type="radio" name="mode" checked="checked">Monoscopic</input>  </td>
+            <td><input id="uiStereo" title="Whether to render the display in side-by-side stereo." type="radio" name="mode"                  >Stereoscopic</input></td>
+            <td><input id="uiVR"     title="Whether to render the display in VR."                  type="radio" name="mode"                  >VR</input>          </td>
         </tr>
         <tr>
           <td>Eye&nbsp;separation:</td>

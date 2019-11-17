@@ -44,6 +44,7 @@
     "console"           : "readonly"
   , "document"          : "readonly"
   , "localStorage"      : "readonly"
+  , "navigator"         : "readonly"
   , "window"            : "readonly"
 
   , "glMatrix"          : "readonly"
@@ -59,7 +60,9 @@
   , "Uint8Array"        : "readonly"
   , "Uint16Array"       : "readonly"
   , "Uint32Array"       : "readonly"
+  , "VRFrameData"       : "readonly"
   , "WebSocket"         : "readonly"
+  , "WebVRPolyfill"     : "readonly"
 
   , "uiAddress"         : "readonly"
   , "uiCanvas"          : "readonly"
@@ -88,6 +91,7 @@
   , "uiUpperLeftX"      : "readonly"
   , "uiUpperLeftY"      : "readonly"
   , "uiUpperLeftZ"      : "readonly"
+  , "uiVR"              : "readonly"
   , "uiViewOrientationX": "readonly"
   , "uiViewOrientationY": "readonly"
   , "uiViewOrientationZ": "readonly"

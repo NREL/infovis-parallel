@@ -4,6 +4,9 @@ import * as Connection    from "./connection"
 import * as Visualizer    from "./visualizer"
 
 
+const polyfill = new WebVRPolyfill()
+
+
 export function load() {
   Configuration.load()
 }
@@ -63,6 +66,8 @@ export function startup() {
   Configuration.compute()
   Connection.updateButtons()
 
+  Visualizer.setupVR(function(hasVR) {uiVR.disabled = !hasVR})
+
 }
 
 
@@ -70,7 +75,14 @@ export function startVisualizing() {
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler, disconnectHandler)
   isVisualizing = true
-  Visualizer.visualizeBuffers(theContext, configuration, requestQueue, keyQueue, Connection.send)
+  Visualizer.visualizeBuffers(
+    theContext     ,
+    configuration  ,
+    requestQueue   ,
+    keyQueue       ,
+    Connection.send,
+    uiVR.checked
+  )
 }
 
 

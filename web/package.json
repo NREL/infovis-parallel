@@ -7,11 +7,12 @@
   "private": true,
   "main": "src/controller.js",
   "dependencies": {
+    "webvr-polyfill": "^0.10.11"
   },
   "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-config-google": "^0.14.0",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9",
-    "eslint": "^6.5.1",
-    "eslint-config-google": "^0.14.0"
+    "webpack-cli": "^3.3.10"
   }
 }

@@ -11,6 +11,7 @@ const DEBUG = false
 
 
 const quat = glMatrix.quat
+const mat4 = glMatrix.mat4
 const vec3 = glMatrix.vec3
 
 
@@ -86,21 +87,21 @@ function processRequest(gl, graphics, request) {
 
   let dirty = false
 
-  if (DEBUG) console.debug("animation: request =", request)
+  if (DEBUG) console.debug("processRequest: request =", request)
 
   if (request.getShow() != 0) {
-    if (DEBUG) console.debug("animate: show =", request.getShow())
+    if (DEBUG) console.debug("processRequest: show =", request.getShow())
     graphics.manager.current = request.getShow()
     dirty = true
   }
 
   if (request.getReset()) {
-    if (DEBUG) console.debug("animate: reset")
+    if (DEBUG) console.debug("processRequest: reset")
     Frames.reset(graphics.manager)
   }
 
   if (request.getUpsertList().length > 0) {
-    if (DEBUG) console.debug("animate: upsert", request.getUpsertList().length)
+    if (DEBUG) console.debug("processRequest: upsert", request.getUpsertList().length)
     Frames.insert(gl, request.getUpsertList(), graphics.manager)
   }
 
@@ -114,7 +115,7 @@ function processRequest(gl, graphics, request) {
     graphics.pov.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
     graphics.pov.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
     dirty = true
-    if (DEBUG) console.debug("animate: view =", graphics.pov)
+    if (DEBUG) console.debug("processRequest: view =", graphics.pov)
   }
 
   if (request.hasToolloc()) {
@@ -122,19 +123,19 @@ function processRequest(gl, graphics, request) {
     graphics.tool.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
     graphics.tool.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
     dirty = true
-    if (DEBUG) console.debug("animate: tool =", graphics.tool)
+    if (DEBUG) console.debug("processRequest: tool =", graphics.tool)
   }
 
   if (request.hasOffsetloc()) {
     const loc = request.getOffsetloc()
     graphics.offset.position = vec3.fromValues(loc.getPosx(), loc.getPosy(), loc.getPosz())
     graphics.offset.rotation = quat.fromValues(loc.getRotx(), loc.getRoty(), loc.getRotz(), loc.getRotw())
-    if (DEBUG) console.debug("animate: offset =", graphics.offset)
+    if (DEBUG) console.debug("processRequest: offset =", graphics.offset)
   }
 
   if (request.getMessage() != "") {
     graphics.message = request.getMessage()
-    if (DEBUG) console.debug("animate: message = '", graphics.message, "'")
+    if (DEBUG) console.debug("processRequest: message = '", graphics.message, "'")
   }
 
   return dirty
@@ -142,10 +143,29 @@ function processRequest(gl, graphics, request) {
 }
 
 
+let vrDisplay = null
+
+
+export function setupVR(action) {
+  navigator.getVRDisplays().then(function(displays) {
+    const hasVR = displays.length > 0
+    vrDisplay = hasVR ? displays[displays.length - 1] : null
+    action(hasVR)
+  })
+}
+
+
 let isRunning = false
 
 
-export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
+let ONCE = true
+
+export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond, useVR) {
+
+  if (vrDisplay != null) {
+    vrDisplay.depthNear = configuration.display.nearPlane
+    vrDisplay.depthFar  = configuration.display.farPlane
+  }
 
   isRunning = true
 
@@ -174,7 +194,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     const dirtyRequest  = requestQueue.length > 0
     let   dirtyResponse = keyQueue.length > 0
 
-    dirtyResponse |= Navigation.interpretGamepad(graphics)
+    dirtyResponse |= true || Navigation.interpretGamepad(graphics)
 
     while (keyQueue.length > 0)
       Navigation.interpretKeyboard(keyQueue.pop(), graphics)
@@ -189,33 +209,49 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       Frames.prepare(gl, graphics.manager)
       Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
 
-      const eyes = configuration.display.stereo ? 2 : 1
+      const eyes = useVR || configuration.display.stereo ? 2 : 1
       for (let eye = 0; eye < eyes; ++eye) {
 
         gl.viewport((eyes - 1) * eye * gl.canvas.width / 2, 0, gl.canvas.width / eyes, gl.canvas.height)
 
-        const eyeOffset = vec3.scale(
-          vec3.create()
-        , vec3.fromValues(
-            configuration.display.eyeSeparation[0]
-          , configuration.display.eyeSeparation[1]
-          , configuration.display.eyeSeparation[2]
-          )
-        , (eyes - 1) * (2 * eye - 1) / 2
-        )
-        const eyePosition = vec3.add(
-          vec3.create()
-        , graphics.pov.position
-        , vec3.transformQuat(vec3.create(), eyeOffset, graphics.pov.rotation)
-        )
+        if (useVR) {
 
-        graphics.manager.projection = Projection.projection(configuration.display, eyePosition)
-        graphics.manager.modelView = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+          const frameData = new VRFrameData()
+          vrDisplay.getFrameData(frameData)
+
+          graphics.manager.projection = eye == 0 ? frameData.leftProjectionMatrix : frameData.rightProjectionMatrix
+
+          const view                  = eye == 0 ? frameData.leftViewMatrix       : frameData.rightViewMatrix
+          const model = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+          graphics.manager.modelView = mat4.multiply(mat4.create(), model, view)
+
+        } else {
+
+          const eyeOffset = vec3.scale(
+            vec3.create()
+          , vec3.fromValues(
+              configuration.display.eyeSeparation[0]
+            , configuration.display.eyeSeparation[1]
+            , configuration.display.eyeSeparation[2]
+            )
+          , (eyes - 1) * (2 * eye - 1) / 2
+          )
+          const eyePosition = vec3.add(
+            vec3.create()
+          , graphics.pov.position
+          , vec3.transformQuat(vec3.create(), eyeOffset, graphics.pov.rotation)
+          )
+
+          graphics.manager.projection = Projection.projection(configuration.display, eyePosition)
+          graphics.manager.modelView = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+
+        }
 
         Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
         Frames.draw(gl, graphics.manager )
 
       }
+
       for (let eye = 0; eye < 2; ++eye) {
         const messageElement = document.getElementById("uiMessage" + eye)
         messageElement.style.left  = ((eyes - 1) * eye * gl.canvas.width / 2) + "px"
@@ -237,11 +273,33 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       respond(response)
     }
 
+    if (useVR) {
+      vrDisplay.submitFrame()
+      vrDisplay.requestAnimationFrame(animation)
+    } else
+      window.requestAnimationFrame(animation)
+
+  }
+
+  if (useVR && vrDisplay != null) {
+
+    const eye = vrDisplay.getEyeParameters("left")
+    uiCanvas.width  = eye.renderWidth
+    uiCanvas.height = eye.renderHeight
+
+    vrDisplay.requestPresent([{source: uiCanvas}]).then(function() {
+      animation()
+    })
+
+  } else {
+
+    uiCanvas.width  = window.innerWidth
+    uiCanvas.height = window.innerHeight
+
     window.requestAnimationFrame(animation)
 
   }
 
-  window.requestAnimationFrame(animation)
 }
 
 

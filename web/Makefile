@@ -21,7 +21,7 @@ deploy: controller.js
 	gsutil -q -m cp -r -a public-read model.html view.css controller.js lib images gs://visualize.functionally.io/
 
 install:
-	npm install webpack webpack-cli
+	npm install webvr-polyfill webpack webpack-cli eslint
 
 
 .SUFFIXES:
