@@ -225,6 +225,9 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
           const frameData = new VRFrameData()
           vrDisplay.getFrameData(frameData)
 
+          graphics.pov.position = frameData.pose.position
+          graphics.pov.rotation = frameData.pose.orientation
+
           graphics.manager.projection = eye == 0 ? frameData.leftProjectionMatrix : frameData.rightProjectionMatrix
           const view = mat4.multiply(
             mat4.create()
