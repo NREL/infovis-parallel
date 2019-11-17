@@ -86,10 +86,19 @@ export function startup() {
 }
 
 
+export function stopVisualizing() {
+  Connection.unconnect()
+  Visualizer.stop()
+  isVisualizing = false
+}
+
+
 export function startVisualizing() {
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler, disconnectHandler)
   isVisualizing = true
+  window.addEventListener('vrdisplaydeactivate', stopVisualizing, false)
+  window.addEventListener('vrdisplaydisconnect', stopVisualizing, false)
   Visualizer.visualizeBuffers(
     theContext     ,
     configuration  ,
@@ -97,13 +106,6 @@ export function startVisualizing() {
     keyQueue       ,
     Connection.send
   )
-}
-
-
-export function stopVisualizing() {
-  Connection.unconnect()
-  Visualizer.stop()
-  isVisualizing = false
 }
 
 
