@@ -76,7 +76,10 @@ export function startup() {
   Connection.updateButtons()
 
   Visualizer.setupVR(function(hasVR) {
-    uiVR.disabled = !hasVR
+    if (hasVR)
+      uiVR.checked = true
+    else
+      uiVR.disabled = true
     Configuration.updatePanel()
   })
 
