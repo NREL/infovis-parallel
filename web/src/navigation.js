@@ -260,12 +260,29 @@ function doOculusGo(graphics, vetoButtons, now, minFrame, maxFrame, result) {
   }
 
   if (oculusMode == OCULUS_OFFSET) {
+//  const deltaPosition = vec3.scale(
+//    vec3.create()
+//  , vec3.normalize(
+//      vec3.create()
+//    , vec3.rotateX(
+//        vec3.create()
+//      , vec3.fromValues(
+//          gamepad.pose.orientation[0]
+//        , gamepad.pose.orientation[1]
+//        , gamepad.pose.orientation[2]
+//        )
+//      , vec3.create()
+//      , - Math.PI / 2
+//      )
+//    )
+//  , x.deltaOffsetPosition * gamepad.axes[1]
+//  )
     const deltaPosition = vec3.scale(
       vec3.create()
     , vec3.normalize(
         vec3.create()
       , vec3.fromValues(
-          gamepad.pose.orientation[1]
+            gamepad.pose.orientation[1]
         , - gamepad.pose.orientation[0]
         , - gamepad.pose.orientation[2]
         )
