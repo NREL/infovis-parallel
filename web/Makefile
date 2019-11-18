@@ -5,7 +5,7 @@
 SRCS=$(wildcard src/*.js src/*/*.js)
 
 
-all: controller.js
+all: infovis.tar.gz
 
 controller.js: $(SRCS)
 	npx webpack
@@ -17,8 +17,11 @@ lint: model.html controller.js
 	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*}.js
 	tidy -quiet -o /dev/null model.html
 
-deploy: controller.js
-	gsutil -q -m cp -r -a public-read model.html view.css controller.js lib images gs://visualize.functionally.io/
+infovis.tar.gz: model.html view.css controller.js lib images
+	tar czf $@ $^
+
+deploy: model.html view.css controller.js lib images
+	gsutil -q -m cp -r -a public-read $^ gs://visualize.functionally.io/
 
 install:
 	npm install webvr-polyfill webpack webpack-cli eslint
