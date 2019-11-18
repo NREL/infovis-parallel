@@ -115,9 +115,11 @@ let started = false
 
 let lastButton = Date.now()
 
+const oculusGo = "Oculus Go Controller"
+
 
 window.addEventListener("gamepadconnected", function(e) {
-  if (e.gamepad.buttons.length < 12 || e.gamepad.axes.length < 8)
+  if ((e.gamepad.buttons.length < 12 || e.gamepad.axes.length < 8) && e.gamepad.id != oculusGo)
     return
   gamepad = e.gamepad
   if (DEBUG)
@@ -145,7 +147,7 @@ export function interpretGamepad(graphics) {
   const vetoPeriod = 300
   const vetoButtons = now - lastButton <= vetoPeriod
 
-  const startPeriod = 5000
+  const startPeriod = 3000
   if (!started) {
     if (now - lastButton > startPeriod)
       started = true
@@ -157,10 +159,13 @@ export function interpretGamepad(graphics) {
     result.depressed |= gamepad.buttons[i].pressed << i
   result.analog = gamepad.axes
   result.dirty = true
-    
+
   const frames = Frames.listFrames(graphics.manager)
   const minFrame = frames.length == 0 ? 0 : Math.min(...frames)
   const maxFrame = frames.length == 0 ? 0 : Math.max(...frames)
+
+  if (gamepad.id == oculusGo)
+    return doOculusGo(graphics, vetoButtons, now, minFrame, maxFrame, result)
 
   if (!vetoButtons && gamepad.buttons[6].pressed) { // L1 button
     graphics.manager.current = Math.max(graphics.manager.current - 1, minFrame)
@@ -222,6 +227,54 @@ export function interpretGamepad(graphics) {
     )
 
   result.dirty = true
+  return result
+
+}
+
+
+const OCULUS_FRAME  = 0
+const OCULUS_TOOL   = 1
+const OCULUS_OFFSET = 2
+const OCULUS_LENGTH = OCULUS_OFFSET + 1
+
+let oculusMode = OCULUS_FRAME
+
+
+function doOculusGo(graphics, vetoButtons, now, minFrame, maxFrame, result) {
+
+  if (!vetoButtons && gamepad.buttons[1].pressed) {
+    oculusMode = (oculusMode + 1) % OCULUS_LENGTH
+    lastButton = now
+  }
+
+  if (oculusMode == OCULUS_FRAME && !vetoButtons && gamepad.buttons[0].pressed) {
+    graphics.manager.current = minFrame + (graphics.manager.current + 1 - minFrame) % (maxFrame + 1 - minFrame)
+    lastButton = now
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_OFFSET && !vetoButtons && gamepad.buttons[0].pressed) {
+    graphics.offset = {...x.initialOffset}
+    lastButton = now
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_OFFSET) {
+    const deltaPosition = vec3.scale(
+      vec3.create()
+    , vec3.normalize(
+        vec3.create()
+      , vec3.fromValues(
+          gamepad.pose.orientation[1]
+        , - gamepad.pose.orientation[0]
+        , - gamepad.pose.orientation[2]
+        )
+      )
+    , x.deltaOffsetPosition * gamepad.axes[1]
+    )
+    graphics.offset.position = vec3.add(vec3.create(), graphics.offset.position, deltaPosition)
+  }
+
   return result
 
 }
