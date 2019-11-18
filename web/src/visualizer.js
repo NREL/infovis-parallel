@@ -201,7 +201,8 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     const dirtyRequest  = requestQueue.length > 0
     let   dirtyResponse = keyQueue.length > 0
 
-    dirtyResponse |= Navigation.interpretGamepad(graphics)
+    const gamepad = Navigation.interpretGamepad(graphics)
+    dirtyResponse |= gamepad.dirty
 
     while (keyQueue.length > 0)
       Navigation.interpretKeyboard(keyQueue.pop(), graphics)
@@ -281,10 +282,12 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
     if (dirtyResponse) {
       const response = new proto.Infovis.Response()
-      response.setShown(graphics.manager.current)
+      response.setShown(graphics.manager.current          )
       response.setViewloc   (makeLocation(graphics.pov   ))
       response.setToolloc   (makeLocation(graphics.tool  ))
       response.setOffsetloc (makeLocation(graphics.offset))
+      response.setDepressed (gamepad.depressed            )
+      response.setAnalogList(gamepad.analog               )
       respond(response)
     }
 

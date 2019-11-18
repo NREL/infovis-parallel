@@ -134,39 +134,44 @@ window.addEventListener("gamepaddisconnected", function(e) {
 
 export function interpretGamepad(graphics) {
 
+  const result = {dirty: false, depressed: 0, analog: []}
+
   const gamepads = navigator.getGamepads()
   if (gamepad == null || gamepads.length <= gamepad.index || gamepads[gamepad.index].id != gamepad.id)
-    return false
+    return result
   gamepad = gamepads[gamepad.index]
 
   const now = Date.now()
   const vetoPeriod = 300
   const vetoButtons = now - lastButton <= vetoPeriod
 
-  const startPeriod = 3000
+  const startPeriod = 5000
   if (!started) {
     if (now - lastButton > startPeriod)
       started = true
     else
-      return false
+      return result
   }
+
+  for (let i = 0; i < gamepad.buttons.length; ++i)
+    result.depressed |= gamepad.buttons[i].pressed << i
+  result.analog = gamepad.axes
+  result.dirty = true
     
   const frames = Frames.listFrames(graphics.manager)
-  const minFrame = Math.min(...frames)
-  const maxFrame = Math.max(...frames)
-
-  let dirty = false
+  const minFrame = frames.length == 0 ? 0 : Math.min(...frames)
+  const maxFrame = frames.length == 0 ? 0 : Math.max(...frames)
 
   if (!vetoButtons && gamepad.buttons[6].pressed) { // L1 button
     graphics.manager.current = Math.max(graphics.manager.current - 1, minFrame)
     lastButton = now
-    dirty = true
+    result.dirty = true
   }
 
   if (!vetoButtons && gamepad.buttons[7].pressed) { // R1 button
     graphics.manager.current = Math.min(graphics.manager.current + 1, maxFrame)
     lastButton = now
-    dirty = true
+    result.dirty = true
   }
 
   if (!vetoButtons && gamepad.buttons[8].pressed) { // select button
@@ -180,7 +185,7 @@ export function interpretGamepad(graphics) {
     else
       graphics.offset = {...x.initialOffset}
     lastButton = now
-    dirty = true
+    result.dirty = true
   }
 
   const retardation = 0.75
@@ -200,7 +205,7 @@ export function interpretGamepad(graphics) {
   ), scaleRotation)
 
   if (vec3.equals(deltaPosition, zero) && vec3.equals(deltaRotation, zero))
-    return dirty
+    return result
 
   if (toolMode)
     updateTool(
@@ -216,7 +221,8 @@ export function interpretGamepad(graphics) {
     , deltaRotation
     )
 
-  return true
+  result.dirty = true
+  return result
 
 }
 

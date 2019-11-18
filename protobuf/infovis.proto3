@@ -35,8 +35,8 @@ message Location {
 
 
 message Request {
-  int32             show      = 1; // 0 = no change
-  string            message   = 2;
+  int32             show      = 1; // 0  = no change
+  string            message   = 2; // "" = no change
   bool              reset     = 3;
   repeated Geometry upsert    = 4;
   repeated int64    delete    = 5;
