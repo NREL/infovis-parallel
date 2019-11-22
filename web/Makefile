@@ -23,10 +23,13 @@ infovis.tar.gz: model.html view.css controller.js lib images
 deploy: model.html view.css controller.js lib images
 	gsutil -q -m cp -r -a public-read $^ gs://visualize.functionally.io/
 
+serve:
+	npx serve
+
 install:
 	npm install webvr-polyfill webpack webpack-cli eslint
 
 
 .SUFFIXES:
 
-.PHONY: all clean install lint deploy
+.PHONY: all clean install lint deploy serve
