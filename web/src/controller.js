@@ -97,6 +97,8 @@ export function startVisualizing() {
   const configuration = Configuration.update()
   Connection.reconnect(configuration, echoHandler, disconnectHandler)
   isVisualizing = true
+  if (uiStereo.checked)
+    uiCanvas.requestFullscreen()
   window.addEventListener('vrdisplaydeactivate', stopVisualizing, false)
   window.addEventListener('vrdisplaydisconnect', stopVisualizing, false)
   Visualizer.visualizeBuffers(

@@ -14,7 +14,7 @@ function defaultConfiguration(w = window.innerWidth, h = window.innerHeight) {
     }
   , display          : {
       mode           : "mono"
-    , eyeSeparation  : [0.10, 0, 0]
+    , eyeSeparation  : [0.05, 0, 0]
     , nearPlane      : 0.01
     , farPlane       : 100
     , lowerLeft      : aspect > 1 ? [  - padding1,   - padding, 0] : [  - padding,   - padding1, 0]
