@@ -91,14 +91,13 @@ export function interpretKeyboard(y, graphics) {
   else if ((target != null) && (key in x.move)) {
     if (target == graphics.tool)
       updateTool(
-        target
+        graphics
       , vec3.scale(vec3.create(), x.move[key][0], deltaPosition)
       , vec3.scale(vec3.create(), x.move[key][1], deltaRotation)
-      , graphics.offset.rotation
       )
     else
       updateOffset(
-        target
+        graphics
       , vec3.scale(vec3.create(), x.move[key][0], deltaPosition)
       , vec3.scale(vec3.create(), x.move[key][1], deltaRotation)
       )
@@ -113,7 +112,7 @@ let toolMode = false
 
 let started = false
 
-let lastButton = Date.now()
+let lastButton = null
 
 const oculusGo = "Oculus Go Controller"
 
@@ -132,6 +131,12 @@ window.addEventListener("gamepaddisconnected", function(e) {
     console.debug("Disconnecting from gamepad %s.", gamepad.id)
   gamepad = null
 })
+
+
+export function resetGamepad() {
+  started = false
+  lastButton = Date.now()
+}
 
 
 export function interpretGamepad(graphics) {
@@ -232,89 +237,24 @@ export function interpretGamepad(graphics) {
 }
 
 
-const OCULUS_FRAME  = 0
-const OCULUS_TOOL   = 1
-const OCULUS_OFFSET = 2
-const OCULUS_LENGTH = OCULUS_OFFSET + 1
+function updateOffset(graphics, deltaPosition, deltaRotation) {
 
-let oculusMode = OCULUS_FRAME
+  if (DEBUG) console.debug("updateOffset: graphics.offset =", graphics.offset)
 
-
-function doOculusGo(graphics, vetoButtons, now, minFrame, maxFrame, result) {
-
-  if (!vetoButtons && gamepad.buttons[1].pressed) {
-    oculusMode = (oculusMode + 1) % OCULUS_LENGTH
-    lastButton = now
-  }
-
-  if (oculusMode == OCULUS_FRAME && !vetoButtons && gamepad.buttons[0].pressed) {
-    graphics.manager.current = minFrame + (graphics.manager.current + 1 - minFrame) % (maxFrame + 1 - minFrame)
-    lastButton = now
-    result.dirty = true
-  }
-
-  if (oculusMode == OCULUS_OFFSET && !vetoButtons && gamepad.buttons[0].pressed) {
-    graphics.offset = {...x.initialOffset}
-    lastButton = now
-    result.dirty = true
-  }
-
-  if (oculusMode == OCULUS_OFFSET) {
-//  const deltaPosition = vec3.scale(
-//    vec3.create()
-//  , vec3.normalize(
-//      vec3.create()
-//    , vec3.rotateX(
-//        vec3.create()
-//      , vec3.fromValues(
-//          gamepad.pose.orientation[0]
-//        , gamepad.pose.orientation[1]
-//        , gamepad.pose.orientation[2]
-//        )
-//      , vec3.create()
-//      , - Math.PI / 2
-//      )
-//    )
-//  , x.deltaOffsetPosition * gamepad.axes[1]
-//  )
-    const deltaPosition = vec3.scale(
-      vec3.create()
-    , vec3.normalize(
-        vec3.create()
-      , vec3.fromValues(
-            gamepad.pose.orientation[1]
-        , - gamepad.pose.orientation[0]
-        , - gamepad.pose.orientation[2]
-        )
-      )
-    , x.deltaOffsetPosition * gamepad.axes[1]
-    )
-    graphics.offset.position = vec3.add(vec3.create(), graphics.offset.position, deltaPosition)
-  }
-
-  return result
-
-}
-
-
-function updateOffset(target, deltaPosition, deltaRotation) {
-
-  if (DEBUG) console.debug("updateOffset: target =", target)
-
-  const oldRotation = target.rotation
+  const oldRotation = graphics.offset.rotation
   const incrementalRotation = Linear.fromEulerd(deltaRotation)
 
-  let newRotation = quat.multiply(
+  const newRotation = quat.multiply(
     quat.create()
   , incrementalRotation
   , oldRotation
   )
 
-  target.position = vec3.add(
+  graphics.offset.position = vec3.add(
     vec3.create()
   , vec3.add(
       vec3.create()
-    , target.position
+    , graphics.offset.position
     , deltaPosition
     )
   , vec3.scaleAndAdd(
@@ -325,21 +265,21 @@ function updateOffset(target, deltaPosition, deltaRotation) {
     )
   )
 
-  target.rotation = newRotation
+  graphics.offset.rotation = newRotation
 
-  if (DEBUG) console.debug("updateOffset: target' =", target)
+  if (DEBUG) console.debug("updateOffset: graphics.offset' =", graphics.offset)
 
 }
 
 
-function updateTool(target, deltaPosition, deltaRotation, extraRotation) {
+function updateTool(graphics, deltaPosition, deltaRotation) {
 
-  if (DEBUG) console.debug("updateTool: target =", target)
+  if (DEBUG) console.debug("updateTool: graphics.tool =", graphics.tool)
 
-  const oldRotation = target.rotation
+  const oldRotation = graphics.tool.rotation
   const incrementalRotation = Linear.fromEulerd(deltaRotation)
 
-  let newRotation = quat.multiply(
+  const newRotation = quat.multiply(
     quat.create()
   , quat.multiply(
       quat.create()
@@ -347,30 +287,161 @@ function updateTool(target, deltaPosition, deltaRotation, extraRotation) {
         quat.create()
       , quat.invert(
           quat.create()
-        , extraRotation
+        , graphics.offset.rotation
         )
       , incrementalRotation
       )
-    , extraRotation
+    , graphics.offset.rotation
     )
   , oldRotation
   )
 
-  target.position = vec3.add(
+  graphics.tool.position = vec3.add(
     vec3.create()
-  , target.position
+  , graphics.tool.position
   , vec3.transformQuat(
       vec3.create()
     , deltaPosition
     , quat.invert(
         quat.create()
-      , extraRotation
+      , graphics.offset.rotation
       )
     )
   )
 
-  target.rotation = newRotation
+  graphics.tool.rotation = newRotation
 
-  if (DEBUG) console.debug("updateTool: target' =", target)
+  if (DEBUG) console.debug("updateTool: graphics.tool' =", graphics.tool)
+
+}
+
+
+const OCULUS_FRAME           = 0
+const OCULUS_TOOL_POSITION   = 1
+const OCULUS_TOOL_ROTATION   = 2
+const OCULUS_OFFSET_POSITION = 3
+const OCULUS_OFFSET_ROTATION = 4
+const OCULUS_LENGTH          = 5
+
+let oculusMode = OCULUS_FRAME
+
+let oculusOffsetRotation = null
+
+
+function doOculusGo(graphics, vetoButtons, now, minFrame, maxFrame, result) {
+
+  if (!vetoButtons && gamepad.buttons[1].pressed) {
+    oculusMode = (oculusMode + 1) % OCULUS_LENGTH
+    if (oculusMode != OCULUS_OFFSET_ROTATION)
+      oculusOffsetRotation = null
+    lastButton = now
+  }
+
+  if (oculusMode == OCULUS_FRAME && !vetoButtons && gamepad.buttons[0].pressed) {
+    graphics.manager.current = minFrame + (graphics.manager.current + 1 - minFrame) % (maxFrame + 1 - minFrame)
+    lastButton = now
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_TOOL_POSITION && !vetoButtons && gamepad.buttons[0].pressed) {
+    graphics.tool = {...x.initialTool}
+    lastButton = now
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_TOOL_POSITION) {
+    const deltaPosition = vec3.scale(
+      vec3.create()
+    , vec3.transformQuat(
+        vec3.create()
+      , vec3.fromValues(0, 0, 1)
+      , gamepad.pose.orientation
+      )
+    , x.deltaOffsetPosition * gamepad.axes[1]
+    )
+    graphics.tool.position = vec3.add(
+      vec3.create()
+    , graphics.tool.position
+    , vec3.transformQuat(
+        vec3.create()
+      , deltaPosition
+      , quat.invert(
+          quat.create()
+        , graphics.offset.rotation
+        )
+      )
+    )
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_TOOL_ROTATION) {
+    graphics.tool.rotation = quat.multiply(
+      quat.create()
+    , quat.invert(
+        quat.create()
+      , graphics.offset.rotation
+      )
+    , quat.multiply(
+        quat.create()
+      , gamepad.pose.orientation
+      , quat.fromValues(0, - Math.SQRT1_2, 0, Math.SQRT1_2)
+      )
+    )
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_OFFSET_POSITION && !vetoButtons && gamepad.buttons[0].pressed) {
+    graphics.offset = {...x.initialOffset}
+    lastButton = now
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_OFFSET_POSITION) {
+    const deltaPosition = vec3.scale(
+      vec3.create()
+    , vec3.transformQuat(
+        vec3.create()
+      , vec3.fromValues(0, 0, 1)
+      , gamepad.pose.orientation
+      )
+    , x.deltaOffsetPosition * gamepad.axes[1]
+    )
+    graphics.offset.position = vec3.add(vec3.create(), graphics.offset.position, deltaPosition)
+    result.dirty = true
+  }
+
+  if (oculusMode == OCULUS_OFFSET_ROTATION && !vetoButtons && gamepad.buttons[0].pressed) {
+    oculusOffsetRotation = quat.multiply(
+      quat.create()
+    , quat.invert(
+        quat.create()
+      , gamepad.pose.orientation
+      )
+    , graphics.offset.rotation
+    )
+    lastButton = now
+  }
+
+  if (oculusMode == OCULUS_OFFSET_ROTATION && oculusOffsetRotation != null) {
+    const newRotation = quat.multiply(
+      quat.create()
+    , gamepad.pose.orientation
+    , oculusOffsetRotation
+    )
+    graphics.offset.position = vec3.add(
+      vec3.create()
+    , graphics.offset.position
+    , vec3.scaleAndAdd(
+        vec3.create()
+      , vec3.transformQuat(vec3.create(), center, graphics.offset.rotation)
+      , vec3.transformQuat(vec3.create(), center, newRotation             )
+      , -1
+      )
+    )
+    graphics.offset.rotation = newRotation
+    result.dirty = true
+  }
+
+  return result
 
 }

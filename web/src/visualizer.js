@@ -187,6 +187,8 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
   Text.ensureShaders(gl)
 
+  Navigation.resetGamepad()
+
   function animation(timestamp) {
 
     if (!isRunning) {
@@ -228,9 +230,15 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
           graphics.pov.position = pose.position    != null ? pose.position    : vec3.create()
           graphics.pov.rotation = pose.orientation != null ? pose.orientation : quat.create()
 
+          const delta = vrDisplay.capabilities.hasPosition ? zero : vec3.fromValues(0.5, 0.5, 2.5)
+          graphics.pov.position = vec3.add(vec3.create(), graphics.pov.position, delta)
+
           graphics.manager.projection = eye == 0 ? frameData.leftProjectionMatrix : frameData.rightProjectionMatrix
           const view = eye == 0 ? frameData.leftViewMatrix : frameData.rightViewMatrix
-          const model = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+          const model = Projection.modelView(
+            vec3.scaleAndAdd(vec3.create(), graphics.offset.position, delta, -1)
+          , graphics.offset.rotation
+          )
           graphics.manager.modelView = mat4.multiply(mat4.create(), view, model)
 
         } else {
