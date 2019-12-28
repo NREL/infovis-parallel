@@ -16,54 +16,48 @@ type Files struct {
   label     Label
   channel   ProtobufChannel
   filenames []string
-  index     int
+  filename  chan string
   done      DoneChannel
-  mux       sync.Mutex
-  wake      chan struct{}
+  mux       sync.RWMutex
 }
 
 
 func NewFiles(label Label, filenames []string) *Files {
 
-  filenames1 := unglob(filenames)
-
   var files = Files{
     label    : label                ,
     channel  : make(ProtobufChannel),
-    filenames: filenames1           ,
-    index    : 0                    ,
+    filenames: unglob(filenames)    ,
+    filename : make(chan string)    ,
     done     : make(DoneChannel)    ,
-    wake     : make(chan struct{})  ,
   }
 
   go func() {
     defer glog.Infof("Files source %s is closing.\n", files.label)
     defer close(files.channel)
+    defer close(files.filename)
     for {
       select {
-        case <-files.wake:
-          glog.Infof("Files source %s has awoken.\n", files.label)
-          files.mux.Lock()
-          for (files.index < len(files.filenames)) {
-            filename := files.filenames[files.index]
-            files.index++
-            glog.Infof("Files source %s is reading file %s.\n", files.label, filename)
-            buffer, err := ioutil.ReadFile(filename)
-            if err != nil {
-              glog.Errorf("Files source %s encountered %v.\n", files.label, err)
-              continue
-            }
-            files.channel <- buffer
-            glog.Infof("Files source %s sent %v bytes.\n", files.label, len(buffer))
+        case file := <-files.filename:
+          glog.Infof("Files source %s is reading file %s.\n", files.label, file)
+          buffer, err := ioutil.ReadFile(file)
+          if err != nil {
+            glog.Errorf("Files source %s encountered %v.\n", files.label, err)
+            break
           }
-          files.mux.Unlock()
+          select {
+            case files.channel <- buffer:
+              glog.Infof("Files source %s sent %v bytes.\n", files.label, len(buffer))
+            case <-files.done:
+              return
+          }
         case <-files.done:
           return
       }
     }
   }()
 
-  files.wake <- empty
+  files.Reset()
 
   return &files
 
@@ -75,7 +69,13 @@ func (files *Files) Append(filenames []string) {
   files.mux.Lock()
   files.filenames = append(files.filenames, filenames1...)
   files.mux.Unlock()
-  files.wake <- empty
+  for _, file := range filenames1 {
+    select {
+      case files.filename <- file:
+      case <-files.done:
+        return
+    }
+  }
 }
 
 
@@ -90,10 +90,16 @@ func (files *Files) Out() *ProtobufChannel {
 
 
 func (files *Files) Reset() {
-  files.mux.Lock()
-  files.index = 0
-  files.mux.Unlock()
-  files.wake <- empty
+  files.mux.RLock()
+  filenames1 := files.filenames
+  files.mux.RUnlock()
+  for _, file := range filenames1 {
+    select {
+      case files.filename <- file:
+      case <-files.done:
+        return
+    }
+  }
 }
 
 
