@@ -3,23 +3,36 @@ package main
 
 import (
   "flag"
+  "fmt"
   "os"
-  "bitbucket.org/bwbush/infovis-parallel/go/infovis"
   "github.com/golang/glog"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis"
 )
 
 
 func main() {
 
-  flag.Parse()
+  var demo = flag.Bool("demo", false, "run in demo mode")
 
-  if len(os.Args) > 3 && os.Args[1] == "--demo" {
-    infovis.Demo(os.Args[2], os.Args[3], os.Args[4:])
+  flag.Usage = func() {
+    fmt.Fprintf(os.Stderr, "Usage:\n")
+    fmt.Fprintf(os.Stderr, "  go-infovis [options] [file]..\n")
+    fmt.Fprintf(os.Stderr, "  go-infovis [options] -demo [bind-address] [websocket-path] [file]..\n")
+    fmt.Fprintf(os.Stderr, "Options:\n")
+    flag.PrintDefaults()
+  }
+
+  flag.Parse()
+  args := flag.Args()
+  fmt.Println(args)
+
+  if *demo && len(args) > 2 {
+    infovis.Demo(args[0], args[1], args[2:])
     return
   }
 
   interpreter := infovis.NewInterpreter()
-  for _, file := range os.Args[1:] {
+  for _, file := range args {
     interpreter.InterpretLine("script " + file)
   }
   interpreter.Repl()
