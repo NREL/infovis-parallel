@@ -24,7 +24,6 @@ func main() {
 
   flag.Parse()
   args := flag.Args()
-  fmt.Println(args)
 
   if *demo && len(args) > 2 {
     infovis.Demo(args[0], args[1], args[2:])

@@ -11,6 +11,7 @@ import (
   "strconv"
   "strings"
   "time"
+  "github.com/golang/glog"
 )
 
 
@@ -38,7 +39,7 @@ func NewInterpreter() *Interpreter {
 
 func checkArguments(tokens []string, message string, count int, exact bool) bool {
   if exact && len(tokens) != count || len(tokens) < count {
-    fmt.Println(message)
+    glog.Warningln(message)
     return false
   }
   return true
@@ -48,7 +49,7 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
 func (interpreter *Interpreter) lookupSource(label Label) (Source, bool) {
   source, ok := interpreter.sources[label];
   if !ok {
-    fmt.Printf("Source %s does not exist.\n", label)
+    glog.Warningf("Source %s does not exist.\n", label)
     return nil, false
   }
   return source, true
@@ -58,7 +59,7 @@ func (interpreter *Interpreter) lookupSource(label Label) (Source, bool) {
 func (interpreter *Interpreter) lookupSink(label Label) (Sink, bool) {
   sink, ok := interpreter.sinks[label]
   if !ok {
-    fmt.Printf("Sink %s does not exist.\n", label)
+    glog.Warningf("Sink %s does not exist.\n", label)
     return nil, false
   }
   return sink, true
@@ -68,7 +69,7 @@ func (interpreter *Interpreter) lookupSink(label Label) (Sink, bool) {
 func (interpreter *Interpreter) lookupRelay(label Label) (*Relay, bool) {
   relay, ok := interpreter.relays[label]
   if !ok {
-    fmt.Printf("Relay %s does not exist.\n", label)
+    glog.Warningf("Relay %s does not exist.\n", label)
     return nil, false
   }
   return relay, true
@@ -77,7 +78,7 @@ func (interpreter *Interpreter) lookupRelay(label Label) (*Relay, bool) {
 
 func (interpreter *Interpreter) assertNoSource(label Label) bool {
   if _, ok := interpreter.sources[label]; ok {
-    fmt.Printf("Source %s already exists.\n", label)
+    glog.Warningf("Source %s already exists.\n", label)
     return false
   }
   return true
@@ -86,7 +87,7 @@ func (interpreter *Interpreter) assertNoSource(label Label) bool {
 
 func (interpreter *Interpreter) assertNoSink(label Label) bool {
   if _, ok := interpreter.sinks[label]; ok {
-    fmt.Printf("Sink %s already exists.\n", label)
+    glog.Warningf("Sink %s already exists.\n", label)
     return false
   }
   return true
@@ -95,7 +96,7 @@ func (interpreter *Interpreter) assertNoSink(label Label) bool {
 
 func (interpreter *Interpreter) assertNoRelay(label Label) bool {
   if _, ok := interpreter.relays[label]; ok {
-    fmt.Printf("Relay %s already exists.\n", label)
+    glog.Warningf("Relay %s already exists.\n", label)
     return false
   }
   return true
@@ -105,7 +106,6 @@ func (interpreter *Interpreter) assertNoRelay(label Label) bool {
 func (interpreter *Interpreter) Repl() {
   var reader = bufio.NewReader(os.Stdin)
   for {
-    fmt.Print("> ")
     line, ok := reader.ReadString('\n')
     if ok != nil {
       return
@@ -140,8 +140,9 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "sources":
       if checkArguments(tokens, "The 'sources' command takes no arguments.", 1, true) {
+        fmt.Print(">")
         for label := range interpreter.sources {
-          fmt.Printf("%s ", label)
+          fmt.Printf(" %s", label)
         }
         fmt.Println()
         return true
@@ -149,8 +150,9 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "sinks":
       if checkArguments(tokens, "The 'sinks' command takes no arguments.", 1, true) {
+        fmt.Print(">")
         for label := range interpreter.sinks {
-          fmt.Printf("%s ", label)
+          fmt.Printf(" %s", label)
         }
         fmt.Println()
         return true
@@ -158,8 +160,9 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "relays":
       if checkArguments(tokens, "The 'relays' command takes no arguments.", 1, true) {
+        fmt.Print(">")
         for label, relay := range interpreter.relays {
-          fmt.Printf("%s{%v,%v} ", label, relay.SourceLabels(), relay.SinkLabels())
+          fmt.Printf(" %s{%v,%v}", label, relay.SourceLabels(), relay.SinkLabels())
         }
         fmt.Println()
         return true
@@ -184,7 +187,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
           found = true
         }
         if !found {
-          fmt.Printf("%s is neither a source, sink, or relay.\n", label)
+          glog.Warningf("%s is neither a source, sink, or relay.\n", label)
           return false
         }
       }
@@ -225,7 +228,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
             files.Append(tokens[2:])
             return true
           }
-          fmt.Printf("The source %s is not a file source.\n", tokens[1])
+          glog.Warningf("The source %s is not a file source.\n", tokens[1])
         }
       }
 
@@ -242,7 +245,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
           if conversion, ok := ParseConversion(token); ok {
             conversions = append(conversions, conversion)
           } else {
-            fmt.Printf("The value '%s' is not a valid conversion.\n", token)
+            glog.Warningf("The value '%s' is not a valid conversion.\n", token)
             return false
           }
         }
@@ -257,7 +260,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
           if filter, ok := ParseFilter(token); ok {
             filters = append(filters, filter)
           } else {
-            fmt.Printf("The value '%s' is not a valid filter.\n", token)
+            glog.Warningf("The value '%s' is not a valid filter.\n", token)
             return false
           }
         }
@@ -346,7 +349,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       for _, file := range tokens[1:] {
         content, err := ioutil.ReadFile(file)
         if err != nil {
-          fmt.Printf("Failed to read file %s: %v.\n", file, err)
+          glog.Warningf("Failed to read file %s: %v.\n", file, err)
           return false
         }
         for _, line := range strings.Split(string(content), "\n") {
@@ -365,45 +368,45 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
           time.Sleep(time.Duration(delay) * time.Second)
           return true
         }
-        fmt.Printf("Could not parse whole number %s: %v.\n", tokens[1], err)
+        glog.Warningf("Could not parse whole number %s: %v.\n", tokens[1], err)
       }
 
     case "exit":
       os.Exit(0)
 
     case "help":
-      fmt.Println("verbose")
-      fmt.Println("silent")
-      fmt.Println("sources")
-      fmt.Println("sinks")
-      fmt.Println("relays")
-      fmt.Println("delete [source|sink|relay]...")
-      fmt.Println("reset [source]...")
-      fmt.Println("absorber 'sink'")
-      fmt.Println("printer 'sink' (Request|Response)")
-      fmt.Println("files 'source' [filename]...")
-      fmt.Println("append 'source' [filename]...")
-      fmt.Println("relay 'relay'")
-      fmt.Println("converter 'relay' [show] [view] [tool] [offset]")
-      fmt.Println("filter 'relay' [show] [message] [reset] [upsert] [delete] [view] [tool] [offset]")
-      fmt.Println("add-source 'relay' [source]...")
-      fmt.Println("add-sink 'relay' [sink]...")
-      fmt.Println("remove-source 'relay' [source]...")
-      fmt.Println("remove-sink 'relay' [sink]...")
-      fmt.Println("serve 'address' 'path'")
-      fmt.Println("websocket 'path'")
-      fmt.Println("kafka 'address' [true|false] 'topic'")
-      fmt.Println("script [file]...")
-      fmt.Println("wait 'seconds'")
-      fmt.Println("exit")
-      fmt.Println("help")
+      fmt.Println("? absorber 'sink'")
+      fmt.Println("? add-sink 'relay' [sink]...")
+      fmt.Println("? add-source 'relay' [source]...")
+      fmt.Println("? append 'source' [filename]...")
+      fmt.Println("? converter 'relay' [show] [view] [tool] [offset]")
+      fmt.Println("? delete [source|sink|relay]...")
+      fmt.Println("? exit")
+      fmt.Println("? files 'source' [filename]...")
+      fmt.Println("? filter 'relay' [show] [message] [reset] [upsert] [delete] [view] [tool] [offset]")
+      fmt.Println("? help")
+      fmt.Println("? kafka 'address' [true|false] 'topic'")
+      fmt.Println("? printer 'sink' (Request|Response)")
+      fmt.Println("? relay 'relay'")
+      fmt.Println("? relays")
+      fmt.Println("? remove-sink 'relay' [sink]...")
+      fmt.Println("? remove-source 'relay' [source]...")
+      fmt.Println("? reset [source]...")
+      fmt.Println("? script [file]...")
+      fmt.Println("? serve 'address' 'path'")
+      fmt.Println("? silent")
+      fmt.Println("? sinks")
+      fmt.Println("? sources")
+      fmt.Println("? verbose")
+      fmt.Println("? wait 'seconds'")
+      fmt.Println("? websocket 'path'")
       return true
 
     case "":
       return true
 
     default:
-      fmt.Printf("Illegal command '%v'.\n", tokens)
+      glog.Warningf("Illegal command '%v'.\n", tokens)
 
   }
 
