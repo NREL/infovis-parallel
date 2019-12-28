@@ -27,7 +27,7 @@ func NewAbsorber(label Label) *Absorber {
     for {
       select {
         case buffer, ok := <-absorber.channel:
-          if !ok { // FIXME: This can only happen if the channel is closed exertnally.
+          if !ok {
             glog.Errorf("Receive failed for absorber %s.\n", absorber.label)
             absorber.Exit()
             return
@@ -49,19 +49,23 @@ func (absorber *Absorber) Label() Label {
 }
 
 
-func (absorber *Absorber) In() ProtobufChannel {
+func (absorber *Absorber) In() ProtobufInChannel {
   return absorber.channel
 }
 
 
 func (absorber *Absorber) Exit() {
-  close(absorber.done)
+  select {
+    case <-absorber.done:
+    default:
+      close(absorber.done)
+  }
 }
 
 
 func (absorber *Absorber) Alive() bool {
   select {
-    case <- absorber.done:
+    case <-absorber.done:
       return false
     default:
       return true

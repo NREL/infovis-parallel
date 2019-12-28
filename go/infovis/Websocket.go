@@ -54,26 +54,25 @@ func (server *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
 
     label := strings.TrimPrefix(request.URL.Path, server.root)
     server.mux.Lock()
-    websocket, found := server.websockets[label]
+    socket, found := server.websockets[label]
     server.mux.Unlock()
     if !found {
-      glog.Infof("No WebSocket for %s.\n", label)
+      glog.Warningf("No WebSocket for %s.\n", label)
       return
     }
     glog.Infof("WebSocket established for %s.\n", label)
 
-    websocket.addConnection(conn)
+    socket.addConnection(conn)
+    defer socket.removeConnection(conn)
 
-    for websocket.Alive() {
+    for socket.Alive() {
       _, buffer, err := conn.ReadMessage()
       if err != nil {
         glog.Errorf("WebSocket %s encountered %v.\n", label, err)
-        break
+        return
       }
-      websocket.received(&buffer)
+      socket.received(&buffer)
     }
-
-    websocket.removeConnection(conn)
 
   }
 }
@@ -110,7 +109,12 @@ func NewWebsocket(server *Server, label Label) *Websocket {
     defer close(socket.out)
     for {
       select {
-        case buffer := <-socket.in:
+        case buffer, ok := <-socket.in:
+          if !ok {
+            glog.Errorf("Receive failed for absorber %s.\n", socket.label)
+            socket.Exit()
+            return
+          }
           socket.mux.Lock()
           conns := socket.conns
           socket.mux.Unlock()
@@ -162,12 +166,12 @@ func (socket *Websocket) Label() Label {
 }
 
 
-func (socket *Websocket) In() ProtobufChannel {
+func (socket *Websocket) In() ProtobufInChannel {
   return socket.in
 }
 
 
-func (socket *Websocket) Out() ProtobufChannel {
+func (socket *Websocket) Out() ProtobufOutChannel {
   return socket.out
 }
 
@@ -177,7 +181,11 @@ func (socket *Websocket) Reset() {
 
 
 func (socket *Websocket) Exit() {
-  close(socket.done)
+  select {
+    case <-socket.done:
+    default:
+      close(socket.done)
+  }
 }
 
 

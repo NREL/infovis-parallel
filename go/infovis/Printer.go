@@ -32,7 +32,7 @@ func NewPrinter(label Label, kind string) *Printer {
           if !ok {
             glog.Errorf("Receive failed for printer %s\n.", printer.label)
             printer.Exit()
-            continue
+            return
           }
           glog.Infof("Printer %s received %v bytes.\n", printer.label, len(buffer))
           switch kind {
@@ -40,18 +40,18 @@ func NewPrinter(label Label, kind string) *Printer {
               request := Request{}
               err := proto.Unmarshal(buffer, &request)
               if err != nil {
-                glog.Errorf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
+                glog.Warningf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
                 break
               }
-              fmt.Printf("Printer %s received %s: %v.\n", label, kind, request)
+              fmt.Printf("= Printer %s received %s: %v.\n", label, kind, request)
             case "Response":
               response := Response{}
               err := proto.Unmarshal(buffer, &response)
               if err != nil {
-                glog.Errorf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
+                glog.Warningf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
                 break
               }
-              fmt.Printf("Printer %s received %s: %v.\n", label, kind, response)
+              fmt.Printf("= Printer %s received %s: %v.\n", label, kind, response)
           }
         case <-printer.done:
           return
@@ -69,13 +69,17 @@ func (printer *Printer) Label() Label {
 }
 
 
-func (printer *Printer) In() ProtobufChannel {
+func (printer *Printer) In() ProtobufInChannel {
   return printer.channel
 }
 
 
 func (printer *Printer) Exit() {
-  close(printer.done)
+  select {
+    case <-printer.done:
+    default:
+      close(printer.done)
+  }
 }
 
 

@@ -9,9 +9,6 @@ import (
 )
 
 
-var empty struct{}
-
-
 type Files struct {
   label     Label
   channel   ProtobufChannel
@@ -42,7 +39,7 @@ func NewFiles(label Label, filenames []string) *Files {
           glog.Infof("Files source %s is reading file %s.\n", files.label, file)
           buffer, err := ioutil.ReadFile(file)
           if err != nil {
-            glog.Errorf("Files source %s encountered %v.\n", files.label, err)
+            glog.Warningf("Files source %s encountered %v.\n", files.label, err)
             break
           }
           select {
@@ -84,7 +81,7 @@ func (files *Files) Label() Label {
 }
 
 
-func (files *Files) Out() ProtobufChannel {
+func (files *Files) Out() ProtobufOutChannel {
   return files.channel
 }
 
@@ -104,13 +101,17 @@ func (files *Files) Reset() {
 
 
 func (files *Files) Exit() {
-  close(files.done)
+  select {
+    case <-files.done:
+    default:
+      close(files.done)
+  }
 }
 
 
 func (files *Files) Alive() bool {
   select {
-    case <- files.done:
+    case <-files.done:
       return false
     default:
       return true
@@ -123,7 +124,7 @@ func unglob(filenames []string) []string {
   for _, filename := range filenames {
     matches, err := filepath.Glob(filename)
     if err != nil {
-      glog.Errorf("Invalid glob pattern '%s': %v.", filename, err)
+      glog.Warningf("Invalid glob pattern '%s': %v.", filename, err)
       continue
     }
     result = append(result, matches...)

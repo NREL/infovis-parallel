@@ -140,7 +140,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "sources":
       if checkArguments(tokens, "The 'sources' command takes no arguments.", 1, true) {
-        fmt.Print(">")
+        fmt.Print("=")
         for label := range interpreter.sources {
           fmt.Printf(" %s", label)
         }
@@ -150,7 +150,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "sinks":
       if checkArguments(tokens, "The 'sinks' command takes no arguments.", 1, true) {
-        fmt.Print(">")
+        fmt.Print("=")
         for label := range interpreter.sinks {
           fmt.Printf(" %s", label)
         }
@@ -160,7 +160,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "relays":
       if checkArguments(tokens, "The 'relays' command takes no arguments.", 1, true) {
-        fmt.Print(">")
+        fmt.Print("=")
         for label, relay := range interpreter.relays {
           fmt.Printf(" %s{%v,%v}", label, relay.SourceLabels(), relay.SinkLabels())
         }
@@ -353,7 +353,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
           return false
         }
         for _, line := range strings.Split(string(content), "\n") {
-          fmt.Printf(">> %s\n", line)
+          fmt.Printf("> %s\n", line)
           if !interpreter.InterpretLine(line) {
             return false
           }

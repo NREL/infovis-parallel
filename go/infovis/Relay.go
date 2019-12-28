@@ -69,7 +69,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
 
   request := Request{}
   if err := proto.Unmarshal(*buffer, &request); err != nil {
-    glog.Errorf("Filter failed to unmarshal buffer: %v.\n", err)
+    glog.Warningf("Filter failed to unmarshal buffer: %v.\n", err)
     return buffer, false
   }
 
@@ -94,7 +94,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
 
   bufferNew, err := proto.Marshal(&request)
   if err != nil {
-    glog.Errorf("Filter %s failed to marshal request %v: %v.\n", request, err)
+    glog.Warningf("Filter %s failed to marshal request %v: %v.\n", request, err)
     return buffer, false
   }
 
@@ -137,7 +137,7 @@ func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
   request := Request{}
   response := Response{}
   if err := proto.Unmarshal(*buffer, &response); err != nil {
-    glog.Errorf("Converter %s failed to unmarshal buffer: %v.\n", err)
+    glog.Warningf("Converter %s failed to unmarshal buffer: %v.\n", err)
     return buffer, false
   }
 
@@ -156,7 +156,7 @@ func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
 
   bufferNew, err := proto.Marshal(&request)
   if err != nil {
-    glog.Errorf("Converter %s failed to marshal request %v: %v.\n", request, err)
+    glog.Warningf("Converter %s failed to marshal request %v: %v.\n", request, err)
     return buffer, false
   }
 
@@ -190,15 +190,27 @@ func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay
     defer close(relay.merge)
     for {
       select {
-        case buffer := <-relay.merge:
+        case buffer, ok := <-relay.merge:
+          if !ok {
+            glog.Errorf("Merged receive failed for relay %s.\n", relay.label)
+            relay.Exit()
+            return
+          }
           converted, ok := convertBuffer(conversions, &buffer)
           if !ok {
-            continue
+            break
           }
           filtered, ok := filterBuffer(exclusions, converted)
+          if !ok {
+            break
+          }
           for _, sink := range relay.Sinks() {
-            (*sink).In() <- *filtered
-            glog.Infof("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), (*sink).Label())
+            select {
+              case (*sink).In() <- *filtered:
+                glog.Infof("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), (*sink).Label())
+              case <-relay.done:
+                return
+            }
           }
         case <-relay.done:
           return
@@ -265,6 +277,7 @@ func (relay *Relay) AddSource(label Label, source *Source) {
         case buffer, ok := <-(*source).Out():
           if !ok {
             glog.Errorf("Relay %s source %s was closed.\n", relay.label, label)
+            relay.Exit()
             return
           }
           relay.mux.RLock()
@@ -272,10 +285,15 @@ func (relay *Relay) AddSource(label Label, source *Source) {
           relay.mux.RUnlock()
           if !ok {
             glog.Errorf("Relay %s source %s is no longer connected.\n", relay.label, label)
+            relay.Exit()
             return
           }
-          relay.merge <- buffer
-          glog.Infof("Relay %s read %v bytes from source %s.\n", relay.label, len(buffer), label)
+          select {
+            case relay.merge <- buffer:
+              glog.Infof("Relay %s read %v bytes from source %s.\n", relay.label, len(buffer), label)
+            case <-relay.done:
+              return
+          }
         case <-relay.done:
           return
       }
@@ -306,7 +324,11 @@ func (relay *Relay) RemoveSink(label Label) {
 
 
 func (relay *Relay) Exit() {
-  close(relay.done)
+  select {
+    case <-relay.done:
+    default:
+      close(relay.done)
+  }
 }
 
 

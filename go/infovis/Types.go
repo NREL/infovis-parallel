@@ -7,6 +7,12 @@ type Label = string
 type ProtobufChannel = chan []byte
 
 
+type ProtobufInChannel = chan<- []byte
+
+
+type ProtobufOutChannel = <-chan []byte
+
+
 type DoneChannel = chan interface{}
 
 
@@ -16,14 +22,15 @@ type Connectable interface {
   Alive() bool
 }
 
+
 type Source interface {
   Connectable
-  Out() ProtobufChannel
+  Out() ProtobufOutChannel
   Reset()
 }
 
 
 type Sink interface {
   Connectable
-  In() ProtobufChannel
+  In() ProtobufInChannel
 }

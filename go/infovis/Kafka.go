@@ -68,6 +68,7 @@ func NewKafka(label Label, broker string, start bool) *Kafka {
           glog.Infof("Kafka consumer %s read %v bytes.\n", label, len(buffer))
           select {
             case kafka.out <- buffer:
+              glog.Infof("Kafka consumer %s wrote %v bytes.\n", label, len(buffer))
             case <-kafka.done:
               return
           }
@@ -108,12 +109,12 @@ func (kafka *Kafka) Label() Label {
 }
 
 
-func (kafka *Kafka) In() ProtobufChannel {
+func (kafka *Kafka) In() ProtobufInChannel {
   return kafka.in
 }
 
 
-func (kafka *Kafka) Out() ProtobufChannel {
+func (kafka *Kafka) Out() ProtobufOutChannel {
   return kafka.out
 }
 
@@ -127,7 +128,11 @@ func (kafka *Kafka) Reset() {
 
 
 func (kafka *Kafka) Exit() {
-  close(kafka.done)
+  select {
+    case <-kafka.done:
+    default:
+      close(kafka.done)
+  }
 }
 
 
