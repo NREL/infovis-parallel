@@ -17,7 +17,7 @@ type Files struct {
   channel   ProtobufChannel
   filenames []string
   index     int
-  exit      bool
+  done      DoneChannel
   mux       sync.Mutex
   wake      chan struct{}
 }
@@ -32,31 +32,35 @@ func NewFiles(label Label, filenames []string) *Files {
     channel  : make(ProtobufChannel),
     filenames: filenames1           ,
     index    : 0                    ,
-    exit     : false                ,
+    done     : make(DoneChannel)    ,
     wake     : make(chan struct{})  ,
   }
 
   go func() {
-    for !files.exit {
-      <-files.wake
-      glog.Infof("Files source %s has awoken.\n", files.label)
-      files.mux.Lock()
-      for (files.index < len(files.filenames)) {
-        filename := files.filenames[files.index]
-        files.index++
-        glog.Infof("Files source %s is reading file %s.\n", files.label, filename)
-        buffer, err := ioutil.ReadFile(filename)
-        if err != nil {
-          glog.Errorf("Files source %s encountered %v.\n", files.label, err)
-          continue
-        }
-        files.channel <- buffer
-        glog.Infof("Files source %s sent %v bytes.\n", files.label, len(buffer))
+    defer glog.Infof("Files source %s is closing.\n", files.label)
+    defer close(files.channel)
+    for {
+      select {
+        case <-files.wake:
+          glog.Infof("Files source %s has awoken.\n", files.label)
+          files.mux.Lock()
+          for (files.index < len(files.filenames)) {
+            filename := files.filenames[files.index]
+            files.index++
+            glog.Infof("Files source %s is reading file %s.\n", files.label, filename)
+            buffer, err := ioutil.ReadFile(filename)
+            if err != nil {
+              glog.Errorf("Files source %s encountered %v.\n", files.label, err)
+              continue
+            }
+            files.channel <- buffer
+            glog.Infof("Files source %s sent %v bytes.\n", files.label, len(buffer))
+          }
+          files.mux.Unlock()
+        case <-files.done:
+          return
       }
-      files.mux.Unlock()
     }
-    glog.Infof("Files source %s is closing.\n", files.label)
-    close(files.channel)
   }()
 
   files.wake <- empty
@@ -94,12 +98,17 @@ func (files *Files) Reset() {
 
 
 func (files *Files) Exit() {
-  files.exit = true
+  close(files.done)
 }
 
 
 func (files *Files) Alive() bool {
-  return !files.exit
+  select {
+    case <- files.done:
+      return false
+    default:
+      return true
+  }
 }
 
 

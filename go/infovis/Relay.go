@@ -170,7 +170,7 @@ type Relay struct {
   sources map[Label]Source
   sinks   map[Label]Sink
   merge   ProtobufChannel
-  exit    bool
+  done    DoneChannel
   mux     sync.RWMutex
 }
 
@@ -182,24 +182,28 @@ func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay
     sources: make(map[Label]Source),
     sinks  : make(map[Label]Sink  ),
     merge  : make(ProtobufChannel) ,
-    exit   : false                 ,
+    done   : make(DoneChannel)     ,
   }
 
   go func() {
-    for !relay.exit {
-      buffer := <-relay.merge
-      converted, ok := convertBuffer(conversions, &buffer)
-      if !ok {
-        continue
-      }
-      filtered, ok := filterBuffer(exclusions, converted)
-      for _, sink := range relay.Sinks() {
-        *sink.In() <- *filtered
-        glog.Infof("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), sink.Label())
+    defer glog.Infof("Relay %s is closing.\n", relay.label)
+    defer close(relay.merge)
+    for {
+      select {
+        case buffer := <-relay.merge:
+          converted, ok := convertBuffer(conversions, &buffer)
+          if !ok {
+            continue
+          }
+          filtered, ok := filterBuffer(exclusions, converted)
+          for _, sink := range relay.Sinks() {
+            *sink.In() <- *filtered
+            glog.Infof("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), sink.Label())
+          }
+        case <-relay.done:
+          return
       }
     }
-    glog.Infof("Relay %s is closing.\n", relay.label)
-    close(relay.merge)
   }()
 
   return &relay
@@ -256,21 +260,25 @@ func (relay *Relay) AddSource(label Label, source Source) {
   relay.sources[label] = source
   relay.mux.Unlock()
   go func() {
-    for !relay.exit {
-      buffer, ok := <-*source.Out()
-      if !ok {
-        glog.Errorf("Relay %s source %s was closed.\n", relay.label, label)
-        return
+    for {
+      select {
+        case buffer, ok := <-*source.Out():
+          if !ok {
+            glog.Errorf("Relay %s source %s was closed.\n", relay.label, label)
+            return
+          }
+          relay.mux.RLock()
+          _, ok = relay.sources[label]
+          relay.mux.RUnlock()
+          if !ok {
+            glog.Errorf("Relay %s source %s is no longer connected.\n", relay.label, label)
+            return
+          }
+          relay.merge <- buffer
+          glog.Infof("Relay %s read %v bytes from source %s.\n", relay.label, len(buffer), label)
+        case <-relay.done:
+          return
       }
-      relay.mux.RLock()
-      _, ok = relay.sources[label]
-      relay.mux.RUnlock()
-      if !ok {
-        glog.Errorf("Relay %s source %s is no longer connected.\n", relay.label, label)
-        return
-      }
-      relay.merge <- buffer
-      glog.Infof("Relay %s read %v bytes from source %s.\n", relay.label, len(buffer), label)
     }
   }()
 }
@@ -298,10 +306,15 @@ func (relay *Relay) RemoveSink(label Label) {
 
 
 func (relay *Relay) Exit() {
-  relay.exit = true
+  close(relay.done)
 }
 
 
 func (relay *Relay) Alive() bool {
-  return !relay.exit
+  select {
+    case <-relay.done:
+      return false
+    default:
+      return true
+  }
 }

@@ -12,6 +12,8 @@ import (
 
 func main() {
 
+  defer glog.Flush()
+
   var demo = flag.Bool("demo", false, "run in demo mode")
 
   flag.Usage = func() {
@@ -36,6 +38,5 @@ func main() {
   }
   interpreter.Repl()
 
-  glog.Flush()
 
 }

@@ -64,7 +64,7 @@ func (server *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
 
     websocket.addConnection(conn)
 
-    for !websocket.exit {
+    for websocket.Alive() {
       _, buffer, err := conn.ReadMessage()
       if err != nil {
         glog.Errorf("WebSocket %s encountered %v.\n", label, err)
@@ -83,7 +83,7 @@ type Websocket struct {
   label   Label
   in      ProtobufChannel
   out     ProtobufChannel
-  exit    bool
+  done    DoneChannel
   server  *Server
   conns   []*websocket.Conn
   mux     sync.Mutex
@@ -96,7 +96,7 @@ func NewWebsocket(server *Server, label Label) *Websocket {
     label  : label                ,
     in     : make(ProtobufChannel),
     out    : make(ProtobufChannel),
-    exit   : false                ,
+    done   : make(DoneChannel)    ,
     server : server               ,
   }
 
@@ -105,23 +105,27 @@ func NewWebsocket(server *Server, label Label) *Websocket {
   server.mux.Unlock()
 
   go func() {
-    for !socket.exit {
-      buffer := <-socket.in
-      socket.mux.Lock()
-      conns := socket.conns
-      socket.mux.Unlock()
-      for _, conn := range conns {
-        err := conn.WriteMessage(websocket.BinaryMessage, buffer)
-        if err != nil {
-          glog.Errorf("Removing Websocket connection for %s.\n", label)
-          socket.removeConnection(conn)
-          continue
-        }
+    defer glog.Infof("WebSocket %s is closing.\n", label)
+    defer close(socket.in)
+    defer close(socket.out)
+    for {
+      select {
+        case buffer := <-socket.in:
+          socket.mux.Lock()
+          conns := socket.conns
+          socket.mux.Unlock()
+          for _, conn := range conns {
+            err := conn.WriteMessage(websocket.BinaryMessage, buffer)
+            if err != nil {
+              glog.Errorf("Removing Websocket connection for %s.\n", label)
+              socket.removeConnection(conn)
+              continue
+            }
+          }
+        case <-socket.done:
+          return
       }
     }
-    glog.Infof("WebSocket %s is closing.\n", label)
-    close(socket.in)
-    close(socket.out)
   }()
 
   return &socket
@@ -173,10 +177,15 @@ func (socket *Websocket) Reset() {
 
 
 func (socket *Websocket) Exit() {
-  socket.exit = true
+  close(socket.done)
 }
 
 
 func (socket *Websocket) Alive() bool {
-  return !socket.exit
+  select {
+    case <-socket.done:
+      return false
+    default:
+      return true
+  }
 }

@@ -9,7 +9,7 @@ import (
 type Absorber struct {
   label   Label
   channel ProtobufChannel
-  exit    bool
+  done    DoneChannel
 }
 
 
@@ -18,21 +18,25 @@ func NewAbsorber(label Label) *Absorber {
   var absorber = Absorber {
     label  : label                ,
     channel: make(ProtobufChannel),
-    exit   : false                ,
+    done   : make(DoneChannel)    ,
   }
 
   go func() {
-    for !absorber.exit {
-      buffer, ok := <-absorber.channel
-      if !ok {
-        glog.Errorf("Receive failed for absorber %s.\n", absorber.label)
-        absorber.exit = true
-        continue
+    defer glog.Infof("Absorber %s is closing.\n", absorber.label)
+    defer close(absorber.channel)
+    for {
+      select {
+        case buffer, ok := <-absorber.channel:
+          if !ok { // FIXME: This can only happen if the channel is closed exertnally.
+            glog.Errorf("Receive failed for absorber %s.\n", absorber.label)
+            absorber.Exit()
+            return
+          }
+          glog.Infof("Absorber %s received %v bytes.\n", absorber.label, len(buffer))
+        case <-absorber.done:
+          return
       }
-      glog.Infof("Absorber %s received %v bytes.\n", absorber.label, len(buffer))
     }
-    glog.Infof("Absorber %s is closing.\n", absorber.label)
-    close(absorber.channel)
   }()
 
   return &absorber
@@ -51,10 +55,15 @@ func (absorber *Absorber) In() *ProtobufChannel {
 
 
 func (absorber *Absorber) Exit() {
-  absorber.exit = true
+  close(absorber.done)
 }
 
 
 func (absorber *Absorber) Alive() bool {
-  return !absorber.exit
+  select {
+    case <- absorber.done:
+      return false
+    default:
+      return true
+  }
 }

@@ -7,6 +7,9 @@ type Label = string
 type ProtobufChannel = chan []byte
 
 
+type DoneChannel = chan interface{}
+
+
 type Connectable interface {
   Label() Label
   Exit()
