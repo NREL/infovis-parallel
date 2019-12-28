@@ -69,8 +69,8 @@ func (printer *Printer) Label() Label {
 }
 
 
-func (printer *Printer) In() *ProtobufChannel {
-  return &printer.channel
+func (printer *Printer) In() ProtobufChannel {
+  return printer.channel
 }
 
 

@@ -84,8 +84,8 @@ func (files *Files) Label() Label {
 }
 
 
-func (files *Files) Out() *ProtobufChannel {
-  return &files.channel
+func (files *Files) Out() ProtobufChannel {
+  return files.channel
 }
 
 

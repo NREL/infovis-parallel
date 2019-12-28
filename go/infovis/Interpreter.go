@@ -273,7 +273,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
         if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
             if source, ok := interpreter.lookupSource(label); ok {
-              relay.AddSource(label, source)
+              relay.AddSource(label, &source)
             } else {
               return false
             }
@@ -287,7 +287,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
         if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
             if sink, ok := interpreter.lookupSink(label); ok {
-              relay.AddSink(label, sink)
+              relay.AddSink(label, &sink)
             } else {
               return false
             }
@@ -406,7 +406,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       return true
 
     default:
-      glog.Warningf("Illegal command '%v'.\n", tokens)
+      glog.Warningf("Illegal command %v.\n", tokens)
 
   }
 

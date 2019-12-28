@@ -49,8 +49,8 @@ func (absorber *Absorber) Label() Label {
 }
 
 
-func (absorber *Absorber) In() *ProtobufChannel {
-  return &absorber.channel
+func (absorber *Absorber) In() ProtobufChannel {
+  return absorber.channel
 }
 
 

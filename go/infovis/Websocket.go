@@ -162,13 +162,13 @@ func (socket *Websocket) Label() Label {
 }
 
 
-func (socket *Websocket) In() *ProtobufChannel {
-  return &socket.in
+func (socket *Websocket) In() ProtobufChannel {
+  return socket.in
 }
 
 
-func (socket *Websocket) Out() *ProtobufChannel {
-  return &socket.out
+func (socket *Websocket) Out() ProtobufChannel {
+  return socket.out
 }
 
 

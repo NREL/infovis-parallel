@@ -108,13 +108,13 @@ func (kafka *Kafka) Label() Label {
 }
 
 
-func (kafka *Kafka) In() *ProtobufChannel {
-  return &kafka.in
+func (kafka *Kafka) In() ProtobufChannel {
+  return kafka.in
 }
 
 
-func (kafka *Kafka) Out() *ProtobufChannel {
-  return &kafka.out
+func (kafka *Kafka) Out() ProtobufChannel {
+  return kafka.out
 }
 
 

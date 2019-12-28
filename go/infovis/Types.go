@@ -18,12 +18,12 @@ type Connectable interface {
 
 type Source interface {
   Connectable
-  Out() *ProtobufChannel
+  Out() ProtobufChannel
   Reset()
 }
 
 
 type Sink interface {
   Connectable
-  In() *ProtobufChannel
+  In() ProtobufChannel
 }

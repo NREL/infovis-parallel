@@ -167,8 +167,8 @@ func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
 
 type Relay struct {
   label   Label
-  sources map[Label]Source
-  sinks   map[Label]Sink
+  sources map[Label]*Source
+  sinks   map[Label]*Sink
   merge   ProtobufChannel
   done    DoneChannel
   mux     sync.RWMutex
@@ -178,11 +178,11 @@ type Relay struct {
 func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay {
 
   var relay = Relay{
-    label  : label                 ,
-    sources: make(map[Label]Source),
-    sinks  : make(map[Label]Sink  ),
-    merge  : make(ProtobufChannel) ,
-    done   : make(DoneChannel)     ,
+    label  : label                  ,
+    sources: make(map[Label]*Source),
+    sinks  : make(map[Label]*Sink  ),
+    merge  : make(ProtobufChannel)  ,
+    done   : make(DoneChannel)      ,
   }
 
   go func() {
@@ -197,8 +197,8 @@ func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay
           }
           filtered, ok := filterBuffer(exclusions, converted)
           for _, sink := range relay.Sinks() {
-            *sink.In() <- *filtered
-            glog.Infof("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), sink.Label())
+            (*sink).In() <- *filtered
+            glog.Infof("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), (*sink).Label())
           }
         case <-relay.done:
           return
@@ -211,9 +211,9 @@ func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay
 }
 
 
-func (relay *Relay) Sources() []Source {
+func (relay *Relay) Sources() []*Source {
   relay.mux.RLock()
-  sources := make([]Source, 0, len(relay.sources))
+  sources := make([]*Source, 0, len(relay.sources))
   for _, source := range relay.sources {
     sources = append(sources, source)
   }
@@ -222,9 +222,9 @@ func (relay *Relay) Sources() []Source {
 }
 
 
-func (relay *Relay) Sinks() []Sink {
+func (relay *Relay) Sinks() []*Sink {
   relay.mux.RLock()
-  sinks := make([]Sink, 0, len(relay.sinks))
+  sinks := make([]*Sink, 0, len(relay.sinks))
   for _, sink := range relay.sinks {
     sinks = append(sinks, sink)
   }
@@ -255,14 +255,14 @@ func (relay *Relay) SinkLabels() []Label {
 }
 
 
-func (relay *Relay) AddSource(label Label, source Source) {
+func (relay *Relay) AddSource(label Label, source *Source) {
   relay.mux.Lock()
   relay.sources[label] = source
   relay.mux.Unlock()
   go func() {
     for {
       select {
-        case buffer, ok := <-*source.Out():
+        case buffer, ok := <-(*source).Out():
           if !ok {
             glog.Errorf("Relay %s source %s was closed.\n", relay.label, label)
             return
@@ -284,7 +284,7 @@ func (relay *Relay) AddSource(label Label, source Source) {
 }
 
 
-func (relay *Relay) AddSink(label Label, sink Sink) {
+func (relay *Relay) AddSink(label Label, sink *Sink) {
   relay.mux.Lock()
   relay.sinks[label] = sink
   relay.mux.Unlock()
