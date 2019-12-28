@@ -2,10 +2,10 @@ package infovis
 
 
 import (
-  "log"
   "net/http"
   "strings"
   "sync"
+  "github.com/golang/glog"
   "github.com/gorilla/websocket"
 )
 
@@ -14,7 +14,6 @@ type Server struct {
   root       string
   websockets map[Label]*Websocket
   mux        sync.Mutex
-  verbose    bool
 }
 
 
@@ -25,18 +24,15 @@ var upgrader = websocket.Upgrader{
 }
 
 
-func NewServer(address string, root string, verbose bool) *Server {
+func NewServer(address string, root string) *Server {
   var server = Server {
     root      : root                      ,
     websockets: make(map[Label]*Websocket),
-    verbose   : verbose                   ,
   }
   http.HandleFunc(root, server.makeHandler())
   go func() {
-    if verbose {
-      log.Printf("Serving WebSockets on address %s%s.\n", address, server.root)
-    }
-    log.Fatal(http.ListenAndServe(address, nil))
+    glog.Infof("Serving WebSockets on address %s%s.\n", address, server.root)
+    glog.Fatal(http.ListenAndServe(address, nil))
   }()
   return &server
 }
@@ -47,12 +43,12 @@ func (server *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
 
     conn, err := upgrader.Upgrade(responseWriter, request, nil)
     if err != nil {
-      log.Fatal(err)
+      glog.Fatal(err)
     }
     defer conn.Close()
 
     if !strings.HasPrefix(request.URL.Path, server.root) {
-      log.Printf("Invalid WebSocket path %s\n.", request.URL.Path)
+      glog.Errorf("Invalid WebSocket path %s\n.", request.URL.Path)
       return
     }
 
@@ -61,21 +57,17 @@ func (server *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
     websocket, found := server.websockets[label]
     server.mux.Unlock()
     if !found {
-      if server.verbose {
-        log.Printf("No WebSocket for %s.\n", label)
-      }
+      glog.Infof("No WebSocket for %s.\n", label)
       return
     }
-    if server.verbose {
-      log.Printf("WebSocket established for %s.\n", label)
-    }
+    glog.Infof("WebSocket established for %s.\n", label)
 
     websocket.addConnection(conn)
 
     for !websocket.exit {
       _, buffer, err := conn.ReadMessage()
       if err != nil {
-        log.Printf("WebSocket %s encountered %v.\n", label, err)
+        glog.Errorf("WebSocket %s encountered %v.\n", label, err)
         break
       }
       websocket.received(&buffer)
@@ -92,21 +84,19 @@ type Websocket struct {
   in      ProtobufChannel
   out     ProtobufChannel
   exit    bool
-  verbose bool
   server  *Server
   conns   []*websocket.Conn
   mux     sync.Mutex
 }
 
 
-func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
+func NewWebsocket(server *Server, label Label) *Websocket {
 
   var socket = Websocket {
     label  : label                ,
     in     : make(ProtobufChannel),
     out    : make(ProtobufChannel),
     exit   : false                ,
-    verbose: verbose              ,
     server : server               ,
   }
 
@@ -123,15 +113,13 @@ func NewWebsocket(server *Server, label Label, verbose bool) *Websocket {
       for _, conn := range conns {
         err := conn.WriteMessage(websocket.BinaryMessage, buffer)
         if err != nil {
-          log.Printf("Removing Websocket connection for %s.\n", label)
+          glog.Errorf("Removing Websocket connection for %s.\n", label)
           socket.removeConnection(conn)
           continue
         }
       }
     }
-    if verbose {
-      log.Printf("WebSocket %s is closing.\n", label)
-    }
+    glog.Infof("WebSocket %s is closing.\n", label)
     close(socket.in)
     close(socket.out)
   }()

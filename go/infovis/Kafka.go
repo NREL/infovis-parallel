@@ -3,7 +3,7 @@ package infovis
 
 import (
   "context"
-  "log"
+  "github.com/golang/glog"
   kafkA "github.com/segmentio/kafka-go"
 )
 
@@ -19,7 +19,7 @@ type Kafka struct {
 }
 
 
-func NewKafka(label Label, broker string, start bool, verbose bool) *Kafka {
+func NewKafka(label Label, broker string, start bool) *Kafka {
 
   readerConfig := kafkA.ReaderConfig{
     Brokers  : []string{broker},
@@ -48,21 +48,19 @@ func NewKafka(label Label, broker string, start bool, verbose bool) *Kafka {
       kafka.offset = -2
     }
     if err := kafka.reader.SetOffset(kafka.offset); err != nil {
-      log.Printf("Kafka consumer %s encountered error: %v.\n", label, err)
+      glog.Errorf("Kafka consumer %s encountered error: %v.\n", label, err)
       kafka.exit = true
     }
     kafka.offset = kafka.reader.Offset()
     for !kafka.exit {
       message, err := kafka.reader.ReadMessage(context.Background())
       if err != nil {
-        log.Printf("Kakfa consumer %s encountered error: %v.\n", label, err)
+        glog.Errorf("Kakfa consumer %s encountered error: %v.\n", label, err)
         kafka.exit = true
         break
       }
       buffer := message.Value
-      if verbose {
-        log.Printf("Kafka consumer %s read %v bytes.\n", label, len(buffer))
-      }
+      glog.Infof("Kafka consumer %s read %v bytes.\n", label, len(buffer))
       kafka.out <- buffer
     }
     kafka.reader.Close()
@@ -72,19 +70,17 @@ func NewKafka(label Label, broker string, start bool, verbose bool) *Kafka {
     for !kafka.exit {
       buffer, okay := <-kafka.in
       if !okay {
-        log.Printf("Receive failed for Kafka producer %s.\n", label)
+        glog.Errorf("Receive failed for Kafka producer %s.\n", label)
         kafka.exit = true
         break
       }
       err := kafka.writer.WriteMessages(context.Background(), kafkA.Message{Key: []byte{}, Value: buffer,})
       if err != nil {
-        log.Printf("Kafka producer %s encountered error: %v.\n", label, err)
+        glog.Errorf("Kafka producer %s encountered error: %v.\n", label, err)
         kafka.exit = true
         break
       }
-      if verbose {
-        log.Printf("Kafka producer %s wrote %v bytes.\n", label, len(buffer))
-      }
+      glog.Infof("Kafka producer %s wrote %v bytes.\n", label, len(buffer))
     }
     kafka.writer.Close()
   }()
@@ -111,7 +107,7 @@ func (kafka *Kafka) Out() *ProtobufChannel {
 
 func (kafka *Kafka) Reset() {
   if err := kafka.reader.SetOffset(kafka.offset); err != nil {
-    log.Printf("Kafka consumer %s encountered error: %v.\n", kafka.label, err)
+    glog.Errorf("Kafka consumer %s encountered error: %v.\n", kafka.label, err)
     kafka.exit = true
   }
 }

@@ -2,8 +2,8 @@ package infovis
 
 
 import (
-  "log"
   "sync"
+  "github.com/golang/glog"
   "github.com/golang/protobuf/proto"
 )
 
@@ -69,7 +69,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
 
   request := Request{}
   if err := proto.Unmarshal(*buffer, &request); err != nil {
-    log.Printf("Filter failed to unmarshal buffer: %v.\n", err)
+    glog.Errorf("Filter failed to unmarshal buffer: %v.\n", err)
     return buffer, false
   }
 
@@ -94,7 +94,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
 
   bufferNew, err := proto.Marshal(&request)
   if err != nil {
-    log.Printf("Filter %s failed to marshal request %v: %v.\n", request, err)
+    glog.Errorf("Filter %s failed to marshal request %v: %v.\n", request, err)
     return buffer, false
   }
 
@@ -137,7 +137,7 @@ func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
   request := Request{}
   response := Response{}
   if err := proto.Unmarshal(*buffer, &response); err != nil {
-    log.Printf("Converter %s failed to unmarshal buffer: %v.\n", err)
+    glog.Errorf("Converter %s failed to unmarshal buffer: %v.\n", err)
     return buffer, false
   }
 
@@ -156,7 +156,7 @@ func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
 
   bufferNew, err := proto.Marshal(&request)
   if err != nil {
-    log.Printf("Converter %s failed to marshal request %v: %v.\n", request, err)
+    glog.Errorf("Converter %s failed to marshal request %v: %v.\n", request, err)
     return buffer, false
   }
 
@@ -175,7 +175,7 @@ type Relay struct {
 }
 
 
-func NewRelay(label Label, conversions []Conversion, exclusions []Filter, verbose bool) *Relay {
+func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay {
 
   var relay = Relay{
     label  : label                 ,
@@ -195,14 +195,10 @@ func NewRelay(label Label, conversions []Conversion, exclusions []Filter, verbos
       filtered, ok := filterBuffer(exclusions, converted)
       for _, sink := range relay.Sinks() {
         *sink.In() <- *filtered
-        if verbose {
-          log.Printf("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), sink.Label())
-        }
+        glog.Infof("Relay %s wrote %v bytes to sink %s.\n", relay.label, len(*filtered), sink.Label())
       }
     }
-    if verbose {
-      log.Printf("Relay %s is closing.\n", relay.label)
-    }
+    glog.Infof("Relay %s is closing.\n", relay.label)
     close(relay.merge)
   }()
 
@@ -255,7 +251,7 @@ func (relay *Relay) SinkLabels() []Label {
 }
 
 
-func (relay *Relay) AddSource(label Label, source Source, verbose bool) {
+func (relay *Relay) AddSource(label Label, source Source) {
   relay.mux.Lock()
   relay.sources[label] = source
   relay.mux.Unlock()
@@ -263,20 +259,18 @@ func (relay *Relay) AddSource(label Label, source Source, verbose bool) {
     for !relay.exit {
       buffer, ok := <-*source.Out()
       if !ok {
-        log.Printf("Relay %s source %s was closed.\n", relay.label, label)
+        glog.Errorf("Relay %s source %s was closed.\n", relay.label, label)
         return
       }
       relay.mux.RLock()
       _, ok = relay.sources[label]
       relay.mux.RUnlock()
       if !ok {
-        log.Printf("Relay %s source %s is no longer connected.\n", relay.label, label)
+        glog.Errorf("Relay %s source %s is no longer connected.\n", relay.label, label)
         return
       }
       relay.merge <- buffer
-      if verbose {
-        log.Printf("Relay %s read %v bytes from source %s.\n", relay.label, len(buffer), label)
-      }
+      glog.Infof("Relay %s read %v bytes from source %s.\n", relay.label, len(buffer), label)
     }
   }()
 }

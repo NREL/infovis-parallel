@@ -2,9 +2,9 @@ package infovis
 
 import (
   "io/ioutil"
-  "log"
   "net/http"
   "path/filepath"
+  "github.com/golang/glog"
   "github.com/gorilla/websocket"
 )
 
@@ -21,21 +21,19 @@ func Demo(address string, path string, globs []string) {
 
     conn, err := upgrader.Upgrade(responseWriter, request, nil)
     if err != nil {
-      log.Fatal(err)
-      return
+      glog.Fatal(err)
     }
     defer conn.Close()
 
     for _, glob := range globs {
       matches, err := filepath.Glob(glob)
       if err != nil {
-        log.Fatal(err)
-        continue
+        glog.Fatal(err)
       }
       for _, filename := range matches {
         buffer, err := ioutil.ReadFile(filename)
         if err != nil {
-          log.Fatal(err)
+          glog.Fatal(err)
           return
         }
         conn.WriteMessage(websocket.BinaryMessage, buffer)
@@ -53,6 +51,6 @@ func Demo(address string, path string, globs []string) {
 
 
   http.HandleFunc(path, handler)
-  log.Fatal(http.ListenAndServe(address, nil))
+  glog.Fatal(http.ListenAndServe(address, nil))
 
 }

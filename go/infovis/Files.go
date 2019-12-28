@@ -3,9 +3,9 @@ package infovis
 
 import (
   "io/ioutil"
-  "log"
   "path/filepath"
   "sync"
+  "github.com/golang/glog"
 )
 
 
@@ -23,7 +23,7 @@ type Files struct {
 }
 
 
-func NewFiles(label Label, filenames []string, verbose bool) *Files {
+func NewFiles(label Label, filenames []string) *Files {
 
   filenames1 := unglob(filenames)
 
@@ -39,31 +39,23 @@ func NewFiles(label Label, filenames []string, verbose bool) *Files {
   go func() {
     for !files.exit {
       <-files.wake
-      if verbose {
-        log.Printf("Files source %s has awoken.\n", files.label)
-      }
+      glog.Infof("Files source %s has awoken.\n", files.label)
       files.mux.Lock()
       for (files.index < len(files.filenames)) {
         filename := files.filenames[files.index]
         files.index++
-        if verbose {
-          log.Printf("Files source %s is reading file %s.\n", files.label, filename)
-        }
+        glog.Infof("Files source %s is reading file %s.\n", files.label, filename)
         buffer, err := ioutil.ReadFile(filename)
         if err != nil {
-          log.Printf("Files source %s encountered %v.\n", files.label, err)
+          glog.Errorf("Files source %s encountered %v.\n", files.label, err)
           continue
         }
         files.channel <- buffer
-        if verbose {
-          log.Printf("Files source %s sent %v bytes.\n", files.label, len(buffer))
-        }
+        glog.Infof("Files source %s sent %v bytes.\n", files.label, len(buffer))
       }
       files.mux.Unlock()
     }
-    if verbose {
-      log.Printf("Files source %s is closing.\n", files.label)
-    }
+    glog.Infof("Files source %s is closing.\n", files.label)
     close(files.channel)
   }()
 
@@ -116,7 +108,7 @@ func unglob(filenames []string) []string {
   for _, filename := range filenames {
     matches, err := filepath.Glob(filename)
     if err != nil {
-      log.Printf("Invalid glob pattern '%s': %v.", filename, err)
+      glog.Errorf("Invalid glob pattern '%s': %v.", filename, err)
       continue
     }
     result = append(result, matches...)

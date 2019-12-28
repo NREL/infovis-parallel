@@ -2,7 +2,7 @@ package infovis
 
 
 import (
-  "log"
+  "github.com/golang/glog"
 )
 
 
@@ -13,7 +13,7 @@ type Absorber struct {
 }
 
 
-func NewAbsorber(label Label, verbose bool) *Absorber {
+func NewAbsorber(label Label) *Absorber {
 
   var absorber = Absorber {
     label  : label                ,
@@ -25,17 +25,13 @@ func NewAbsorber(label Label, verbose bool) *Absorber {
     for !absorber.exit {
       buffer, ok := <-absorber.channel
       if !ok {
-        log.Printf("Receive failed for absorber %s.\n", absorber.label)
+        glog.Errorf("Receive failed for absorber %s.\n", absorber.label)
         absorber.exit = true
         continue
       }
-      if verbose {
-        log.Printf("Absorber %s received %v bytes.\n", absorber.label, len(buffer))
-      }
+      glog.Infof("Absorber %s received %v bytes.\n", absorber.label, len(buffer))
     }
-    if verbose {
-      log.Printf("Absorber %s is closing.\n", absorber.label)
-    }
+    glog.Infof("Absorber %s is closing.\n", absorber.label)
     close(absorber.channel)
   }()
 

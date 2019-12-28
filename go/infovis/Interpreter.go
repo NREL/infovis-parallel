@@ -3,6 +3,7 @@ package infovis
 
 import (
   "bufio"
+  "flag"
   "fmt"
   "io/ioutil"
   "os"
@@ -14,7 +15,6 @@ import (
 
 
 type Interpreter struct {
-  verbose   bool
   sources   map[Label]Source
   sinks     map[Label]Sink
   relays    map[Label]*Relay
@@ -26,7 +26,6 @@ type Interpreter struct {
 
 func NewInterpreter() *Interpreter {
   var interpreter = Interpreter{
-    verbose  : false                       ,
     sources  : make(map[Label]Source)      ,
     sinks    : make(map[Label]Sink  )      ,
     relays   : make(map[Label]*Relay)      ,
@@ -129,13 +128,13 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "verbose":
       if checkArguments(tokens, "The 'verbose' command takes no arguments.", 1, true) {
-        interpreter.verbose = true
+        flag.Set("stderrthreshold", "INFO")
         return true
       }
 
     case "silent":
       if checkArguments(tokens, "The 'silent' command takes no arguments.", 1, true) {
-        interpreter.verbose = false
+        flag.Set("stderrthreshold", "ERROR")
         return true
       }
 
@@ -203,19 +202,19 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "absorber":
       if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) && interpreter.assertNoSink(tokens[1]) {
-        interpreter.sinks[tokens[1]] = NewAbsorber(tokens[1], interpreter.verbose)
+        interpreter.sinks[tokens[1]] = NewAbsorber(tokens[1])
         return true
       }
 
     case "printer":
       if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) && interpreter.assertNoSink(tokens[1]) {
-        interpreter.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], interpreter.verbose)
+        interpreter.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2])
         return true
       }
 
     case "files":
       if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && interpreter.assertNoSource(tokens[1]) {
-        interpreter.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], interpreter.verbose)
+        interpreter.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:])
         return true
       }
 
@@ -232,7 +231,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "relay":
       if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && interpreter.assertNoRelay(tokens[1]) {
-        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{}, interpreter.verbose)
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{})
         return true
       }
 
@@ -247,7 +246,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
             return false
           }
         }
-        interpreter.relays[tokens[1]] = NewRelay(tokens[1], conversions, []Filter{}, interpreter.verbose)
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], conversions, []Filter{})
         return true
       }
 
@@ -262,7 +261,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
             return false
           }
         }
-        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, InvertFilters(&filters), interpreter.verbose)
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, InvertFilters(&filters))
         return true
       }
 
@@ -271,7 +270,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
         if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
             if source, ok := interpreter.lookupSource(label); ok {
-              relay.AddSource(label, source, interpreter.verbose)
+              relay.AddSource(label, source)
             } else {
               return false
             }
@@ -324,13 +323,13 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "serve":
       if checkArguments(tokens, "The 'serve' command must have an address and a path.", 3, true) {
-        interpreter.server = NewServer(tokens[1], tokens[2], interpreter.verbose)
+        interpreter.server = NewServer(tokens[1], tokens[2])
         return true
       }
 
     case "websocket":
       if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) && interpreter.assertNoSource(tokens[1]) && interpreter.assertNoSink(tokens[1]) {
-        websocket := NewWebsocket(interpreter.server, tokens[1], interpreter.verbose)
+        websocket := NewWebsocket(interpreter.server, tokens[1])
         interpreter.sources[tokens[1]] = websocket
         interpreter.sinks[tokens[1]]   = websocket
         return true
@@ -338,7 +337,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "kafka":
       if checkArguments(tokens, "The 'kafka' command must have an address, whether to start at the earliest offset, and a topic.", 4, true) && interpreter.assertNoSource(tokens[3]) && interpreter.assertNoSink(tokens[3]) {
-        kafka := NewKafka(tokens[3], tokens[1], tokens[2] == "true", interpreter.verbose)
+        kafka := NewKafka(tokens[3], tokens[1], tokens[2] == "true")
         interpreter.sources[tokens[3]] = kafka
         interpreter.sinks[tokens[3]]   = kafka
       }
@@ -351,9 +350,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
           return false
         }
         for _, line := range strings.Split(string(content), "\n") {
-          if interpreter.verbose {
-            fmt.Printf(">> %s\n", line)
-          }
+          fmt.Printf(">> %s\n", line)
           if !interpreter.InterpretLine(line) {
             return false
           }
