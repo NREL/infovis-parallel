@@ -42,9 +42,9 @@ func NewInterpreter() *Interpreter {
   go func(){
     for {
       label := <-interpreter.reaper
-//    interpreter.mux.Lock()
+      interpreter.mux.Lock()
       interpreter.deleteConnectable(label, false)
-//    interpreter.mux.Unlock()
+      interpreter.mux.Unlock()
     }
   }()
 
@@ -63,7 +63,6 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
 
 
 func (interpreter *Interpreter) deleteConnectable(label Label, warn bool) bool {
-  fmt.Print(label, " ", interpreter.sources, " ", interpreter.sinks, " ", interpreter.relays)
   if source, ok := interpreter.sources[label]; ok {
     source.Exit()
     delete(interpreter.sources, label)
@@ -164,8 +163,8 @@ func (interpreter *Interpreter) InterpretLine(line string) bool {
 
 func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
-//interpreter.mux.Lock()
-//defer interpreter.mux.Unlock()
+  interpreter.mux.Lock()
+  defer interpreter.mux.Unlock()
 
   switch tokens[0] {
 
