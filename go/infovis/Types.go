@@ -4,6 +4,12 @@ package infovis
 type Label = string
 
 
+type LabelChannel = chan Label
+
+
+type LabelInChannel = chan<- Label
+
+
 type ProtobufChannel = chan []byte
 
 

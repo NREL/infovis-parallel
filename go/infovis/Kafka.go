@@ -19,7 +19,7 @@ type Kafka struct {
 }
 
 
-func NewKafka(label Label, broker string, start bool) *Kafka {
+func NewKafka(label Label, broker string, start bool, reaper LabelInChannel) *Kafka {
 
   readerConfig := kafkA.ReaderConfig{
     Brokers  : []string{broker},
@@ -42,6 +42,11 @@ func NewKafka(label Label, broker string, start bool) *Kafka {
     writer: kafkA.NewWriter(writerConfig),
     offset: -1                           ,
   }
+
+  go func() {
+    <-kafka.done
+    reaper <- label
+  }()
 
   go func() {
     defer kafka.reader.Close()

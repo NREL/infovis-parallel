@@ -10,6 +10,7 @@ import (
   "regexp"
   "strconv"
   "strings"
+  "sync"
   "time"
   "github.com/golang/glog"
 )
@@ -22,18 +23,33 @@ type Interpreter struct {
   server    *Server
   tokenizer *regexp.Regexp
   commenter *regexp.Regexp
+  reaper    LabelChannel
+  mux       sync.Mutex
 }
 
 
 func NewInterpreter() *Interpreter {
+
   var interpreter = Interpreter{
     sources  : make(map[Label]Source)      ,
     sinks    : make(map[Label]Sink  )      ,
     relays   : make(map[Label]*Relay)      ,
     tokenizer: regexp.MustCompile(" +")    ,
     commenter: regexp.MustCompile(" *#.*$"),
+    reaper   : make(LabelChannel)          ,
   }
+
+  go func(){
+    for {
+      label := <-interpreter.reaper
+//    interpreter.mux.Lock()
+      interpreter.deleteConnectable(label, false)
+//    interpreter.mux.Unlock()
+    }
+  }()
+
   return &interpreter
+
 }
 
 
@@ -43,6 +59,30 @@ func checkArguments(tokens []string, message string, count int, exact bool) bool
     return false
   }
   return true
+}
+
+
+func (interpreter *Interpreter) deleteConnectable(label Label, warn bool) bool {
+  fmt.Print(label, " ", interpreter.sources, " ", interpreter.sinks, " ", interpreter.relays)
+  if source, ok := interpreter.sources[label]; ok {
+    source.Exit()
+    delete(interpreter.sources, label)
+    return true
+  }
+  if sink, ok := interpreter.sinks[label]; ok {
+    sink.Exit()
+    delete(interpreter.sinks, label)
+    return true
+  }
+  if relay, ok := interpreter.relays[label]; ok {
+    relay.Exit()
+    delete(interpreter.relays, label)
+    return true
+  }
+  if warn {
+    glog.Warningf("%s is neither a source, sink, or relay.\n", label)
+  }
+  return false
 }
 
 
@@ -124,6 +164,9 @@ func (interpreter *Interpreter) InterpretLine(line string) bool {
 
 func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
+//interpreter.mux.Lock()
+//defer interpreter.mux.Unlock()
+
   switch tokens[0] {
 
     case "verbose":
@@ -170,24 +213,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "delete":
       for _, label := range tokens[1:] {
-        var found = false
-        if source, ok := interpreter.sources[label]; ok {
-          source.Exit()
-          delete(interpreter.sources, label)
-          found = true
-        }
-        if sink, ok := interpreter.sinks[label]; ok {
-          sink.Exit()
-          delete(interpreter.sinks, label)
-          found = true
-        }
-        if relay, ok := interpreter.relays[label]; ok {
-          relay.Exit()
-          delete(interpreter.relays, label)
-          found = true
-        }
-        if !found {
-          glog.Warningf("%s is neither a source, sink, or relay.\n", label)
+        if !interpreter.deleteConnectable(label, true) {
           return false
         }
       }
@@ -205,19 +231,19 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "absorber":
       if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) && interpreter.assertNoSink(tokens[1]) {
-        interpreter.sinks[tokens[1]] = NewAbsorber(tokens[1])
+        interpreter.sinks[tokens[1]] = NewAbsorber(tokens[1], interpreter.reaper)
         return true
       }
 
     case "printer":
       if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) && interpreter.assertNoSink(tokens[1]) {
-        interpreter.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2])
+        interpreter.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], interpreter.reaper)
         return true
       }
 
     case "files":
       if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && interpreter.assertNoSource(tokens[1]) {
-        interpreter.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:])
+        interpreter.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], interpreter.reaper)
         return true
       }
 
@@ -234,7 +260,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "relay":
       if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && interpreter.assertNoRelay(tokens[1]) {
-        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{})
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{}, interpreter.reaper)
         return true
       }
 
@@ -249,7 +275,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
             return false
           }
         }
-        interpreter.relays[tokens[1]] = NewRelay(tokens[1], conversions, []Filter{})
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], conversions, []Filter{}, interpreter.reaper)
         return true
       }
 
@@ -264,7 +290,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
             return false
           }
         }
-        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, InvertFilters(&filters))
+        interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, InvertFilters(&filters), interpreter.reaper)
         return true
       }
 
@@ -332,7 +358,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "websocket":
       if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) && interpreter.assertNoSource(tokens[1]) && interpreter.assertNoSink(tokens[1]) {
-        websocket := NewWebsocket(interpreter.server, tokens[1])
+        websocket := NewWebsocket(interpreter.server, tokens[1], interpreter.reaper)
         interpreter.sources[tokens[1]] = websocket
         interpreter.sinks[tokens[1]]   = websocket
         return true
@@ -340,7 +366,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "kafka":
       if checkArguments(tokens, "The 'kafka' command must have an address, whether to start at the earliest offset, and a topic.", 4, true) && interpreter.assertNoSource(tokens[3]) && interpreter.assertNoSink(tokens[3]) {
-        kafka := NewKafka(tokens[3], tokens[1], tokens[2] == "true")
+        kafka := NewKafka(tokens[3], tokens[1], tokens[2] == "true", interpreter.reaper)
         interpreter.sources[tokens[3]] = kafka
         interpreter.sinks[tokens[3]]   = kafka
       }

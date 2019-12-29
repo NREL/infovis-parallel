@@ -19,7 +19,7 @@ type Files struct {
 }
 
 
-func NewFiles(label Label, filenames []string) *Files {
+func NewFiles(label Label, filenames []string, reaper LabelInChannel) *Files {
 
   var files = Files{
     label    : label                ,
@@ -28,6 +28,11 @@ func NewFiles(label Label, filenames []string) *Files {
     filename : make(chan string)    ,
     done     : make(DoneChannel)    ,
   }
+
+  go func() {
+    <-files.done
+    reaper <- files.label
+  }()
 
   go func() {
     defer glog.Infof("Files source %s is closing.\n", files.label)

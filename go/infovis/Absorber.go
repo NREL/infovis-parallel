@@ -13,13 +13,18 @@ type Absorber struct {
 }
 
 
-func NewAbsorber(label Label) *Absorber {
+func NewAbsorber(label Label, reaper LabelInChannel) *Absorber {
 
   var absorber = Absorber {
     label  : label                ,
     channel: make(ProtobufChannel),
     done   : make(DoneChannel)    ,
   }
+
+  go func() {
+    <-absorber.done
+    reaper <- absorber.label
+  }()
 
   go func() {
     defer glog.Infof("Absorber %s is closing.\n", absorber.label)

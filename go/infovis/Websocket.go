@@ -89,7 +89,7 @@ type Websocket struct {
 }
 
 
-func NewWebsocket(server *Server, label Label) *Websocket {
+func NewWebsocket(server *Server, label Label, reaper LabelInChannel) *Websocket {
 
   var socket = Websocket {
     label  : label                ,
@@ -102,6 +102,11 @@ func NewWebsocket(server *Server, label Label) *Websocket {
   server.mux.Lock()
   server.websockets[label] = &socket
   server.mux.Unlock()
+
+  go func() {
+    <-socket.done
+    reaper <- socket.label
+  }()
 
   go func() {
     defer glog.Infof("WebSocket %s is closing.\n", label)

@@ -175,7 +175,7 @@ type Relay struct {
 }
 
 
-func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay {
+func NewRelay(label Label, conversions []Conversion, exclusions []Filter, reaper LabelInChannel) *Relay {
 
   var relay = Relay{
     label  : label                  ,
@@ -184,6 +184,11 @@ func NewRelay(label Label, conversions []Conversion, exclusions []Filter) *Relay
     merge  : make(ProtobufChannel)  ,
     done   : make(DoneChannel)      ,
   }
+
+  go func() {
+    <-relay.done
+    reaper <- relay.label
+  }()
 
   go func() {
     defer glog.Infof("Relay %s is closing.\n", relay.label)

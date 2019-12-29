@@ -15,13 +15,18 @@ type Printer struct {
 }
 
 
-func NewPrinter(label Label, kind string) *Printer {
+func NewPrinter(label Label, kind string, reaper LabelInChannel) *Printer {
 
   var printer = Printer {
     label  : label                ,
     channel: make(ProtobufChannel),
     done   : make(DoneChannel)    ,
   }
+
+  go func() {
+    <-printer.done
+    reaper <- printer.label
+  }()
 
   go func() {
     defer glog.Infof("Printer %s is closing.\n", printer.label)
