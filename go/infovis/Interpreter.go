@@ -155,7 +155,7 @@ func (interpreter *Interpreter) Repl() {
 
 
 func (interpreter *Interpreter) InterpretLine(line string) bool {
-  line = strings.TrimSuffix(line, "\n")
+  line = strings.TrimSpace(line)
   line = interpreter.commenter.ReplaceAllLiteralString(line, "")
   return interpreter.InterpretTokens(interpreter.tokenizer.Split(line, -1))
 }
