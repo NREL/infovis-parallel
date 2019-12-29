@@ -176,7 +176,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "silent":
       if checkArguments(tokens, "The 'silent' command takes no arguments.", 1, true) {
-        flag.Set("stderrthreshold", "ERROR")
+        flag.Set("stderrthreshold", "WARNING")
         return true
       }
 
