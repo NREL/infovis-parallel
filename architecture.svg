@@ -10,14 +10,135 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="13.148549in"
-   height="8.0662498in"
-   viewBox="0 0 333.97315 204.88275"
+   height="8.3162498in"
+   viewBox="0 0 333.97315 211.23275"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="architecture.svg">
   <defs
      id="defs2">
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker17679"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend">
+      <path
+         inkscape:connector-curvature="0"
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#5841cb;fill-opacity:1;fill-rule:evenodd;stroke:#5841cb;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path17677" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker2203"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#5841cb;fill-opacity:1;fill-rule:evenodd;stroke:#5841cb;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path2201"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1867"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#5841cb;fill-opacity:1;fill-rule:evenodd;stroke:#5841cb;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path1865"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1863"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#cb4155;fill-opacity:1;fill-rule:evenodd;stroke:#cb4155;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path1861"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker1859"
+       style="overflow:visible"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         id="path1276"
+         style="fill:#cb4155;fill-opacity:1;fill-rule:evenodd;stroke:#cb4155;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1690"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mstart">
+      <path
+         transform="scale(0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path1688"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1520"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mstart">
+      <path
+         transform="scale(0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path1518"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1516"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mstart">
+      <path
+         transform="scale(0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path1514"
+         inkscape:connector-curvature="0" />
+    </marker>
     <marker
        inkscape:stockid="Arrow2Mstart"
        orient="auto"
@@ -209,7 +330,7 @@
       <path
          transform="scale(-0.6)"
          d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
-         style="fill:#cb4154;fill-opacity:1;fill-rule:evenodd;stroke:#cb4154;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         style="fill:#5841cb;fill-opacity:1;fill-rule:evenodd;stroke:#5841cb;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
          id="path6384"
          inkscape:connector-curvature="0" />
     </marker>
@@ -224,7 +345,7 @@
       <path
          transform="scale(-0.6)"
          d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
-         style="fill:#cb4154;fill-opacity:1;fill-rule:evenodd;stroke:#cb4154;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         style="fill:#5841cb;fill-opacity:1;fill-rule:evenodd;stroke:#5841cb;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
          id="path6314"
          inkscape:connector-curvature="0" />
     </marker>
@@ -268,7 +389,7 @@
        inkscape:isstock="true">
       <path
          id="path6016"
-         style="fill:#cb4154;fill-opacity:1;fill-rule:evenodd;stroke:#cb4154;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         style="fill:#5841cb;fill-opacity:1;fill-rule:evenodd;stroke:#5841cb;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
          d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
          transform="scale(-0.6)"
          inkscape:connector-curvature="0" />
@@ -325,10 +446,11 @@
        refX="0"
        id="Arrow2Mend"
        style="overflow:visible"
-       inkscape:isstock="true">
+       inkscape:isstock="true"
+       inkscape:collect="always">
       <path
          id="path5365"
-         style="fill:#0000ff;fill-opacity:1;fill-rule:evenodd;stroke:#0000ff;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         style="fill:#cb4155;fill-opacity:1;fill-rule:evenodd;stroke:#cb4155;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
          d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
          transform="scale(-0.6)"
          inkscape:connector-curvature="0" />
@@ -357,10 +479,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.99424785"
-     inkscape:cx="631.13036"
-     inkscape:cy="387.17999"
+     inkscape:cx="590.89894"
+     inkscape:cy="387.18001"
      inkscape:document-units="in"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="true"
      units="in"
      inkscape:window-width="1889"
@@ -378,8 +500,8 @@
        units="in"
        spacingx="3.175"
        spacingy="3.175"
-       originx="57.083956"
-       originy="8.2481839e-06" />
+       originx="57.083961"
+       originy="1.2355996e-05" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -394,10 +516,180 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="clients"
+     style="display:inline"
+     sodipodi:insensitive="true"
+     transform="translate(-7.8177826e-8,6.3500005)">
+    <g
+       id="g4737"
+       transform="translate(93.498964,-8.9643299)">
+      <rect
+         y="96.879654"
+         x="116.49252"
+         height="24.384947"
+         width="43.434944"
+         id="rect4589"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.015054, 1.015054;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4593"
+         y="107.30824"
+         x="138.09975"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           id="tspan4659"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="107.30824"
+           x="138.09975"
+           sodipodi:role="line">2D web</tspan><tspan
+           id="tspan4663"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="115.24574"
+           x="138.09975"
+           sodipodi:role="line">browser</tspan></text>
+    </g>
+    <g
+       id="g4743"
+       transform="translate(92.697443,-7.440472)">
+      <rect
+         y="127.1058"
+         x="117.29403"
+         height="24.384947"
+         width="43.434944"
+         id="rect4589-3"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505401, 1.01505401;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4593-9"
+         y="137.53792"
+         x="139.05098"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           id="tspan4623"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="137.53792"
+           x="139.05098"
+           sodipodi:role="line">Side-by-side</tspan><tspan
+           id="tspan4655"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="145.47542"
+           x="139.05098"
+           sodipodi:role="line">stereo 3D</tspan></text>
+    </g>
+    <g
+       id="g4749"
+       transform="translate(63.154002,-3.0672781)">
+      <rect
+         y="154.4826"
+         x="146.83748"
+         height="24.384947"
+         width="43.434944"
+         id="rect4589-3-6"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505402, 1.01505402;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4593-9-6"
+         y="164.91119"
+         x="168.3929"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           id="tspan4623-4"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="164.91119"
+           x="168.3929"
+           sodipodi:role="line">WebVR</tspan><tspan
+           id="tspan4651"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="172.84869"
+           x="168.3929"
+           sodipodi:role="line">stereo 3D</tspan></text>
+    </g>
+    <g
+       id="g4725"
+       transform="translate(19.792679,-10.57659)">
+      <rect
+         y="28.641808"
+         x="190.19881"
+         height="24.384947"
+         width="43.434944"
+         id="rect4589-7"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505401, 1.01505401;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4593-2"
+         y="39.105675"
+         x="211.71783"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           id="tspan4663-7"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="39.105675"
+           x="211.71783"
+           sodipodi:role="line">DLP</tspan><tspan
+           id="tspan4715"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="47.043175"
+           x="211.71783"
+           sodipodi:role="line">stereo 3D</tspan></text>
+    </g>
+    <g
+       id="g4731"
+       transform="translate(19.792671,-95.772232)">
+      <rect
+         y="145.58746"
+         x="190.19881"
+         height="24.384947"
+         width="43.434944"
+         id="rect4589-7-3"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505402, 1.01505402;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4593-2-8"
+         y="156.01958"
+         x="212.05452"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           id="tspan4663-7-2"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="156.01958"
+           x="212.05452"
+           sodipodi:role="line">Immersive</tspan><tspan
+           id="tspan4719"
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
+           y="163.95708"
+           x="212.05452"
+           sodipodi:role="line">stereo 3D</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 190.43395,131.85805 h 19.05"
+       id="path4869"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 190.43395,46.132454 19.05,15.87491"
+       id="path4871"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 190.43395,131.85805 19.05,31.75018"
+       id="path4873"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 190.43395,46.132454 19.05,-15.87491"
+       id="path4875"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 190.43395,131.85805 19.05,-31.75018"
+       id="path4877"
+       inkscape:connector-curvature="0" />
+  </g>
+  <g
+     inkscape:label="components"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(57.083959,-92.117249)">
+     transform="translate(57.083959,-85.767249)"
+     style="display:inline"
+     sodipodi:insensitive="true">
     <g
        id="g5104"
        transform="translate(0,-85.725048)">
@@ -426,18 +718,16 @@
          id="text4526-47"
          y="222.21033"
          x="111.01999"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:7.05555534px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
          xml:space="preserve"><tspan
-           id="tspan4548-2"
-           style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="222.21033"
+           sodipodi:role="line"
+           id="tspan1171"
            x="111.01999"
-           sodipodi:role="line">Immersive</tspan><tspan
-           id="tspan5096"
-           style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="231.02977"
+           y="222.21033">Quadbuffer</tspan><tspan
+           sodipodi:role="line"
+           id="tspan1173"
            x="111.01999"
-           sodipodi:role="line">client</tspan></text>
+           y="231.02977">client</tspan></text>
     </g>
     <g
        id="g5112"
@@ -480,231 +770,6 @@
            x="111.01982"
            sodipodi:role="line">client</tspan></text>
     </g>
-    <g
-       id="g4737"
-       transform="translate(36.415004,83.152919)">
-      <rect
-         y="96.879654"
-         x="116.49252"
-         height="24.384947"
-         width="43.434944"
-         id="rect4589"
-         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.015054, 1.015054;stroke-dashoffset:0;stroke-opacity:1" />
-      <text
-         id="text4593"
-         y="107.30824"
-         x="138.09975"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-         xml:space="preserve"><tspan
-           id="tspan4659"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="107.30824"
-           x="138.09975"
-           sodipodi:role="line">2D web</tspan><tspan
-           id="tspan4663"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="116.12769"
-           x="138.09975"
-           sodipodi:role="line">browser</tspan></text>
-    </g>
-    <g
-       id="g4743"
-       transform="translate(35.613483,84.676777)">
-      <rect
-         y="127.1058"
-         x="117.29403"
-         height="24.384947"
-         width="43.434944"
-         id="rect4589-3"
-         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505401, 1.01505401;stroke-dashoffset:0;stroke-opacity:1" />
-      <text
-         id="text4593-9"
-         y="137.53792"
-         x="139.05098"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-         xml:space="preserve"><tspan
-           id="tspan4623"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="137.53792"
-           x="139.05098"
-           sodipodi:role="line">Side-by-side</tspan><tspan
-           id="tspan4655"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="146.35736"
-           x="139.05098"
-           sodipodi:role="line">stereo 3D</tspan></text>
-    </g>
-    <g
-       id="g4749"
-       transform="translate(6.0700422,89.049971)">
-      <rect
-         y="154.4826"
-         x="146.83748"
-         height="24.384947"
-         width="43.434944"
-         id="rect4589-3-6"
-         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505402, 1.01505402;stroke-dashoffset:0;stroke-opacity:1" />
-      <text
-         id="text4593-9-6"
-         y="164.91119"
-         x="168.3929"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-         xml:space="preserve"><tspan
-           id="tspan4623-4"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="164.91119"
-           x="168.3929"
-           sodipodi:role="line">WebVR</tspan><tspan
-           id="tspan4651"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="173.73064"
-           x="168.3929"
-           sodipodi:role="line">stereo 3D</tspan></text>
-    </g>
-    <g
-       id="g4725"
-       transform="translate(-37.29128,81.540659)">
-      <rect
-         y="28.641808"
-         x="190.19881"
-         height="24.384947"
-         width="43.434944"
-         id="rect4589-7"
-         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505401, 1.01505401;stroke-dashoffset:0;stroke-opacity:1" />
-      <text
-         id="text4593-2"
-         y="39.105675"
-         x="211.71783"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-         xml:space="preserve"><tspan
-           id="tspan4663-7"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="39.105675"
-           x="211.71783"
-           sodipodi:role="line">DLP</tspan><tspan
-           id="tspan4715"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="47.925117"
-           x="211.71783"
-           sodipodi:role="line">stereo 3D</tspan></text>
-    </g>
-    <g
-       id="g4731"
-       transform="translate(-37.291288,-3.6549831)">
-      <rect
-         y="145.58746"
-         x="190.19881"
-         height="24.384947"
-         width="43.434944"
-         id="rect4589-7-3"
-         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.01505399;stroke-miterlimit:4;stroke-dasharray:1.01505402, 1.01505402;stroke-dashoffset:0;stroke-opacity:1" />
-      <text
-         id="text4593-2-8"
-         y="156.01958"
-         x="212.05452"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-         xml:space="preserve"><tspan
-           id="tspan4663-7-2"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="156.01958"
-           x="212.05452"
-           sodipodi:role="line">Immersive</tspan><tspan
-           id="tspan4719"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.26458332"
-           y="164.83902"
-           x="212.05452"
-           sodipodi:role="line">stereo 3D</tspan></text>
-    </g>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="202.89838"
-       y="186.9863"
-       id="text4753"><tspan
-         sodipodi:role="line"
-         id="tspan4751"
-         x="202.89838"
-         y="186.9863"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">• Chrome</tspan><tspan
-         sodipodi:role="line"
-         x="202.89838"
-         y="193.60088"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan4757">• Firefox</tspan><tspan
-         sodipodi:role="line"
-         x="202.89838"
-         y="200.21547"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan6114">• Safari</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="202.89838"
-       y="250.48509"
-       id="text4761"><tspan
-         sodipodi:role="line"
-         x="202.89838"
-         y="250.48509"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan4763">• Oculus headsets</tspan><tspan
-         sodipodi:role="line"
-         x="202.89838"
-         y="257.09967"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan4767">• VIVE headsets</tspan><tspan
-         sodipodi:role="line"
-         x="202.89838"
-         y="263.71426"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan4771">• Google cardboard</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="202.89838"
-       y="225.35233"
-       id="text4775"><tspan
-         sodipodi:role="line"
-         id="tspan4773"
-         x="202.89838"
-         y="225.35233"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">• Epson Moverio</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="203.2"
-       y="121.05315"
-       id="text4761-5"><tspan
-         sodipodi:role="line"
-         x="203.2"
-         y="121.05315"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan6106">• DLP stereo projectors</tspan><tspan
-         sodipodi:role="line"
-         x="203.2"
-         y="127.66773"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan6112">• Stereo video recording</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="203.2"
-       y="149.4986"
-       id="text4761-5-9"><tspan
-         sodipodi:role="line"
-         x="203.2"
-         y="149.4986"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan4771-0-8">• Desktop 3D workstations</tspan><tspan
-         sodipodi:role="line"
-         x="203.2"
-         y="156.11317"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan6108">• NREL ESIF immersive</tspan><tspan
-         sodipodi:role="line"
-         x="203.2"
-         y="162.72777"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
-         id="tspan4854">  visualization environment</tspan></text>
     <g
        id="g5164"
        transform="translate(12.699551,0.52911705)">
@@ -823,114 +888,15 @@
            sodipodi:role="line"
            id="tspan5272">devices</tspan></text>
     </g>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26454607"
-       x="-32.056053"
-       y="102.47449"
-       id="text4753-6"
-       transform="scale(0.99985922,1.0001408)"><tspan
-         sodipodi:role="line"
-         x="-32.056053"
-         y="102.47449"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan4757-7">• 3D scatterplots</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056053"
-         y="109.08814"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5297">• parallel planes</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056053"
-         y="115.70179"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5299">• graph layouts</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056053"
-         y="122.31544"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5301">• . . .</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26454607"
-       x="-32.056072"
-       y="250.88484"
-       id="text4753-6-3"
-       transform="scale(0.99985922,1.0001408)"><tspan
-         sodipodi:role="line"
-         x="-32.056072"
-         y="250.88484"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan4757-7-6">• tracked headsets</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056072"
-         y="257.4985"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5297-0">• tracked joysticks</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056072"
-         y="264.11215"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5299-4">• gamepads</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056072"
-         y="270.7258"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5332">• 3D mice</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056072"
-         y="277.33945"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5330">• keyboards</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056072"
-         y="283.95309"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5334">• Leap Motion controllers</tspan><tspan
-         sodipodi:role="line"
-         x="-32.056072"
-         y="290.56674"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
-         id="tspan5301-9">• . . .</tspan></text>
-    <path
-       style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6316)"
-       d="M 12.7,150.95 31.75,170"
-       id="path5336"
-       inkscape:connector-curvature="0" />
     <path
        style="fill:none;stroke:#0000ff;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;marker-end:url(#marker5878)"
        d="M 12.7,211.275 31.75,195.4"
        id="path5874"
        inkscape:connector-curvature="0" />
-    <path
-       style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6194)"
-       d="M 12.7,211.275 25.4,201.75"
-       id="path5922"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6018)"
-       d="m 76.199999,170 6.35,-12.7"
-       id="path6014"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6386)"
-       d="m 76.199999,195.4 12.7,15.875"
-       id="path6098"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6252)"
-       d="m 41.274999,170 v -15.875 h 22.225 V 170"
-       id="path6100"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:none;stroke:#cb4154;stroke-width:1.26999993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:2.53999986,1.26999993;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker6574)"
-       d="M 82.549999,227.15 12.7,211.275"
-       id="path6570"
-       inkscape:connector-curvature="0" />
     <g
-       transform="translate(-120.65032,-41.274243)"
+       transform="translate(-120.65032,-41.274241)"
        id="g5104-1-8-5"
-       style="stroke-width:1.26999998;stroke-miterlimit:3.51999998;stroke-dasharray:none">
+       style="display:inline;stroke-width:1.26999998;stroke-miterlimit:3.51999998;stroke-dasharray:none">
       <rect
          y="218.32559"
          x="70.551361"
@@ -968,36 +934,296 @@
            x="98.319984"
            sodipodi:role="line"
            id="tspan6713">managers</tspan></text>
-      <path
-         style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow2Mstart);marker-end:url(#marker5970)"
-         d="m 120.65032,227.14924 h 25.4"
-         id="path9037"
-         inkscape:connector-curvature="0" />
     </g>
   </g>
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
-     d="m 190.43395,131.85805 h 19.05"
-     id="path4869"
-     inkscape:connector-curvature="0" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
-     d="m 190.43395,46.132454 19.05,15.87491"
-     id="path4871"
-     inkscape:connector-curvature="0" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
-     d="m 190.43395,131.85805 19.05,31.75018"
-     id="path4873"
-     inkscape:connector-curvature="0" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
-     d="m 190.43395,46.132454 19.05,-15.87491"
-     id="path4875"
-     inkscape:connector-curvature="0" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.63499993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.26999992, 0.63499996;stroke-dashoffset:0;stroke-opacity:1"
-     d="m 190.43395,131.85805 19.05,-31.75018"
-     id="path4877"
-     inkscape:connector-curvature="0" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="flows"
+     style="display:inline"
+     sodipodi:insensitive="true"
+     transform="translate(-7.8177826e-8,6.3500005)">
+    <path
+       transform="translate(57.08396,-92.117249)"
+       style="fill:none;stroke:#5841cb;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6316)"
+       d="M 12.7,150.95 31.75,170"
+       id="path5336"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(57.08396,-92.117249)"
+       style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6194)"
+       d="M 12.7,211.275 25.4,201.75"
+       id="path5922"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(57.08396,-92.117249)"
+       style="fill:none;stroke:#5841cb;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6018)"
+       d="m 76.199999,170 6.35,-12.7"
+       id="path6014"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(57.08396,-92.117249)"
+       style="fill:none;stroke:#5841cb;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker6386)"
+       d="m 76.199999,195.4 12.7,15.875"
+       id="path6098"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(57.08396,-92.117249)"
+       style="fill:none;stroke:#cb4154;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.51999998;stroke-dasharray:2.53999986, 1.26999993;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker6574)"
+       d="M 82.549999,227.15 12.7,211.275"
+       id="path6570"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(57.08396,-92.117249)"
+       style="fill:none;stroke:#5841cb;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.75999999;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2203)"
+       d="m 44.449994,169.99999 v -15.875 h 15.875 v 15.875"
+       id="path1183"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(57.08396,-92.117249)"
+       style="fill:none;stroke:#cb4155;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.75999999;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1859)"
+       d="m 66.674994,169.99999 v -22.225 H 38.099995 v 22.225"
+       id="path1185"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(-63.56636,-133.39149)"
+       style="display:inline;fill:none;stroke:#cb4155;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.75999999;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1863)"
+       d="m 120.65031,220.79923 h 25.4"
+       id="path1179"
+       inkscape:connector-curvature="0" />
+    <path
+       transform="translate(-63.56636,-133.39149)"
+       style="display:inline;fill:none;stroke:#5841cb;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3.75999999;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1867)"
+       d="m 146.05031,230.32423 h -25.4"
+       id="path1181"
+       inkscape:connector-curvature="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="bullets"
+     style="display:inline"
+     transform="translate(-7.8177826e-8,6.3500005)"
+     sodipodi:insensitive="true">
+    <text
+       transform="translate(57.08396,-92.117249)"
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="202.89838"
+       y="186.9863"
+       id="text4753"><tspan
+         sodipodi:role="line"
+         id="tspan4751"
+         x="202.89838"
+         y="186.9863"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">• Chrome</tspan><tspan
+         sodipodi:role="line"
+         x="202.89838"
+         y="193.60088"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan4757">• Firefox</tspan><tspan
+         sodipodi:role="line"
+         x="202.89838"
+         y="200.21547"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan6114">• Safari</tspan></text>
+    <text
+       transform="translate(57.08396,-92.117249)"
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="202.89838"
+       y="250.48509"
+       id="text4761"><tspan
+         sodipodi:role="line"
+         x="202.89838"
+         y="250.48509"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan4763">• Oculus headsets</tspan><tspan
+         sodipodi:role="line"
+         x="202.89838"
+         y="257.09967"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan4767">• VIVE headsets</tspan><tspan
+         sodipodi:role="line"
+         x="202.89838"
+         y="263.71426"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan4771">• Google cardboard</tspan></text>
+    <text
+       transform="translate(57.08396,-92.117249)"
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="202.89838"
+       y="225.35233"
+       id="text4775"><tspan
+         sodipodi:role="line"
+         id="tspan4773"
+         x="202.89838"
+         y="225.35233"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">• Epson Moverio</tspan></text>
+    <text
+       transform="translate(57.08396,-92.117249)"
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="203.2"
+       y="121.05315"
+       id="text4761-5"><tspan
+         sodipodi:role="line"
+         x="203.2"
+         y="121.05315"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan6106">• DLP 3D projectors</tspan><tspan
+         sodipodi:role="line"
+         x="203.2"
+         y="127.66773"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan6112">• Stereo video recording</tspan></text>
+    <text
+       transform="translate(57.08396,-92.117249)"
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="203.2"
+       y="149.4986"
+       id="text4761-5-9"><tspan
+         sodipodi:role="line"
+         x="203.2"
+         y="149.4986"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan4771-0-8">• Desktop 3D workstations</tspan><tspan
+         sodipodi:role="line"
+         x="203.2"
+         y="156.11317"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan6108">• NREL ESIF immersive</tspan><tspan
+         sodipodi:role="line"
+         x="203.2"
+         y="162.72777"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332"
+         id="tspan4854">  visualization environment</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26454607"
+       x="25.035944"
+       y="4.0211"
+       id="text4753-6"
+       transform="scale(0.99985922,1.0001408)"><tspan
+         sodipodi:role="line"
+         x="25.035944"
+         y="4.0211"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan4757-7">• 3D scatterplots</tspan><tspan
+         sodipodi:role="line"
+         x="25.035944"
+         y="10.634752"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5297">• parallel planes</tspan><tspan
+         sodipodi:role="line"
+         x="25.035944"
+         y="17.248404"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5299">• graph layouts</tspan><tspan
+         sodipodi:role="line"
+         x="25.035944"
+         y="23.862057"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan21058">• Haskell, Go, Python</tspan><tspan
+         sodipodi:role="line"
+         x="25.035944"
+         y="30.475708"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5301">• . . .</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26454607"
+       x="-32.056072"
+       y="250.88484"
+       id="text4753-6-3"
+       transform="matrix(0.99985923,0,0,1.0001408,57.08396,-92.117249)"><tspan
+         sodipodi:role="line"
+         x="-32.056072"
+         y="250.88484"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan4757-7-6">• tracked headsets</tspan><tspan
+         sodipodi:role="line"
+         x="-32.056072"
+         y="257.4985"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5297-0">• tracked joysticks</tspan><tspan
+         sodipodi:role="line"
+         x="-32.056072"
+         y="264.11215"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5299-4">• gamepads</tspan><tspan
+         sodipodi:role="line"
+         x="-32.056072"
+         y="270.7258"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5332">• 3D mice</tspan><tspan
+         sodipodi:role="line"
+         x="-32.056072"
+         y="277.33945"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5330">• keyboards</tspan><tspan
+         sodipodi:role="line"
+         x="-32.056072"
+         y="283.95309"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5334">• Leap Motion controllers</tspan><tspan
+         sodipodi:role="line"
+         x="-32.056072"
+         y="290.56674"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29092169px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26454607"
+         id="tspan5301-9">• . . .</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="legend"
+     style="display:inline"
+     transform="translate(-7.8177826e-8,6.3500005)"
+     sodipodi:insensitive="true">
+    <path
+       style="fill:none;stroke:#5841cb;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker17679)"
+       d="m 120.58395,176.92966 h 15.875"
+       id="path17661"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#cb4155;stroke-width:1.26999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Mend)"
+       d="m 120.58395,188.80943 h 15.875"
+       id="path17663"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#5841cb;stroke-width:0.26458332;stroke-opacity:1"
+       x="142.80894"
+       y="178.24773"
+       id="text18365"><tspan
+         sodipodi:role="line"
+         id="tspan18363"
+         x="142.80894"
+         y="178.24773"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:#5841cb;stroke-width:0.26458332;stroke-opacity:1">request</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#cb4155;stroke-width:0.26458332;stroke-opacity:1"
+       x="142.80894"
+       y="189.88942"
+       id="text18369"><tspan
+         sodipodi:role="line"
+         id="tspan18367"
+         x="142.80894"
+         y="189.88942"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:#cb4155;stroke-width:0.26458332;stroke-opacity:1">response</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="120.58395"
+       y="167.84096"
+       id="text19381"><tspan
+         sodipodi:role="line"
+         id="tspan19379"
+         x="120.58395"
+         y="167.84096"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;text-decoration: underline;text-decoration-line: underline;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">protobuf messages</tspan></text>
+  </g>
 </svg>

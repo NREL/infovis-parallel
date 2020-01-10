@@ -4,7 +4,7 @@
 
 
 
-![Architecture.](architecture.svg)
+![Architecture.](architecture.png)
 
 
 ## Protocol buffer specification
