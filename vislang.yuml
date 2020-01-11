@@ -1,0 +1,76 @@
+[Dataset|maxRecords :: Maybe Int;chunkSize :: Maybe Int]
+
+[Variable|variableAlias :: VariableAlias]
+
+[DataSet]++-n>[Variable]
+
+[Variable]^-.-[ContinuousVariable|variableName :: String;units :: Maybe String;lowerBound :: Maybe Double;upperBound :: Maybe Double;jitter :: Maybe Double]
+
+
+[Extent|origin :: Position]
+
+[Extent]^-.-[Extent1D|cornerX :: Position]
+
+[Extent]^-.-[Extent2D|cornerX :: Position;cornerY :: Position]
+
+[Extent]^-.-[Extent3D|cornerX :: Position;cornerY :: Position;cornerZ :: Position]
+
+
+[Axis]
+[Axis]<>axisVariable-1>[Variable]
+
+[Axes1D]++-1>[Axis]
+
+[Axes2D]++-2>[Axis]
+
+[Axes3D]++-3>[Axis]
+
+
+[Styling|normalColor :: Color;selectColor :: Color;highlightColor :: Color;thickness :: Double]
+
+
+[Grid|gridAlias :: GridAlias;divisions :: Int;axisColor :: Color;axisSize :: Double;labelColor :: Color;labelSize :: Double]
+
+[Grid]^-.-[LineGrid]
+[LineGrid]++-1>[Axes1D]
+[LineGrid]++lineStyling>[Styling]
+
+[Grid]^-.-[RectangleGrid]
+[RectangleGrid]++-1>[Axes2D]
+[RectangleGrid]++lineStyling>[Styling]
+[RectangleGrid]++faceStyling>[Styling]
+
+[Grid]^-.-[BoxGrid]
+[BoxGrid]++-1>[Axes3D]
+[BoxGrid]++lineStyling>[Styling]
+[BoxGrid]++faceStyling>[Styling]
+
+
+[Container]^-.-[Singleton]
+[Singleton]++-1>[Extent]
+[Singleton]++-1>[Grid]
+
+[Container]^-.-[Array]
+[Array]++-n>[Extent]
+[Array]++-n>[Grid]
+
+[Container]^-.-[Collection]
+[Collection]++-n>[Extent]
+[Collection]++-n>[Container]
+
+
+[Link|linkAlias :: LinkAlias]
+[Link]++styling>[Styling]
+
+[Link]^-.-[Point]
+[Point]<>linkedGrid-1>[Grid]
+
+[Link]^-.-[Polyline]
+[Polyline]<>linkedGrids-n>[Grid]
+
+
+[Presentation]
+[Presentation]<>animationKey-?>[Variable]
+[Presentation]<>uniqueKey-?>[Variable]
+[Presentation]++-n>[Container]
+[Presentation]++-n>[Link]

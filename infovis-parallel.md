@@ -1,8 +1,14 @@
 % InfoVis Parallel
-% Draft Documentation
-% 2020-01-09
+% Technical Manual
+% 2020-01-10
 
 
+## Visualization language
+
+![Visualization language.](vislang.png)
+
+
+## Architecture
 
 ![Architecture.](architecture.png)
 
