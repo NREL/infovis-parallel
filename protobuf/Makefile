@@ -5,7 +5,7 @@
 EXAMPLES=$(addsuffix .pbb,$(basename $(wildcard examples/*.pbt)))
 
 
-all: examples ../unity/oculus/Assets/Infovis/Protobuf.cs ../web/src/infovis.proto3_pb.js ../go/infovis/infovis.proto3.pb.go
+all: examples ../unity/oculus/Assets/Infovis/Protobuf.cs ../web/src/infovis.proto3_pb.js ../go/infovis/infovis.proto3.pb.go ../julia/src/Infovis.jl
 
 examples: $(EXAMPLES)
 
@@ -23,6 +23,9 @@ examples/bslm-%.pbt: examples/bslm.tsv.part-% examples/bslm.awk
 %.go: infovis.proto3
 	GOPATH=$(PWD)/tmp go get github.com/golang/protobuf/protoc-gen-go
 	PATH=$(PWD)/tmp/bin:$(PATH) protoc --go_out $(dir $@) $<
+
+%.jl: infovis.proto3
+	protoc --julia_out=$(dir $@) $<
 
 %.pbb : %.pbt infovis.proto3
 	protoc --encode=Infovis.Request infovis.proto3 < $< > $@
