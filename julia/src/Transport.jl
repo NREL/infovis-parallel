@@ -43,32 +43,27 @@ function _handler(
 end
 
 
-function _runner(
-  address  :: String
-, capacity :: Int64
+function connect(
+  address         :: String
+; capacity = 1000 :: Int64
 ) :: Client
+  ready     = Channel{Done}(1)
   control   = Channel{Done}(1)
-  requests  = Channel{Request}(capacity)
+  requests  = Channel{Request}(1)
   responses = Channel{Response}(capacity)
   @async WebSockets.open(address) do socket
     @async _handler(socket, requests)
     @async _handler(socket, responses)
+    put!(ready, Done())
     take!(control)
     close(socket, statusnumber = 1000, freereason = "done")
+  take!(ready)
   end
   (
     control   = control
   , requests  = requests
   , responses = responses
   )
-end
-
-
-function connect(
-  address         :: String
-; capacity = 1000 :: Int64
-) :: Client
-  (@sync @async _runner(address, capacity)).result
 end
 
 export connect

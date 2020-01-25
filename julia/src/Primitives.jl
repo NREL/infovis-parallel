@@ -4,6 +4,62 @@ import InfoVis.Transport: Client, send
 import StaticArrays: SVector
 
 
+function request(request :: Request)
+  function sender(client :: Client)
+    send(client, request)
+    client
+  end
+  sender
+end
+
+export request
+  
+
+function showframe(frame :: Signed)
+  request(
+    Request(
+      show    = convert(Int32, frame)
+    , message = ""
+    , reset   = false
+    , upsert  = []
+    , delete  = []
+    )
+  )
+end
+
+export showframe
+
+
+function showmessage(message = "" :: String)
+  request(
+    Request(
+      show    = 0
+    , message = message != "" ? message : " "
+    , reset   = false
+    , upsert  = []
+    , delete  = []
+    )
+  )
+end
+
+export showmessage
+
+
+function resetdisplay()
+  request(
+    Request(
+      show    = 0
+    , message = ""
+    , reset   = true
+    , upsert  = []
+    , delete  = []
+    )
+  )
+end
+
+export resetdisplay
+
+
 function empty(
   ; upserts = Geometry[] :: Vector{Geometry}
   , deletes = Int64[] :: Vector{Int64}
@@ -19,17 +75,6 @@ end
 
 export empty
 
-
-function request(request :: Request)
-  function sender(client :: Client)
-    send(client, request)
-    client
-  end
-  sender
-end
-
-export request
-  
 
 @enum Geometries POINTS POLYLINES RECTANGLES LABEL AXIS
 
