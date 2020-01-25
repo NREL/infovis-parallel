@@ -2,7 +2,9 @@
 using InfoVis
 
 import InfoVis.Buffers: Geometry, Request
+import InfoVis.Primitives: points
 import InfoVis.Transport: connect, send, stop
+import StaticArrays: SVector
 
 
 req = Request(
@@ -103,10 +105,12 @@ rws = connect("ws://127.0.0.1:42042/julia")
 
 sleep(2)
 
-send(rws, req)
+z = [[SVector(0.1, 0.2, 0.3)], [SVector(0.4, 0.5, 0.6), SVector(0.7, 0.8, 0.9)]]
+
+rws |> points(1, z)
 
 sleep(2)
 
-stop(rws)
+rws |> stop
 
 sleep(2)
