@@ -1,5 +1,5 @@
 
-import InfoVis.Buffers: Geometry, Request
+import InfoVis.Buffers: Geometry, Location, Request
 import InfoVis.Transport: Client, send
 import StaticArrays: SVector
 
@@ -256,3 +256,76 @@ function axis(
 end
 
 export axis
+
+
+function Location(
+  location  :: SVector{3,Float64}
+, rotation  :: SVector{4,Float64}
+)
+  Location(
+    posx = location[1]
+  , posy = location[2]
+  , posz = location[3]
+  , rotw = rotation[1]
+  , rotx = rotation[2]
+  , roty = rotation[3]
+  , rotz = rotation[4]
+  )
+end
+
+
+function setview(
+  location = SVector(0., 0., 0.)     :: SVector{3,Float64}
+, rotation = SVector(1., 0., 0., 0.) :: SVector{4,Float64}
+)
+  request(
+    Request(
+      show    = 0
+    , message = ""
+    , reset   = false
+    , upsert  = []
+    , delete  = []
+    , viewloc = Location(location, rotation)
+    )
+  )
+end
+
+export setview
+
+
+function settool(
+  location = SVector(0., 0., 0.)     :: SVector{3,Float64}
+, rotation = SVector(1., 0., 0., 0.) :: SVector{4,Float64}
+)
+  request(
+    Request(
+      show    = 0
+    , message = ""
+    , reset   = false
+    , upsert  = []
+    , delete  = []
+    , toolloc = Location(location, rotation)
+    )
+  )
+end
+
+export settool
+
+
+function setoffset(
+  location = SVector(0., 0., 0.)     :: SVector{3,Float64}
+, rotation = SVector(1., 0., 0., 0.) :: SVector{4,Float64}
+)
+  request(
+    Request(
+      show      = 0
+    , message   = ""
+    , reset     = false
+    , upsert    = []
+    , delete    = []
+    , offsetloc = Location(location, rotation)
+    )
+  )
+end
+
+export setoffset

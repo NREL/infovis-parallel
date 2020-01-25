@@ -62,6 +62,12 @@ sleep(5)
 
 z |> showframe(2) ;
 
+sleep(2)
+
+z |> setview(SVector(-5., 3., 15.))    |>
+     settool(SVector(0.5, 0.5, 0.5))   |>
+     setoffset(SVector(0.5, 0.5, 0.5)) ;
+
 sleep(5)
 
 z |> showmessage("goodbye") ;
