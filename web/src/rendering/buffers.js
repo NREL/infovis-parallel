@@ -156,7 +156,7 @@ function updateAttribute(field, identifier, value, shapeBuffer) {
 
 export function deleteInstance(shapeBuffer, identifier) {
   if (shapeBuffer.locationses.has(identifier)) {
-    const locations = shapeBuffer.locationses
+    const locations = shapeBuffer.locationses.get(identifier)
     locations.forEach(function(location) {
       shapeBuffer.empties.add(location)
       shapeBuffer.pendingScales.set(location, zeroScale)
@@ -180,7 +180,7 @@ function updateShapeBuffer(gl, shapeBuffer) {
   if (shapeBuffer.pendingPositions.size +
       shapeBuffer.pendingRotations.size +
       shapeBuffer.pendingScales.size    +
-      shapeBuffer.pendingColors     == 0)
+      shapeBuffer.pendingColors.size    == 0)
     return
 
   if (DEBUG) console.debug("updateShapeBuffer")
@@ -190,7 +190,7 @@ function updateShapeBuffer(gl, shapeBuffer) {
   updateBuffer(gl, shapeBuffer.pendingScales   , shapeBuffer.scales   , shapeBuffer.shapeProgram.scalesDescription   )
   updateBuffer(gl, shapeBuffer.pendingColors   , shapeBuffer.colors   , shapeBuffer.shapeProgram.colorsDescription   )
 
-  let location = null
+  let location = -1
   shapeBuffer.locationses.forEach((xs, _) =>
     xs.forEach(
       function(x) {
