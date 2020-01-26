@@ -13,4 +13,8 @@ module Primitives
   include("Primitives.jl")
 end
 
+module Plots
+  include("Plots.jl")
+end
+
 end
