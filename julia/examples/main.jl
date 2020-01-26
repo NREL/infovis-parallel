@@ -2,11 +2,22 @@
 using InfoVis
 using InfoVis.Primitives
 
-import InfoVis.Transport: connect, stop
+import InfoVis.Transport: connect, responses, stop
 import StaticArrays: SVector
 
 
 z = connect("ws://127.0.0.1:42042/julia") ;
+
+function reporter(response)
+  if isdefined(response, :offsetloc)
+    location = response.offsetloc
+    position = InfoVis.Primitives.position(location)
+    rotation = InfoVis.Primitives.rotation(location)
+    println(position, " ", rotation)
+  end
+end
+
+@async responses(z, reporter)
 
 sleep(5)
 
@@ -20,14 +31,14 @@ z |> label(111, "x axis", SVector( 0.1 , -0.1,  0.0 ), SVector( 1.0 , -0.1,  0.0
 
 sleep(2)
 
-z |> points(201, [[SVector(0.0, 0.0, 0.0)]], size = 0.05, color = UInt32(2798576639), text = "one"  , glyph = Int32(1)) |>
-     points(202, [[SVector(1.0, 0.0, 0.0)]], size = 0.10, color = UInt32( 528004351), text = "two"  , glyph = Int32(0)) |>
-     points(203, [[SVector(0.0, 1.0, 0.0)]], size = 0.15, color = UInt32(3000994559), text = "three", glyph = Int32(1)) |>
-     points(204, [[SVector(1.0, 1.0, 0.0)]], size = 0.20, color = UInt32( 866135295), text = "four" , glyph = Int32(0)) |>
-     points(205, [[SVector(0.0, 0.0, 1.0)]], size = 0.25, color = UInt32(4221213183), text = "five" , glyph = Int32(1)) |>
-     points(206, [[SVector(1.0, 0.0, 1.0)]], size = 0.30, color = UInt32(3810139391), text = "six"  , glyph = Int32(0)) |>
-     points(207, [[SVector(0.0, 1.0, 1.0)]], size = 0.35, color = UInt32(4257181695), text = "seven", glyph = Int32(1)) |>
-     points(208, [[SVector(1.0, 1.0, 1.0)]], size = 0.40, color = UInt32(4286513407), text = "eight", glyph = Int32(0)) ;
+z |> points(201, [[SVector(0.0, 0.0, 0.0)]], size = 0.05, color = UInt32(2798576639), text = "one"  , glyph = 1) |>
+     points(202, [[SVector(1.0, 0.0, 0.0)]], size = 0.10, color = UInt32( 528004351), text = "two"  , glyph = 0) |>
+     points(203, [[SVector(0.0, 1.0, 0.0)]], size = 0.15, color = UInt32(3000994559), text = "three", glyph = 1) |>
+     points(204, [[SVector(1.0, 1.0, 0.0)]], size = 0.20, color = UInt32( 866135295), text = "four" , glyph = 0) |>
+     points(205, [[SVector(0.0, 0.0, 1.0)]], size = 0.25, color = UInt32(4221213183), text = "five" , glyph = 1) |>
+     points(206, [[SVector(1.0, 0.0, 1.0)]], size = 0.30, color = UInt32(3810139391), text = "six"  , glyph = 0) |>
+     points(207, [[SVector(0.0, 1.0, 1.0)]], size = 0.35, color = UInt32(4257181695), text = "seven", glyph = 1) |>
+     points(208, [[SVector(1.0, 1.0, 1.0)]], size = 0.40, color = UInt32(4286513407), text = "eight", glyph = 0) ;
 
 z |> polylines(301, [[
                       SVector(
@@ -36,7 +47,7 @@ z |> polylines(301, [[
                       , (cos(pi * alpha) + 1) / 2
                       )
                       for alpha in 0.0:0.05:1.0
-                    ]], size = 0.05, color = UInt32(1088475391), text = "helices", glyph = Int32(1), frame = Int32(2)) ;
+                    ]], size = 0.05, color = UInt32(1088475391), text = "helices", glyph = 1, frame = 2) ;
 
 z |> rectangles(401, [
                        SVector(
@@ -49,14 +60,14 @@ z |> rectangles(401, [
                        , SVector(1.0, 0.9, 0.1)
                        , SVector(1.0, 0.1, 0.9)
                        )
-                     ], size = 0.01, color = UInt32(8388768), text = "face", frame = Int32(2)) |>
+                     ], size = 0.01, color = UInt32(8388768), text = "face", frame = 2) |>
      rectangles(402, [
                        SVector(
                          SVector(0.0, 0.1, 0.1)
                        , SVector(1.0, 0.1, 0.1)
                        , SVector(0.0, 0.1, 0.9)
                        )
-                     ], size = 0.01, color = UInt32(8388768), text = "base", frame = Int32(2)) ;
+                     ], size = 0.01, color = UInt32(8388768), text = "base", frame = 2) ;
 
 sleep(5)
 

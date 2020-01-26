@@ -17,10 +17,14 @@ function _handler(
 , channel :: Channel{Request}
 ) :: Nothing
   for request in channel
-    io = IOBuffer()
-    writeproto(io, request)
-    if !writeguarded(socket, take!(io))
-      break
+    try
+      io = IOBuffer()
+      writeproto(io, request)
+      if !writeguarded(socket, take!(io))
+        break
+      end
+    catch e
+      @error e
     end
   end
   nothing
@@ -32,12 +36,17 @@ function _handler(
 , channel :: Channel{Response}
 ) :: Nothing
   while socket.state == CONNECTED
-    message, success = readguarded(socket)
-    if !success
-      break
+    try
+      message, success = readguarded(socket)
+      if !success
+        break
+      end
+      io = IOBuffer(message)
+      response = readproto(io, Response())
+      put!(channel, response)
+    catch e
+      @error e
     end
-    response = readproto(message, Response())
-    put!(cannel, response)
   end
   nothing
 end
@@ -56,6 +65,8 @@ function connect(
     @async _handler(socket, responses)
     put!(ready, Done())
     take!(control)
+    close(requests)
+    close(responses)
     close(socket, statusnumber = 1000, freereason = "done")
   take!(ready)
   end
@@ -90,3 +101,12 @@ function stop(client :: Client) :: Nothing
 end
 
 export stop
+
+
+function responses(client :: Client, handler = x -> nothing) :: Nothing
+  for response in client.responses
+    handler(response)
+  end
+end
+
+export responses

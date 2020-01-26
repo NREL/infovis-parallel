@@ -62,7 +62,7 @@ export resetdisplay
 
 function empty(
   ; upserts = Geometry[] :: Vector{Geometry}
-  , deletes = Int64[] :: Vector{Int64}
+  , deletes = Int64[]    :: Vector{Int64}
 ) :: Request
   Request(
     show    = 0
@@ -83,17 +83,17 @@ export Geometries
 
 function Geometry(
   geometry   :: Geometries
-, identifier :: Int64
+, identifier :: Signed
 , coords     :: Vector{Vector{SVector{3,Float64}}}
-, frame      :: Int32
+, frame      :: Signed
 , size       :: Float64
-, color      :: UInt32
+, color      :: Unsigned
 , text       :: String
-, glyph      :: Int32
+, glyph      :: Signed
 ) :: Geometry
   Geometry(
-    fram  = frame
-  , iden  = identifier
+    fram  = convert(Int32, frame)
+  , iden  = convert(Int64, identifier)
   , _type = Int32(geometry) + 1
   , mask  = geometry <= POLYLINES ? 31 : 15
   , cnts  = map(Int32 ∘ length, coords)
@@ -101,21 +101,21 @@ function Geometry(
   , posy  = vcat(map(ps -> map(p -> p[2], ps), coords)...)
   , posz  = vcat(map(ps -> map(p -> p[3], ps), coords)...)
   , size  = size
-  , colr  = color
+  , colr  = convert(UInt32, color)
   , text  = text
-  , glyp  = glyph
+  , glyp  = convert(Int32, glyph)
   )
 end
 
 
 function points(
-  identifier         :: Int64
+  identifier         :: Signed
 , coords             :: Vector{Vector{SVector{3,Float64}}}
-; frame = Int32(1)   :: Int32
+; frame = 1          :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: UInt32
+, color = 0x035096FF :: Unsigned
 , text  = ""         :: String
-, glyph = Int32(0)   :: Int32
+, glyph = 0          :: Signed
 )
   request(
     empty(
@@ -139,13 +139,13 @@ export points
 
 
 function polylines(
-  identifier         :: Int64
+  identifier         :: Signed
 , coords             :: Vector{Vector{SVector{3,Float64}}}
-; frame = Int32(1)   :: Int32
+; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: UInt32
+, color = 0x035096FF :: Unsigned
 , text  = ""         :: String
-, glyph = Int32(0)   :: Int32
+, glyph = Int32(0)   :: Signed
 )
   request(
     empty(
@@ -169,11 +169,11 @@ export polylines
 
 
 function rectangles(
-  identifier         :: Int64
+  identifier         :: Signed
 , coords             :: Vector{SVector{3,SVector{3,Float64}}}
-; frame = Int32(1)   :: Int32
+; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: UInt32
+, color = 0x035096FF :: Unsigned
 , text  = ""         :: String
 )
   request(
@@ -198,14 +198,14 @@ export rectangles
 
 
 function label(
-  identifier         :: Int64
+  identifier         :: Signed
 , text               :: String
 , origin             :: SVector{3,Float64}
 , horizontal         :: SVector{3,Float64}
 , vertical           :: SVector{3,Float64}
-; frame = Int32(1)   :: Int32
+; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: UInt32
+, color = 0x035096FF :: Unsigned
 )
   request(
     empty(
@@ -229,12 +229,12 @@ export label
 
 
 function axis(
-  identifier         :: Int64
+  identifier         :: Signed
 , start              :: SVector{3,Float64}
 , finish             :: SVector{3,Float64}
-; frame = Int32(1)   :: Int32
+; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: UInt32
+, color = 0x035096FF :: Unsigned
 , text  = ""         :: String
 )
   request(
@@ -259,13 +259,13 @@ export axis
 
 
 function Location(
-  location  :: SVector{3,Float64}
+  position  :: SVector{3,Float64}
 , rotation  :: SVector{4,Float64}
 )
   Location(
-    posx = location[1]
-  , posy = location[2]
-  , posz = location[3]
+    posx = position[1]
+  , posy = position[2]
+  , posz = position[3]
   , rotw = rotation[1]
   , rotx = rotation[2]
   , roty = rotation[3]
@@ -275,7 +275,7 @@ end
 
 
 function setview(
-  location = SVector(0., 0., 0.)     :: SVector{3,Float64}
+  position = SVector(0., 0., 0.)     :: SVector{3,Float64}
 , rotation = SVector(1., 0., 0., 0.) :: SVector{4,Float64}
 )
   request(
@@ -285,7 +285,7 @@ function setview(
     , reset   = false
     , upsert  = []
     , delete  = []
-    , viewloc = Location(location, rotation)
+    , viewloc = Location(position, rotation)
     )
   )
 end
@@ -294,7 +294,7 @@ export setview
 
 
 function settool(
-  location = SVector(0., 0., 0.)     :: SVector{3,Float64}
+  position = SVector(0., 0., 0.)     :: SVector{3,Float64}
 , rotation = SVector(1., 0., 0., 0.) :: SVector{4,Float64}
 )
   request(
@@ -304,7 +304,7 @@ function settool(
     , reset   = false
     , upsert  = []
     , delete  = []
-    , toolloc = Location(location, rotation)
+    , toolloc = Location(position, rotation)
     )
   )
 end
@@ -313,7 +313,7 @@ export settool
 
 
 function setoffset(
-  location = SVector(0., 0., 0.)     :: SVector{3,Float64}
+  position = SVector(0., 0., 0.)     :: SVector{3,Float64}
 , rotation = SVector(1., 0., 0., 0.) :: SVector{4,Float64}
 )
   request(
@@ -323,9 +323,32 @@ function setoffset(
     , reset     = false
     , upsert    = []
     , delete    = []
-    , offsetloc = Location(location, rotation)
+    , offsetloc = Location(position, rotation)
     )
   )
 end
 
 export setoffset
+
+
+function position(location :: Location) :: SVector{3,Float64}
+  SVector(
+    location.posx
+  , location.posy
+  , location.posz
+  )
+end
+
+export position
+
+
+function rotation(location :: Location) :: SVector{4,Float64}
+  SVector(
+    location.rotw
+  , location.rotx
+  , location.roty
+  , location.rotz
+  )
+end
+
+export rotation
