@@ -379,9 +379,11 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
         }
         for _, line := range strings.Split(string(content), "\n") {
           fmt.Printf("> %s\n", line)
+          interpreter.mux.Unlock()
           if !interpreter.InterpretLine(line) {
             return false
           }
+          interpreter.mux.Lock()
         }
       }
       return true
