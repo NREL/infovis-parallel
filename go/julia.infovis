@@ -1,19 +1,13 @@
-verbose
-
-serve 127.0.0.1:42042 /
-
-printer P Request
-relay R
-add-sink R P
+relay julia-input
+relay julia-output
 
 websocket julia
-add-source R julia
+add-source julia-input julia
 
-websocket demo
-add-sink R demo
+printer julia-printer Request
+add-sink julia-input julia-printer
 
-relay RR
-add-source RR demo
-add-sink RR julia
-
-wait 10000
+websocket julia-demo
+add-sink julia-input julia-demo
+add-source julia-output julia-demo
+add-sink julia-output julia

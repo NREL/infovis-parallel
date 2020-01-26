@@ -1,0 +1,19 @@
+verbose
+
+serve 127.0.0.1:42042 /
+
+relay r
+
+websocket demo
+add-sink r demo
+
+files f
+add-source r f
+
+append f ../protobuf/examples/axes.pbb
+append f ../protobuf/examples/corner-points.pbb
+
+wait 5
+append f ../protobuf/examples/corner-points.pbb
+
+wait 1000
