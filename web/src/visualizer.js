@@ -164,6 +164,8 @@ let isRunning = false
 
 export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
 
+  let starting = Date.now() + 2000
+
   const useVR = configuration.display.mode == "webvr"
 
   if (vrDisplay != null) {
@@ -197,8 +199,9 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       return
     }
 
-    const dirtyRequest  = requestQueue.length > 0
-    let   dirtyResponse = keyQueue.length > 0
+    const now = new Date()
+    const dirtyRequest  = (starting && starting < now) || requestQueue.length > 0
+    let   dirtyResponse = (starting && starting < now) || keyQueue.length > 0
 
     const gamepad = Navigation.interpretGamepad(graphics)
     dirtyResponse |= gamepad.dirty
@@ -210,6 +213,8 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
 
     if (useVR || dirtyRequest || dirtyResponse) {
+
+      starting = null
 
       setupCanvas(gl)
 
