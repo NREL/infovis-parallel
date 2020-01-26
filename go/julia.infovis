@@ -1,0 +1,19 @@
+verbose
+
+serve 127.0.0.1:42042 /
+
+printer P Request
+relay R
+add-sink R P
+
+websocket julia
+add-source R julia
+
+websocket demo
+add-sink R demo
+
+relay RR
+add-source RR demo
+add-sink RR julia
+
+wait 10000
