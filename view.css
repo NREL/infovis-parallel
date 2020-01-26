@@ -1,0 +1,90 @@
+
+#uiConnector table {
+  width: 100%
+}
+
+th {
+  padding-top: 25px
+; text-align : left
+}
+
+td button {
+  width: 100%
+}
+
+#uiAddress {
+  width: 100%
+}
+
+a, a:visited {
+  color: black
+}
+
+a:hover {
+  color: darkred
+}
+
+a:active {
+  color: darkred
+}
+
+#uiConnector {
+  position: absolute
+; left    : 20px
+; top     : 20px
+; width   : 600px
+; height  : 100%
+}
+
+#uiGithub {
+  text-align: right
+}
+
+#uiBanner {
+  position: absolute
+; left    : 15px
+; right   : 15px
+; top     : 15px
+}
+
+#uiMessageArea {
+  width      : 100%
+}
+
+#uiKeyboard {
+  position        : absolute
+; left            : 0px
+; right           : 0px
+; bottom          : 0px
+; width           : 100%
+; padding         : 10px
+; background-color: #C0C0C0E0
+; visibility      : hidden
+}
+
+#uiKeyboard p {
+  margin    : 0
+; text-align: center
+}
+
+#uiVisualize {
+  visibility: hidden
+; position  : absolute
+; left      : 0
+; top       : 0
+}
+
+#uiScratch {
+  visibility: hidden
+}
+
+#uiCanvas {
+  margin: 0
+; width : 100%
+; height: 100%
+}
+
+html, body {
+  width   : 100%
+; height  : 100%
+}
