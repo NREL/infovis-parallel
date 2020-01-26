@@ -214,7 +214,8 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       setupCanvas(gl)
 
       Frames.prepare(gl, graphics.manager)
-      Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
+      if (dirtyResponse)
+        Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
 
       const eyes = useVR || configuration.display.mode == "stereo" ? 2 : 1
       for (let eye = 0; eye < eyes; ++eye) {
