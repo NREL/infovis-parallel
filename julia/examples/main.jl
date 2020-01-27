@@ -3,7 +3,7 @@ using InfoVis
 using InfoVis.Primitives
 
 import DataFrames: DataFrame
-import InfoVis.Plots: scatterplot
+import InfoVis.Plots: axes, scatterplot
 import InfoVis.Transport: connect, responses, stop
 import Random: rand
 import StaticArrays: SVector
@@ -31,6 +31,8 @@ z |> axis(20000001, SVector(0.0, 0.0, 0.0), SVector(1.0, 0.0, 0.0), size = 0.02,
 z |> label(20000004, "x axis", SVector( 0.1 , -0.1,  0.0 ), SVector( 1.0 , -0.1,  0.0 ), SVector(0.1, 1.0, 0.0), size = 0.10, color = UInt32(55613088)) |>
      label(20000005, "y axis", SVector(-0.07,  0.1, -0.07), SVector(-0.07,  1.0, -0.07), SVector(1.0, 0.1, 1.0), size = 0.10, color = UInt32(55613088)) |>
      label(20000006, "z axis", SVector( 0.0 , -0.1,  0.1 ), SVector( 0.0 , -0.1,  1.0 ), SVector(0.0, 1.0, 0.1), size = 0.10, color = UInt32(55613088)) ;
+
+z |> showframe(1) ;
 
 sleep(2)
 
@@ -90,9 +92,10 @@ function randomdata(n :: Signed)
   df
 end
 
-z |> scatterplot(randomdata(50) , :ID, :X, :Y, :Z, :Size, :Color, :Glyph, frame = 3) ;
+z |> axes(frame = 3) |>
+     scatterplot(randomdata(50), :ID, :X, :Y, :Z, size  = :Size, color = :Color, glyph = :Glyph, frame = 3) |>
+     showframe(3) ;
 
-z |> showframe(3) ;
 
 sleep(2)
 
