@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 ProtoBuf = "3349acd9-ac6a-5e09-bcdb-63829b23a429"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"

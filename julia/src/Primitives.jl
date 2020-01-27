@@ -113,7 +113,7 @@ function points(
 , coords             :: Vector{Vector{SVector{3,Float64}}}
 ; frame = 1          :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: Unsigned
+, color = 0x7DF9FFFF :: Unsigned
 , text  = ""         :: String
 , glyph = 0          :: Signed
 )
@@ -143,7 +143,7 @@ function polylines(
 , coords             :: Vector{Vector{SVector{3,Float64}}}
 ; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: Unsigned
+, color = 0x7DF9FFFF :: Unsigned
 , text  = ""         :: String
 , glyph = Int32(0)   :: Signed
 )
@@ -173,7 +173,7 @@ function rectangles(
 , coords             :: Vector{SVector{3,SVector{3,Float64}}}
 ; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: Unsigned
+, color = 0x7DF9FFFF :: Unsigned
 , text  = ""         :: String
 )
   request(
@@ -205,7 +205,7 @@ function label(
 , vertical           :: SVector{3,Float64}
 ; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: Unsigned
+, color = 0x7DF9FFFF :: Unsigned
 )
   request(
     empty(
@@ -234,7 +234,7 @@ function axis(
 , finish             :: SVector{3,Float64}
 ; frame = Int32(1)   :: Signed
 , size  = 0.01       :: Float64
-, color = 0x035096FF :: Unsigned
+, color = 0x7DF9FFFF :: Unsigned
 , text  = ""         :: String
 )
   request(

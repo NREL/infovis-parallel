@@ -1,6 +1,6 @@
 
 import DataFrames: DataFrame
-import InfoVis.Primitives: axis, label, points
+import InfoVis.Primitives: axis, label, points, polylines
 import InfoVis.Transport: Client
 import StaticArrays: SVector
 
@@ -26,15 +26,15 @@ export axes
 
 
 function scatterplot(
-  df               :: DataFrame
-, i                :: Symbol
-, x                :: Symbol
-, y                :: Symbol
-, z                :: Symbol
-; size  = 0.01     :: Union{Symbol,Float64}
-, color = 0x035096 :: Union{Symbol,Unsigned}
-, glyph = 0        :: Union{Symbol,Signed}
-, frame = 1        :: Signed
+  df                 :: DataFrame
+, i                  :: Symbol
+, x                  :: Symbol
+, y                  :: Symbol
+, z                  :: Symbol
+; size  = 0.01       :: Union{Symbol,Float64}
+, color = 0x7DF9FFFF :: Union{Symbol,Unsigned}
+, glyph = 0          :: Union{Symbol,Signed}
+, frame = 1          :: Signed
 )
   function f(client)
     for row in eachrow(df)
@@ -57,3 +57,40 @@ function scatterplot(
 end
 
 export scatterplot
+
+
+function lineplot(
+  df                 :: DataFrame
+, i                  :: Symbol
+, x                  :: Symbol
+, y                  :: Symbol
+, z                  :: Symbol
+; size  = 0.01       :: Union{Symbol,Float64}
+, color = 0x7DF9FFFF :: Union{Symbol,Unsigned}
+, glyph = 0          :: Union{Symbol,Signed}
+, frame = 1          :: Signed
+)
+  function f(client)
+    for row in eachrow(df)
+      client |> polylines(
+                  getproperty(row, i)
+                , [[
+                    SVector(
+                      getproperty(row, x)[j]
+                    , getproperty(row, y)[j]
+                    , getproperty(row, z)[j]
+                    )
+                    for j in 1:length(getproperty(row, x))
+                  ]]
+                , size  = typeof(size ) == Symbol ? getproperty(row, size ) : size
+                , color = typeof(color) == Symbol ? getproperty(row, color) : color
+                , glyph = typeof(glyph) == Symbol ? getproperty(row, glyph) : glyph
+                , frame = frame
+                )
+    end
+    client
+  end
+  return f
+end
+
+export lineplot

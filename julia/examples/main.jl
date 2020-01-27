@@ -3,7 +3,7 @@ using InfoVis
 using InfoVis.Primitives
 
 import DataFrames: DataFrame
-import InfoVis.Plots: axes, scatterplot
+import InfoVis.Plots: axes, lineplot, scatterplot
 import InfoVis.Transport: connect, responses, stop
 import Random: rand
 import StaticArrays: SVector
@@ -80,7 +80,7 @@ z |> showframe(2) ;
 
 sleep(2)
 
-function randomdata(n :: Signed)
+function randompoints(n :: Signed)
   df = DataFrame()
   df.ID    = 1:n
   df.X     = [rand() for i in 1:n]
@@ -92,10 +92,19 @@ function randomdata(n :: Signed)
   df
 end
 
-z |> axes(frame = 3) |>
-     scatterplot(randomdata(50), :ID, :X, :Y, :Z, size  = :Size, color = :Color, glyph = :Glyph, frame = 3) |>
-     showframe(3) ;
+function randomlines(n :: Signed)
+  df = DataFrame()
+  df.ID    = 1:n
+  df.X     = [[rand(), rand()] for i in 1:n]
+  df.Y     = [[rand(), rand()] for i in 1:n]
+  df.Z     = [[rand(), rand()] for i in 1:n]
+  df
+end
 
+z |> axes(frame = 3) |>
+     scatterplot(randompoints(50), :ID, :X, :Y, :Z, size  = :Size, color = :Color, glyph = :Glyph, frame = 3) |>
+     lineplot(randomlines(5), :ID, :X, :Y, :Z, frame = 3) |>
+     showframe(3) ;
 
 sleep(2)
 
