@@ -11,11 +11,12 @@ module InfoVis.Parallel.Visualizer (
 import Control.Concurrent.Chan (newChan)
 import Control.Monad (void)
 import Control.Monad.Except (MonadError, MonadIO, liftEither)
-import Control.Monad.Log (logInfo)
+import Control.Monad.Log (logDebug,logInfo)
 import Data.Aeson.Types (FromJSON, ToJSON)
 import Data.Yaml (decodeFileEither)
 import GHC.Generics (Generic)
 import Graphics.OpenGL.Util.Types (Viewer)
+import Graphics.X11.Xlib.Misc (initThreads)
 import InfoVis (SeverityLog, guardIO, forkLoggedIO, logIO, makeLogger)
 import InfoVis.Parallel.Types (PositionEuler)
 import InfoVis.Parallel.ProtoBuf.Sink (deviceSink, kafkaSink')
@@ -47,6 +48,9 @@ visualizeBuffers :: (MonadError String m, MonadIO m, SeverityLog m)
                  -> m ()
 visualizeBuffers configurationFile debug bufferFiles =
   do
+
+    status <- guardIO initThreads
+    logDebug $ "X11 initThreads status = " ++ show status ++ "."
 
     (logChannel, logger) <- makeLogger
 

@@ -102,8 +102,7 @@ executable infovis-parallel
                    , text              >= 1.2.3
                    , vector            >= 0.12.0
                    , websockets        >= 0.12.5
+                   , X11               >= 1.9
                    , yaml              >= 0.8.32
-  if flag(SwapGroup)
-    build-depends  : X11
   ghc-options      : -threaded -Wall
   default-language : Haskell2010
