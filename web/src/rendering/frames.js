@@ -267,6 +267,8 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
         display.geometries.delete(identifier)
         if (hasBuffer1)
           Buffers.deleteInstance(display.buffer, identifier)
+        if (hasPixmaps(display))
+          display.pixmaps.delete(identifier)
         break
       }
     case REVISION_Insertion:
@@ -277,7 +279,7 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
           updateDisplay(identifier, geometry, display.buffer)
         }
         if (hasPixmaps(display))
-          display.pixmaps.set(identifier, Text.makePixmap(geometry.text))
+          display.pixmaps.set(identifier, Text.makePixmap(geometry.text, decimalColor(geometry.color)))
         break
       }
     case REVISION_Recoloring:
@@ -285,9 +287,17 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
         display.geometries.set(identifier, geometry)
         if (hasBuffer1)
           Buffers.updateColor(identifier, geometry.color, display.buffer)
+        if (hasPixmaps(display))
+          display.pixmaps.set(identifier, Text.makePixmap(geometry.text, decimalColor(geometry.color)))
         break
       }
   }
+}
+
+
+function decimalColor(x) {
+  let c = "00000000" + x.toString(16)
+  return "#" + c.slice(c.length - 8)
 }
 
 
