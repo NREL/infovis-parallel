@@ -1,7 +1,7 @@
 name = "InfoVis"
 uuid = "4f5107b8-3ecf-11ea-2e51-6589d43209bc"
 authors = ["Brian W Bush <brian.bush@nrel.gov>"]
-version = "4.0.0"
+version = "0.4.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"

@@ -1,5 +1,5 @@
 % InfoVis Parallel
-% Technical Manual
+% Technical Manual, v. 0.4.0
 % 2020-01-14
 
 
