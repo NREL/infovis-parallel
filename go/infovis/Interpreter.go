@@ -86,7 +86,7 @@ func (interpreter *Interpreter) deleteConnectable(label Label, warn bool) bool {
 
 
 func (interpreter *Interpreter) lookupSource(label Label) (Source, bool) {
-  source, ok := interpreter.sources[label];
+  source, ok := interpreter.sources[label]
   if !ok {
     glog.Warningf("Source %s does not exist.\n", label)
     return nil, false
@@ -115,25 +115,15 @@ func (interpreter *Interpreter) lookupRelay(label Label) (*Relay, bool) {
 }
 
 
-func (interpreter *Interpreter) assertNoSource(label Label) bool {
+func (interpreter *Interpreter) assertNoConnectable(label Label) bool {
   if _, ok := interpreter.sources[label]; ok {
     glog.Warningf("Source %s already exists.\n", label)
     return false
   }
-  return true
-}
-
-
-func (interpreter *Interpreter) assertNoSink(label Label) bool {
   if _, ok := interpreter.sinks[label]; ok {
-    glog.Warningf("Sink %s already exists.\n", label)
+    glog.Warningf("Channel %s already exists.\n", label)
     return false
   }
-  return true
-}
-
-
-func (interpreter *Interpreter) assertNoRelay(label Label) bool {
   if _, ok := interpreter.relays[label]; ok {
     glog.Warningf("Relay %s already exists.\n", label)
     return false
@@ -229,19 +219,19 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       return true
 
     case "absorber":
-      if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) && interpreter.assertNoSink(tokens[1]) {
+      if checkArguments(tokens, "The 'absorber' command must name a channel.", 2, true) && interpreter.assertNoConnectable(tokens[1]) {
         interpreter.sinks[tokens[1]] = NewAbsorber(tokens[1], interpreter.reaper)
         return true
       }
 
     case "printer":
-      if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) && interpreter.assertNoSink(tokens[1]) {
+      if checkArguments(tokens, "The 'printer' command must name a channel and a kind of protocol buffer.", 3, true) && interpreter.assertNoConnectable(tokens[1]) {
         interpreter.sinks[tokens[1]] = NewPrinter(tokens[1], tokens[2], interpreter.reaper)
         return true
       }
 
     case "files":
-      if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && interpreter.assertNoSource(tokens[1]) {
+      if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && interpreter.assertNoConnectable(tokens[1]) {
         interpreter.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], interpreter.reaper)
         return true
       }
@@ -258,13 +248,13 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       }
 
     case "relay":
-      if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && interpreter.assertNoRelay(tokens[1]) {
+      if checkArguments(tokens, "The 'relay' command must have one argument.", 2, true) && interpreter.assertNoConnectable(tokens[1]) {
         interpreter.relays[tokens[1]] = NewRelay(tokens[1], []Conversion{}, []Filter{}, interpreter.reaper)
         return true
       }
 
     case "converter":
-      if checkArguments(tokens, "The 'converter' command must name a relay.", 2, false) && interpreter.assertNoRelay(tokens[1]) {
+      if checkArguments(tokens, "The 'converter' command must name a relay.", 2, false) && interpreter.assertNoConnectable(tokens[1]) {
         conversions := make([]Conversion, 0, len(tokens) - 2)
         for _, token := range tokens[2:] {
           if conversion, ok := ParseConversion(token); ok {
@@ -279,7 +269,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       }
 
     case "filter":
-      if checkArguments(tokens, "The 'filter' command must name a relay.", 2, false) && interpreter.assertNoRelay(tokens[1]) {
+      if checkArguments(tokens, "The 'filter' command must name a relay.", 2, false) && interpreter.assertNoConnectable(tokens[1]) {
         filters := make([]Filter, 0, len(tokens) - 2)
         for _, token := range tokens[2:] {
           if filter, ok := ParseFilter(token); ok {
@@ -356,7 +346,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       }
 
     case "websocket":
-      if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) && interpreter.assertNoSource(tokens[1]) && interpreter.assertNoSink(tokens[1]) {
+      if checkArguments(tokens, "The 'websocket' command must have a path.", 2, true) && interpreter.assertNoConnectable(tokens[1]) {
         websocket := NewWebsocket(interpreter.server, tokens[1], interpreter.reaper)
         interpreter.sources[tokens[1]] = websocket
         interpreter.sinks[tokens[1]]   = websocket
@@ -364,7 +354,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       }
 
     case "kafka":
-      if checkArguments(tokens, "The 'kafka' command must have an address, whether to start at the earliest offset, and a topic.", 4, true) && interpreter.assertNoSource(tokens[3]) && interpreter.assertNoSink(tokens[3]) {
+      if checkArguments(tokens, "The 'kafka' command must have an address, whether to start at the earliest offset, and a topic.", 4, true) && interpreter.assertNoConnectable(tokens[3]) {
         kafka := NewKafka(tokens[3], tokens[1], tokens[2] == "true", interpreter.reaper)
         interpreter.sources[tokens[3]] = kafka
         interpreter.sinks[tokens[3]]   = kafka
