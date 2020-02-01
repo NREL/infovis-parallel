@@ -71,13 +71,15 @@ func (files *Files) Append(filenames []string) {
   files.mux.Lock()
   files.filenames = append(files.filenames, filenames1...)
   files.mux.Unlock()
-  for _, file := range filenames1 {
-    select {
-      case files.filename <- file:
-      case <-files.done:
-        return
+  go func() {
+    for _, file := range filenames1 {
+      select {
+        case files.filename <- file:
+        case <-files.done:
+          return
+      }
     }
-  }
+  }()
 }
 
 
@@ -95,13 +97,15 @@ func (files *Files) Reset() {
   files.mux.RLock()
   filenames1 := files.filenames
   files.mux.RUnlock()
-  for _, file := range filenames1 {
-    select {
-      case files.filename <- file:
-      case <-files.done:
-        return
+  go func() {
+    for _, file := range filenames1 {
+      select {
+        case files.filename <- file:
+        case <-files.done:
+          return
+      }
     }
-  }
+  }()
 }
 
 
