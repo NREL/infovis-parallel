@@ -401,7 +401,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
 
     case "help":
       fmt.Println("? absorber 'sink'")
-      fmt.Println("? add-sink 'relay' [sink]...")
+      fmt.Println("? add-sink 'relay' [sink|relay]...")
       fmt.Println("? add-source 'relay' [source]...")
       fmt.Println("? append 'source' [filename]...")
       fmt.Println("? converter 'relay' [show] [view] [tool] [offset]")
@@ -414,7 +414,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       fmt.Println("? printer 'sink' (Request|Response)")
       fmt.Println("? relay 'relay'")
       fmt.Println("? relays")
-      fmt.Println("? remove-sink 'relay' [sink]...")
+      fmt.Println("? remove-sink 'relay' [sink|relay]...")
       fmt.Println("? remove-source 'relay' [source]...")
       fmt.Println("? reset [source]...")
       fmt.Println("? script [file]...")

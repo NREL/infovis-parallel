@@ -133,11 +133,11 @@ func unglob(filenames []string) []string {
   for _, filename := range filenames {
     matches, err := filepath.Glob(filename)
     if err != nil {
-      glog.Warningf("Invalid glob pattern '%s': %v.", filename, err)
+      glog.Warningf("Invalid glob pattern '%s': %v.\n", filename, err)
       continue
     }
     if len(matches) == 0 {
-      glog.Warningf("Glob pattern '%s' matched no files.", filename)
+      glog.Warningf("Glob pattern '%s' matched no files.\n", filename)
     }
     result = append(result, matches...)
   }

@@ -274,6 +274,7 @@ func (relay *Relay) SinkLabels() []Label {
 
 func (relay *Relay) AddSource(label Label, source *Source) {
   relay.mux.Lock()
+  glog.Infof("Adding source %s to relay %s.\n", label, relay.label)
   relay.sources[label] = source
   relay.mux.Unlock()
   go func() {
@@ -309,6 +310,7 @@ func (relay *Relay) AddSource(label Label, source *Source) {
 
 func (relay *Relay) AddSink(label Label, sink *Sink) {
   relay.mux.Lock()
+  glog.Infof("Adding sink %s to relay %s.\n", label, relay.label)
   relay.sinks[label] = sink
   relay.mux.Unlock()
 }
@@ -316,15 +318,25 @@ func (relay *Relay) AddSink(label Label, sink *Sink) {
 
 func (relay *Relay) RemoveSource(label Label) {
   relay.mux.Lock()
+  defer relay.mux.Unlock()
+  if _, ok := relay.sources[label]; !ok {
+    glog.Warningf("No source %s in relay %s.\n", label, relay.label)
+    return
+  }
+  glog.Infof("Removing source %s from relay %s.\n", label, relay.label)
   delete(relay.sources, label)
-  relay.mux.Unlock()
 }
 
 
 func (relay *Relay) RemoveSink(label Label) {
   relay.mux.Lock()
+  defer relay.mux.Unlock()
+  if _, ok := relay.sinks[label]; !ok {
+    glog.Warningf("No sink %s in relay %s.\n", label, relay.label)
+    return
+  }
+  glog.Infof("Removing sink %s from relay %s.\n", label, relay.label)
   delete(relay.sinks, label)
-  relay.mux.Unlock()
 }
 
 

@@ -35,7 +35,7 @@ func NewPrinter(label Label, kind string, reaper LabelInChannel) *Printer {
       select {
         case buffer, ok := <-printer.channel:
           if !ok {
-            glog.Errorf("Receive failed for printer %s\n.", printer.label)
+            glog.Errorf("Receive failed for printer %s.\n", printer.label)
             printer.Exit()
             return
           }
