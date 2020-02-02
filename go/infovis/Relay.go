@@ -328,6 +328,11 @@ func (relay *Relay) RemoveSink(label Label) {
 }
 
 
+func (relay *Relay) Label() Label {
+  return relay.label
+}
+
+
 func (relay *Relay) Exit() {
   select {
     case <-relay.done:
@@ -344,4 +349,9 @@ func (relay *Relay) Alive() bool {
     default:
       return true
   }
+}
+
+
+func (relay *Relay) In() ProtobufInChannel {
+  return relay.merge
 }

@@ -95,9 +95,17 @@ func (interpreter *Interpreter) lookupSource(label Label) (Source, bool) {
 }
 
 
-func (interpreter *Interpreter) lookupSink(label Label) (Sink, bool) {
+func (interpreter *Interpreter) lookupSink(label Label, allowRelays bool) (Sink, bool) {
   sink, ok := interpreter.sinks[label]
   if !ok {
+    if allowRelays {
+      sink, ok = interpreter.relays[label]
+      if !ok {
+        glog.Warningf("%s is neither a sink or relay.\n", label)
+        return nil, false
+      }
+      return sink, true
+    }
     glog.Warningf("Sink %s does not exist.\n", label)
     return nil, false
   }
@@ -301,7 +309,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       if checkArguments(tokens, "The 'add' command must name a relay.", 2, false) {
         if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
-            if sink, ok := interpreter.lookupSink(label); ok {
+            if sink, ok := interpreter.lookupSink(label, true); ok {
               relay.AddSink(label, &sink)
             } else {
               return false
@@ -329,7 +337,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       if checkArguments(tokens, "The 'remove' command must name a relay.", 2, false) {
         if relay, ok := interpreter.lookupRelay(tokens[1]); ok {
           for _, label := range tokens[2:] {
-            if _, ok := interpreter.lookupSink(label); ok {
+            if _, ok := interpreter.lookupSink(label, true); ok {
               relay.RemoveSink(label)
             } else {
               return false
