@@ -24,6 +24,7 @@ func Demo(address string, path string, globs []string) {
       glog.Fatal(err)
     }
     defer conn.Close()
+    glog.Infof("Handling request from %s.\n", request.RemoteAddr)
 
     for _, glob := range globs {
       matches, err := filepath.Glob(glob)

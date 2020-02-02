@@ -46,6 +46,7 @@ func (server *Server) makeHandler() func(http.ResponseWriter, *http.Request) {
       glog.Fatal(err)
     }
     defer conn.Close()
+    glog.Infof("Handling request from %s.\n", request.RemoteAddr)
 
     if !strings.HasPrefix(request.URL.Path, server.root) {
       glog.Errorf("Invalid WebSocket path %s\n.", request.URL.Path)
