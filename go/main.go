@@ -12,6 +12,8 @@ import (
 
 func main() {
 
+//infovis.NewJoystick(0)
+
   defer glog.Flush()
 
   var demo = flag.Bool("demo", false, "run in demo mode")

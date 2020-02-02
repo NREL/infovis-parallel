@@ -10,6 +10,7 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/pierrec/lz4 v2.3.0+incompatible // indirect
 	github.com/segmentio/kafka-go v0.3.4
+	github.com/simulatedsimian/joystick v1.0.1
 	golang.org/x/crypto v0.0.0-20191105034135-c7e5f84aec59 // indirect
 	golang.org/x/net v0.0.0-20191105084925-a882066a44e0 // indirect
 	golang.org/x/text v0.3.2 // indirect
