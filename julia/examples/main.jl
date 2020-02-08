@@ -9,7 +9,7 @@ import Random: rand
 import StaticArrays: SVector
 
 
-z = connect("ws://127.0.0.1:42042/infovis/v4/julia") ;
+z = connect("ws://104.198.152.159:42042/infovis/v4/julia") ;
 
 function reporter(response)
   if isdefined(response, :offsetloc)
