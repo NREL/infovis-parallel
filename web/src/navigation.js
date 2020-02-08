@@ -219,14 +219,14 @@ export function interpretGamepad(graphics) {
 
   if (toolMode)
     updateTool(
-      graphics.tool
+      graphics
     , deltaPosition
     , deltaRotation
     , graphics.offset.rotation
     )
   else
     updateOffset(
-      graphics.offset
+      graphics
     , deltaPosition
     , deltaRotation
     )
