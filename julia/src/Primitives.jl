@@ -1,7 +1,19 @@
 
+import Colors: Colorant, RGBA, @colorant_str
 import InfoVis.Buffers: Geometry, Location, Request
 import InfoVis.Transport: Client, send
 import StaticArrays: SVector
+
+
+function _colorant2uint(c :: Colorant) :: UInt32
+  c1 = convert(RGBA, c)
+  quantize(x) = round(UInt32, 0xFF * x)
+  r = quantize(c1.r    )
+  g = quantize(c1.g    )
+  b = quantize(c1.b    )
+  a = quantize(c1.alpha)
+  0x100 * (0x100 * (0x100 * r + g) + b) + a
+end
 
 
 function request(request :: Request)
@@ -87,7 +99,7 @@ function Geometry(
 , coords     :: Vector{Vector{SVector{3,Float64}}}
 , frame      :: Signed
 , size       :: Float64
-, color      :: Unsigned
+, color      :: Colorant
 , text       :: String
 , glyph      :: Signed
 ) :: Geometry
@@ -101,7 +113,7 @@ function Geometry(
   , posy  = vcat(map(ps -> map(p -> p[2], ps), coords)...)
   , posz  = vcat(map(ps -> map(p -> p[3], ps), coords)...)
   , size  = size
-  , colr  = convert(UInt32, color)
+  , colr  = _colorant2uint(color)
   , text  = text
   , glyp  = convert(Int32, glyph)
   )
@@ -109,13 +121,13 @@ end
 
 
 function points(
-  identifier         :: Signed
-, coords             :: Vector{Vector{SVector{3,Float64}}}
-; frame = 1          :: Signed
-, size  = 0.01       :: Float64
-, color = 0x7DF9FFFF :: Unsigned
-, text  = ""         :: String
-, glyph = 0          :: Signed
+  identifier                  :: Signed
+, coords                      :: Vector{Vector{SVector{3,Float64}}}
+; frame = 1                   :: Signed
+, size  = 0.01                :: Float64
+, color = colorant"#7DF9FFFF" :: Colorant
+, text  = ""                  :: String
+, glyph = 0                   :: Signed
 )
   request(
     empty(
@@ -139,13 +151,13 @@ export points
 
 
 function polylines(
-  identifier         :: Signed
-, coords             :: Vector{Vector{SVector{3,Float64}}}
-; frame = Int32(1)   :: Signed
-, size  = 0.01       :: Float64
-, color = 0x7DF9FFFF :: Unsigned
-, text  = ""         :: String
-, glyph = Int32(0)   :: Signed
+  identifier                  :: Signed
+, coords                      :: Vector{Vector{SVector{3,Float64}}}
+; frame = Int32(1)            :: Signed
+, size  = 0.01                :: Float64
+, color = colorant"#7DF9FFFF" :: Colorant
+, text  = ""                  :: String
+, glyph = Int32(0)            :: Signed
 )
   request(
     empty(
@@ -169,12 +181,12 @@ export polylines
 
 
 function rectangles(
-  identifier         :: Signed
-, coords             :: Vector{SVector{3,SVector{3,Float64}}}
-; frame = Int32(1)   :: Signed
-, size  = 0.01       :: Float64
-, color = 0x7DF9FFFF :: Unsigned
-, text  = ""         :: String
+  identifier                  :: Signed
+, coords                      :: Vector{SVector{3,SVector{3,Float64}}}
+; frame = Int32(1)            :: Signed
+, size  = 0.01                :: Float64
+, color = colorant"#7DF9FFFF" :: Colorant
+, text  = ""                  :: String
 )
   request(
     empty(
@@ -198,14 +210,14 @@ export rectangles
 
 
 function label(
-  identifier         :: Signed
-, text               :: String
-, origin             :: SVector{3,Float64}
-, horizontal         :: SVector{3,Float64}
-, vertical           :: SVector{3,Float64}
-; frame = Int32(1)   :: Signed
-, size  = 0.01       :: Float64
-, color = 0x7DF9FFFF :: Unsigned
+  identifier                  :: Signed
+, text                        :: String
+, origin                      :: SVector{3,Float64}
+, horizontal                  :: SVector{3,Float64}
+, vertical                    :: SVector{3,Float64}
+; frame = Int32(1)            :: Signed
+, size  = 0.01                :: Float64
+, color = colorant"#7DF9FFFF" :: Colorant
 )
   request(
     empty(
@@ -229,13 +241,13 @@ export label
 
 
 function axis(
-  identifier         :: Signed
-, start              :: SVector{3,Float64}
-, finish             :: SVector{3,Float64}
-; frame = Int32(1)   :: Signed
-, size  = 0.01       :: Float64
-, color = 0x7DF9FFFF :: Unsigned
-, text  = ""         :: String
+  identifier                  :: Signed
+, start                       :: SVector{3,Float64}
+, finish                      :: SVector{3,Float64}
+; frame = Int32(1)            :: Signed
+, size  = 0.01                :: Float64
+, color = colorant"#7DF9FFFF" :: Colorant
+, text  = ""                  :: String
 )
   request(
     empty(
