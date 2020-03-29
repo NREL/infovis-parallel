@@ -62,6 +62,13 @@ function keyHandler(event) {
 
 export function startup() {
 
+  uiAddress.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      uiConnect.click();
+    }
+  })
+
   document.addEventListener("keydown", keyHandler)
 
   theContext = uiCanvas.getContext("webgl2")

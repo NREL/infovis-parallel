@@ -2,6 +2,9 @@
 const CONFIGURATION_KEY = "configuration"
 
 
+let originalAddress = null
+
+
 function defaultConfiguration(w = window.innerWidth, h = window.innerHeight) {
 
   const aspect = w / h
@@ -10,7 +13,7 @@ function defaultConfiguration(w = window.innerWidth, h = window.innerHeight) {
 
   return {
     server : {
-      address        : "ws://104.198.152.159:42042/infovis/v4/demo"
+      address        : originalAddress
     }
   , display          : {
       mode           : "mono"
@@ -178,6 +181,8 @@ export function update() {
 
 
 export function compute() {
+  if (originalAddress == null)
+    originalAddress = uiAddress.value
   theConfiguration = defaultConfiguration()
   put()
 }
