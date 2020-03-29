@@ -238,6 +238,12 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
         return true
       }
 
+    case "recorder":
+      if checkArguments(tokens, "The 'recorder' command must name a channel and filename prefix.", 3, true) && interpreter.assertNoConnectable(tokens[1]) {
+        interpreter.sinks[tokens[1]] = NewRecorder(tokens[1], tokens[2], interpreter.reaper)
+        return true
+      }
+
     case "files":
       if checkArguments(tokens, "The 'files' command must name a channel.", 2, false) && interpreter.assertNoConnectable(tokens[1]) {
         interpreter.sources[tokens[1]] = NewFiles(tokens[1], tokens[2:], interpreter.reaper)
@@ -412,6 +418,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       fmt.Println("? help")
       fmt.Println("? kafka 'address' [true|false] 'topic'")
       fmt.Println("? printer 'sink' (Request|Response)")
+      fmt.Println("? recorder 'sink' [filename]")
       fmt.Println("? relay 'relay'")
       fmt.Println("? relays")
       fmt.Println("? remove-sink 'relay' [sink|relay]...")
