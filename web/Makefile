@@ -21,7 +21,7 @@ infovis.tar.gz: model.html view.css controller.js lib images
 	tar czf $@ $^
 
 deploy: model.html view.css controller.js lib images
-	gsutil -q -m cp -r -a public-read $^ gs://visualize.functionally.io/
+	gsutil -q -m cp -r $^ gs://demo.vis3d.live/
 
 serve:
 	npx serve
