@@ -1,12 +1,12 @@
-files geometry ../../protobuf/examples/axes.pbb ../../protobuf/examples/corner-points.pbb ../../protobuf/examples/rectangles.pbb ../../protobuf/examples/helices.pbb ../../protobuf/examples/bslm-[01]?.pbb
+files geometry ../../protobuf/examples/axes.pbb ../../protobuf/examples/corner-points.pbb ../../protobuf/examples/rectangles.pbb ../../protobuf/examples/helices.pbb ../../protobuf/examples/bslm-??.pbb
 
-relay r
-converter c show tool offset
+relay R
+converter C show tool offset
 
 websocket demo
-add-sink r demo
-add-sink c demo
+add-sink R demo
+add-sink C demo
 
 websocket master
-add-sink r master
-add-source c master
+add-sink R master
+add-source C master

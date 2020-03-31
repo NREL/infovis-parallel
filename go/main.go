@@ -21,7 +21,7 @@ func main() {
   flag.Usage = func() {
     fmt.Fprintf(os.Stderr, "Usage:\n")
     fmt.Fprintf(os.Stderr, "  go-infovis [options] [file]..\n")
-    fmt.Fprintf(os.Stderr, "  go-infovis [options] -demo [bind-address] [websocket-path] [file]..\n")
+    fmt.Fprintf(os.Stderr, "  go-infovis [options] -demo [bind-address] [websocket-path] [cert-file] [key-file] [file]..\n")
     fmt.Fprintf(os.Stderr, "Options:\n")
     flag.PrintDefaults()
   }
@@ -29,8 +29,8 @@ func main() {
   flag.Parse()
   args := flag.Args()
 
-  if *demo && len(args) > 2 {
-    infovis.Demo(args[0], args[1], args[2:])
+  if *demo && len(args) > 4 {
+    infovis.Demo(args[0], args[1], args[2], args[3], args[4:])
     return
   }
 

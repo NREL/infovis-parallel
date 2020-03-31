@@ -24,7 +24,7 @@ var upgrader = websocket.Upgrader{
 }
 
 
-func NewServer(address string, root string) *Server {
+func NewServer(address string, root string, certFile string, keyFile string) *Server {
   var server = Server {
     root      : root                      ,
     websockets: make(map[Label]*Websocket),
@@ -32,7 +32,7 @@ func NewServer(address string, root string) *Server {
   http.HandleFunc(root, server.makeHandler())
   go func() {
     glog.Infof("Serving WebSockets on address %s%s.\n", address, server.root)
-    glog.Fatal(http.ListenAndServe(address, nil))
+    glog.Fatal(http.ListenAndServeTLS(address, certFile, keyFile, nil))
   }()
   return &server
 }

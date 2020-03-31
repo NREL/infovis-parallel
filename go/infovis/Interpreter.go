@@ -354,8 +354,8 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       return true
 
     case "serve":
-      if checkArguments(tokens, "The 'serve' command must have an address and a path.", 3, true) {
-        interpreter.server = NewServer(tokens[1], tokens[2])
+      if checkArguments(tokens, "The 'serve' command must have an address, a path, an SSL certificate file, and an SSL private key file.", 5, true) {
+        interpreter.server = NewServer(tokens[1], tokens[2], tokens[3], tokens[4])
         return true
       }
 
@@ -425,7 +425,7 @@ func (interpreter *Interpreter) InterpretTokens(tokens []string) bool {
       fmt.Println("? remove-source 'relay' [source]...")
       fmt.Println("? reset [source]...")
       fmt.Println("? script [file]...")
-      fmt.Println("? serve 'address' 'path'")
+      fmt.Println("? serve 'address' 'path' 'cert-file' 'key-file'")
       fmt.Println("? silent")
       fmt.Println("? sinks")
       fmt.Println("? sources")

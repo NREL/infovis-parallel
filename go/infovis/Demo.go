@@ -9,7 +9,7 @@ import (
 )
 
 
-func Demo(address string, path string, globs []string) {
+func Demo(address string, path string, certFile string, keyFile string, globs []string) {
 
   var upgrader = websocket.Upgrader{
     ReadBufferSize : 16384                                         ,
@@ -53,6 +53,6 @@ func Demo(address string, path string, globs []string) {
 
 
   http.HandleFunc(path, handler)
-  glog.Fatal(http.ListenAndServe(address, nil))
+  glog.Fatal(http.ListenAndServeTLS(address, certFile, keyFile, nil))
 
 }

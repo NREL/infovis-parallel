@@ -1,5 +1,5 @@
 printer P Request                     # Print requests.
-files F ../protobuf/examples/axes.pbb # Load a file containing protocol buffers.
+files F ../../protobuf/examples/axes.pbb # Load a file containing protocol buffers.
 relay R                               # Create a relay.
 add-sink R P                          # Connect the printer to the relay.
 add-source R F                        # Connect the files to the relay.
