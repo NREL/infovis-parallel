@@ -3,10 +3,10 @@ files geometry ../../protobuf/examples/axes.pbb ../../protobuf/examples/corner-p
 relay R
 converter C show tool offset
 
-websocket demo
+websocket  demo
 add-sink R demo
 add-sink C demo
 
-websocket master
-add-sink R master
+websocket    master
+add-sink   R master
 add-source C master

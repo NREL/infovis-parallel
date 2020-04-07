@@ -2,12 +2,12 @@ relay input
 relay output
 
 websocket         julia
-add-source input  julia
-add-sink   output julia
+add-source output julia
+add-sink   input  julia
 
-printer        recorder Request
-add-sink input recorder
+printer        monitor Request
+add-sink input monitor
 
 websocket         client
-add-sink   input  client
-add-source output client
+add-source input  client
+add-sink   output client
