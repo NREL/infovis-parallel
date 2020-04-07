@@ -1,5 +1,6 @@
 
 import InfoVis.Buffers: Request, Response
+import MbedTLS: SSLConfig
 import ProtoBuf: readproto, writeproto
 import WebSockets: WebSockets, WebSocket, close, open, readguarded, writeguarded, CONNECTED
 
@@ -60,7 +61,7 @@ function connect(
   control   = Channel{Done}(1)
   requests  = Channel{Request}(1)
   responses = Channel{Response}(capacity)
-  @async WebSockets.open(address) do socket
+  @async WebSockets.open(address; sslconfig=SSLConfig(false)) do socket
     @async _handler(socket, requests)
     @async _handler(socket, responses)
     put!(ready, Done())
@@ -68,8 +69,8 @@ function connect(
     close(requests)
     close(responses)
     close(socket, statusnumber = 1000, freereason = "done")
-  take!(ready)
   end
+  take!(ready)
   (
     control   = control
   , requests  = requests
