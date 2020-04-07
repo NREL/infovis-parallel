@@ -1,13 +1,13 @@
-relay julia-input
-relay julia-output
+relay input
+relay output
 
-websocket julia
-add-source julia-input julia
+websocket         julia
+add-source input  julia
+add-sink   output julia
 
-printer julia-printer Request
-add-sink julia-input julia-printer
+printer        recorder Request
+add-sink input recorder
 
-websocket julia-demo
-add-sink julia-input julia-demo
-add-source julia-output julia-demo
-add-sink julia-output julia
+websocket         client
+add-sink   input  client
+add-source output client
