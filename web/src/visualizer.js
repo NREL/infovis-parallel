@@ -1,6 +1,8 @@
 
 import * as Frames     from "./rendering/frames"
-import * as Navigation from "./navigation"
+import * as Gamepad    from "./input/gamepad"
+import * as Input      from "./input/webxr"
+import * as Keyboard   from "./input/keyboard"
 import * as Linear     from "./rendering/linear"
 import * as Projection from "./rendering/projection"
 import * as Selector   from "./rendering/selector"
@@ -156,7 +158,7 @@ export function setupXR(action) {
 
 let isRunning = false
 
-var xrReferenceSpace = null
+let xrReferenceSpace = null
 
 
 function drawAll(gl, graphics, perspective = mat4.create()) {
@@ -198,7 +200,8 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
   Text.ensureShaders(gl)
 
-  Navigation.resetGamepad()
+  Gamepad.reset()
+  Input.reset()
 
   setupCanvas(gl)
 
@@ -211,19 +214,21 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     }
 
     const now = new Date()
-    const dirtyRequest  = (starting && starting < now) || requestQueue.length > 0
-    let   dirtyResponse = (starting && starting < now) || keyQueue.length > 0
+    const isStarting = starting && starting < now
 
-    const gamepad = Navigation.interpretGamepad(graphics)
+    const dirtyRequest  = requestQueue.length > 0
+    let   dirtyResponse = keyQueue.length > 0
+
+    const gamepad = Gamepad.interpret(graphics)
     dirtyResponse |= gamepad.dirty
-  
+
     while (keyQueue.length > 0)
-      Navigation.interpretKeyboard(keyQueue.pop(), graphics)
-  
+      Keyboard.interpret(keyQueue.pop(), graphics)
+
     while (requestQueue.length > 0)
       dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
 
-    if (xrFrame || dirtyRequest || dirtyResponse) {
+    if (!isStarting && (xrFrame || dirtyRequest || dirtyResponse)) {
 
       starting = null
 
@@ -234,6 +239,13 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       if (xrFrame) {
 
         const xrSession = xrFrame.session
+
+        const delta = vec3.fromValues(0.5, 0.5, 2.5)
+
+        if (Input.interpret(graphics, xrFrame, xrReferenceSpace, delta)) {
+          Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
+          dirtyResponse = true
+        }
 
         const pose = xrFrame.getViewerPose(xrReferenceSpace)
 
@@ -249,17 +261,16 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
         , pose.transform.orientation.w
         )
 
-        const delta = vec3.fromValues(0.5, 0.5, 2.5)
         graphics.manager.modelView = Projection.modelView(
           vec3.scaleAndAdd(vec3.create(), graphics.offset.position, delta, -1)
         , graphics.offset.rotation
         )
 
-        let layer = xrSession.renderState.baseLayer
+        const layer = xrSession.renderState.baseLayer
         gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-        for (let view of pose.views) {
+        for (const view of pose.views) {
 
           const viewport = layer.getViewport(view);
           gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height)
@@ -284,7 +295,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
         const eyes = configuration.display.mode == "stereo" ? 2 : 1
         for (let eye = 0; eye < eyes; ++eye) {
 
-          let viewport = {
+          const viewport = {
             x      : (eyes - 1) * eye * gl.canvas.width / 2
           , y      : 0
           , width  : gl.canvas.width / eyes
@@ -316,7 +327,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
     }
 
-    if (dirtyResponse) {
+    if (!isStarting && dirtyResponse) {
       const response = new proto.Infovis.Response()
       response.setShown(graphics.manager.current          )
       response.setViewloc   (makeLocation(graphics.pov   ))
@@ -339,7 +350,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     navigator.xr.requestSession('immersive-vr').then((xrSession) => {
       if (DEBUG) console.debug("visualizeBuffers: xrSession = ", xrSession)
       xrSession.addEventListener("end", stopper)
-      let xrLayer = new XRWebGLLayer(xrSession, gl)
+      const xrLayer = new XRWebGLLayer(xrSession, gl)
       xrSession.updateRenderState({baseLayer: xrLayer})
       xrSession.requestReferenceSpace("local").then((referenceSpace) => {
         xrReferenceSpace = referenceSpace

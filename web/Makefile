@@ -14,7 +14,7 @@ clean:
 	rm controller.js
 
 lint: model.html controller.js
-	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,rendering/*}.js
+	npx eslint -c eslint.json src/{configuration,connection,controller,transport,visualizer,input/*,rendering/*}.js
 	tidy -quiet -o /dev/null model.html
 
 infovis.tar.gz: model.html view.css controller.js lib images

@@ -296,7 +296,7 @@ function insertDisplay(deltaGeometry, shapeMesh, display) {
 
 
 function decimalColor(x) {
-  let c = "00000000" + x.toString(16)
+  const c = "00000000" + x.toString(16)
   return "#" + c.slice(c.length - 8)
 }
 
