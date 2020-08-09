@@ -117,12 +117,12 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
 
   if (!vetoButtons && buttons.length >= 5 && buttons[4].pressed) {
     lastButton = now
-    graphics.manager.current = minFrame + (graphics.manager.current - 1 - minFrame) % (maxFrame + 1 - minFrame)
+    graphics.manager.current = Math.max(minFrame, graphics.manager.current - 1)
   }
 
   if (!vetoButtons && buttons.length >= 6 && buttons[5].pressed) {
     lastButton = now
-    graphics.manager.current = minFrame + (graphics.manager.current + 1 - minFrame) % (maxFrame + 1 - minFrame)
+    graphics.manager.current = Math.min(maxFrame, graphics.manager.current + 1)
   }
 
   if (!vetoButtons && buttons.length >= 4 && buttons[3].pressed) {
