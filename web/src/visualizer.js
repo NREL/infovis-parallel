@@ -15,7 +15,7 @@ const mat4 = glMatrix.mat4
 const vec3 = glMatrix.vec3
 
 
-new WebVRPolyfill()
+new WebXRPolyfill()
 
 
 const zero = vec3.fromValues(0, 0, 0)
@@ -24,8 +24,6 @@ const zero = vec3.fromValues(0, 0, 0)
 export function setupCanvas(gl, useBlending = !DEBUG, useCulling = !DEBUG) {
 
   if (DEBUG) console.debug("setupCanvas")
-
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
   gl.clearColor(0., 0., 0., 1.)
   gl.clearDepth(1.0)
@@ -42,8 +40,6 @@ export function setupCanvas(gl, useBlending = !DEBUG, useCulling = !DEBUG) {
     gl.enable(gl.CULL_FACE)
     gl.cullFace(gl.BACK)
   }
-
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
 
@@ -147,31 +143,44 @@ function processRequest(gl, graphics, request) {
 }
 
 
-let vrDisplay = null
-
-
-export function setupVR(action) {
-  navigator.getVRDisplays().then(function(displays) {
-    const hasVR = displays.length > 0
-    vrDisplay = hasVR ? displays[displays.length - 1] : null
-    action(hasVR)
-  })
+export function setupXR(action) {
+  if (navigator.xr)
+    navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
+      if (DEBUG) console.debug("setupXR: supported = ", supported)
+      action(supported)
+    })
+  else
+    action(false)
 }
 
 
 let isRunning = false
 
+var xrReferenceSpace = null
 
-export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond) {
+
+function drawAll(gl, graphics, perspective = mat4.create()) {
+
+  if (!(new RegExp("^ *$")).test(graphics.message.text))
+    Text.drawText(
+      gl
+    , graphics.message.image
+    , [vec3.fromValues(0, 0, -1), vec3.fromValues(1, 0, -1), vec3.fromValues(0, 1, -1)]
+    , 0.075
+    , perspective
+    , mat4.create()
+    , true
+    )
+
+  Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
+  Frames.draw(gl, graphics.manager)
+
+}
+
+
+export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond, stopper) {
 
   let starting = Date.now() + 2000
-
-  const useVR = configuration.display.mode == "webvr"
-
-  if (vrDisplay != null) {
-    vrDisplay.depthNear = configuration.display.nearPlane
-    vrDisplay.depthFar  = configuration.display.farPlane
-  }
 
   isRunning = true
 
@@ -191,7 +200,9 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
   Navigation.resetGamepad()
 
-  function animation(timestamp) {
+  setupCanvas(gl)
+
+  function animation(timestamp, xrFrame = null) {
 
     if (!isRunning) {
       keyQueue.length = 0
@@ -205,49 +216,81 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
     const gamepad = Navigation.interpretGamepad(graphics)
     dirtyResponse |= gamepad.dirty
-
+  
     while (keyQueue.length > 0)
       Navigation.interpretKeyboard(keyQueue.pop(), graphics)
-
+  
     while (requestQueue.length > 0)
       dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
 
-    if (useVR || dirtyRequest || dirtyResponse) {
+    if (xrFrame || dirtyRequest || dirtyResponse) {
 
       starting = null
-
-      setupCanvas(gl)
 
       Frames.prepare(gl, graphics.manager)
       if (dirtyResponse)
         Selector.prepare(gl, graphics.selector, graphics.tool.position, graphics.tool.rotation)
 
-      const eyes = useVR || configuration.display.mode == "stereo" ? 2 : 1
-      for (let eye = 0; eye < eyes; ++eye) {
+      if (xrFrame) {
 
-        gl.viewport((eyes - 1) * eye * gl.canvas.width / 2, 0, gl.canvas.width / eyes, gl.canvas.height)
+        const xrSession = xrFrame.session
 
-        if (useVR) {
+        const pose = xrFrame.getViewerPose(xrReferenceSpace)
 
-          const frameData = new VRFrameData()
-          vrDisplay.getFrameData(frameData)
+        graphics.pov.position = vec3.fromValues(
+          pose.transform.position.x
+        , pose.transform.position.y
+        , pose.transform.position.z
+        )
+        graphics.pov.rotation = quat.fromValues(
+          pose.transform.orientation.x
+        , pose.transform.orientation.y
+        , pose.transform.orientation.z
+        , pose.transform.orientation.w
+        )
 
-          const pose = frameData.pose
-          graphics.pov.position = pose.position    != null ? pose.position    : vec3.create()
-          graphics.pov.rotation = pose.orientation != null ? pose.orientation : quat.create()
+        const delta = vec3.fromValues(0.5, 0.5, 2.5)
+        graphics.manager.modelView = Projection.modelView(
+          vec3.scaleAndAdd(vec3.create(), graphics.offset.position, delta, -1)
+        , graphics.offset.rotation
+        )
 
-          const delta = vrDisplay.capabilities.hasPosition ? zero : vec3.fromValues(0.5, 0.5, 2.5)
-          graphics.pov.position = vec3.add(vec3.create(), graphics.pov.position, delta)
+        let layer = xrSession.renderState.baseLayer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer)
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-          graphics.manager.projection = eye == 0 ? frameData.leftProjectionMatrix : frameData.rightProjectionMatrix
-          const view = eye == 0 ? frameData.leftViewMatrix : frameData.rightViewMatrix
-          const model = Projection.modelView(
-            vec3.scaleAndAdd(vec3.create(), graphics.offset.position, delta, -1)
-          , graphics.offset.rotation
+        for (let view of pose.views) {
+
+          const viewport = layer.getViewport(view);
+          gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height)
+
+          graphics.manager.projection = mat4.multiply(
+            mat4.create()
+          , view.projectionMatrix
+          , view.transform.inverse.matrix
           )
-          graphics.manager.modelView = mat4.multiply(mat4.create(), view, model)
 
-        } else {
+          drawAll(gl, graphics, view.projectionMatrix)
+
+        }
+
+      } else {
+
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        graphics.manager.modelView = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+
+        const eyes = configuration.display.mode == "stereo" ? 2 : 1
+        for (let eye = 0; eye < eyes; ++eye) {
+
+          let viewport = {
+            x      : (eyes - 1) * eye * gl.canvas.width / 2
+          , y      : 0
+          , width  : gl.canvas.width / eyes
+          , height : gl.canvas.height
+          }
+          gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height)
 
           const eyeOffset = vec3.scale(
             vec3.create()
@@ -263,25 +306,11 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
           , graphics.pov.position
           , vec3.transformQuat(vec3.create(), eyeOffset, graphics.pov.rotation)
           )
-
           graphics.manager.projection = Projection.projection(configuration.display, eyePosition)
-          graphics.manager.modelView = Projection.modelView(graphics.offset.position, graphics.offset.rotation)
+
+          drawAll(gl, graphics)
 
         }
-
-        if (!(new RegExp("^ *$")).test(graphics.message.text))
-          Text.drawText(
-            gl
-          , graphics.message.image
-          , [vec3.fromValues(0, 0, 0), vec3.fromValues(1, 0, 0), vec3.fromValues(0, 1, 0)]
-          , 0.075
-          , mat4.create()
-          , mat4.create()
-          , true
-          )
-
-        Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
-        Frames.draw(gl, graphics.manager )
 
       }
 
@@ -298,22 +327,24 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       respond(response)
     }
 
-    if (useVR) {
-      vrDisplay.submitFrame()
-      vrDisplay.requestAnimationFrame(animation)
-    } else
+    if (xrFrame)
+      xrFrame.session.requestAnimationFrame(animation)
+    else
       window.requestAnimationFrame(animation)
 
   }
 
-  if (useVR && vrDisplay != null) {
+  if (configuration.display.mode == "webxr") {
 
-    const eye = vrDisplay.getEyeParameters("left")
-    uiCanvas.width  = eye.renderWidth
-    uiCanvas.height = eye.renderHeight
-
-    vrDisplay.requestPresent([{source: uiCanvas}]).then(function() {
-      animation()
+    navigator.xr.requestSession('immersive-vr').then((xrSession) => {
+      if (DEBUG) console.debug("visualizeBuffers: xrSession = ", xrSession)
+      xrSession.addEventListener("end", stopper)
+      let xrLayer = new XRWebGLLayer(xrSession, gl)
+      xrSession.updateRenderState({baseLayer: xrLayer})
+      xrSession.requestReferenceSpace("local").then((referenceSpace) => {
+        xrReferenceSpace = referenceSpace
+        xrSession.requestAnimationFrame(animation)
+      })
     })
 
   } else {

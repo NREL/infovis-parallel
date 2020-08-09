@@ -25,7 +25,7 @@ export function projection(display, eye) {
   const throw1 = - vec3.dot(va, vn)
 
   // Extent on near clipping plane.
-  const scaling = near / throw1
+  const scaling = throw1 > 0 ? near / throw1 : 1e9
   const left   = vec3.dot(vr, va) * scaling
   const right  = vec3.dot(vr, vb) * scaling
   const bottom = vec3.dot(vu, va) * scaling

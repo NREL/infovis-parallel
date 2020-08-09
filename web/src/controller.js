@@ -71,7 +71,7 @@ export function startup() {
 
   document.addEventListener("keydown", keyHandler)
 
-  theContext = uiCanvas.getContext("webgl2")
+  theContext = uiCanvas.getContext("webgl2", {xrCompatible: true})
   const gl = theContext
 
   gl.canvas.width  = window.innerWidth
@@ -82,11 +82,11 @@ export function startup() {
   Configuration.compute()
   Connection.updateButtons()
 
-  Visualizer.setupVR(function(hasVR) {
-    if (hasVR)
-      uiVR.checked = true
+  Visualizer.setupXR(function(hasXR) {
+    if (hasXR)
+      uiXR.checked = true
     else
-      uiVR.disabled = true
+      uiXR.disabled = true
     Configuration.updatePanel()
   })
 
@@ -106,14 +106,13 @@ export function startVisualizing() {
   isVisualizing = true
   if (uiStereo.checked)
     uiCanvas.requestFullscreen()
-  window.addEventListener('vrdisplaydeactivate', stopVisualizing, false)
-  window.addEventListener('vrdisplaydisconnect', stopVisualizing, false)
   Visualizer.visualizeBuffers(
-    theContext     ,
-    configuration  ,
-    requestQueue   ,
-    keyQueue       ,
-    Connection.send
+    theContext
+  , configuration
+  , requestQueue
+  , keyQueue
+  , Connection.send
+  , stopVisualizing
   )
 }
 
