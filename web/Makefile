@@ -21,13 +21,13 @@ infovis.tar.gz: model.html view.css controller.js lib images
 	tar czf $@ $^
 
 deploy: model.html view.css controller.js lib images
-	gsutil -q -m cp -r $^ gs://demo.vis3d.live/
+	gsutil -q -m cp -r $^ gs://vis3d.live/
 
 serve:
 	npx serve --ssl-cert localhost.crt --ssl-key localhost.key
 
 install:
-	npm install webvr-polyfill webpack webpack-cli eslint
+	npm install webxr-polyfill webpack webpack-cli eslint
 
 
 .SUFFIXES:
