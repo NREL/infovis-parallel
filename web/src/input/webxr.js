@@ -7,7 +7,7 @@ const quat = glMatrix.quat
 const vec3 = glMatrix.vec3
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 const center = vec3.fromValues(0.5, 0.5, 0.5)
@@ -49,18 +49,6 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
   , inputPose.transform.orientation.w
   )
 
-  graphics.tool.position = vec3.scaleAndAdd(
-    vec3.create()
-  , vec3.add(vec3.create(), position, delta)
-  , graphics.offset.position
-  , -1
-  )
-  graphics.tool.rotation = quat.multiply(
-    quat.create()
-  , rotation
-  , quat.fromValues(-0.271, -0.653, 0.271, 0.653)
-  )
-
   const now = Date.now()
   const vetoPeriod = 300
   const vetoButtons = now - lastButton <= vetoPeriod
@@ -68,7 +56,7 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
   const buttons = inputSource.gamepad.buttons
   const axes    = inputSource.gamepad.axes
 
-  if (axes.length >= 4) {
+  if (!vetoButtons && axes.length >= 4 && axes[3] != 0) {
     const deltaPosition = vec3.scale(
       vec3.create()
     , vec3.transformQuat(
@@ -129,7 +117,46 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
     lastButton = now
     graphics.offset.position = x.initialOffset.position
     graphics.offset.rotation = x.initialOffset.rotation
+    offsetRotation = null
   }
+
+  if (true)
+    // FIXME: Only works for rotations.
+    graphics.tool.position = vec3.add(
+      vec3.create()
+    , vec3.transformQuat(
+        vec3.create()
+      , vec3.scaleAndAdd(
+          vec3.create()
+        , vec3.add(vec3.create(), position, delta)
+        , center
+        , -1
+        )
+      , quat.invert(quat.create(), graphics.offset.rotation)
+      )
+    , center
+    )
+  else
+    // FIXME: Only works for translations.
+    graphics.tool.position = vec3.scaleAndAdd(
+      vec3.create()
+    , vec3.add(vec3.create(), position, delta)
+    , graphics.offset.position
+    , -1
+    )
+
+  graphics.tool.rotation = quat.multiply(
+    quat.create()
+  , quat.multiply(
+      quat.create()
+    , rotation
+    , quat.fromValues(-0.271, -0.653, 0.271, 0.653)
+    )
+  , quat.invert(
+      quat.create()
+    , graphics.offset.rotation
+    )
+  )
 
   if (DEBUG) {
     let line = "interpretWebXR"
