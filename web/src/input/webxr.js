@@ -133,14 +133,14 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
 
   graphics.tool.rotation = quat.multiply(
     quat.create()
+  , quat.invert(
+      quat.create()
+    , graphics.offset.rotation
+    )
   , quat.multiply(
       quat.create()
     , rotation
     , quat.fromValues(-0.271, -0.653, 0.271, 0.653)
-    )
-  , quat.invert(
-      quat.create()
-    , graphics.offset.rotation
     )
   )
 
