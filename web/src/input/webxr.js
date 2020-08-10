@@ -120,30 +120,16 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
     offsetRotation = null
   }
 
-  if (true)
-    // FIXME: Only works for rotations.
-    graphics.tool.position = vec3.add(
-      vec3.create()
-    , vec3.transformQuat(
-        vec3.create()
-      , vec3.scaleAndAdd(
-          vec3.create()
-        , vec3.add(vec3.create(), position, delta)
-        , center
-        , -1
-        )
-      , quat.invert(quat.create(), graphics.offset.rotation)
-      )
-    , center
-    )
-  else
-    // FIXME: Only works for translations.
-    graphics.tool.position = vec3.scaleAndAdd(
+  graphics.tool.position = vec3.transformQuat(
+    vec3.create()
+  , vec3.scaleAndAdd(
       vec3.create()
     , vec3.add(vec3.create(), position, delta)
     , graphics.offset.position
     , -1
     )
+  , quat.invert(quat.create(), graphics.offset.rotation)
+  )
 
   graphics.tool.rotation = quat.multiply(
     quat.create()
