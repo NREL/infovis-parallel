@@ -5,7 +5,7 @@
 EXAMPLES=$(addsuffix .pbb,$(basename $(wildcard examples/*.pbt)))
 
 
-all: examples ../unity/oculus/Assets/Infovis/Protobuf.cs ../web/src/infovis.proto3_pb.js ../go/infovis/infovis.proto3.pb.go ../julia/src/Infovis.jl
+all: examples ../web/src/infovis.proto3_pb.js ../go/infovis/infovis.proto3.pb.go ../julia/src/Infovis.jl ../python/src/infovis/proto3_pb2.py
 
 examples: $(EXAMPLES)
 
@@ -14,8 +14,7 @@ examples/bslm-%.pbt: examples/bslm.tsv.part-% examples/bslm.awk
 
 
 %.cs: infovis.proto3
-	protoc --csharp_out . $<
-	mv Infovis.cs $@
+	protoc --csharp_out $(dir $@) $<
 
 %.js: infovis.proto3
 	protoc --js_out import_style=commonjs,binary:$(dir $@) $<
@@ -26,6 +25,9 @@ examples/bslm-%.pbt: examples/bslm.tsv.part-% examples/bslm.awk
 
 %.jl: infovis.proto3
 	protoc --julia_out=$(dir $@) $<
+
+%.py: infovis.proto3
+	protoc --python_out $(dir $@) $<
 
 %.pbb : %.pbt infovis.proto3
 	protoc --encode=Infovis.Request infovis.proto3 < $< > $@
