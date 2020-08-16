@@ -61,11 +61,11 @@ def empty(upserts = [], deletes = []):
 
 
 class GeomTypes(IntEnum):
-  POINTS     = 0
-  POLYLINES  = 1
-  RECTANGLES = 2
-  LABEL      = 3
-  AXIS       = 4
+  POINTS     = 1
+  POLYLINES  = 2
+  RECTANGLES = 3
+  LABEL      = 4
+  AXIS       = 5
 
 
 class GlyphTypes(IntEnum):
@@ -85,6 +85,7 @@ def Geometry(
 ):
   geometry = pb.Geometry()
   geometry.fram = frame
+  geometry.iden = identifier
   geometry.type = geomtype
   geometry.mask = 31 if geomtype <= GeomTypes.POLYLINES else 15
   geometry.cnts.extend([len(ps) for ps in coords])

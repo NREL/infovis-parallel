@@ -1,6 +1,12 @@
 
+import numpy as np
+
 from infovis.primitives import Axis, Label, Points, Polylines
 from infovis.transport  import Client
+
+
+def has_column(df, x):
+  return np.any(df.columns.isin([x]))
 
 
 class PlotClient(Client):
@@ -40,9 +46,9 @@ class PlotClient(Client):
       Points(
         row[i]                                                 ,
         [[[row[x], row[y], row[z]]]]                           ,
-        size  = row[size ] if isinstance(size , str) else size ,
-        color = row[color] if isinstance(color, str) else color,
-        glyph = row[glyph] if isinstance(glyph, str) else glyph,
+        size  = row[size ] if has_column(df, size ) else size ,
+        color = row[color] if has_column(df, color) else color,
+        glyph = row[glyph] if has_column(df, glyph) else glyph,
         frame = frame                                          ,
       )
       for _, row in df.iterrows()
@@ -64,9 +70,9 @@ class PlotClient(Client):
       Polylines(
         row[i]                                                           ,
         [[[row[x][j], row[y][j], row[z][j]] for j in range(len(row[x]))]],
-        size  = row[size ] if isinstance(size , str) else size           ,
-        color = row[color] if isinstance(color, str) else color          ,
-        glyph = row[glyph] if isinstance(glyph, str) else glyph          ,
+        size  = row[size ] if has_column(df, size ) else size           ,
+        color = row[color] if has_column(df, color) else color          ,
+        glyph = row[glyph] if has_column(df, glyph) else glyph          ,
         frame = frame                                                    ,
       )
       for _, row in df.iterrows()

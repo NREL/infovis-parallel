@@ -6,7 +6,7 @@ import infovis as iv
 import numpy   as np
 import pandas  as pd
 
-from math       import cos, sin
+from math       import cos, pi, sin
 from matplotlib import colors
 from time       import sleep
 
