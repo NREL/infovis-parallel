@@ -182,7 +182,7 @@ function drawAll(gl, graphics, perspective = mat4.create()) {
 
 export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, respond, stopper) {
 
-  let starting = Date.now() + 2000
+  let starting = Date.now() + 3000
 
   isRunning = true
 
@@ -213,8 +213,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       return
     }
 
-    const now = new Date()
-    const isStarting = starting && starting < now
+    const isStarting = starting && starting > Date.now()
 
     const dirtyRequest  = requestQueue.length > 0
     let   dirtyResponse = keyQueue.length > 0
@@ -229,8 +228,6 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
 
     if (!isStarting && (xrFrame || dirtyRequest || dirtyResponse)) {
-
-      starting = null
 
       Frames.prepare(gl, graphics.manager)
       if (dirtyResponse)
