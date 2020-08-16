@@ -20,7 +20,7 @@ def websocket_thread_start(client, loop = asyncio.get_event_loop()):
 
 class Client:
 
-  def __init__(self, address, ssl_context = None):
+  def __init__(self, address, ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)):
     self.address = address
     self.ssl_context = ssl_context
     self.pending_requests  = Queue()

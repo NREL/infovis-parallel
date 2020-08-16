@@ -1,7 +1,4 @@
 
-import certifi
-import ssl
-
 import infovis as iv
 import numpy   as np
 import pandas  as pd
@@ -11,17 +8,7 @@ from matplotlib import colors
 from time       import sleep
 
 
-if True:
-  ssl_ctx = None
-elif True:
-  ssl_ctx = ssl.create_default_context()
-  ssl_ctx.load_verify_locations(certifi.where())
-else:
-  ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-  ssl_ctx.load_verify_locations("ca_bundle.crt")
-
-
-z = iv.PlotClient("wss://substrate.functionally.dev:42041/infovis/v4/julia", ssl_ctx)
+z = iv.PlotClient("wss://substrate.functionally.dev:42041/infovis/v4/julia")
 
 z_thread = iv.websocket_thread_start(z)
 
