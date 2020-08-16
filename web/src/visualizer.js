@@ -227,6 +227,11 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
     while (requestQueue.length > 0)
       dirtyResponse |= processRequest(gl, graphics, requestQueue.pop())
 
+    if (starting && !isStarting) {
+      dirtyResponse = true
+      starting = null
+    }
+
     if (!isStarting && (xrFrame || dirtyRequest || dirtyResponse)) {
 
       Frames.prepare(gl, graphics.manager)
