@@ -8,7 +8,7 @@ from matplotlib import colors
 from time       import sleep
 
 
-z = iv.PlotClient("wss://substrate.functionally.dev:42041/infovis/v4/julia")
+z = iv.PlotClient("wss://substrate.functionally.dev:42041/infovis/v4/script")
 
 z_thread = iv.websocket_thread_start(z)
 

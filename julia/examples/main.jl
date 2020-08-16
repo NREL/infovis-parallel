@@ -12,7 +12,7 @@ import Random: rand
 import StaticArrays: SVector
 
 
-z = connect("wss://substrate.functionally.dev:42041/infovis/v4/julia") ;
+z = connect("wss://substrate.functionally.dev:42041/infovis/v4/script") ;
 
 function reporter(response)
   if isdefined(response, :offsetloc)
