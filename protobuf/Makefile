@@ -27,7 +27,7 @@ examples/bslm-%.pbt: examples/bslm.tsv.part-% examples/bslm.awk
 	protoc --julia_out=$(dir $@) $<
 
 %.py: infovis.proto3
-	protoc --python_out $(dir $@) $<
+	protoc --python_out $(dir $(dir $@)) $<
 
 %.pbb : %.pbt infovis.proto3
 	protoc --encode=Infovis.Request infovis.proto3 < $< > $@
