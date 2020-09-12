@@ -1,6 +1,5 @@
 
 import * as Frames     from "./rendering/frames"
-import * as Gamepad    from "./input/gamepad"
 import * as Input      from "./input/webxr"
 import * as Keyboard   from "./input/keyboard"
 import * as Linear     from "./rendering/linear"
@@ -200,7 +199,6 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
   Text.ensureShaders(gl)
 
-  Gamepad.reset()
   Input.reset()
 
   setupCanvas(gl)
@@ -217,9 +215,6 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
     const dirtyRequest  = requestQueue.length > 0
     let   dirtyResponse = keyQueue.length > 0
-
-    const gamepad = Gamepad.interpret(graphics)
-    dirtyResponse |= gamepad.dirty
 
     while (keyQueue.length > 0)
       Keyboard.interpret(keyQueue.pop(), graphics)
@@ -335,8 +330,6 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       response.setViewloc   (makeLocation(graphics.pov   ))
       response.setToolloc   (makeLocation(graphics.tool  ))
       response.setOffsetloc (makeLocation(graphics.offset))
-      response.setDepressed (gamepad.depressed            )
-      response.setAnalogList(gamepad.analog               )
       respond(response)
     }
 

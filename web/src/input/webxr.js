@@ -113,6 +113,12 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
     graphics.manager.current = Math.min(maxFrame, graphics.manager.current + 1)
   }
 
+  // Oculus Go controller.
+  if (!vetoButtons && buttons.length == 3 && buttons[2].pressed) {
+    lastButton = now
+    graphics.manager.current = minFrame + (graphics.manager.current + 1 - minFrame) % (maxFrame + 1 - minFrame)
+  }
+
   if (!vetoButtons && buttons.length >= 4 && buttons[3].pressed) {
     lastButton = now
     graphics.offset.position = x.initialOffset.position
