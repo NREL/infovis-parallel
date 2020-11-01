@@ -8,7 +8,7 @@ import (
 )
 
 
-func box(doc *gltf.Document, x float32, y float32, z float32) [2]uint32 {
+func Box(doc *gltf.Document, x float32, y float32, z float32) [2]uint32 {
   var x1 = x / 2
   var y1 = y / 2
   var z1 = z / 2
@@ -34,12 +34,12 @@ func box(doc *gltf.Document, x float32, y float32, z float32) [2]uint32 {
 }
 
 
-func cube(doc *gltf.Document, d float32) [2]uint32 {
-  return box(doc, d, d, d)
+func Cube(doc *gltf.Document, d float32) [2]uint32 {
+  return Box(doc, d, d, d)
 }
 
 
-func tube(doc *gltf.Document, l float32, d float32) [2]uint32 {
+func Tube(doc *gltf.Document, l float32, d float32) [2]uint32 {
   var s = d / (1 + 2 * float32(math.Sqrt(2)))
   var u = s / 2
   var v = u + s * float32(math.Sqrt(2))
@@ -82,7 +82,7 @@ func tube(doc *gltf.Document, l float32, d float32) [2]uint32 {
 }
 
 
-func icosahedron(doc *gltf.Document, d float32) [2]uint32 {
+func Icosahedron(doc *gltf.Document, d float32) [2]uint32 {
   var phi = (1 + math.Sqrt(5)) / 2
   var x = d / 2 / float32(math.Sqrt(1 + phi * phi))
   var z = float32(phi) * x
@@ -127,7 +127,7 @@ func icosahedron(doc *gltf.Document, d float32) [2]uint32 {
 }
 
 
-func rectangle(doc *gltf.Document, h float32, w float32) [2]uint32 {
+func Rectangle(doc *gltf.Document, h float32, w float32) [2]uint32 {
   var h2 = h / 2
   var w2 = w / 2
   positionAccessor := modeler.WritePosition(doc, [][3]float32{
@@ -144,12 +144,12 @@ func rectangle(doc *gltf.Document, h float32, w float32) [2]uint32 {
 }
 
 
-func square(doc *gltf.Document, w float32) [2]uint32 {
-  return rectangle(doc, w, w)
+func Square(doc *gltf.Document, w float32) [2]uint32 {
+  return Rectangle(doc, w, w)
 }
 
 
-func arrow(doc *gltf.Document, l float32, d float32, f float32, o float32) [2]uint32 {
+func Arrow(doc *gltf.Document, l float32, d float32, f float32, o float32) [2]uint32 {
   var s = d / (1 + 2 * float32(math.Sqrt(2)))
   var u = s / 2
   var v = u + s * float32(math.Sqrt(2))

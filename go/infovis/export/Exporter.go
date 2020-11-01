@@ -40,13 +40,13 @@ func Export(filenames []string) {
   }
 
   doc := gltf.NewDocument()
-  buffers, _ := makeBuffers(doc)
+  buffers, _ := MakeBuffers(doc)
   doc.Meshes = []*gltf.Mesh{
-    buffers[model.MESH_CUBE  ].makeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
-    buffers[model.MESH_SPHERE].makeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
-    buffers[model.MESH_LINE  ].makeMesh(doc, [4]float32{0.0, 0.0, 1.0, 0.8}),
-    buffers[model.MESH_SQUARE].makeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
-    buffers[model.MESH_ARROW ].makeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
+    buffers[model.MESH_CUBE  ].MakeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
+    buffers[model.MESH_SPHERE].MakeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
+    buffers[model.MESH_LINE  ].MakeMesh(doc, [4]float32{0.0, 0.0, 1.0, 0.8}),
+    buffers[model.MESH_SQUARE].MakeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
+    buffers[model.MESH_ARROW ].MakeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
   }
   doc.Nodes = []*gltf.Node{
     {

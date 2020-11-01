@@ -7,28 +7,28 @@ import (
 )
 
 
-type buffersType = map[int32]*buffer
+type Buffers = map[int32]*Buffer
 
-func makeBuffers(doc *gltf.Document) (buffersType, colorsType) {
-  var buffers = make(buffersType)
+func MakeBuffers(doc *gltf.Document) (Buffers, colorsType) {
+  var buffers = make(Buffers)
   var colors = make(colorsType)
-  buffers[model.MESH_CUBE  ] = makeBuffer(doc, &colors, "cube"       , cube       (doc, 1           ))
-  buffers[model.MESH_SPHERE] = makeBuffer(doc, &colors, "icosahedron", icosahedron(doc, 1           ))
-  buffers[model.MESH_LINE  ] = makeBuffer(doc, &colors, "tube"       , tube       (doc, 1, 1        ))
-  buffers[model.MESH_SQUARE] = makeBuffer(doc, &colors, "square"     , square     (doc, 1           ))
-  buffers[model.MESH_ARROW ] = makeBuffer(doc, &colors, "arrow"      , arrow      (doc, 1, 1, 0.1, 2))
+  buffers[model.MESH_CUBE  ] = MakeBuffer(doc, &colors, "cube"       , Cube       (doc, 1           ))
+  buffers[model.MESH_SPHERE] = MakeBuffer(doc, &colors, "icosahedron", Icosahedron(doc, 1           ))
+  buffers[model.MESH_LINE  ] = MakeBuffer(doc, &colors, "tube"       , Tube       (doc, 1, 1        ))
+  buffers[model.MESH_SQUARE] = MakeBuffer(doc, &colors, "square"     , Square     (doc, 1           ))
+  buffers[model.MESH_ARROW ] = MakeBuffer(doc, &colors, "arrow"      , Arrow      (doc, 1, 1, 0.1, 2))
   return buffers, colors
 }
 
 
-type buffer struct {
-  makeMesh func(*gltf.Document, [4]float32) *gltf.Mesh
-  meshes   map[color]*gltf.Mesh
+type Buffer struct {
+  MakeMesh func(*gltf.Document, [4]float32) *gltf.Mesh
+  Meshes   map[color]*gltf.Mesh
 }
 
-func makeBuffer(doc *gltf.Document, colors *colorsType, name string, accessors [2]uint32) *buffer {
-  return &buffer{
-    makeMesh: func(doc *gltf.Document, rgba [4]float32) *gltf.Mesh {
+func MakeBuffer(doc *gltf.Document, colors *colorsType, name string, accessors [2]uint32) *Buffer {
+  return &Buffer{
+    MakeMesh: func(doc *gltf.Document, rgba [4]float32) *gltf.Mesh {
                 return &gltf.Mesh{
                   Name: name,
                   Primitives: []*gltf.Primitive{{
@@ -40,7 +40,7 @@ func makeBuffer(doc *gltf.Document, colors *colorsType, name string, accessors [
                   }},
                 }
               },
-    meshes  : make(map[color]*gltf.Mesh),
+    Meshes  : make(map[color]*gltf.Mesh),
   }
 }
 
