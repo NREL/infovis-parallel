@@ -101,7 +101,7 @@ func findShapeMesh(geometry *Geometry) int8 {
     case GEOMETRY_RECTANGLES:
       return MESH_SQUARE
     case GEOMETRY_LABEL:
-      return MESH_LABEL
+      return MESH_TEXT
     case GEOMETRY_AXIS:
       return MESH_ARROW
     default:

@@ -67,9 +67,9 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
           u1 := positions[i]
           ud := scaleAndAdd(u1, u0, -1)
           uc := scaleAndAdd(u0, ud, 0.5)
-          r := rotationFromVectorPair(right, ud)
+          q := rotationFromVectorPair(right, ud)
           s := [3]float32{length(ud), float32(geometry.Size), float32(geometry.Size)}
-          inode := builder.MakeNode(model.MESH_LINE, uc, r, s, color, text)
+          inode := builder.MakeNode(model.MESH_LINE, uc, q, s, color, text)
           nodes = append(nodes, inode)
         }
       }
@@ -88,50 +88,23 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
         nodes = append(nodes, inode)
       }
 
+    case model.GEOMETRY_LABEL:
+
+    case model.GEOMETRY_AXIS:
+      for _, positions := range positionss {
+        u0 := positions[0]
+        u1 := positions[1]
+        ud := scaleAndAdd(u1, u0, -1)
+        uc := scaleAndAdd(u0, ud, 0.5)
+        q := rotationFromVectorPair(right, ud)
+        s := [3]float32{length(ud), float32(geometry.Size), float32(geometry.Size)}
+        inode := builder.MakeNode(model.MESH_ARROW, uc, q, s, color, text)
+        nodes = append(nodes, inode)
+      }
+
+
   }
 
   return nodes
 
 }
-
-
-/*
-  } else if (Geometry.hasRectangles(geometry)) {
-
-    geometry.shape.rectangles.forEach(function([o, u, v]) {
-      const w = vec3.length(vec3.scaleAndAdd(vec3.create(), u, o, -1))
-      const h = vec3.length(vec3.scaleAndAdd(vec3.create(), v, o, -1))
-      const q = Linear.rotationFromPlane(right, back, o, u, v)
-      positions.push(vec3.add(
-        vec3.create()
-      , o
-      , vec3.transformQuat(vec3.create(), vec3.fromValues(w / 2, 0, h / 2), q)
-      ))
-      rotations.push(q)
-      scales.push(vec3.fromValues(w, geometry.size, h))
-    })
-
-  } else if (Geometry.hasLabel(geometry)) {
-
-    undefined
-
-  } else if (Geometry.hasAxis(geometry)) {
-
-    const u0 = geometry.shape.axis[0]
-    const u1 = geometry.shape.axis[1]
-    const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
-    const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
-
-    positions.push(uc)
-    rotations.push(Linear.rotationFromVectorPair(right, ud))
-    scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size))
-
-  }
-
-  Buffers.insertPositions(identifier, positions, shapeBuffer)
-  Buffers.updateRotations(identifier, rotations, shapeBuffer)
-  Buffers.updateScales   (identifier, scales   , shapeBuffer)
-  Buffers.updateColor    (identifier, color    , shapeBuffer)
-
-}
-*/

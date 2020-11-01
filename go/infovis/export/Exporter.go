@@ -2,7 +2,6 @@ package export
 
 
 import (
-  "fmt"
   "io/ioutil"
   "github.com/qmuntal/gltf"
   "github.com/golang/glog"
@@ -31,13 +30,9 @@ func Export(filenames []string) {
   doc := gltf.NewDocument()
   builder := MakeBuilder(doc)
 
-  for fram, frame := range manager.Frames {
-    fmt.Printf("Frame %d\n", fram)
-    for mesh, display := range frame.Displays {
-      fmt.Printf("  Display %d\n", mesh)
-      for iden, geometry := range display.Geometries {
-        fmt.Printf("    Geometry %d\n", iden)
-        fmt.Printf("      %v\n", geometry)
+  for _, frame := range manager.Frames {
+    for _, display := range frame.Displays {
+      for _, geometry := range display.Geometries {
         nodes := builder.Render(geometry)
         doc.Scenes[0].Nodes = append(doc.Scenes[0].Nodes, nodes...)
       }

@@ -33,11 +33,11 @@ const (
   MESH_SPHERE      = iota
   MESH_LINE        = iota
   MESH_SQUARE      = iota
-  MESH_LABEL       = iota
+  MESH_TEXT       = iota
   MESH_ARROW       = iota
 )
 
-var MESHES = [...]int8{MESH_CUBE, MESH_SPHERE, MESH_LINE, MESH_SQUARE, MESH_LABEL, MESH_ARROW}
+var MESHES = [...]int8{MESH_CUBE, MESH_SPHERE, MESH_LINE, MESH_SQUARE, MESH_TEXT, MESH_ARROW}
 
 
 func deltaPosition(geometry *Geometry) bool {
