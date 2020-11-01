@@ -19,9 +19,29 @@ func decodeColor(rgba uint32) [4]float32 {
 func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
 
   var nodes = []uint32{}
+
+  var right = [3]float32{1, 0, 0}
+//var back  = [3]float32{0, 0, 1}
+  var noRotation = [4]float32{0, 0, 0, 1}
+
+  var mesh int8
   var color = decodeColor(geometry.Colr)
   var text = geometry.Text
-  var mesh int8
+
+  var positionss = [][][3]float32{}
+  var n = 0
+  for _, cnt := range geometry.Cnts {
+    positions := make([][3]float32, cnt)
+    for i := 0; i < int(cnt); i++ {
+      positions[i] = [3]float32{
+        float32(geometry.Posx[n]),
+        float32(geometry.Posy[n]),
+        float32(geometry.Posz[n]),
+      }
+      n++
+    }
+    positionss = append(positionss, positions)
+  }
 
   switch geometry.Type {
 
@@ -32,51 +52,37 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
         case model.GLYPH_SPHERE:
           mesh = model.MESH_SPHERE
       }
-      var n = 0
-      for _, cnt := range geometry.Cnts {
-        n += int(cnt)
-      }
       scale := [3]float32{float32(geometry.Size), float32(geometry.Size), float32(geometry.Size)}
-      for i := 0; i < n; i++ {
-        inode := builder.MakeNode(
-          mesh,
-          [3]float32{
-            float32(geometry.Posx[i]),
-            float32(geometry.Posy[i]),
-            float32(geometry.Posz[i]),
-          },
-          [4]float32{0, 0, 0, 1},
-          scale,
-          color,
-          text,
-        )
-        nodes = append(nodes, inode)
+      for _, positions := range positionss {
+        for _, position := range positions {
+          inode := builder.MakeNode(mesh, position, noRotation, scale, color, text)
+          nodes = append(nodes, inode)
+        }
       }
+
+    case model.GEOMETRY_POLYLINES:
+      mesh = model.MESH_LINE
+      for _, positions := range positionss {
+        for i := 1; i < len(positions); i++ {
+          u0 := positions[i - 1]
+          u1 := positions[i]
+          ud := scaleAndAdd(u1, u0, -1)
+          uc := scaleAndAdd(u0, ud, 0.5)
+          r := rotationFromVectorPair(right, ud)
+          s := [3]float32{length(ud), float32(geometry.Size), float32(geometry.Size)}
+          inode := builder.MakeNode(mesh, uc, r, s, color, text)
+          nodes = append(nodes, inode)
+        }
+      }
+
   }
 
   return nodes
 
 }
+
+
 /*
-function updateDisplay(identifier, geometry, shapeBuffer) {
-
-  const positions = []
-  const rotations = []
-  const scales    = []
-  const color     = geometry.color
-
-  const noRotation = quat.fromValues(0, 0, 0, 1)
-  const right = vec3.fromValues(1, 0, 0)
-  const back  = vec3.fromValues(0, 0, 1)
-
-  if (Geometry.hasPoints(geometry)) {
-
-    positions.push(...geometry.shape.points.flat())
-    rotations.push(...positions.map((point) => noRotation))
-    scales.push(...positions.map((point) => vec3.fromValues(geometry.size, geometry.size, geometry.size)))
-
-  } else if (Geometry.hasPolylines(geometry)) {
-
     geometry.shape.polylines.map((polyline) => [
       polyline.slice(0, polyline.length - 1)
     , polyline.slice(1, polyline.length    )

@@ -17,7 +17,7 @@ func main() {
   export.Export([]string{
     "../protobuf/examples/axes.pbb"         ,
     "../protobuf/examples/corner-points.pbb",
-//  "../protobuf/examples/helices.pbb"      ,
+    "../protobuf/examples/helices.pbb"      ,
     "../protobuf/examples/rectangles.pbb"   ,
   })
   os.Exit(0)
