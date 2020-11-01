@@ -21,10 +21,9 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
   var nodes = []uint32{}
 
   var right = [3]float32{1, 0, 0}
-//var back  = [3]float32{0, 0, 1}
+  var back  = [3]float32{0, 0, 1}
   var noRotation = [4]float32{0, 0, 0, 1}
 
-  var mesh int8
   var color = decodeColor(geometry.Colr)
   var text = geometry.Text
 
@@ -46,6 +45,7 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
   switch geometry.Type {
 
     case model.GEOMETRY_POINTS:
+      var mesh int8
       switch geometry.Glyp {
         case model.GLYPH_CUBE:
           mesh = model.MESH_CUBE
@@ -61,7 +61,6 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
       }
 
     case model.GEOMETRY_POLYLINES:
-      mesh = model.MESH_LINE
       for _, positions := range positionss {
         for i := 1; i < len(positions); i++ {
           u0 := positions[i - 1]
@@ -70,9 +69,23 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
           uc := scaleAndAdd(u0, ud, 0.5)
           r := rotationFromVectorPair(right, ud)
           s := [3]float32{length(ud), float32(geometry.Size), float32(geometry.Size)}
-          inode := builder.MakeNode(mesh, uc, r, s, color, text)
+          inode := builder.MakeNode(model.MESH_LINE, uc, r, s, color, text)
           nodes = append(nodes, inode)
         }
+      }
+
+    case model.GEOMETRY_RECTANGLES:
+      for _, positions := range positionss {
+        o := positions[0]
+        u := positions[1]
+        v := positions[2]
+        w := length(scaleAndAdd(u, o, -1))
+        h := length(scaleAndAdd(v, o, -1))
+        q := rotationFromPlane(right, back, o, u, v)
+        p := add(o, transformQuat([3]float32{w / 2, 0, h / 2}, q))
+        s := [3]float32{w, float32(geometry.Size), h}
+        inode := builder.MakeNode(model.MESH_LINE, p, q, s, color, text)
+        nodes = append(nodes, inode)
       }
 
   }
@@ -83,20 +96,6 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
 
 
 /*
-    geometry.shape.polylines.map((polyline) => [
-      polyline.slice(0, polyline.length - 1)
-    , polyline.slice(1, polyline.length    )
-    ]).forEach(([u0s, u1s]) =>
-      u0s.map(function(u0, i) {
-        const u1 = u1s[i]
-        const ud = vec3.scaleAndAdd(vec3.create(), u1, u0, -1)
-        const uc = vec3.scaleAndAdd(vec3.create(), u0, ud, 0.5)
-        positions.push(uc)
-        rotations.push(Linear.rotationFromVectorPair(right, ud))
-        scales.push(vec3.fromValues(vec3.length(ud), geometry.size, geometry.size))
-      })
-    )
-
   } else if (Geometry.hasRectangles(geometry)) {
 
     geometry.shape.rectangles.forEach(function([o, u, v]) {
