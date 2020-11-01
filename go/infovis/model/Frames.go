@@ -85,15 +85,13 @@ func (display *Display) Delete(idens []int64) {
 func findShapeMesh(geometry *Geometry) int8 {
   switch geometry.Type {
     case GEOMETRY_POINTS:
-      if deltaGlyph(geometry) {
-        switch geometry.Glyp {
-          case GLYPH_CUBE:
-            return MESH_CUBE
-          case GLYPH_SPHERE:
-            return MESH_SPHERE
-          default:
-            return 0
-        }
+      switch geometry.Glyp {
+        case GLYPH_CUBE:
+          return MESH_CUBE
+        case GLYPH_SPHERE:
+          return MESH_SPHERE
+        default:
+          return -1
       }
       return -1
     case GEOMETRY_POLYLINES:
@@ -105,6 +103,6 @@ func findShapeMesh(geometry *Geometry) int8 {
     case GEOMETRY_AXIS:
       return MESH_ARROW
     default:
-      return 0
+      return -1
   }
 }

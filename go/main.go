@@ -15,10 +15,11 @@ import (
 func main() {
 
   export.Export([]string{
-    "../protobuf/examples/axes.pbb"         ,
-    "../protobuf/examples/corner-points.pbb",
-    "../protobuf/examples/helices.pbb"      ,
-    "../protobuf/examples/rectangles.pbb"   ,
+    "../protobuf/examples/axes.pbb"          ,
+    "../protobuf/examples/corner-points.pbb" ,
+    "../protobuf/examples/helices.pbb"       ,
+    "../protobuf/examples/rectangles.pbb"    ,
+    "../protobuf/examples/tmp/bslm-0[01].pbb",
   })
   os.Exit(0)
 

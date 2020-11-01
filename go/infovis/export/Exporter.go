@@ -2,7 +2,9 @@ package export
 
 
 import (
+  "fmt"
   "io/ioutil"
+  "path/filepath"
   "github.com/qmuntal/gltf"
   "github.com/golang/glog"
   "github.com/golang/protobuf/proto"
@@ -15,14 +17,24 @@ func Export(filenames []string) {
   var manager = model.MakeManager()
 
   for _, filename := range filenames {
-    if buffer, err := ioutil.ReadFile(filename); err != nil {
-      glog.Errorf("Reading file %s encountered %v.\n", filename, err)
-    } else {
-      request := model.Request{}
-      if err = proto.Unmarshal(buffer, &request); err != nil {
-        glog.Errorf("Could not unmarshal %s: %v.\n", filename, err)
+    matches, err := filepath.Glob(filename)
+    if err != nil {
+      glog.Warningf("Invalid glob pattern '%s': %v.\n", filename, err)
+      continue
+    }
+    if len(matches) == 0 {
+      glog.Warningf("Glob pattern '%s' matched no files.\n", filename)
+    }
+    for _, match := range matches {
+      if buffer, err := ioutil.ReadFile(match); err != nil {
+        glog.Errorf("Reading file %s encountered %v.\n", match, err)
       } else {
-        manager.Insert(request.Upsert)
+        request := model.Request{}
+        if err = proto.Unmarshal(buffer, &request); err != nil {
+          glog.Errorf("Could not unmarshal %s: %v.\n", match, err)
+        } else {
+          manager.Insert(request.Upsert)
+        }
       }
     }
   }
@@ -30,59 +42,30 @@ func Export(filenames []string) {
   doc := gltf.NewDocument()
   builder := MakeBuilder(doc)
 
-  for _, frame := range manager.Frames {
-    for _, display := range frame.Displays {
-      for _, geometry := range display.Geometries {
+  allNodes := []uint32{}
+  for iframe, frame := range manager.Frames {
+    for idisplay, display := range frame.Displays {
+      for igeometry, geometry := range display.Geometries {
+        fmt.Printf("Frame %4d, Display %d, Geometry %8d\r", iframe, idisplay, igeometry)
         nodes := builder.Render(geometry)
-        doc.Scenes[0].Nodes = append(doc.Scenes[0].Nodes, nodes...)
+        allNodes = append(allNodes, nodes...)
       }
     }
   }
+  fmt.Printf("                                             \r")
 
-/*
-  doc.Scenes[0].Nodes = []uint32{
-    builder.MakeNode(
-      model.MESH_CUBE,
-      [3]float32{ 0,  0,  0},
-      [4]float32{0, 0, 0, 1},
-      [3]float32{10, 10, 10},
-      [4]float32{1.0, 0.0, 0.0, 1.0},
-      "Cube",
-    ),
-    builder.MakeNode(
-      model.MESH_SPHERE,
-      [3]float32{20,  0,  0},
-      [4]float32{0, 0, 0, 1},
-      [3]float32{10, 10, 10},
-      [4]float32{0.0, 1.0, 0.0, 0.9},
-      "Icosahedron",
-    ),
-    builder.MakeNode(
-      model.MESH_LINE,
-      [3]float32{ 0,  0, 20},
-      [4]float32{0, 0, 0, 1},
-      [3]float32{40, 10, 10},
-      [4]float32{0.0, 0.0, 1.0, 0.8},
-      "Tube",
-    ),
-    builder.MakeNode(
-      model.MESH_SQUARE,
-      [3]float32{ 0, 20,  0},
-      [4]float32{0, 0, 0, 1},
-      [3]float32{10, 10, 10},
-      [4]float32{1.0, 0.0, 0.0, 1.0},
-      "Square",
-    ),
-    builder.MakeNode(
-      model.MESH_ARROW,
-      [3]float32{ 0, 20, 20},
-      [4]float32{0, 0, 0, 1},
-      [3]float32{40, 10, 10},
-      [4]float32{0.0, 1.0, 0.0, 0.9},
-      "Arrow",
-    ),
+  root := gltf.Node{
+    Name: "root",
+    Scale: [3]float32{2, 2, 2},
+    Children: allNodes,
   }
-*/
+  iroot := uint32(len(doc.Nodes))
+  doc.Nodes = append(doc.Nodes, &root)
+  doc.Scenes[0].Nodes = append(doc.Scenes[0].Nodes, iroot)
+
+  fmt.Printf("Materials: %d\n", len(doc.Materials))
+  fmt.Printf("Meshes:    %d\n", len(doc.Meshes))
+  fmt.Printf("Nodes:     %d\n", len(doc.Nodes))
 
   if err := gltf.SaveBinary(doc, "./example.glb"); err != nil {
     panic(err)

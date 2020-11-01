@@ -94,7 +94,7 @@ type color struct {
   a int
 }
 
-const colorPrecision = 10
+const colorPrecision = 50
 
 func makeColor(rgba [4]float32) color {
   return color{
