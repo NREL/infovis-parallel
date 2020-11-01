@@ -31,11 +31,11 @@ func (manager *Manager) DeletE(idens []int64) {
 
 
 type Frame struct {
-  Displays map[int32]*Display
+  Displays map[int8]*Display
 }
 
 func MakeFrame() *Frame {
-  var frame = Frame{make(map[int32]*Display)}
+  var frame = Frame{make(map[int8]*Display)}
   for _, mesh := range MESHES {
     frame.Displays[mesh] = MakeDisplay()
   }
@@ -63,7 +63,7 @@ func MakeDisplay() *Display {
   return &Display{make(map[int64]*Geometry)}
 }
 
-func (display *Display) Insert(mesh int32, delta *Geometry) {
+func (display *Display) Insert(mesh int8, delta *Geometry) {
   var mesh1 = findShapeMesh(delta)
   var iden = delta.Iden
   if geometry, ok := display.Geometries[iden]; ok {
@@ -82,7 +82,7 @@ func (display *Display) Delete(idens []int64) {
 }
 
 
-func findShapeMesh(geometry *Geometry) int32 {
+func findShapeMesh(geometry *Geometry) int8 {
   switch geometry.Type {
     case GEOMETRY_POINTS:
       if deltaGlyph(geometry) {
@@ -92,6 +92,7 @@ func findShapeMesh(geometry *Geometry) int32 {
           case GLYPH_SPHERE:
             return MESH_SPHERE
           default:
+            return 0
         }
       }
       return -1

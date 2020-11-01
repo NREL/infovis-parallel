@@ -28,6 +28,9 @@ func Export(filenames []string) {
     }
   }
 
+  doc := gltf.NewDocument()
+  builder := MakeBuilder(doc)
+
   for fram, frame := range manager.Frames {
     fmt.Printf("Frame %d\n", fram)
     for mesh, display := range frame.Displays {
@@ -35,53 +38,59 @@ func Export(filenames []string) {
       for iden, geometry := range display.Geometries {
         fmt.Printf("    Geometry %d\n", iden)
         fmt.Printf("      %v\n", geometry)
+        nodes := builder.Render(geometry)
+        doc.Scenes[0].Nodes = append(doc.Scenes[0].Nodes, nodes...)
       }
     }
   }
 
-  doc := gltf.NewDocument()
-  buffers, _ := MakeBuffers(doc)
-  doc.Meshes = []*gltf.Mesh{
-    buffers[model.MESH_CUBE  ].MakeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
-    buffers[model.MESH_SPHERE].MakeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
-    buffers[model.MESH_LINE  ].MakeMesh(doc, [4]float32{0.0, 0.0, 1.0, 0.8}),
-    buffers[model.MESH_SQUARE].MakeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
-    buffers[model.MESH_ARROW ].MakeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
+/*
+  doc.Scenes[0].Nodes = []uint32{
+    builder.MakeNode(
+      model.MESH_CUBE,
+      [3]float32{ 0,  0,  0},
+      [4]float32{0, 0, 0, 1},
+      [3]float32{10, 10, 10},
+      [4]float32{1.0, 0.0, 0.0, 1.0},
+      "Cube",
+    ),
+    builder.MakeNode(
+      model.MESH_SPHERE,
+      [3]float32{20,  0,  0},
+      [4]float32{0, 0, 0, 1},
+      [3]float32{10, 10, 10},
+      [4]float32{0.0, 1.0, 0.0, 0.9},
+      "Icosahedron",
+    ),
+    builder.MakeNode(
+      model.MESH_LINE,
+      [3]float32{ 0,  0, 20},
+      [4]float32{0, 0, 0, 1},
+      [3]float32{40, 10, 10},
+      [4]float32{0.0, 0.0, 1.0, 0.8},
+      "Tube",
+    ),
+    builder.MakeNode(
+      model.MESH_SQUARE,
+      [3]float32{ 0, 20,  0},
+      [4]float32{0, 0, 0, 1},
+      [3]float32{10, 10, 10},
+      [4]float32{1.0, 0.0, 0.0, 1.0},
+      "Square",
+    ),
+    builder.MakeNode(
+      model.MESH_ARROW,
+      [3]float32{ 0, 20, 20},
+      [4]float32{0, 0, 0, 1},
+      [3]float32{40, 10, 10},
+      [4]float32{0.0, 1.0, 0.0, 0.9},
+      "Arrow",
+    ),
   }
-  doc.Nodes = []*gltf.Node{
-    {
-      Name       : "Cube",
-      Mesh       : gltf.Index(0),
-      Scale      : [3]float32{10, 10, 10},
-      Translation: [3]float32{ 0,  0,  0},
-    },
-    {
-      Name       : "Icosahedron",
-      Mesh       : gltf.Index(1),
-      Scale      : [3]float32{10, 10, 10},
-      Translation: [3]float32{20,  0,  0},
-    },
-    {
-      Name       : "Tube",
-      Mesh       : gltf.Index(2),
-      Scale      : [3]float32{40, 10, 10},
-      Translation: [3]float32{ 0,  0, 20},
-    },
-    {
-      Name       : "Square",
-      Mesh       : gltf.Index(3),
-      Scale      : [3]float32{10, 10, 10},
-      Translation: [3]float32{ 0, 20,  0},
-    },
-   {
-     Name       : "Arrow",
-     Mesh       : gltf.Index(4),
-     Scale      : [3]float32{40, 10, 10},
-     Translation: [3]float32{ 0, 20, 20},
-   },
-  }
-  doc.Scenes[0].Nodes = []uint32{0, 1, 2, 3, 4}
+*/
+
   if err := gltf.SaveBinary(doc, "./example.glb"); err != nil {
     panic(err)
   }
+
 }

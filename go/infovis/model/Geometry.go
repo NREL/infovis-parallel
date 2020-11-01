@@ -2,42 +2,42 @@ package model
 
 
 const (
-  GLYPH_CUBE   = iota
-  GLYPH_SPHERE = iota
+  GLYPH_CUBE   int32 = iota
+  GLYPH_SPHERE       = iota
 )
 
 const (
-  GLYPH_BOX      = iota
-  GLYPH_CYLINDER = iota
+  GLYPH_BOX      int32 = iota
+  GLYPH_CYLINDER       = iota
 )
 
 const (
-  MASK_POSN =  1
-  MASK_SIZE =  2
-  MASK_COLR =  4
-  MASK_TEXT =  8
-  MASK_GLYP = 16
+  MASK_POSN int32 = 1 << iota
+  MASK_SIZE       = 1 << iota
+  MASK_COLR       = 1 << iota
+  MASK_TEXT       = 1 << iota
+  MASK_GLYP       = 1 << iota
 )
 
 const (
-  GEOMETRY_POINTS     = 1 + iota
-  GEOMETRY_POLYLINES  = 1 + iota
-  GEOMETRY_RECTANGLES = 1 + iota
-  GEOMETRY_LABEL      = 1 + iota
-  GEOMETRY_AXIS       = 1 + iota
+  GEOMETRY_POINTS     int32 = 1 + iota
+  GEOMETRY_POLYLINES        = 1 + iota
+  GEOMETRY_RECTANGLES       = 1 + iota
+  GEOMETRY_LABEL            = 1 + iota
+  GEOMETRY_AXIS             = 1 + iota
 )
 
 
 const (
-  MESH_CUBE   = iota
-  MESH_SPHERE = iota
-  MESH_LINE   = iota
-  MESH_SQUARE = iota
-  MESH_LABEL  = iota
-  MESH_ARROW  = iota
+  MESH_CUBE   int8 = iota
+  MESH_SPHERE      = iota
+  MESH_LINE        = iota
+  MESH_SQUARE      = iota
+  MESH_LABEL       = iota
+  MESH_ARROW       = iota
 )
 
-var MESHES = [...]int32{MESH_CUBE, MESH_SPHERE, MESH_LINE, MESH_SQUARE, MESH_LABEL, MESH_ARROW}
+var MESHES = [...]int8{MESH_CUBE, MESH_SPHERE, MESH_LINE, MESH_SQUARE, MESH_LABEL, MESH_ARROW}
 
 
 func deltaPosition(geometry *Geometry) bool {
