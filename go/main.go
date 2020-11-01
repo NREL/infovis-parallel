@@ -7,10 +7,20 @@ import (
   "os"
   "github.com/golang/glog"
   "bitbucket.org/bwbush/infovis-parallel/go/infovis"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis/export"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis/switchboard"
 )
 
 
 func main() {
+
+  export.Export([]string{
+    "../protobuf/examples/axes.pbb"         ,
+    "../protobuf/examples/corner-points.pbb",
+//  "../protobuf/examples/helices.pbb"      ,
+    "../protobuf/examples/rectangles.pbb"   ,
+  })
+  os.Exit(0)
 
 //infovis.NewJoystick(0)
 
@@ -34,7 +44,7 @@ func main() {
     return
   }
 
-  interpreter := infovis.NewInterpreter()
+  interpreter := switchboard.NewInterpreter()
   for _, file := range args {
     interpreter.InterpretLine("script " + file)
   }

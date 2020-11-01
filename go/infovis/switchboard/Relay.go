@@ -1,10 +1,11 @@
-package infovis
+package switchboard
 
 
 import (
   "sync"
   "github.com/golang/glog"
   "github.com/golang/protobuf/proto"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis/protobuf"
 )
 
 
@@ -67,7 +68,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
     return buffer, true
   }
 
-  request := Request{}
+  request := protobuf.Request{}
   if err := proto.Unmarshal(*buffer, &request); err != nil {
     glog.Warningf("Filter failed to unmarshal buffer: %v.\n", err)
     return buffer, false
@@ -80,7 +81,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
       case FilterReset:
         request.Reset_ = false
       case FilterUpsert:
-        request.Upsert = []*Geometry{}
+        request.Upsert = []*protobuf.Geometry{}
       case FilterDelete:
         request.Delete = []int64{}
       case FilterView:
@@ -134,8 +135,8 @@ func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
     return buffer, true
   }
 
-  request := Request{}
-  response := Response{}
+  request := protobuf.Request{}
+  response := protobuf.Response{}
   if err := proto.Unmarshal(*buffer, &response); err != nil {
     glog.Warningf("Converter %s failed to unmarshal buffer: %v.\n", err)
     return buffer, false

@@ -1,4 +1,4 @@
-package infovis
+package switchboard
 
 
 type Label = string

@@ -2,7 +2,7 @@
 #!nix-shell -i "make -f" -p go golint
 
 
-SRCS=$(wildcard main.go infovis/*.go)
+SRCS=$(wildcard main.go infovis/*.go infovis/*/*.go)
 
 
 all: go-infovis
@@ -15,8 +15,11 @@ setcap: go-infovis
 	sudo setcap 'cap_net_bind_service=+ep' $@
 
 lint: $(SRCS)
-	GOPATH= golint infovis/*.go
 	GOPATH= golint main.go
+	GOPATH= golint infovis/*.go
+	GOPATH= golint infovis/export/*.go
+	GOPATH= golint infovis/protobuf/*.go
+	GOPATH= golint infovis/switchboard/*.go
 
 tidy: $(SRCS)
 	GOPATH= go mod tidy
