@@ -175,7 +175,7 @@ function arrow(l, d, f, o) {
   , q5,     q4 , out(q4)    , out(q5)
   , q6,     q5 , out(q5)    , out(q6)
   , q7,     q6 , out(q6)    , out(q7)
-  , q8,     q7 , out(q8)    , out(q8)
+  , q8,     q7 , out(q7)    , out(q8)
   , q1,     q8 , out(q8)    , out(q1)
   , q0, out(q2), mid(q2, q1), out(q1)
   , q0, out(q3), mid(q3, q2), out(q2)
