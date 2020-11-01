@@ -5,7 +5,7 @@ import (
   "fmt"
   "github.com/golang/glog"
   "github.com/golang/protobuf/proto"
-  "bitbucket.org/bwbush/infovis-parallel/go/infovis/protobuf"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis/model"
 )
 
 
@@ -43,7 +43,7 @@ func NewPrinter(label Label, kind string, reaper LabelInChannel) *Printer {
           glog.Infof("Printer %s received %v bytes.\n", printer.label, len(buffer))
           switch kind {
             case "Request":
-              request := protobuf.Request{}
+              request := model.Request{}
               err := proto.Unmarshal(buffer, &request)
               if err != nil {
                 glog.Warningf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)
@@ -51,7 +51,7 @@ func NewPrinter(label Label, kind string, reaper LabelInChannel) *Printer {
               }
               fmt.Printf("= Printer %s received %s: %v.\n", label, kind, request)
             case "Response":
-              response := protobuf.Response{}
+              response := model.Response{}
               err := proto.Unmarshal(buffer, &response)
               if err != nil {
                 glog.Warningf("Printer %s could not unmarshal %s: %v.\n", label, kind, err)

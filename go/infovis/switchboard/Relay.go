@@ -5,7 +5,7 @@ import (
   "sync"
   "github.com/golang/glog"
   "github.com/golang/protobuf/proto"
-  "bitbucket.org/bwbush/infovis-parallel/go/infovis/protobuf"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis/model"
 )
 
 
@@ -68,7 +68,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
     return buffer, true
   }
 
-  request := protobuf.Request{}
+  request := model.Request{}
   if err := proto.Unmarshal(*buffer, &request); err != nil {
     glog.Warningf("Filter failed to unmarshal buffer: %v.\n", err)
     return buffer, false
@@ -81,7 +81,7 @@ func filterBuffer(exclusions []Filter, buffer *[]byte) (*[]byte, bool) {
       case FilterReset:
         request.Reset_ = false
       case FilterUpsert:
-        request.Upsert = []*protobuf.Geometry{}
+        request.Upsert = []*model.Geometry{}
       case FilterDelete:
         request.Delete = []int64{}
       case FilterView:
@@ -135,8 +135,8 @@ func convertBuffer(conversions []Conversion, buffer *[]byte) (*[]byte, bool) {
     return buffer, true
   }
 
-  request := protobuf.Request{}
-  response := protobuf.Response{}
+  request := model.Request{}
+  response := model.Response{}
   if err := proto.Unmarshal(*buffer, &response); err != nil {
     glog.Warningf("Converter %s failed to unmarshal buffer: %v.\n", err)
     return buffer, false

@@ -7,23 +7,23 @@ import (
   "github.com/qmuntal/gltf"
   "github.com/golang/glog"
   "github.com/golang/protobuf/proto"
-  "bitbucket.org/bwbush/infovis-parallel/go/infovis/protobuf"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis/model"
 )
 
 
 func Export(filenames []string) {
 
-  var manager = makeManager()
+  var manager = model.MakeManager()
 
   for _, filename := range filenames {
     if buffer, err := ioutil.ReadFile(filename); err != nil {
       glog.Errorf("Reading file %s encountered %v.\n", filename, err)
     } else {
-      request := protobuf.Request{}
+      request := model.Request{}
       if err = proto.Unmarshal(buffer, &request); err != nil {
         glog.Errorf("Could not unmarshal %s: %v.\n", filename, err)
       } else {
-        manager.insert(request.Upsert)
+        manager.Insert(request.Upsert)
       }
     }
   }
@@ -42,11 +42,11 @@ func Export(filenames []string) {
   doc := gltf.NewDocument()
   buffers, _ := makeBuffers(doc)
   doc.Meshes = []*gltf.Mesh{
-    buffers[cubeMesh     ].makeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
-    buffers[sphereMesh   ].makeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
-    buffers[polylineMesh ].makeMesh(doc, [4]float32{0.0, 0.0, 1.0, 0.8}),
-    buffers[rectangleMesh].makeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
-    buffers[axisMesh     ].makeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
+    buffers[model.MESH_CUBE  ].makeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
+    buffers[model.MESH_SPHERE].makeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
+    buffers[model.MESH_LINE  ].makeMesh(doc, [4]float32{0.0, 0.0, 1.0, 0.8}),
+    buffers[model.MESH_SQUARE].makeMesh(doc, [4]float32{1.0, 0.0, 0.0, 1.0}),
+    buffers[model.MESH_ARROW ].makeMesh(doc, [4]float32{0.0, 1.0, 0.0, 0.9}),
   }
   doc.Nodes = []*gltf.Node{
     {

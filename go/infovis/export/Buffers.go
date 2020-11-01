@@ -3,19 +3,8 @@ package export
 
 import (
   "github.com/qmuntal/gltf"
+  "bitbucket.org/bwbush/infovis-parallel/go/infovis/model"
 )
-
-
-const (
-  cubeMesh      = iota
-  sphereMesh    = iota
-  polylineMesh  = iota
-  rectangleMesh = iota
-  labelMesh     = iota
-  axisMesh      = iota
-)
-
-var meshes = [...]int32{cubeMesh, sphereMesh, polylineMesh, rectangleMesh, labelMesh, axisMesh}
 
 
 type buffersType = map[int32]*buffer
@@ -23,11 +12,11 @@ type buffersType = map[int32]*buffer
 func makeBuffers(doc *gltf.Document) (buffersType, colorsType) {
   var buffers = make(buffersType)
   var colors = make(colorsType)
-  buffers[cubeMesh     ] = makeBuffer(doc, &colors, "cube"       , cube       (doc, 1           ))
-  buffers[sphereMesh   ] = makeBuffer(doc, &colors, "icosahedron", icosahedron(doc, 1           ))
-  buffers[polylineMesh ] = makeBuffer(doc, &colors, "tube"       , tube       (doc, 1, 1        ))
-  buffers[rectangleMesh] = makeBuffer(doc, &colors, "square"     , square     (doc, 1           ))
-  buffers[axisMesh     ] = makeBuffer(doc, &colors, "arrow"      , arrow      (doc, 1, 1, 0.1, 2))
+  buffers[model.MESH_CUBE  ] = makeBuffer(doc, &colors, "cube"       , cube       (doc, 1           ))
+  buffers[model.MESH_SPHERE] = makeBuffer(doc, &colors, "icosahedron", icosahedron(doc, 1           ))
+  buffers[model.MESH_LINE  ] = makeBuffer(doc, &colors, "tube"       , tube       (doc, 1, 1        ))
+  buffers[model.MESH_SQUARE] = makeBuffer(doc, &colors, "square"     , square     (doc, 1           ))
+  buffers[model.MESH_ARROW ] = makeBuffer(doc, &colors, "arrow"      , arrow      (doc, 1, 1, 0.1, 2))
   return buffers, colors
 }
 
