@@ -21,7 +21,7 @@ func main() {
     "../protobuf/examples/rectangles.pbb"    ,
     "../protobuf/examples/tmp/bslm-0[01].pbb",
     "../protobuf/examples/some-text.pbb"     ,
-  }, "./example.glb")
+  }, "./example.glb", false)
   os.Exit(0)
 
 //infovis.NewJoystick(0)
