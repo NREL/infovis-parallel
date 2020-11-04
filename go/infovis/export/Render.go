@@ -19,6 +19,9 @@ func decodeColor(rgba uint32) [4]float32 {
 func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
 
   var nodes = []uint32{}
+  if geometry.Size <= 0 || geometry.Colr & 0x000000FF == 00 {
+    return nodes
+  }
 
   var right = [3]float32{1, 0, 0}
   var up    = [3]float32{0, 1, 0}
