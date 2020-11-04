@@ -2,3 +2,5 @@ pkg/
 go-infovis
 *.gltf
 *.glb
+*.pbt
+*.pbb
