@@ -4,6 +4,9 @@ import * as Connection    from "./connection"
 import * as Visualizer    from "./visualizer"
 
 
+const version = "Version 0.4.4"
+
+
 export function download() {
   Configuration.download()
 }
@@ -61,6 +64,8 @@ function keyHandler(event) {
 
 
 export function startup() {
+
+  version_num.innerText = version
 
   uiAddress.addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {
