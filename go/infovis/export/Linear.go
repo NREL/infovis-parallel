@@ -66,6 +66,15 @@ func add(u [3]float32, v [3]float32) [3]float32 {
 }
 
 
+func scale(u [3]float32, s float32) [3]float32 {
+  return [3]float32{
+    u[0] * s,
+    u[1] * s,
+    u[2] * s,
+  }
+}
+
+
 func scaleAndAdd(u [3]float32, v [3]float32, s float32) [3]float32 {
   return [3]float32{
     u[0] + v[0] * s,

@@ -1,0 +1,11 @@
+github.com/aprice/embed v0.0.0-20181126214606-b9ceb1f6d22d h1:8DbznMbFh21pRZDARpIJZfMkP8yq9RhmTOsKtGEJRwc=
+github.com/aprice/embed v0.0.0-20181126214606-b9ceb1f6d22d/go.mod h1:z7Oa/gJJkV6/+xqwMFqFU3F+sJ6tX7tMHEV12dyep0s=
+github.com/go-test/deep v1.0.1/go.mod h1:wGDj63lr65AM2AQyKZd/NYHGb0R+1RLqB8NKt3aSFNA=
+github.com/qmuntal/gltf v0.17.1/go.mod h1:ENqYfECmeaqs2BWXWe6OKtMC8ucZII6s9OHr6F5oZ94=
+github.com/spf13/pflag v1.0.3 h1:zPAT6CGy6wXeQ7NtTnaTerfKOsV6V6F8agHXFiazDkg=
+github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
+github.com/tdewolff/minify v2.3.6+incompatible h1:2hw5/9ZvxhWLvBUnHE06gElGYz+Jv9R4Eys0XUzItYo=
+github.com/tdewolff/minify v2.3.6+incompatible/go.mod h1:9Ov578KJUmAWpS6NeZwRZyT56Uf6o3Mcz9CEsg8USYs=
+github.com/tdewolff/parse v2.3.4+incompatible h1:x05/cnGwIMf4ceLuDMBOdQ1qGniMoxpP46ghf0Qzh38=
+github.com/tdewolff/parse v2.3.4+incompatible/go.mod h1:8oBwCsVmUkgHO8M5iCzSIDtpzXOT0WXX9cWhz+bIzJQ=
+github.com/tdewolff/test v1.0.0/go.mod h1:DiQUlutnqlEvdvhSn2LPGy4TFwRauAaYDsL+683RNX4=

@@ -12,11 +12,11 @@ import (
 )
 
 
-func Export(filenames []string) {
+func Export(innames []string, outname string) {
 
   var manager = model.MakeManager()
 
-  for _, filename := range filenames {
+  for _, filename := range innames {
     matches, err := filepath.Glob(filename)
     if err != nil {
       glog.Warningf("Invalid glob pattern '%s': %v.\n", filename, err)
@@ -40,7 +40,7 @@ func Export(filenames []string) {
   }
 
   doc := gltf.NewDocument()
-  builder := MakeBuilder(doc)
+  builder := MakeBuilder(doc, "NotoSerif-Regular.ttf")
 
   allNodes := []uint32{}
   for iframe, frame := range manager.Frames {
@@ -67,8 +67,8 @@ func Export(filenames []string) {
   fmt.Printf("Meshes:    %d\n", len(doc.Meshes))
   fmt.Printf("Nodes:     %d\n", len(doc.Nodes))
 
-  if err := gltf.SaveBinary(doc, "./example.glb"); err != nil {
-    panic(err)
+  if err := gltf.SaveBinary(doc, outname); err != nil {
+    glog.Fatalf("Failed writing scenes to %s: %v\n", outname, err)
   }
 
 }

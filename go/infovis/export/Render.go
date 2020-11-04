@@ -21,6 +21,7 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
   var nodes = []uint32{}
 
   var right = [3]float32{1, 0, 0}
+  var up    = [3]float32{0, 1, 0}
   var back  = [3]float32{0, 0, 1}
   var noRotation = [4]float32{0, 0, 0, 1}
 
@@ -89,6 +90,17 @@ func (builder *Builder) Render(geometry *model.Geometry) []uint32 {
       }
 
     case model.GEOMETRY_LABEL:
+
+      for _, positions := range positionss {
+        w, h, img := builder.rasterize(geometry.Text, geometry.Colr)
+        p := positions[0]
+        u := positions[1]
+        v := positions[2]
+        q := rotationFromPlane(right, up, p, u, v)
+        s := scale([3]float32{float32(w) / float32(h), 1, 1}, float32(geometry.Size))
+        inode := builder.makeImage(img, p, q, s, geometry.Text)
+        nodes = append(nodes, inode)
+      }
 
     case model.GEOMETRY_AXIS:
       for _, positions := range positionss {

@@ -20,7 +20,8 @@ func main() {
     "../protobuf/examples/helices.pbb"       ,
     "../protobuf/examples/rectangles.pbb"    ,
     "../protobuf/examples/tmp/bslm-0[01].pbb",
-  })
+    "../protobuf/examples/some-text.pbb"     ,
+  }, "./example.glb")
   os.Exit(0)
 
 //infovis.NewJoystick(0)
