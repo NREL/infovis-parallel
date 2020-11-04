@@ -40,7 +40,7 @@ func Export(innames []string, outname string) {
   }
 
   doc := gltf.NewDocument()
-  builder := MakeBuilder(doc, "NotoSerif-Regular.ttf")
+  builder := MakeBuilder(doc)
 
   allNodes := []uint32{}
   for iframe, frame := range manager.Frames {

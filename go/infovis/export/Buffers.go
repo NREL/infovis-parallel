@@ -7,7 +7,6 @@ import (
   clr "image/color"
   "image/draw"
   "image/png"
-  "io/ioutil"
   "golang.org/x/image/font"
   "golang.org/x/image/math/fixed"
   "github.com/golang/freetype/truetype"
@@ -30,11 +29,11 @@ type Builder struct {
 }
 
 
-func MakeBuilder(doc *gltf.Document, fontfile string) *Builder {
+func MakeBuilder(doc *gltf.Document) *Builder {
   var builder = Builder{
     doc,
     make(map[int8]*Buffer),
-    make(colors), makeFace(fontfile),
+    make(colors), makeFace(),
     modeler.WriteIndices(doc, []uint8{0,1,2, 0,2,3, 0,3,2, 0,2,1}),
     modeler.WritePosition(doc, [][3]float32{{0,0,0}, {1,0,0}, {1,1,0}, {0,1,0}}),
     modeler.WriteTextureCoord(doc, [][2]float32{{0,1}, {1,1}, {1,0}, {0,0}}),
@@ -153,14 +152,10 @@ const fontSize float64 = 12
 
 const fontDpi float64 = 300
 
-func makeFace(fontfile string) font.Face {
-  fontBytes, err := ioutil.ReadFile(fontfile)
+func makeFace() font.Face {
+  fontData, err := truetype.Parse(fontBytes())
   if err != nil {
-    glog.Fatalf("Failed reading font file %s: %v\n", fontfile, err)
-  }
-  fontData, err := truetype.Parse(fontBytes)
-  if err != nil {
-    glog.Fatalf("Failed parsing font file %s: %v\n", fontfile, err)
+    glog.Fatalf("Failed parsing font file %s: %v\n", fontFile, err)
   }
   return truetype.NewFace(fontData, &truetype.Options{
       Size:    fontSize,
