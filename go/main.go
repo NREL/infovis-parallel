@@ -39,7 +39,7 @@ func main() {
   }
 
   if *export && len(args) > 1 {
-    xport.Export(args[1:], args[0], false)
+    xport.Export(args[1:], args[0], false, true)
     return
   }
 
