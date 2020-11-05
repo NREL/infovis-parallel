@@ -1,4 +1,6 @@
 
+import * as Linear     from "./linear"
+
 const vec3 = glMatrix.vec3
 
 
@@ -184,4 +186,46 @@ export function hasPolylines(geometry) {
 
 export function hasRectangles(geometry) {
   return "rectangles" in geometry.shape
+}
+
+
+export function distance(geometry, origin) {
+
+  let dist = Number.MAX_VALUE
+
+  if (hasPoints(geometry)) {
+
+    geometry.shape.points.forEach(pointses => pointses.forEach(point => {
+      dist = Math.min(dist, Linear.distancePointSphere(origin, point, geometry.size / 2))
+    }))
+
+  } else if (hasPolylines(geometry)) {
+
+    geometry.shape.polylines.map((polyline) => [
+      polyline.slice(0, polyline.length - 1)
+    , polyline.slice(1, polyline.length    )
+    ]).forEach(([u0s, u1s]) =>
+      u0s.map(function(u0, i) {
+        const u1 = u1s[i]
+        dist = Math.min(dist, Linear.distancePointCylinder(origin, u0, u1, geometry.size / 2))
+    }))
+
+  } else if (hasRectangles(geometry)) {
+
+    geometry.shape.rectangles.forEach(function([o, u, v]) {
+      dist = Math.min(dist, Linear.distancePointRectangle(origin, o, u, v))
+    })
+
+  } else if (hasLabel(geometry)) {
+
+  } else if (hasAxis(geometry)) {
+
+    const u0 = geometry.shape.axis[0]
+    const u1 = geometry.shape.axis[1]
+    dist = Math.min(dist, Linear.distancePointCylinder(origin, u0, u1, geometry.size / 2))
+
+  }
+
+  return dist
+
 }

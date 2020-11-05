@@ -4,7 +4,7 @@ import * as Connection    from "./connection"
 import * as Visualizer    from "./visualizer"
 
 
-const version = "Version 0.4.4"
+const version = "Version 0.4.5"
 
 
 export function download() {

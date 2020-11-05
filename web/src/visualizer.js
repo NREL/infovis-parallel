@@ -21,6 +21,8 @@ new WebXRPolyfill()
 
 const zero = vec3.fromValues(0, 0, 0)
 
+const hoverThreshold = 0.005
+
 
 export function setupCanvas(gl, useBlending = !DEBUG, useCulling = !DEBUG) {
 
@@ -65,7 +67,8 @@ function initializeGraphics(gl, initialViewer, initialTool) {
   , pov      : initialViewer
   , tool     : initialTool
   , offset   : {position: zero, rotation: Linear.fromEulerd(zero)}
-  , message  : {text: "", image: Text.makePixmap("")}
+  , message  : {text: "", image: null                  }
+  , hover    : {text: "", image: null, identifier: null}
   }
 }
 
@@ -160,21 +163,37 @@ let isRunning = false
 let xrReferenceSpace = null
 
 
-function drawAll(gl, graphics, perspective = mat4.create()) {
+function drawAll(gl, graphics, perspective = mat4.create(), depth = 1, size = 0.10) {
 
-  if (!(new RegExp("^ *$")).test(graphics.message.text))
+  Frames.draw(gl, graphics.manager)
+
+  Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
+
+  gl.disable(gl.DEPTH_TEST)
+
+  if (!(new RegExp("^ *$")).test(graphics.hover.text))
     Text.drawText(
       gl
-    , graphics.message.image
-    , [vec3.fromValues(0, 0, -1), vec3.fromValues(1, 0, -1), vec3.fromValues(0, 1, -1)]
-    , 0.075
+    , graphics.hover.image
+    , [vec3.fromValues(0, -0.25, - depth), vec3.fromValues(1, -0.25, - depth), vec3.fromValues(0, 1, - depth)]
+    , size
     , perspective
     , mat4.create()
     , true
     )
 
-  Selector.draw(gl, graphics.selector, graphics.manager.projection, graphics.manager.modelView)
-  Frames.draw(gl, graphics.manager)
+  if (!(new RegExp("^ *$")).test(graphics.message.text))
+    Text.drawText(
+      gl
+    , graphics.message.image
+    , [vec3.fromValues(0, 0.25, - depth), vec3.fromValues(1, 0.25, - depth), vec3.fromValues(0, 1, - depth)]
+    , size
+    , perspective
+    , mat4.create()
+    , true
+    )
+
+  gl.enable(gl.DEPTH_TEST)
 
 }
 
@@ -227,6 +246,20 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       starting = null
     }
 
+    {
+      let [distance, identifier, geometry] = Frames.nearest(graphics.manager, graphics.tool.position)
+      const oldText = graphics.hover.text
+      if (distance > hoverThreshold) {
+        graphics.hover.identifier = null
+        graphics.hover.text = ""
+      } else {
+        graphics.hover.identifier = identifier
+        graphics.hover.text = geometry.text != "" ? geometry.text : "«" + identifier + "»"
+      }
+      if (graphics.hover.text != oldText && graphics.hover.text != "")
+        graphics.hover.image = Text.makePixmap(graphics.hover.text, "orange", 150)
+    }
+      
     if (!isStarting && (xrFrame || dirtyRequest || dirtyResponse)) {
 
       Frames.prepare(gl, graphics.manager)
@@ -278,7 +311,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
           , view.transform.inverse.matrix
           )
 
-          drawAll(gl, graphics, view.projectionMatrix)
+          drawAll(gl, graphics, view.projectionMatrix, 10, 0.50)
 
         }
 

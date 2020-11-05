@@ -75,6 +75,15 @@ export function draw(gl, manager) {
 }
 
 
+export function nearest(manager, point) {
+  if (manager.frames.has(manager.current)) {
+    if (DEBUG) console.debug("nearest: frame =", manager.current)
+    return nearestFrame(manager.frames.get(manager.current), point)
+  }
+  return [Number.MAX_VALUE, null, null]
+}
+
+
 const MESH_Cube      = 1
 const MESH_Sphere    = 2
 const MESH_Polyline  = 3
@@ -160,6 +169,27 @@ function drawFrame(gl, frame, projection, modelView) {
 }
 
 
+function nearestFrame(frame, point) {
+  let distance = Number.MAX_VALUE
+  let identifier = null
+  let geometry = null
+  Array.from(frame.entries()).map(entry => {
+    const [mesh, display] = entry
+    if (DEBUG) console.debug("nearestFrame: mesh =", mesh)
+    let [distance1, identifier1, geometry1] = nearestDisplay(mesh, display, point)
+    if (distance1 < distance) {
+      distance = distance1
+      identifier = identifier1
+      geometry = geometry1
+    }
+  })
+  if (DEBUG) console.debug("nearestFrame: distance ="  , distance  )
+  if (DEBUG) console.debug("nearestFrame: identifier =", identifier)
+  if (DEBUG) console.debug("nearestFrame: geometry ="  , geometry  )
+  return [distance, identifier, geometry]
+}
+
+
 function resetDisplay(display) {
   deleteDisplay(display, Array.from(display.geometries.keys()))
 }
@@ -201,6 +231,24 @@ function drawDisplay(gl, display, projection, modelView) {
     , projection
     , modelView
     ))
+}
+
+
+function nearestDisplay(mesh, display, point) {
+  let distance = Number.MAX_VALUE
+  let identifier = null
+  let geometry = null
+  Array.from(display.geometries.entries()).map(entry => {
+    const [identifier1, geometry1] = entry
+    if (DEBUG) console.debug("nearestDisplay: identifier =", identifier1)
+    let distance1 = Geometry.distance(geometry1, point)
+    if (distance1 < distance) {
+      distance = distance1
+      identifier = identifier1
+      geometry = geometry1
+    }
+  })
+  return [distance, identifier, geometry]
 }
 
 

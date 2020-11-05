@@ -166,3 +166,39 @@ export function boxCoordinates(po, pu, pv, pw, ps) {
 export function toQuaternion(w, x, y, z) {
   return quat.fromValues(x, y, z, w)
 }
+
+
+const buf3a = vec3.create()
+const buf3b = vec3.create()
+const buf3c = vec3.create()
+const buf3d = vec3.create()
+const buf3e = vec3.create()
+const buf3f = vec3.create()
+
+
+export function distancePointSphere(p, q, r) {
+  const qp = vec3.scaleAndAdd(buf3a, q, p, -1)
+  return Math.max(0, vec3.length(qp) - r)
+}
+
+
+export function distancePointCylinder(p, q0, q1, r) {
+  const pq0 = vec3.scaleAndAdd(buf3a, p, q0, -1)
+  const v = vec3.scaleAndAdd(buf3b, q1, q0, -1)
+  const t = Math.max(0, Math.min(1, vec3.dot(pq0, v) / vec3.dot(v, v)))
+  const q = vec3.scaleAndAdd(buf3d, q0, v, t)
+  const qp = vec3.scaleAndAdd(buf3e, q, p, -1)
+  return Math.max(0, vec3.length(qp) - r)
+}
+
+
+export function distancePointRectangle(p, q0, q1, q2, r = 0) {
+  const pq0 = vec3.scaleAndAdd(buf3a, p, q0, -1)
+  const u = vec3.scaleAndAdd(buf3b, q1, q0, -1)
+  const v = vec3.scaleAndAdd(buf3c, q2, q0, -1)
+  const s = Math.max(0, Math.min(1, vec3.dot(pq0, u) / vec3.dot(u, u)))
+  const t = Math.max(0, Math.min(1, vec3.dot(pq0, v) / vec3.dot(v, v)))
+  const q = vec3.scaleAndAdd(buf3d, vec3.scaleAndAdd(buf3e, q0, u, s), v, t)
+  const qp = vec3.scaleAndAdd(buf3f, q, p, -1)
+  return Math.max(0, vec3.length(qp) - r)
+}
