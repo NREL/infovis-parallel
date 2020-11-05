@@ -67,8 +67,8 @@ function initializeGraphics(gl, initialViewer, initialTool) {
   , pov      : initialViewer
   , tool     : initialTool
   , offset   : {position: zero, rotation: Linear.fromEulerd(zero)}
-  , message  : {text: "", image: null                  }
-  , hover    : {text: "", image: null, identifier: null}
+  , message  : {text: "", image: null}
+  , hover    : {text: "", image: null, identifier: null, dirty: null, unhover: null}
   }
 }
 
@@ -171,7 +171,7 @@ function drawAll(gl, graphics, perspective = mat4.create(), depth = 1, size = 0.
 
   gl.disable(gl.DEPTH_TEST)
 
-  if (!(new RegExp("^ *$")).test(graphics.hover.text))
+  if (!(new RegExp("^ *$")).test(graphics.hover.text) && graphics.hover.image != null)
     Text.drawText(
       gl
     , graphics.hover.image
@@ -182,7 +182,7 @@ function drawAll(gl, graphics, perspective = mat4.create(), depth = 1, size = 0.
     , true
     )
 
-  if (!(new RegExp("^ *$")).test(graphics.message.text))
+  if (!(new RegExp("^ *$")).test(graphics.message.text) && graphics.message.image != null)
     Text.drawText(
       gl
     , graphics.message.image
@@ -248,16 +248,25 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
 
     {
       let [distance, identifier, geometry] = Frames.nearest(graphics.manager, graphics.tool.position)
+      const oldIdentifier = graphics.hover.identifier
       const oldText = graphics.hover.text
       if (distance > hoverThreshold) {
         graphics.hover.identifier = null
         graphics.hover.text = ""
+        graphics.hover.image = null
+        graphics.hover.dirty = null
+        graphics.hover.unhover = oldIdentifier
       } else {
         graphics.hover.identifier = identifier
         graphics.hover.text = geometry.text != "" ? geometry.text : "«" + identifier + "»"
+        if (graphics.hover.text == "")
+          graphics.hover.image = null
+        else if (graphics.hover.text != oldText)
+          graphics.hover.image = Text.makePixmap(graphics.hover.text, "orange", 150)
+        graphics.hover.dirty = identifier != oldIdentifier ? identifier : null
+        graphics.hover.unhover = identifier != oldIdentifier ? oldIdentifier : null
       }
-      if (graphics.hover.text != oldText && graphics.hover.text != "")
-        graphics.hover.image = Text.makePixmap(graphics.hover.text, "orange", 150)
+      dirtyResponse |= graphics.hover.dirty != null || graphics.hover.unhover != null
     }
       
     if (!isStarting && (xrFrame || dirtyRequest || dirtyResponse)) {
@@ -311,7 +320,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
           , view.transform.inverse.matrix
           )
 
-          drawAll(gl, graphics, view.projectionMatrix, 10, 0.50)
+          drawAll(gl, graphics, view.projectionMatrix, 20, 1.00)
 
         }
 
@@ -363,6 +372,14 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
       response.setViewloc   (makeLocation(graphics.pov   ))
       response.setToolloc   (makeLocation(graphics.tool  ))
       response.setOffsetloc (makeLocation(graphics.offset))
+      if (graphics.hover.dirty != null) {
+        response.setHoverList([graphics.hover.dirty])
+        graphics.hover.dirty = null
+      }
+      if (graphics.hover.unhover != null) {
+        response.setUnhoverList([graphics.hover.unhover])
+        graphics.hover.unhover = null
+      }
       respond(response)
     }
 
