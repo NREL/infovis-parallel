@@ -12,7 +12,7 @@ const DEBUG = false
 export function makePixmap(
   text
 , textColor       = DEBUG ? "white" : "#FFFF0080" // CSS color
-, textHeight      = 75                            // px
+, textHeight      = 100                           // px
 , padding         = 10                            // px
 , fontFamily      = "monospace"                   // CSS font
 , backgroundColor = DEBUG ? "gray"  : "#FFFFFF00" // CSS color
