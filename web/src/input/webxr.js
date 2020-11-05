@@ -30,6 +30,8 @@ export function interpret(graphics, xrFrame, xrReferenceSpace, delta) {
     return false
   const inputSource = inputSources[0]
   const inputPose = xrFrame.getPose(inputSource.gripSpace, xrReferenceSpace);
+  if (inputPose == null)
+    return
 
   const x = Navigation.x
 

@@ -138,7 +138,7 @@ function processRequest(gl, graphics, request) {
 
   if (request.getMessage() != "") {
     graphics.message.text = request.getMessage()
-    graphics.message.image = Text.makePixmap(graphics.message.text, "white", 150)
+    graphics.message.image = Text.makePixmap(graphics.message.text, "white", 200)
     if (DEBUG) console.debug("processRequest: message = '", graphics.message.text, "'")
   }
 
@@ -262,7 +262,7 @@ export function visualizeBuffers(gl, configuration, requestQueue, keyQueue, resp
         if (graphics.hover.text == "")
           graphics.hover.image = null
         else if (graphics.hover.text != oldText)
-          graphics.hover.image = Text.makePixmap(graphics.hover.text, "orange", 150)
+          graphics.hover.image = Text.makePixmap(graphics.hover.text, "orange", 200)
         graphics.hover.dirty = identifier != oldIdentifier ? identifier : null
         graphics.hover.unhover = identifier != oldIdentifier ? oldIdentifier : null
       }
